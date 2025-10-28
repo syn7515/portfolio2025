@@ -14,7 +14,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: #18181b;
     --foreground: #ededed;
   }
 }
@@ -22,5 +22,260 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), var(--font-geist-sans), Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Global Typography Styles */
+h1 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  margin-top: 2rem;
+  color: rgb(17 24 39);
+}
+
+h2 {
+  font-size: 1.875rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  margin-top: 1.5rem;
+  color: rgb(31 41 55);
+}
+
+h3 {
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+  margin-top: 1rem;
+  color: rgb(55 65 81);
+}
+
+h4 {
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  margin-top: 0.75rem;
+  color: rgb(55 65 81);
+}
+
+h5 {
+  font-size: 1.125rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  margin-top: 0.5rem;
+  color: rgb(55 65 81);
+}
+
+h6 {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  margin-top: 0.5rem;
+  color: rgb(55 65 81);
+}
+
+/* Global paragraph styles - scoped to avoid MDX conflicts */
+.site-content p {
+  margin-bottom: 1rem;
+  color: rgb(75 85 99);
+  line-height: 1.625;
+}
+
+a {
+  color: rgb(37 99 235);
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: rgb(29 78 216);
+}
+
+ul {
+  margin-bottom: 1rem;
+  margin-left: 1.5rem;
+  list-style-type: disc;
+  color: rgb(75 85 99);
+}
+
+ol {
+  margin-bottom: 1rem;
+  margin-left: 1.5rem;
+  list-style-type: decimal;
+  color: rgb(75 85 99);
+}
+
+li {
+  margin-bottom: 0.5rem;
+}
+
+blockquote {
+  border-left: 4px solid rgb(59 130 246);
+  padding-left: 1rem;
+  font-style: italic;
+  margin: 1.5rem 0;
+  color: rgb(55 65 81);
+}
+
+code {
+  background-color: rgb(243 244 246);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+  color: rgb(31 41 55);
+}
+
+pre {
+  background-color: rgb(243 244 246);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+/* Blog-specific styles */
+.prose {
+  max-width: none;
+}
+
+.prose h1 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  margin-top: 2rem;
+}
+
+.prose h2 {
+  font-size: 1.875rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  margin-top: 1.5rem;
+}
+
+.prose h3 {
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+  margin-top: 1rem;
+}
+
+.prose p {
+  margin-bottom: 1rem;
+  line-height: 1.625;
+}
+
+.prose ul {
+  margin-bottom: 1rem;
+  margin-left: 1.5rem;
+  list-style-type: disc;
+}
+
+.prose ol {
+  margin-bottom: 1rem;
+  margin-left: 1.5rem;
+  list-style-type: decimal;
+}
+
+.prose li {
+  margin-bottom: 0.5rem;
+}
+
+.prose blockquote {
+  border-left: 4px solid rgb(59 130 246);
+  padding-left: 1rem;
+  font-style: italic;
+  margin: 1.5rem 0;
+}
+
+.prose code {
+  background-color: rgb(243 244 246);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+.prose pre {
+  background-color: rgb(243 244 246);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.prose a {
+  color: rgb(37 99 235);
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+
+.prose a:hover {
+  color: rgb(29 78 216);
+}
+
+/* Dark mode styles */
+@media (prefers-color-scheme: dark) {
+  h1 {
+    color: rgb(255 255 255);
+  }
+
+  h2 {
+    color: rgb(243 244 246);
+  }
+
+  h3, h4, h5, h6 {
+    color: rgb(229 231 235);
+  }
+
+  p {
+    color: rgb(209 213 219);
+  }
+
+  a {
+    color: rgb(96 165 250);
+  }
+
+  a:hover {
+    color: rgb(147 197 253);
+  }
+
+  ul, ol {
+    color: rgb(209 213 219);
+  }
+
+  blockquote {
+    color: rgb(209 213 219);
+  }
+
+  code {
+    background-color: rgb(31 41 55);
+    color: rgb(229 231 235);
+  }
+
+  pre {
+    background-color: rgb(31 41 55);
+  }
+
+  .prose code {
+    background-color: rgb(31 41 55);
+    color: rgb(229 231 235);
+  }
+
+  .prose pre {
+    background-color: rgb(31 41 55);
+  }
+
+  .prose a {
+    color: rgb(96 165 250);
+  }
+
+  .prose a:hover {
+    color: rgb(147 197 253);
+  }
 }

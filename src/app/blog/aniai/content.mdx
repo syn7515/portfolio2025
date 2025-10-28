@@ -1,0 +1,134 @@
+import LabelIndicatorCarousel from '@/components/ui/label_indicator_carousel'
+import Divider from '@/components/ui/divider'
+
+<div className="max-w-[480px] mx-auto">
+
+##### Aniai · 2024-2025
+### Building the Tools Behind Smarter Robots
+
+As a founding product designer at a [*robotics startup*](https://www.aniai.ai/), I designed both the robot interface and internal tools for the robot management system.
+
+Beyond leading design, I played a key role in product strategy, working closely with cross-functional teams to shape how our robots are built, tested, and managed.
+
+Here are a few highlights of how design shaped our robotics development process.
+
+
+#### Designing speed for robot development (2024-2025)
+
+Cooking robots handle a delicate job — even a few millimeters of deviation can make the difference between success and failure. To ensure stability, these robots must be tested under extreme conditions.
+
+Our team needed a platform for engineers with little programming experience to **adjust robot actions** for testing.
+
+With the renewal of our internal platform, I reimagined this workflow: from request–response to **direct control**. Instead of a back-and-forth pipeline, I wanted robot and QA engineers to directly control robot actions themselves with key parameters — quickly, confidently, and safely.
+
+<div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] my-20">
+  <LabelIndicatorCarousel
+    items={[
+      { 
+        label: "Edit", 
+        caption: "Fine-tuning robot behavior by editing key firmware parameters",
+        imageUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/generator-1.jpg" 
+      },
+      { 
+        label: "Create", 
+        caption: "Starting from existing parameters and generating firmware",
+        imageUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/generator-2.jpg"
+      },
+      { 
+        label: "Review", 
+        caption: "Tracking firmware build progress",
+        imageUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/generator-3.jpg"
+      },
+    ]}
+  />
+</div>
+
+Because every edit has real impact, I designed the parametric firmware generator around guidance, clarity, and control. 
+
+The layout was designed for quick scanning — users can immediately assess current states and spot what had been changed. Keyboard shortcuts made the editing process smooth and efficient, reducing friction for frequent testers.
+
+The test firmware generator accelerated development process tremendously. The average time to create test firmware reduced from 2-3 business days to **5 minutes**, and the number of tests conducted during the same time span has increased by **3x**.
+
+<Divider variant="gradient" color="stone" spacing="3xl" />
+
+
+#### Scaling robot updates with confidence (2025)
+
+Timely robot upgrades are critical — customers expect smooth updates without downtime. But as we scaled to mass production and began supporting multiple robot versions, the effort to coordinate updates grew rapidly.
+
+We needed **an update management system** that everyone — from robot engineers and product managers to manufacturing and field service — could rely on to coordinate updates.
+
+I shifted to managing updates **by group** instead of tracking each individual robot. At the hardware version level, everyone now had a single source of truth — replacing the scattered, product-by-product approach.
+
+<div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] my-20">
+  <LabelIndicatorCarousel
+    items={[
+      { 
+        label: "Schedule", 
+        caption: "Assigning updates to groups",
+        imageUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/manager-1.jpg" 
+      },
+      { 
+        label: "Update", 
+        caption: "Reviewing and confirming updates",
+        imageUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/manager-2.jpg"
+      },
+      { 
+        label: "Review", 
+        caption: "Software update history by group",
+        imageUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/manager-3.jpg"
+      },
+    ]}
+  />
+</div>
+
+A key design challenge was creating a clear software update overview that helped all stakeholders quickly align. Since the naming system was hard to read at a glance, I focused on table layout and typography to make information scannable and easy to interpret.
+
+The design emphasized transparency and predictability, so that updates could scale smoothly across teams.
+
+The system made update planning reliable — cutting update errors from **5% to 0%**.
+
+<Divider variant="gradient" color="stone" spacing="3xl" />
+
+#### Building a foundation for fast, consistent design (2025)
+
+Beyond shipping features, I worked closely with engineers to create an **MVP design system** for the internal tool. 
+
+With a team of just two (me and FE), we built on top of [*shadcn*](https://ui.shadcn.com/) and tailored it to our product needs — helping us move faster. In about a month, we documented foundational tokens and built 14 production-ready core React components.
+
+The design system was designed primarily for robot engineers, our core users, with high information density in mind. Typography, spacing, and color choices were refined for readability and consistency across tools.
+
+The system gave the team a reliable foundation, speeding up interface development and ensuring consistency across products.
+
+<div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] my-20">
+  <LabelIndicatorCarousel
+    items={[
+      { 
+        label: "", 
+        caption: "Design system MVP — 14 React components",
+        imageUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/ds-1.png" 
+      },
+      { 
+        label: "", 
+        caption: "Tiny little detail — Padding tuned for visual balance depending on icon presence",
+        imageUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/ds-2.png"
+      },
+      { 
+        label: "", 
+        caption: "Documentation on Figma & Storybook",
+        imageUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/ds-3.png"
+      },
+    ]}
+  />
+</div>
+
+<Divider variant="gradient" color="stone" spacing="3xl" />
+
+#### Closing thoughts
+
+This work was highly collaborative, bringing together engineering, product, manufacturing, and customer success. 
+
+It pushed me to dive into robot development and manufacturing processes, and gave me the chance to rethink how we work across teams.
+
+
+</div>
