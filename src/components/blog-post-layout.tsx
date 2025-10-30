@@ -30,7 +30,7 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
       const { content } = await response.json()
       
       // Filter out imports, components, and styling wrappers
-      let filtered = content
+      const filtered = content
         // Remove import statements
         .replace(/^import\s+.*from\s+['"].*['"]\s*$/gm, '')
         // Remove the max-w wrapper div opening
