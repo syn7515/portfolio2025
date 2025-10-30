@@ -5,7 +5,7 @@ import MDXContent from './content.mdx'
 
 export default function AthenahealthPost() {
   return (
-    <BlogPostLayout>
+    <BlogPostLayout slug="athenahealth">
       <MDXContent />
     </BlogPostLayout>
   )

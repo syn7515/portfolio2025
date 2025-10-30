@@ -5,7 +5,7 @@ import MDXContent from './content.mdx'
 
 export default function AniaiPost() {
   return (
-    <BlogPostLayout>
+    <BlogPostLayout slug="aniai">
       <MDXContent />
     </BlogPostLayout>
   )
