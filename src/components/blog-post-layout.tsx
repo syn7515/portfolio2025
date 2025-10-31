@@ -75,6 +75,123 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
       const filtered = content
         // Remove import statements
         .replace(/^import\s+.*from\s+['"].*['"]\s*$/gm, '')
+        // Replace LabelIndicatorCarousel component with markdown images
+        .replace(/<LabelIndicatorCarousel[\s\S]*?items\s*=\s*\{\s*\[([\s\S]*?)\]\s*\}[\s\S]*?\/>/g, (_match: string, arrayContent: string) => {
+          try {
+            // Parse items array content manually
+            const items: Array<{ caption?: string; label?: string; imageUrl?: string; image?: string }> = []
+            
+            // Split by object boundaries, handling nested braces
+            let depth = 0
+            let currentItem = ''
+            
+            for (let i = 0; i < arrayContent.length; i++) {
+              const char = arrayContent[i]
+              
+              if (char === '{') {
+                if (depth === 0) {
+                  currentItem = ''
+                }
+                depth++
+                if (depth > 1) currentItem += char
+              } else if (char === '}') {
+                depth--
+                if (depth === 0) {
+                  // End of an item object
+                  const itemContent = currentItem.trim()
+                  const captionMatch = itemContent.match(/caption\s*:\s*["']([^"']*?)["']/)
+                  const labelMatch = itemContent.match(/label\s*:\s*["']([^"']*?)["']/)
+                  const imageUrlMatch = itemContent.match(/imageUrl\s*:\s*["']([^"']*?)["']/)
+                  const imageMatch = itemContent.match(/image\s*:\s*["']([^"']*?)["']/)
+                  
+                  const imageUrl = imageUrlMatch?.[1] || imageMatch?.[1]
+                  if (imageUrl) {
+                    items.push({
+                      caption: captionMatch?.[1] || labelMatch?.[1] || '',
+                      label: labelMatch?.[1] || '',
+                      imageUrl: imageUrl
+                    })
+                  }
+                  currentItem = ''
+                } else {
+                  currentItem += char
+                }
+              } else if (depth > 0) {
+                currentItem += char
+              }
+            }
+            
+            // Convert each item to markdown image format
+            const markdownImages = items
+              .map((item) => {
+                const caption = item.caption || item.label || ''
+                return `![${caption}](${item.imageUrl})`
+              })
+              .join('\n\n')
+            
+            return markdownImages ? `\n${markdownImages}\n\n` : ''
+          } catch (e) {
+            return ''
+          }
+        })
+        .replace(/<LabelIndicatorCarousel[\s\S]*?items\s*=\s*\{\s*\[([\s\S]*?)\]\s*\}[\s\S]*?<\/LabelIndicatorCarousel>/g, (_match: string, arrayContent: string) => {
+          try {
+            // Parse items array content manually
+            const items: Array<{ caption?: string; label?: string; imageUrl?: string; image?: string }> = []
+            
+            // Split by object boundaries, handling nested braces
+            let depth = 0
+            let currentItem = ''
+            
+            for (let i = 0; i < arrayContent.length; i++) {
+              const char = arrayContent[i]
+              
+              if (char === '{') {
+                if (depth === 0) {
+                  currentItem = ''
+                }
+                depth++
+                if (depth > 1) currentItem += char
+              } else if (char === '}') {
+                depth--
+                if (depth === 0) {
+                  // End of an item object
+                  const itemContent = currentItem.trim()
+                  const captionMatch = itemContent.match(/caption\s*:\s*["']([^"']*?)["']/)
+                  const labelMatch = itemContent.match(/label\s*:\s*["']([^"']*?)["']/)
+                  const imageUrlMatch = itemContent.match(/imageUrl\s*:\s*["']([^"']*?)["']/)
+                  const imageMatch = itemContent.match(/image\s*:\s*["']([^"']*?)["']/)
+                  
+                  const imageUrl = imageUrlMatch?.[1] || imageMatch?.[1]
+                  if (imageUrl) {
+                    items.push({
+                      caption: captionMatch?.[1] || labelMatch?.[1] || '',
+                      label: labelMatch?.[1] || '',
+                      imageUrl: imageUrl
+                    })
+                  }
+                  currentItem = ''
+                } else {
+                  currentItem += char
+                }
+              } else if (depth > 0) {
+                currentItem += char
+              }
+            }
+            
+            // Convert each item to markdown image format
+            const markdownImages = items
+              .map((item) => {
+                const caption = item.caption || item.label || ''
+                return `![${caption}](${item.imageUrl})`
+              })
+              .join('\n\n')
+            
+            return markdownImages ? `\n${markdownImages}\n\n` : ''
+          } catch (e) {
+            return ''
+          }
+        })
         // Remove the max-w wrapper div opening
         .replace(/<div className="max-w-\[480px\] mx-auto">\s*/g, '')
         // Remove full-width container divs with all their attributes
