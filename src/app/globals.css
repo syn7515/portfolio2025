@@ -74,6 +74,23 @@ h6 {
   color: rgb(55 65 81);
 }
 
+/* Global paragraph styles - matching page.tsx styling */
+p {
+  font-size: 0.9375rem;
+  /* 15pt */
+  font-weight: 400;
+  /* font-normal */
+  line-height: 155%;
+  /* leading-[155%] */
+  letter-spacing: 0.0125em;
+  /* tracking-[0.0125em] */
+  color: rgb(87 83 78);
+  /* stone-600 */
+  margin-bottom: 0.75rem;
+  /* mb-3 */
+  font-family: var(--font-inter), Inter, sans-serif;
+}
+
 /* Global paragraph styles - scoped to avoid MDX conflicts */
 .site-content p {
   margin-bottom: 1rem;
@@ -86,6 +103,7 @@ a {
   text-decoration: underline;
   transition: color 0.2s;
   cursor: pointer;
+  font-style: italic;
 }
 
 a:hover {
@@ -215,6 +233,7 @@ pre code {
   text-decoration: underline;
   transition: color 0.2s;
   cursor: pointer;
+  font-style: italic;
 }
 
 .prose a:hover {
@@ -236,7 +255,8 @@ pre code {
   }
 
   p {
-    color: rgb(209 213 219);
+    color: rgb(212 212 216);
+    /* zinc-300 */
   }
 
   a {
@@ -281,6 +301,85 @@ pre code {
 
   .prose a:hover {
     color: rgb(147 197 253);
+  }
+}
+
+/* Intro link styles - matching blog-post.module.css */
+.intro-link {
+  color: rgb(68 64 60) !important;
+  /* stone-700 */
+  cursor: pointer !important;
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+  text-decoration-skip-ink: auto;
+  text-decoration-color: rgb(212 212 216);
+  /* stone-300 */
+  text-decoration-thickness: 5%;
+  text-underline-offset: 0.05rem;
+  text-underline-position: from-font;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+  font-style: italic;
+}
+
+.intro-link:hover {
+  color: rgba(68 64 60, 0.5) !important;
+}
+
+/* Intro link variant for lighter text paragraphs (stone-500/zinc-400) */
+.intro-link-light {
+  color: rgb(120 113 108) !important;
+  /* stone-500 */
+  cursor: pointer !important;
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+  text-decoration-skip-ink: auto;
+  text-decoration-color: rgb(212 212 216);
+  /* stone-300 */
+  text-decoration-thickness: 5%;
+  text-underline-offset: 0.05rem;
+  text-underline-position: from-font;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+  font-style: italic;
+}
+
+.intro-link-light:hover {
+  color: rgba(120 113 108, 0.5) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  .intro-link {
+    color: rgb(212 212 216) !important;
+    /* zinc-300 - matches p text color */
+    opacity: 0.9;
+    /* matches p opacity */
+    text-decoration-color: rgb(82 82 91);
+    /* zinc-600 */
+  }
+
+  .intro-link:hover {
+    color: rgb(244 244 245) !important;
+    /* zinc-100 - lighter text color on hover */
+    opacity: 1;
+    /* full opacity on hover */
+  }
+
+  /* Intro link variant for lighter text paragraphs (stone-500/zinc-400) */
+  .intro-link-light {
+    color: rgb(161 161 170) !important;
+    /* zinc-400 - matches lighter paragraph text color */
+    opacity: 0.9;
+    text-decoration-color: rgb(82 82 91);
+    /* zinc-600 */
+  }
+
+  .intro-link-light:hover {
+    color: rgb(212 212 216) !important;
+    /* zinc-300 - lighter text color on hover */
+    opacity: 1;
   }
 }
 
