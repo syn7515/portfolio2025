@@ -32,7 +32,7 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
       const wasAlreadyOpen = likeTooltipOpen === true
       
       // Random messages
-      const messages = ["You liked this", "Thanks for the love", "Appreciated!"]
+      const messages = ["You liked this", "Thanks for the 💖", "Appreciated!"]
       const randomMessage = messages[Math.floor(Math.random() * messages.length)]
       
       setLikedMessage(randomMessage)
