@@ -29,7 +29,7 @@ export default function BlogPage() {
         <article className="border border-gray-200 dark:border-gray-700 rounded-lg p-6">
           <h2>
             <Link href="/blog/athenahealth">
-              My Second Blog Post
+              Encouraging prompt medical bill payment
             </Link>
           </h2>
           <p>
@@ -38,17 +38,6 @@ export default function BlogPage() {
           <div className="text-sm text-gray-500 dark:text-gray-400">
             Published on {new Date().toLocaleDateString()}
           </div>
-        </article>
-
-        <article className="border border-gray-200 dark:border-gray-700 rounded-lg p-6">
-          <h2>
-            <Link href="/">
-              Back to Home
-            </Link>
-          </h2>
-          <p>
-            Return to the main portfolio page with the carousel component.
-          </p>
         </article>
       </div>
     </div>

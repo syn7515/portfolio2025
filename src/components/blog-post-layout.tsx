@@ -260,12 +260,12 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
 
   return (
     <TooltipProvider>
-      <div className="w-full px-4 pt-12 overflow-x-hidden">
+      <div className="w-full px-4 pt-20 overflow-x-hidden">
         <div className="max-w-[480px] mx-auto mb-4 flex justify-between items-center">
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon-sm" asChild aria-label="Back to home" className="hover:bg-zinc-100 dark:hover:bg-zinc-700/50 -ml-2">
-                <Link href="/blog">
+              <Button variant="ghost" size="icon-sm" asChild aria-label="Back to home" className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50 -ml-2">
+                <Link href="/" className="cursor-pointer">
                   <Undo2 className="text-stone-500 dark:text-stone-300" />
                 </Link>
               </Button>
@@ -302,14 +302,14 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
               }}
             >
               <TooltipTrigger asChild>
-                <div>
+                <div className="cursor-pointer">
                   <Toggle 
                     pressed={isLiked}
                     onPressedChange={handleLike}
                     variant="ghost"
                     size="icon-sm"
                     aria-label="Like"
-                    className="hover:bg-zinc-100 dark:hover:bg-zinc-700/50"
+                    className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50"
                   >
                     <Heart className={isLiked ? "text-red-500" : "text-stone-500 dark:text-stone-300"} />
                   </Toggle>
@@ -338,7 +338,7 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
                   variant="ghost" 
                   size="icon-sm" 
                   aria-label={copied ? "Copied" : "Copy as Markdown"} 
-                  className="hover:bg-zinc-100 dark:hover:bg-zinc-700/50 disabled:opacity-100 relative"
+                  className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50 disabled:opacity-100 relative"
                   onClick={copyAsMarkdown}
                   disabled={copied}
                 >
@@ -364,7 +364,7 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
           <Button 
             variant="ghost" 
             onClick={scrollToTop}
-            className="hover:bg-zinc-100 dark:hover:bg-zinc-700/50 gap-[6px] pl-4 pr-3"
+            className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50 gap-[6px] pl-4 pr-3"
           >
             <span className="text-stone-600 dark:text-stone-200">Back to top</span>
             <ArrowUp className="text-stone-600 dark:text-stone-200" />

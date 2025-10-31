@@ -84,6 +84,7 @@
 .mdxContent a {
     color: rgb(68 64 60) !important;
     /* text-blue-600 */
+    cursor: pointer !important;
     text-decoration-line: underline;
     text-decoration-style: solid;
     text-decoration-skip-ink: auto;
@@ -214,15 +215,19 @@
     }
 
     .mdxContent a {
-        color: rgb(161 161 170) !important;
-        /* zinc-400 */
+        color: rgb(212 212 216) !important;
+        /* zinc-300 - matches p text color */
+        opacity: 0.9;
+        /* matches p opacity */
         text-decoration-color: rgb(82 82 91);
         /* zinc-600 */
     }
 
     .mdxContent a:hover {
-        color: rgb(212 212 216) !important;
-        /* zinc-300 */
+        color: rgb(244 244 245) !important;
+        /* zinc-100 - lighter text color on hover */
+        opacity: 1;
+        /* full opacity on hover */
     }
 
     .mdxContent code {

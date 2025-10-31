@@ -85,6 +85,7 @@ a {
   color: rgb(37 99 235);
   text-decoration: underline;
   transition: color 0.2s;
+  cursor: pointer;
 }
 
 a:hover {
@@ -213,6 +214,7 @@ pre code {
   color: rgb(37 99 235);
   text-decoration: underline;
   transition: color 0.2s;
+  cursor: pointer;
 }
 
 .prose a:hover {
@@ -239,6 +241,7 @@ pre code {
 
   a {
     color: rgb(96 165 250);
+    cursor: pointer;
   }
 
   a:hover {
@@ -273,6 +276,7 @@ pre code {
 
   .prose a {
     color: rgb(96 165 250);
+    cursor: pointer;
   }
 
   .prose a:hover {
@@ -285,6 +289,7 @@ pre code {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -294,6 +299,7 @@ pre code {
   from {
     opacity: 1;
   }
+
   to {
     opacity: 0;
   }
@@ -303,6 +309,7 @@ pre code {
   from {
     transform: scale(0.95);
   }
+
   to {
     transform: scale(1);
   }
@@ -312,6 +319,7 @@ pre code {
   from {
     transform: scale(1);
   }
+
   to {
     transform: scale(0.95);
   }
@@ -321,6 +329,7 @@ pre code {
   from {
     transform: translateY(-0.5rem) scale(0.95);
   }
+
   to {
     transform: translateY(0) scale(1);
   }
@@ -330,6 +339,7 @@ pre code {
   from {
     transform: translateY(0.5rem) scale(0.95);
   }
+
   to {
     transform: translateY(0) scale(1);
   }
@@ -339,6 +349,7 @@ pre code {
   from {
     transform: translateX(-0.5rem) scale(0.95);
   }
+
   to {
     transform: translateX(0) scale(1);
   }
@@ -348,6 +359,7 @@ pre code {
   from {
     transform: translateX(0.5rem) scale(0.95);
   }
+
   to {
     transform: translateX(0) scale(1);
   }

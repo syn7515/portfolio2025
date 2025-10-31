@@ -1,7 +1,6 @@
 "use client"
 
 import { motion } from "framer-motion";
-import { ProgressiveBlur } from "@/components/ui/progressive-blur";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { X, ChevronLeft, ChevronRight, Maximize2 } from "lucide-react";
 
@@ -383,24 +382,6 @@ export default function LabelIndicatorCarousel({
           })}
         </div>
       </div>
-      {withEdgeBlur ? (
-        <>
-          <ProgressiveBlur
-            className="pointer-events-none absolute top-0 left-0 h-full w-[0px] lg:w-[100px] xl:w-[200px] z-10"
-            direction="left"
-            blurIntensity={1}
-            showGradient={true}
-            gradientColor="rgba(255, 255, 255, 1)"
-          />
-          <ProgressiveBlur
-            className="pointer-events-none absolute top-0 right-0 h-full w-[0px] lg:w-[100px] xl:w-[200px] z-10"
-            direction="right"
-            blurIntensity={1}
-            showGradient={true}
-            gradientColor="rgba(255, 255, 255, 1)"
-          />
-        </>
-      ) : null}
 
       {/* Lightbox Overlay */}
       {enableLightbox && isLightboxOpen && (

@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     }
     
     // Construct the path to the MDX file
-    const filePath = join(process.cwd(), 'src', 'app', 'blog', slug, 'content.mdx')
+    const filePath = join(process.cwd(), 'src', 'app', slug, 'content.mdx')
     
     // Read the file
     const content = await readFile(filePath, 'utf-8')
