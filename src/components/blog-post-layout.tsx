@@ -2,10 +2,11 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { Undo2, ArrowUp, Heart, Clipboard } from 'lucide-react'
+import { Undo2, ArrowUp, Heart, Clipboard, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Toggle } from '@/components/ui/toggle'
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipArrow, TooltipProvider } from '@/components/ui/tooltip'
+import { cn } from '@/lib/utils'
 import styles from './blog-post.module.css'
 
 interface BlogPostLayoutProps {
@@ -45,8 +46,14 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
       // If already open, we don't need to change state - just content updates
       
       setTimeout(() => {
-        setLikedMessage(null)
-        setLikeTooltipOpen(undefined) // Reset to undefined to allow hover control again
+        // Close tooltip first (will animate out)
+        setLikeTooltipOpen(false)
+        // Wait for closing animation (0.1s) before resetting likedMessage state
+        // This prevents showing "Show some love" during the closing animation
+        setTimeout(() => {
+          setLikedMessage(null)
+          setLikeTooltipOpen(undefined) // Reset to undefined to allow hover control again
+        }, 100) // Match tooltip closing animation duration
       }, 2000)
     }
   }
@@ -113,7 +120,7 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
       // Show feedback
       setCopied(true)
       
-      // If tooltip was already open, keep it open (content changes without animation)
+      // If tooltip was already open, keep it open (content changes from "Copy as Markdown" to "Copied!" without animation)
       // If tooltip is not open, open it now with "Copied!" text (will animate)
       if (!wasAlreadyOpen) {
         setTooltipOpen(true)
@@ -121,8 +128,13 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
       // If already open, we don't need to change state - just content updates
       
       setTimeout(() => {
-        setCopied(false)
-        setTooltipOpen(undefined) // Reset to undefined to allow hover control again
+        // Close tooltip first (will animate out)
+        setTooltipOpen(false)
+        // Wait for closing animation (0.1s) before resetting copied state
+        // This prevents showing "Copy as Markdown" during the closing animation
+        setTimeout(() => {
+          setCopied(false)
+        }, 100) // Match tooltip closing animation duration
       }, 2000)
     } catch (error) {
       console.error('Failed to copy:', error)
@@ -147,52 +159,38 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
             </TooltipContent>
           </Tooltip>
           <div className="flex gap-1">
-            {(!isLiked || likedMessage) && (
-              <Tooltip 
-                open={likeTooltipOpen !== undefined ? likeTooltipOpen : undefined}
-                onOpenChange={(open) => {
-                  // Allow normal hover behavior when not showing liked message
-                  // When showing liked message, keep tooltip open regardless of hover
-                  if (!likedMessage) {
-                    setLikeTooltipOpen(open)
-                  } else if (open === false) {
-                    // Prevent closing while showing liked message
-                    setLikeTooltipOpen(true)
-                  }
-                }}
-              >
-                <TooltipTrigger asChild>
-                  <div>
-                    <Toggle 
-                      pressed={isLiked}
-                      onPressedChange={handleLike}
-                      variant="ghost"
-                      size="icon-sm"
-                      aria-label="Like"
-                      className="hover:bg-zinc-100 dark:hover:bg-zinc-700/50"
-                    >
-                      <Heart className={isLiked ? "text-red-500" : "text-stone-500 dark:text-stone-300"} />
-                    </Toggle>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent side="top">
-                  <TooltipArrow />
-                  <p>{likedMessage || 'Show some love'}</p>
-                </TooltipContent>
-              </Tooltip>
-            )}
-            {isLiked && !likedMessage && (
-              <Toggle 
-                pressed={isLiked}
-                onPressedChange={handleLike}
-                variant="ghost"
-                size="icon-sm"
-                aria-label="Like"
-                className="hover:bg-zinc-100 dark:hover:bg-zinc-700/50"
-              >
-                <Heart className={isLiked ? "text-red-500" : "text-stone-500 dark:text-stone-300"} />
-              </Toggle>
-            )}
+            <Tooltip 
+              open={likeTooltipOpen !== undefined ? likeTooltipOpen : undefined}
+              onOpenChange={(open) => {
+                // Allow normal hover behavior when not showing liked message
+                // When showing liked message, keep tooltip open regardless of hover
+                if (!likedMessage) {
+                  setLikeTooltipOpen(open)
+                } else if (open === false) {
+                  // Prevent closing while showing liked message
+                  setLikeTooltipOpen(true)
+                }
+              }}
+            >
+              <TooltipTrigger asChild>
+                <div>
+                  <Toggle 
+                    pressed={isLiked}
+                    onPressedChange={handleLike}
+                    variant="ghost"
+                    size="icon-sm"
+                    aria-label="Like"
+                    className="hover:bg-zinc-100 dark:hover:bg-zinc-700/50"
+                  >
+                    <Heart className={isLiked ? "text-red-500" : "text-stone-500 dark:text-stone-300"} />
+                  </Toggle>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="top">
+                <TooltipArrow />
+                <p>{likedMessage || 'Show some love'}</p>
+              </TooltipContent>
+            </Tooltip>
             <Tooltip 
               open={tooltipOpen !== undefined ? tooltipOpen : undefined}
               onOpenChange={(open) => {
@@ -210,11 +208,17 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
                 <Button 
                   variant="ghost" 
                   size="icon-sm" 
-                  aria-label="Copy as Markdown" 
-                  className="hover:bg-zinc-100 dark:hover:bg-zinc-700/50"
+                  aria-label={copied ? "Copied" : "Copy as Markdown"} 
+                  className="hover:bg-zinc-100 dark:hover:bg-zinc-700/50 disabled:opacity-100 relative"
                   onClick={copyAsMarkdown}
+                  disabled={copied}
                 >
-                  <Clipboard className="text-stone-500 dark:text-stone-300" />
+                  <div className={cn("transition-all absolute inset-0 flex items-center justify-center", copied ? "scale-100 opacity-100" : "scale-0 opacity-0")}>
+                    <Check className="text-stone-500 dark:text-stone-300" />
+                  </div>
+                  <div className={cn("transition-all", copied ? "scale-0 opacity-0" : "scale-100 opacity-100")}>
+                    <Clipboard className="text-stone-500 dark:text-stone-300" />
+                  </div>
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="top">
