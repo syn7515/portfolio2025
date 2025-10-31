@@ -279,3 +279,110 @@ pre code {
     color: rgb(147 197 253);
   }
 }
+
+/* Tooltip Animations */
+@keyframes tooltip-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes tooltip-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes tooltip-zoom-in {
+  from {
+    transform: scale(0.95);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes tooltip-zoom-out {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(0.95);
+  }
+}
+
+@keyframes tooltip-slide-from-top {
+  from {
+    transform: translateY(-0.5rem) scale(0.95);
+  }
+  to {
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes tooltip-slide-from-bottom {
+  from {
+    transform: translateY(0.5rem) scale(0.95);
+  }
+  to {
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes tooltip-slide-from-left {
+  from {
+    transform: translateX(-0.5rem) scale(0.95);
+  }
+  to {
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes tooltip-slide-from-right {
+  from {
+    transform: translateX(0.5rem) scale(0.95);
+  }
+  to {
+    transform: translateX(0) scale(1);
+  }
+}
+
+/* Tooltip Content Animations */
+/* Explicit text color for tooltip to ensure dark mode works */
+/* In dark mode: light bg (#ededed) needs dark text (#18181b) */
+.tooltip-content,
+.tooltip-content p {
+  color: var(--background) !important;
+}
+
+/* Default animation (when side is not specified or unknown) */
+.tooltip-content[data-state="delayed-open"] {
+  animation: tooltip-fade-in 0.15s ease-out, tooltip-zoom-in 0.15s ease-out;
+}
+
+.tooltip-content[data-state="closed"] {
+  animation: tooltip-fade-out 0.1s ease-in, tooltip-zoom-out 0.1s ease-in;
+}
+
+/* Directional slide animations (includes zoom + slide + fade) */
+.tooltip-content[data-state="delayed-open"][data-side="top"] {
+  animation: tooltip-fade-in 0.15s ease-out, tooltip-slide-from-bottom 0.15s ease-out;
+}
+
+.tooltip-content[data-state="delayed-open"][data-side="bottom"] {
+  animation: tooltip-fade-in 0.15s ease-out, tooltip-slide-from-top 0.15s ease-out;
+}
+
+.tooltip-content[data-state="delayed-open"][data-side="left"] {
+  animation: tooltip-fade-in 0.15s ease-out, tooltip-slide-from-right 0.15s ease-out;
+}
+
+.tooltip-content[data-state="delayed-open"][data-side="right"] {
+  animation: tooltip-fade-in 0.15s ease-out, tooltip-slide-from-left 0.15s ease-out;
+}

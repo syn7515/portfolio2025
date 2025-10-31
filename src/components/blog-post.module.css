@@ -193,13 +193,19 @@
     .mdxContent h2,
     .mdxContent h3,
     .mdxContent h4,
-    .mdxContent p,
     .mdxContent div,
     .mdxContent ul,
     .mdxContent ol,
     .mdxContent blockquote {
         color: rgb(212 212 216) !important;
         /* zinc-300 */
+    }
+
+    .mdxContent p {
+        color: rgb(212 212 216) !important;
+        /* zinc-300 */
+        opacity: 0.9;
+        /* 90% opacity for slightly darker appearance in dark mode */
     }
 
     .mdxContent h5 {

@@ -4,7 +4,7 @@ export default function BlogLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="min-h-screen bg-white dark:bg-zinc-900">
+    <div className="min-h-screen bg-white dark:bg-zinc-900 overflow-x-hidden">
       <main className="w-full py-8">
         {children}
       </main>
