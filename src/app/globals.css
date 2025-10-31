@@ -383,6 +383,29 @@ pre code {
   }
 }
 
+/* Arrow up bounce animation */
+@keyframes arrow-bounce-up {
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-3px);
+  }
+
+  80% {
+    transform: translateY(0.5px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.arrow-bounce-button:hover .arrow-bounce {
+  animation: arrow-bounce-up 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
 /* Tooltip Animations */
 @keyframes tooltip-fade-in {
   from {
@@ -470,6 +493,16 @@ pre code {
 .tooltip-content,
 .tooltip-content p {
   color: var(--background) !important;
+  font-size: 0.75rem !important;
+  /* text-xs */
+  font-weight: 400 !important;
+  /* font-normal */
+  line-height: 1 !important;
+  /* leading-none */
+  letter-spacing: 0 !important;
+  /* tracking-normal */
+  margin: 0 !important;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
 }
 
 /* Default animation (when side is not specified or unknown) */

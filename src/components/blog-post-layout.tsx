@@ -2,6 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
+import { motion } from 'framer-motion'
 import { Undo2, ArrowUp, Heart, Clipboard, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Toggle } from '@/components/ui/toggle'
@@ -121,11 +122,12 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
               }
             }
             
-            // Convert each item to markdown image format
+            // Convert each item to markdown image format with caption
             const markdownImages = items
               .map((item) => {
                 const caption = item.caption || item.label || ''
-                return `![${caption}](${item.imageUrl})`
+                const imageMarkdown = `![${caption}](${item.imageUrl})`
+                return caption ? `${imageMarkdown}\n*${caption}*` : imageMarkdown
               })
               .join('\n\n')
             
@@ -179,11 +181,12 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
               }
             }
             
-            // Convert each item to markdown image format
+            // Convert each item to markdown image format with caption
             const markdownImages = items
               .map((item) => {
                 const caption = item.caption || item.label || ''
-                return `![${caption}](${item.imageUrl})`
+                const imageMarkdown = `![${caption}](${item.imageUrl})`
+                return caption ? `${imageMarkdown}\n*${caption}*` : imageMarkdown
               })
               .join('\n\n')
             
@@ -261,113 +264,119 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
   return (
     <TooltipProvider>
       <div className="w-full px-4 pt-20 overflow-x-hidden">
-        <div className="max-w-[480px] mx-auto mb-4 flex justify-between items-center">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon-sm" asChild aria-label="Back to home" className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50 -ml-2">
-                <Link href="/" className="cursor-pointer">
-                  <Undo2 className="text-stone-500 dark:text-stone-300" />
-                </Link>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="top">
-              <TooltipArrow />
-              <p>Back to home</p>
-            </TooltipContent>
-          </Tooltip>
-          <div className="flex gap-1">
-            <Tooltip 
-              open={
-                // Don't show tooltip if button is already liked (unless showing liked message)
-                isLiked && !likedMessage 
-                  ? false 
-                  : likeTooltipOpen !== undefined 
-                    ? likeTooltipOpen 
-                    : undefined
-              }
-              onOpenChange={(open) => {
-                // Don't allow opening tooltip if button is already liked
-                if (isLiked && !likedMessage) {
-                  setLikeTooltipOpen(false)
-                  return
-                }
-                // Allow normal hover behavior when not showing liked message and not liked
-                // When showing liked message, keep tooltip open regardless of hover
-                if (!likedMessage) {
-                  setLikeTooltipOpen(open)
-                } else if (open === false) {
-                  // Prevent closing while showing liked message
-                  setLikeTooltipOpen(true)
-                }
-              }}
-            >
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+        >
+          <div className="max-w-[480px] mx-auto mb-4 flex justify-between items-center">
+            <Tooltip>
               <TooltipTrigger asChild>
-                <div className="cursor-pointer">
-                  <Toggle 
-                    pressed={isLiked}
-                    onPressedChange={handleLike}
-                    variant="ghost"
-                    size="icon-sm"
-                    aria-label="Like"
-                    className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50"
-                  >
-                    <Heart className={isLiked ? "text-red-500" : "text-stone-500 dark:text-stone-300"} />
-                  </Toggle>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent side="top">
-                <TooltipArrow />
-                <p>{likedMessage || 'Show some love'}</p>
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip 
-              open={tooltipOpen !== undefined ? tooltipOpen : undefined}
-              onOpenChange={(open) => {
-                // Allow normal hover behavior when not showing "Copied!"
-                // When showing "Copied!", keep tooltip open regardless of hover
-                if (!copied) {
-                  setTooltipOpen(open)
-                } else if (open === false) {
-                  // Prevent closing while showing "Copied!"
-                  setTooltipOpen(true)
-                }
-              }}
-            >
-              <TooltipTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="icon-sm" 
-                  aria-label={copied ? "Copied" : "Copy as Markdown"} 
-                  className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50 disabled:opacity-100 relative"
-                  onClick={copyAsMarkdown}
-                  disabled={copied}
-                >
-                  <div className={cn("transition-all absolute inset-0 flex items-center justify-center", copied ? "scale-100 opacity-100" : "scale-0 opacity-0")}>
-                    <Check className="text-stone-500 dark:text-stone-300" />
-                  </div>
-                  <div className={cn("transition-all", copied ? "scale-0 opacity-0" : "scale-100 opacity-100")}>
-                    <Clipboard className="text-stone-500 dark:text-stone-300" />
-                  </div>
+                <Button variant="ghost" size="icon-sm" asChild aria-label="Back to home" className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50 -ml-2">
+                  <Link href="/" className="cursor-pointer">
+                    <Undo2 className="text-stone-500 dark:text-stone-300" />
+                  </Link>
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="top">
                 <TooltipArrow />
-                <p>{copied ? 'Copied!' : 'Copy as Markdown'}</p>
+                <p>Back to home</p>
               </TooltipContent>
             </Tooltip>
+            <div className="flex gap-1">
+              <Tooltip 
+                open={
+                  // Don't show tooltip if button is already liked (unless showing liked message)
+                  isLiked && !likedMessage 
+                    ? false 
+                    : likeTooltipOpen !== undefined 
+                      ? likeTooltipOpen 
+                      : undefined
+                }
+                onOpenChange={(open) => {
+                  // Don't allow opening tooltip if button is already liked
+                  if (isLiked && !likedMessage) {
+                    setLikeTooltipOpen(false)
+                    return
+                  }
+                  // Allow normal hover behavior when not showing liked message and not liked
+                  // When showing liked message, keep tooltip open regardless of hover
+                  if (!likedMessage) {
+                    setLikeTooltipOpen(open)
+                  } else if (open === false) {
+                    // Prevent closing while showing liked message
+                    setLikeTooltipOpen(true)
+                  }
+                }}
+              >
+                <TooltipTrigger asChild>
+                  <div className="cursor-pointer">
+                    <Toggle 
+                      pressed={isLiked}
+                      onPressedChange={handleLike}
+                      variant="ghost"
+                      size="icon-sm"
+                      aria-label="Like"
+                      className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50"
+                    >
+                      <Heart className={isLiked ? "text-red-500" : "text-stone-500 dark:text-stone-300"} />
+                    </Toggle>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="top">
+                  <TooltipArrow />
+                  <p>{likedMessage || 'Show some love'}</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip 
+                open={tooltipOpen !== undefined ? tooltipOpen : undefined}
+                onOpenChange={(open) => {
+                  // Allow normal hover behavior when not showing "Copied!"
+                  // When showing "Copied!", keep tooltip open regardless of hover
+                  if (!copied) {
+                    setTooltipOpen(open)
+                  } else if (open === false) {
+                    // Prevent closing while showing "Copied!"
+                    setTooltipOpen(true)
+                  }
+                }}
+              >
+                <TooltipTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="icon-sm" 
+                    aria-label={copied ? "Copied" : "Copy as Markdown"} 
+                    className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50 disabled:opacity-100 relative"
+                    onClick={copyAsMarkdown}
+                    disabled={copied}
+                  >
+                    <div className={cn("transition-all absolute inset-0 flex items-center justify-center", copied ? "scale-100 opacity-100" : "scale-0 opacity-0")}>
+                      <Check className="text-stone-500 dark:text-stone-300" />
+                    </div>
+                    <div className={cn("transition-all", copied ? "scale-0 opacity-0" : "scale-100 opacity-100")}>
+                      <Clipboard className="text-stone-500 dark:text-stone-300" />
+                    </div>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">
+                  <TooltipArrow />
+                  <p>{copied ? 'Copied!' : 'Copy as Markdown'}</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+          </div>   
+          <div className={styles.mdxContent}>
+            {children}
           </div>
-        </div>   
-        <div className={styles.mdxContent}>
-          {children}
-        </div>
+        </motion.div>
         <div className="max-w-[480px] mx-auto mt-16 mb-16 flex justify-center">
           <Button 
             variant="ghost" 
             onClick={scrollToTop}
-            className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50 gap-[6px] pl-4 pr-3"
+            className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50 gap-[6px] pl-4 pr-3 arrow-bounce-button"
           >
             <span className="text-stone-600 dark:text-stone-200">Back to top</span>
-            <ArrowUp className="text-stone-600 dark:text-stone-200" />
+            <ArrowUp className="text-stone-600 dark:text-stone-200 arrow-bounce" />
           </Button>
         </div>
       </div>
