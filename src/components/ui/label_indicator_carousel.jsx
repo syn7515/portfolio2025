@@ -295,7 +295,7 @@ export default function LabelIndicatorCarousel({
                     }
                   }
                 }}
-                className="relative rounded-[8px] bg-stone-200/60 transition-all duration-150 dark:bg-stone-800 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-stone-400"
+                className="group relative rounded-[8px] bg-stone-200/60 transition-all duration-150 dark:bg-stone-800 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-stone-400"
                 style={{ width: "100%", height: effHeight }}
                 transition={transition}
                 whileTap={{ scale: 0.98 }}
@@ -321,7 +321,7 @@ export default function LabelIndicatorCarousel({
                   <button
                     type="button"
                     onClick={(e) => { e.stopPropagation(); openLightbox(i); }}
-                    className="absolute right-2 top-2 rounded-md bg-black/15 p-2 text-white backdrop-blur hover:bg-black/30 transition-colors"
+                    className="absolute right-2 top-2 rounded-md bg-black/15 p-2 text-white backdrop-blur group-hover:bg-black/30 transition-colors"
                     aria-label="Open in lightbox"
                   >
                     <Maximize2 className="h-4 w-4" />

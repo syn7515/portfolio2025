@@ -160,9 +160,21 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
           </Tooltip>
           <div className="flex gap-1">
             <Tooltip 
-              open={likeTooltipOpen !== undefined ? likeTooltipOpen : undefined}
+              open={
+                // Don't show tooltip if button is already liked (unless showing liked message)
+                isLiked && !likedMessage 
+                  ? false 
+                  : likeTooltipOpen !== undefined 
+                    ? likeTooltipOpen 
+                    : undefined
+              }
               onOpenChange={(open) => {
-                // Allow normal hover behavior when not showing liked message
+                // Don't allow opening tooltip if button is already liked
+                if (isLiked && !likedMessage) {
+                  setLikeTooltipOpen(false)
+                  return
+                }
+                // Allow normal hover behavior when not showing liked message and not liked
                 // When showing liked message, keep tooltip open regardless of hover
                 if (!likedMessage) {
                   setLikeTooltipOpen(open)
