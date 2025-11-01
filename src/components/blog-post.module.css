@@ -146,6 +146,11 @@
     /* my-4 */
 }
 
+.mdxContent sup {
+    color: rgb(120 113 108) !important;
+    /* stone-500 - lighter text color */
+}
+
 .mdxContent code {
     background-color: rgb(243 244 246);
     /* bg-gray-100 */
@@ -228,6 +233,11 @@
         /* zinc-100 - lighter text color on hover */
         opacity: 1;
         /* full opacity on hover */
+    }
+
+    .mdxContent sup {
+        color: rgb(161 161 170) !important;
+        /* zinc-400 - lighter text color for dark mode */
     }
 
     .mdxContent code {
