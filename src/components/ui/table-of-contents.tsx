@@ -20,6 +20,7 @@ export default function TableOfContents({ className, labels }: TableOfContentsPr
   const [activeId, setActiveId] = React.useState<string | null>(null)
   const [hoveredId, setHoveredId] = React.useState<string | null>(null)
   const [isTocHovered, setIsTocHovered] = React.useState(false)
+  const [hasExpanded, setHasExpanded] = React.useState(false)
   // Extract h4 headings and add IDs
   React.useEffect(() => {
     let retryCount = 0
@@ -238,7 +239,7 @@ export default function TableOfContents({ className, labels }: TableOfContentsPr
   }
 
   // Spacing between rails - denser when labels hidden, more spaced when shown
-  const railSpacing = isTocHovered ? 24 : 8 // 24px when labels shown, 8px when hidden
+  const railSpacing = isTocHovered ? 24 : 4 // 24px when labels shown, 4px when hidden
 
   return (
       <div 
@@ -251,26 +252,34 @@ export default function TableOfContents({ className, labels }: TableOfContentsPr
         >
           {/* Container for all rails - evenly spaced with transition */}
           <div 
-            className="relative flex flex-col transition-all duration-300 ease-in-out"
+            className="relative flex flex-col transition-all duration-200 ease-in-out"
             style={{ 
               gap: `${railSpacing}px`,
               pointerEvents: 'auto'
             }}
-            onMouseEnter={() => setIsTocHovered(true)}
+            onMouseEnter={() => {
+              setIsTocHovered(true)
+              if (!hasExpanded) {
+                setHasExpanded(true)
+              }
+            }}
             onMouseLeave={() => setIsTocHovered(false)}
           >
           {/* Blurred background box - only shown when labels are visible */}
-          {isTocHovered && (
-            <div 
-              className="absolute bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl -z-10 transition-opacity duration-300"
-              style={{
-                left: '-1.25rem',
-                right: '-1.25rem',
-                top: '-1.25rem',
-                bottom: '-1.25rem'
-              }}
-            />
-          )}
+          <div 
+            className="absolute bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl -z-10"
+            style={{
+              left: '-1.25rem',
+              right: '-1.25rem',
+              top: '-1.25rem',
+              bottom: '-1.25rem',
+              opacity: isTocHovered ? 1 : 0,
+              transitionDelay: isTocHovered ? '300ms' : '0ms', // Delay to appear after labels are rendered
+              transitionDuration: '150ms',
+              transitionTimingFunction: 'ease-in-out',
+              pointerEvents: isTocHovered ? 'auto' : 'none'
+            }}
+          />
           {/* Heading rails and labels - fixed positions with 20px gaps */}
           {headings.map((heading, index) => {
             const isActive = activeId === heading.id
@@ -283,7 +292,7 @@ export default function TableOfContents({ className, labels }: TableOfContentsPr
             return (
               <div
                 key={heading.id}
-                className="flex items-center gap-3 cursor-pointer group"
+                className="flex items-center gap-[10px] cursor-pointer group"
                 style={{ 
                   pointerEvents: 'auto'
                 }}
@@ -294,28 +303,50 @@ export default function TableOfContents({ className, labels }: TableOfContentsPr
                 {/* Rail indicator - horizontal bar for each heading */}
                 <div
                   className={cn(
-                    "transition-all flex-shrink-0 rounded-full",
+                    "flex-shrink-0 rounded-full",
+                    // Only apply transition when TOC is not hovered (for initial expansion)
+                    !isTocHovered && "transition-all",
                     isActive || isHovered
-                      ? isTocHovered ? "h-[1.5px] w-2" : "h-[2.5px] w-8"
-                      : isTocHovered ? "opacity-40 h-[1.5px] w-2" : "opacity-40 h-[2px] w-5",
+                      ? isTocHovered ? "h-[1.5px] w-1.5" : "h-[2.5px] w-8"
+                      : isTocHovered ? "opacity-40 h-[1.5px] w-1.5" : "opacity-40 h-[2px] w-5",
                     isActive || isHovered
                       ? "bg-stone-700 dark:bg-zinc-300" // Active: darker in light, lighter in dark
                       : "bg-stone-400 dark:bg-zinc-600" // Inactive: lighter in light, darker in dark
                   )}
                   style={{ 
-                    minWidth: (isActive || isHovered) && !isTocHovered ? '32px' : (isTocHovered ? '8px' : '20px'),
+                    minWidth: (isActive || isHovered) && !isTocHovered ? '32px' : (isTocHovered ? '6px' : '20px'),
                     minHeight: isActive || isHovered ? (isTocHovered ? '1.5px' : '2.5px') : (isTocHovered ? '1.5px' : '2px'),
-                    opacity: isActive || isHovered ? 0.8 : undefined
+                    opacity: isActive || isHovered ? 0.8 : undefined,
+                    // Remove transition when TOC is hovered for instant feedback
+                    transition: isTocHovered ? 'none' : undefined
                   }}
                 />
                 
                 {/* Text label */}
                 <span
                   className={cn(
-                    "text-sm text-stone-600 dark:text-zinc-400 whitespace-nowrap transition-opacity pointer-events-none flex-shrink-0",
-                    isActive || isHovered ? "font-medium" : "font-normal"
+                    "text-sm whitespace-nowrap pointer-events-none flex-shrink-0",
+                    isActive || isHovered 
+                      ? "text-stone-700 dark:text-zinc-300 font-medium" 
+                      : "text-stone-600 dark:text-zinc-500 font-normal" // Darker color for inactive labels
                   )}
-                  style={{ opacity: textOpacity }}
+                  style={{ 
+                    opacity: textOpacity,
+                    // Instant transitions when TOC has already been expanded (for individual item hover)
+                    // Smooth transition with delay only on initial expansion
+                    ...(hasExpanded && isTocHovered 
+                      ? {
+                          transitionProperty: 'none',
+                          transitionDuration: '0ms',
+                          transitionDelay: '0ms'
+                        }
+                      : {
+                          transitionProperty: 'opacity',
+                          transitionDuration: '50ms',
+                          transitionTimingFunction: 'ease-in-out',
+                          transitionDelay: isTocHovered ? '150ms' : '0ms'
+                        })
+                  }}
                 >
                   {heading.text}
                 </span>
