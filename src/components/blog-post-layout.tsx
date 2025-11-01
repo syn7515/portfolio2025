@@ -7,6 +7,7 @@ import { Undo2, ArrowUp, Heart, Clipboard, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Toggle } from '@/components/ui/toggle'
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipArrow, TooltipProvider } from '@/components/ui/tooltip'
+import TableOfContents from '@/components/ui/table-of-contents'
 import { cn } from '@/lib/utils'
 import styles from './blog-post.module.css'
 
@@ -21,41 +22,94 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
   const [likedMessage, setLikedMessage] = React.useState<string | null>(null)
   const [likeTooltipOpen, setLikeTooltipOpen] = React.useState<boolean | undefined>(undefined)
   const [isLiked, setIsLiked] = React.useState(false)
+  const [shouldAnimate, setShouldAnimate] = React.useState(false)
+
+  // Initialize liked state from localStorage on mount
+  React.useEffect(() => {
+    if (!slug || typeof window === 'undefined') return
+
+    try {
+      const likedPostsJson = localStorage.getItem('liked-posts')
+      if (likedPostsJson) {
+        const likedPosts: string[] = JSON.parse(likedPostsJson)
+        setIsLiked(likedPosts.includes(slug))
+      }
+    } catch (error) {
+      // Handle localStorage errors (quota exceeded, disabled, etc.)
+      console.error('Failed to read liked posts from localStorage:', error)
+    }
+  }, [slug])
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const handleLike = (pressed: boolean) => {
+    const wasLiked = isLiked
     setIsLiked(pressed)
+    
+    // Trigger animation when transitioning from unliked to liked
+    if (pressed && !wasLiked) {
+      setShouldAnimate(true)
+      // Clear animation flag after animation completes (0.35s)
+      setTimeout(() => {
+        setShouldAnimate(false)
+      }, 350)
+    }
+    
+    // Persist to localStorage
+    if (slug && typeof window !== 'undefined') {
+      try {
+        const likedPostsJson = localStorage.getItem('liked-posts')
+        const likedPosts: string[] = likedPostsJson ? JSON.parse(likedPostsJson) : []
+        
+        if (pressed) {
+          // Add slug if not already in array
+          if (!likedPosts.includes(slug)) {
+            likedPosts.push(slug)
+            localStorage.setItem('liked-posts', JSON.stringify(likedPosts))
+          }
+        } else {
+          // Remove slug from array
+          const updatedLikedPosts = likedPosts.filter((postSlug) => postSlug !== slug)
+          localStorage.setItem('liked-posts', JSON.stringify(updatedLikedPosts))
+        }
+      } catch (error) {
+        // Handle localStorage errors (quota exceeded, disabled, etc.)
+        console.error('Failed to save liked posts to localStorage:', error)
+      }
+    }
     
     if (pressed) {
       // Check if tooltip is already open (user hovered and it's visible)
       const wasAlreadyOpen = likeTooltipOpen === true
       
       // Random messages
-      const messages = ["You liked this", "Thanks for the 💖", "Appreciated!"]
+      const messages = ["You liked this!", "Thanks for the 💖", "Appreciated!"]
       const randomMessage = messages[Math.floor(Math.random() * messages.length)]
       
-      setLikedMessage(randomMessage)
-      
-      // If tooltip was already open, keep it open (content changes without animation)
-      // If tooltip is not open, open it now with the message (will animate)
-      if (!wasAlreadyOpen) {
-        setLikeTooltipOpen(true)
-      }
-      // If already open, we don't need to change state - just content updates
-      
+      // Delay showing the message by 0.3s
       setTimeout(() => {
-        // Close tooltip first (will animate out)
-        setLikeTooltipOpen(false)
-        // Wait for closing animation (0.1s) before resetting likedMessage state
-        // This prevents showing "Show some love" during the closing animation
+        setLikedMessage(randomMessage)
+        
+        // If tooltip was already open, keep it open (content changes without animation)
+        // If tooltip is not open, open it now with the message (will animate)
+        if (!wasAlreadyOpen) {
+          setLikeTooltipOpen(true)
+        }
+        // If already open, we don't need to change state - just content updates
+        
         setTimeout(() => {
-          setLikedMessage(null)
-          setLikeTooltipOpen(undefined) // Reset to undefined to allow hover control again
-        }, 100) // Match tooltip closing animation duration
-      }, 2000)
+          // Close tooltip first (will animate out)
+          setLikeTooltipOpen(false)
+          // Wait for closing animation (0.1s) before resetting likedMessage state
+          // This prevents showing "Show some love" during the closing animation
+          setTimeout(() => {
+            setLikedMessage(null)
+            setLikeTooltipOpen(undefined) // Reset to undefined to allow hover control again
+          }, 100) // Match tooltip closing animation duration
+        }, 2000)
+      }, 300)
     }
   }
 
@@ -261,8 +315,17 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
     }
   }
 
+  // Custom labels for aniai post
+  const tocLabels = slug === 'aniai' ? {
+    "Designing speed for robot development (2024-2025)": "Parametric firmware generator",
+    "Scaling robot updates with confidence (2025)": "Update manger",
+    "Building a foundation for fast, consistent design (2025)": "Minimum viable design system",
+    "Closing thoughts": "Thoughts"
+  } : undefined
+
   return (
     <TooltipProvider>
+      <TableOfContents labels={tocLabels} />
       <div className="w-full px-4 pt-20 overflow-x-hidden">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -319,7 +382,10 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
                       aria-label="Like"
                       className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50"
                     >
-                      <Heart className={isLiked ? "text-red-500" : "text-stone-500 dark:text-stone-300"} />
+                      <Heart className={cn(
+                        isLiked ? "text-red-500 fill-red-500/20" : "text-stone-500 dark:text-stone-300",
+                        shouldAnimate && "heart-bounce"
+                      )} />
                     </Toggle>
                   </div>
                 </TooltipTrigger>

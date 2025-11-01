@@ -24,7 +24,7 @@ export function Divider({
     thick: 'border-t-2',
     dashed: 'border-t border-dashed',
     dotted: 'border-t border-dotted',
-    gradient: 'border-0 h-px bg-gradient-to-r from-stone-300/30 via-stone-300 to-stone-300/30',
+    gradient: 'border-0 h-px bg-gradient-to-r from-stone-300/30 via-stone-300/70 to-stone-300/30',
   };
   
   const colorClasses = {
@@ -51,17 +51,17 @@ export function Divider({
   if (variant === 'gradient') {
     const gradientColorClasses = {
       gray: orientation === 'vertical' 
-        ? 'bg-gradient-to-b from-gray-300/30 via-gray-300 to-gray-300/30 dark:from-zinc-700/30 dark:via-zinc-700 dark:to-zinc-700/30'
-        : 'bg-gradient-to-r from-gray-300/30 via-gray-300 to-gray-300/30 dark:from-zinc-700/30 dark:via-zinc-700 dark:to-zinc-700/30',
+        ? 'bg-gradient-to-b from-gray-300/30 via-gray-300/70 to-gray-300/30 dark:from-zinc-700/30 dark:via-zinc-700/70 dark:to-zinc-700/30'
+        : 'bg-gradient-to-r from-gray-300/30 via-gray-300/70 to-gray-300/30 dark:from-zinc-700/30 dark:via-zinc-700/70 dark:to-zinc-700/30',
       stone: orientation === 'vertical' 
-        ? 'bg-gradient-to-b from-stone-300/30 via-stone-300 to-stone-300/30 dark:from-zinc-700/30 dark:via-zinc-700 dark:to-zinc-700/30'
-        : 'bg-gradient-to-r from-stone-300/30 via-stone-300 to-stone-300/30 dark:from-zinc-700/30 dark:via-zinc-700 dark:to-zinc-700/30',
+        ? 'bg-gradient-to-b from-stone-300/30 via-stone-300/70 to-stone-300/30 dark:from-zinc-700/30 dark:via-zinc-700/70 dark:to-zinc-700/30'
+        : 'bg-gradient-to-r from-stone-300/30 via-stone-300/70 to-stone-300/30 dark:from-zinc-700/30 dark:via-zinc-700/70 dark:to-zinc-700/30',
       slate: orientation === 'vertical' 
-        ? 'bg-gradient-to-b from-slate-300/30 via-slate-300 to-slate-300/30 dark:from-zinc-700/30 dark:via-zinc-700 dark:to-zinc-700/30'
-        : 'bg-gradient-to-r from-slate-300/30 via-slate-300 to-slate-300/30 dark:from-zinc-700/30 dark:via-zinc-700 dark:to-zinc-700/30',
+        ? 'bg-gradient-to-b from-slate-300/30 via-slate-300/70 to-slate-300/30 dark:from-zinc-700/30 dark:via-zinc-700/70 dark:to-zinc-700/30'
+        : 'bg-gradient-to-r from-slate-300/30 via-slate-300/70 to-slate-300/30 dark:from-zinc-700/30 dark:via-zinc-700/70 dark:to-zinc-700/30',
       zinc: orientation === 'vertical' 
-        ? 'bg-gradient-to-b from-zinc-300/30 via-zinc-300 to-zinc-300/30 dark:from-zinc-700/30 dark:via-zinc-700 dark:to-zinc-700/30'
-        : 'bg-gradient-to-r from-zinc-300/30 via-zinc-300 to-zinc-300/30 dark:from-zinc-700/30 dark:via-zinc-700 dark:to-zinc-700/30',
+        ? 'bg-gradient-to-b from-zinc-300/30 via-zinc-300/70 to-zinc-300/30 dark:from-zinc-700/30 dark:via-zinc-700/70 dark:to-zinc-700/30'
+        : 'bg-gradient-to-r from-zinc-300/30 via-zinc-300/70 to-zinc-300/30 dark:from-zinc-700/30 dark:via-zinc-700/70 dark:to-zinc-700/30',
     };
     
     const gradientSizeClasses = orientation === 'vertical' 
