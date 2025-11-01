@@ -326,7 +326,7 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
   return (
     <TooltipProvider>
       <TableOfContents labels={tocLabels} />
-      <div className="w-full px-4 pt-20 overflow-x-hidden">
+      <div className="w-full px-4 pt-12 sm:pt-20 overflow-x-hidden">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -435,7 +435,7 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
             {children}
           </div>
         </motion.div>
-        <div className="max-w-[480px] mx-auto mt-16 mb-16 flex justify-center">
+        <div className="max-w-[480px] mx-auto mt-16 mb-8 sm:mb-16 flex justify-center">
           <Button 
             variant="ghost" 
             onClick={scrollToTop}

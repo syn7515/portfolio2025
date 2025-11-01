@@ -114,15 +114,34 @@ export default function LabelIndicatorCarousel({
   const [uncontrolledIndex, setUncontrolledIndex] = useState(defaultIndex);
   const index = isControlled ? currentIndex : uncontrolledIndex;
 
+  // Viewport detection for disabling lightbox on sm and below
+  const [isSmOrBelow, setIsSmOrBelow] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.innerWidth < 768; // md breakpoint
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsSmOrBelow(window.innerWidth < 768);
+    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, []);
+
   // Lightbox state
   const [isLightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(index);
+  
+  // Disable lightbox on sm and below
+  const effectiveLightboxEnabled = enableLightbox && !isSmOrBelow;
 
   const openLightbox = useCallback((i) => {
-    if (!enableLightbox) return;
+    if (!effectiveLightboxEnabled) return;
     setLightboxIndex(i);
     setLightboxOpen(true);
-  }, [enableLightbox]);
+  }, [effectiveLightboxEnabled]);
 
   const closeLightbox = useCallback(() => setLightboxOpen(false), []);
   const prevLightbox = useCallback(() => setLightboxIndex((i) => Math.max(0, i - 1)), []);
@@ -279,7 +298,7 @@ export default function LabelIndicatorCarousel({
                 aria-label={`Select card ${i + 1}${label ? `: ${label}` : ""}`}
                 onClick={() => {
                   if (i === index) {
-                    if (openLightboxOnCardClick) openLightbox(i);
+                    if (openLightboxOnCardClick && effectiveLightboxEnabled) openLightbox(i);
                   } else {
                     setIndex(i);
                   }
@@ -288,7 +307,7 @@ export default function LabelIndicatorCarousel({
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
                     if (i === index) {
-                      if (openLightboxOnCardClick) openLightbox(i);
+                      if (openLightboxOnCardClick && effectiveLightboxEnabled) openLightbox(i);
                     } else {
                       setIndex(i);
                     }
@@ -315,12 +334,12 @@ export default function LabelIndicatorCarousel({
                   </div>
                 )}
 
-                {/* Optional top-right expand icon when lightbox enabled */}
-                {enableLightbox && i === index && imageUrl && (
+                {/* Optional top-right expand icon when lightbox enabled (hidden on sm and below) */}
+                {effectiveLightboxEnabled && i === index && imageUrl && (
                   <button
                     type="button"
                     onClick={(e) => { e.stopPropagation(); openLightbox(i); }}
-                    className="absolute right-2 top-2 rounded-md bg-black/15 p-2 text-white backdrop-blur group-hover:bg-black/30 transition-colors"
+                    className="hidden md:block absolute right-2 top-2 rounded-md bg-black/15 p-2 text-white backdrop-blur group-hover:bg-black/30 transition-colors"
                     aria-label="Open in lightbox"
                   >
                     <Maximize2 className="h-4 w-4" />
@@ -384,7 +403,7 @@ export default function LabelIndicatorCarousel({
       </div>
 
       {/* Lightbox Overlay */}
-      {enableLightbox && isLightboxOpen && (
+      {effectiveLightboxEnabled && isLightboxOpen && (
         <div 
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" 
           role="dialog" 

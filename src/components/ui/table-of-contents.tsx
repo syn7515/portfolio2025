@@ -21,6 +21,25 @@ export default function TableOfContents({ className, labels }: TableOfContentsPr
   const [hoveredId, setHoveredId] = React.useState<string | null>(null)
   const [isTocHovered, setIsTocHovered] = React.useState(false)
   const [hasExpanded, setHasExpanded] = React.useState(false)
+  // Track previous isTocHovered to detect state changes
+  const prevIsTocHovered = React.useRef(isTocHovered)
+  // Track dark mode
+  const [isDarkMode, setIsDarkMode] = React.useState(false)
+  
+  // Update ref when isTocHovered changes
+  React.useEffect(() => {
+    prevIsTocHovered.current = isTocHovered
+  }, [isTocHovered])
+  
+  // Detect dark mode
+  React.useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    setIsDarkMode(mediaQuery.matches)
+    
+    const handleChange = (e: MediaQueryListEvent) => setIsDarkMode(e.matches)
+    mediaQuery.addEventListener('change', handleChange)
+    return () => mediaQuery.removeEventListener('change', handleChange)
+  }, [])
   // Extract h4 headings and add IDs
   React.useEffect(() => {
     let retryCount = 0
@@ -274,8 +293,10 @@ export default function TableOfContents({ className, labels }: TableOfContentsPr
               top: '-1.25rem',
               bottom: '-1.25rem',
               opacity: isTocHovered ? 1 : 0,
-              transitionDelay: isTocHovered ? '300ms' : '0ms', // Delay to appear after labels are rendered
-              transitionDuration: '150ms',
+              // Delay adjusted to match label appearance timing: labels finish at 420ms (320ms delay + 100ms duration)
+              // Background box: 100ms delay + 120ms duration = 220ms finish
+              transitionDelay: (!prevIsTocHovered.current && isTocHovered) ? '100ms' : (isTocHovered ? '0ms' : '0ms'),
+              transitionDuration: '120ms',
               transitionTimingFunction: 'ease-in-out',
               pointerEvents: isTocHovered ? 'auto' : 'none'
             }}
@@ -304,8 +325,6 @@ export default function TableOfContents({ className, labels }: TableOfContentsPr
                 <div
                   className={cn(
                     "flex-shrink-0 rounded-full",
-                    // Only apply transition when TOC is not hovered (for initial expansion)
-                    !isTocHovered && "transition-all",
                     isActive || isHovered
                       ? isTocHovered ? "h-[1.5px] w-1.5" : "h-[2.5px] w-8"
                       : isTocHovered ? "opacity-40 h-[1.5px] w-1.5" : "opacity-40 h-[2px] w-5",
@@ -317,24 +336,36 @@ export default function TableOfContents({ className, labels }: TableOfContentsPr
                     minWidth: (isActive || isHovered) && !isTocHovered ? '32px' : (isTocHovered ? '6px' : '20px'),
                     minHeight: isActive || isHovered ? (isTocHovered ? '1.5px' : '2.5px') : (isTocHovered ? '1.5px' : '2px'),
                     opacity: isActive || isHovered ? 0.8 : undefined,
-                    // Remove transition when TOC is hovered for instant feedback
-                    transition: isTocHovered ? 'none' : undefined
+                    // Smooth transition with eased bezier curve for both expanding and collapsing
+                    // Disable transition only when:
+                    // - TOC is already expanded (hasExpanded === true)
+                    // - TOC is currently hovered (isTocHovered === true)
+                    // - An individual item is being hovered (hoveredId !== null)
+                    // - TOC wasn't just expanded (prevIsTocHovered was also true)
+                    // This ensures transitions work when expanding (prevIsTocHovered === false) or collapsing
+                    transition: (hasExpanded && isTocHovered && hoveredId !== null && prevIsTocHovered.current) ? 'none' : 'all 350ms cubic-bezier(0.4, 0, 0.2, 1)'
                   }}
                 />
                 
                 {/* Text label */}
                 <span
                   className={cn(
-                    "text-sm whitespace-nowrap pointer-events-none flex-shrink-0",
-                    isActive || isHovered 
-                      ? "text-stone-700 dark:text-zinc-300 font-medium" 
-                      : "text-stone-600 dark:text-zinc-500 font-normal" // Darker color for inactive labels
+                    "text-sm whitespace-nowrap pointer-events-none flex-shrink-0 font-normal"
                   )}
                   style={{ 
                     opacity: textOpacity,
+                    // Use inline styles to override any parent CSS - conditionally apply based on dark mode
+                    color: isDarkMode
+                      ? (isActive || isHovered 
+                          ? 'rgb(212 212 216)' // zinc-300
+                          : 'rgb(161 161 170)') // zinc-400 (more visible in dark mode)
+                      : (isActive || isHovered
+                          ? 'rgb(68 64 60)' // stone-700
+                          : 'rgb(120 113 108)'), // stone-600
                     // Instant transitions when TOC has already been expanded (for individual item hover)
-                    // Smooth transition with delay only on initial expansion
-                    ...(hasExpanded && isTocHovered 
+                    // When expanding: delay must match rail animation duration (350ms) so labels appear after rails finish
+                    // When collapsing: instant (0ms delay)
+                    ...(hasExpanded && isTocHovered && prevIsTocHovered.current && hoveredId !== null
                       ? {
                           transitionProperty: 'none',
                           transitionDuration: '0ms',
@@ -342,9 +373,11 @@ export default function TableOfContents({ className, labels }: TableOfContentsPr
                         }
                       : {
                           transitionProperty: 'opacity',
-                          transitionDuration: '50ms',
+                          transitionDuration: '100ms',
                           transitionTimingFunction: 'ease-in-out',
-                          transitionDelay: isTocHovered ? '150ms' : '0ms'
+                          // When expanding (prevIsTocHovered is false, isTocHovered is true): delay 320ms to match rail animation duration
+                          // When collapsing (isTocHovered is false): instant (0ms)
+                          transitionDelay: (!prevIsTocHovered.current && isTocHovered) ? '320ms' : '0ms'
                         })
                   }}
                 >
