@@ -258,7 +258,7 @@ export default function TableOfContents({ className, labels }: TableOfContentsPr
   }
 
   // Spacing between rails - denser when labels hidden, more spaced when shown
-  const railSpacing = isTocHovered ? 24 : 4 // 24px when labels shown, 4px when hidden
+  const railSpacing = isTocHovered ? 16 : 4 // 24px when labels shown, 4px when hidden
 
   return (
       <div 
