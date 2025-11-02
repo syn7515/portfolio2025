@@ -389,12 +389,12 @@ pre code {
     transform: translateY(0);
   }
 
-  50% {
+  25% {
     transform: translateY(-3px);
   }
 
-  80% {
-    transform: translateY(0.5px);
+  50% {
+    transform: translateY(1px);
   }
 
   100% {
@@ -411,17 +411,14 @@ pre code {
     transform: scale(1);
   }
 
-  25% {
-    transform: scale(1.04);
+  15% {
+    transform: scale(1.2);
   }
 
   50% {
-    transform: scale(1);
+    transform: scale(0.95);
   }
 
-  75% {
-    transform: scale(1.2);
-  }
 
   100% {
     transform: scale(1);
