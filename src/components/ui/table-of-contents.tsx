@@ -250,15 +250,16 @@ export default function TableOfContents({ className, labels }: TableOfContentsPr
             onMouseLeave={() => setIsTocHovered(false)}
           >
           <div 
-            className="absolute bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl -z-10"
+            className="absolute bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-lg -z-10"
             style={{
               left: '-1.25rem',
-              right: '-1.25rem',
-              top: '-1.25rem',
-              bottom: '-1.25rem',
+              right: (hasExpanded && isTocHovered) ? '-2rem' : '-0.5rem',
+              top: '-1rem',
+              bottom: '-1rem',
               opacity: isTocHovered ? 1 : 0,
-              transitionDelay: (!prevIsTocHovered.current && isTocHovered) ? '50ms' : '0ms',
-              transitionDuration: '170ms',
+              transitionProperty: 'opacity, right',
+              transitionDuration: '170ms, 350ms',
+              transitionDelay: (!prevIsTocHovered.current && isTocHovered) ? '50ms, 0ms' : '0ms',
               transitionTimingFunction: 'ease-in-out',
               pointerEvents: isTocHovered ? 'auto' : 'none'
             }}
@@ -282,8 +283,8 @@ export default function TableOfContents({ className, labels }: TableOfContentsPr
                   className={cn(
                     "flex-shrink-0 rounded-full",
                     isActive || isHovered
-                      ? isTocHovered ? "h-[1.5px] w-2" : "h-[2.5px] w-8"
-                      : isTocHovered ? "opacity-60 h-[1.5px] w-2" : "opacity-60 h-[2px] w-5",
+                      ? isTocHovered ? "h-[1.5px] w-1,5" : "h-[2.2px] w-8"
+                      : isTocHovered ? "opacity-60 h-[1.5px] w-1,5" : "opacity-60 h-[2.2px] w-5",
                     isActive || isHovered
                       ? "bg-stone-700 dark:bg-zinc-300"
                       : "bg-stone-400 dark:bg-zinc-600"
