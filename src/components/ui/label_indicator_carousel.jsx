@@ -107,6 +107,8 @@ export default function LabelIndicatorCarousel({
   // Lightbox options
   enableLightbox = true,
   openLightboxOnCardClick = true,
+  // Indicator options
+  showIndicators = true,
 } = {}) {
   const sourceItems = items ?? FALLBACK_ITEMS;
   const normalized = useMemo(() => sourceItems.map(normalizeItem), [sourceItems]);
@@ -365,41 +367,43 @@ export default function LabelIndicatorCarousel({
         </motion.div>
 
         {/* Indicators */}
-        <div className="mt-4 sm:mt-8 flex h-8 items-center justify-center" style={{ columnGap: 8 }}>
-          {normalized.map(({ label }, i) => {
-            const active = index === i;
-            return (
-              <div key={i} onClick={() => setIndex(i)}>
-                <motion.button
-                  type="button"
-                  initial={false}
-                  className="flex cursor-pointer select-none items-center justify-center overflow-hidden rounded-full bg-stone-100 text-xs sm:text-sm text-stone-500 outline-none ring-0 focus-visible:ring-2 focus-visible:ring-stone-400 dark:bg-zinc-800 dark:text-zinc-300"
-                  animate={{
-                    width: active ? effIndicators.expanded : effIndicators.collapsed,
-                    height: active ? effIndicators.height : effIndicators.collapsed,
-                  }}
-                  transition={transition}
-                  aria-current={active ? "true" : undefined}
-                  aria-label={`Go to ${typeof label === "string" ? label : `item ${i + 1}`}`}
-                >
-                  <motion.span
+        {showIndicators && (
+          <div className="mt-4 sm:mt-8 flex h-8 items-center justify-center" style={{ columnGap: 8 }}>
+            {normalized.map(({ label }, i) => {
+              const active = index === i;
+              return (
+                <div key={i} onClick={() => setIndex(i)}>
+                  <motion.button
+                    type="button"
                     initial={false}
-                    className="block whitespace-nowrap px-3 py-1"
+                    className="flex cursor-pointer select-none items-center justify-center overflow-hidden rounded-full bg-stone-100 text-xs sm:text-sm text-stone-500 outline-none ring-0 focus-visible:ring-2 focus-visible:ring-stone-400 dark:bg-zinc-800 dark:text-zinc-300"
                     animate={{
-                      opacity: active ? 1 : 0,
-                      scale: active ? 1 : 0,
-                      filter: active ? "blur(0)" : "blur(4px)",
-                      transformOrigin: "center",
+                      width: active ? effIndicators.expanded : effIndicators.collapsed,
+                      height: active ? effIndicators.height : effIndicators.collapsed,
                     }}
                     transition={transition}
+                    aria-current={active ? "true" : undefined}
+                    aria-label={`Go to ${typeof label === "string" ? label : `item ${i + 1}`}`}
                   >
-                    {label}
-                  </motion.span>
-                </motion.button>
-              </div>
-            );
-          })}
-        </div>
+                    <motion.span
+                      initial={false}
+                      className="block whitespace-nowrap px-3 py-1"
+                      animate={{
+                        opacity: active ? 1 : 0,
+                        scale: active ? 1 : 0,
+                        filter: active ? "blur(0)" : "blur(4px)",
+                        transformOrigin: "center",
+                      }}
+                      transition={transition}
+                    >
+                      {label}
+                    </motion.span>
+                  </motion.button>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Lightbox Overlay */}

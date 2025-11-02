@@ -29,6 +29,7 @@ export interface LabelIndicatorCarouselProps {
   swipeThreshold?: number;
   velocityThreshold?: number;
   wheelToNavigate?: boolean;
+  showIndicators?: boolean;
 }
 
 declare const LabelIndicatorCarousel: React.FC<LabelIndicatorCarouselProps>;
