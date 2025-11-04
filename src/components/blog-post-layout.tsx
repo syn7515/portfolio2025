@@ -85,7 +85,7 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
       const wasAlreadyOpen = likeTooltipOpen === true
       
       // Random messages
-      const messages = ["You liked this!", "Thanks for the 💖", "Appreciated!"]
+      const messages = ["You liked this!", "Thanks for the 💖", "Appreciated ;)"]
       const randomMessage = messages[Math.floor(Math.random() * messages.length)]
       
       // Delay showing the message by 0.3s
@@ -318,7 +318,7 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
   // Custom labels for aniai post
   const tocLabels = slug === 'aniai' ? {
     "Designing speed for robot development (2024-2025)": "Parametric firmware generator",
-    "Scaling robot updates with confidence (2025)": "Update manger",
+    "Scaling robot updates with confidence (2025)": "Robot update manger",
     "Building a foundation for fast, consistent design (2025)": "Minimum viable design system",
     "Closing thoughts": "Thoughts"
   } : undefined
@@ -337,7 +337,7 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
               <TooltipTrigger asChild>
                 <Button variant="ghost" size="icon-sm" asChild aria-label="Back to home" className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50 -ml-2">
                   <Link href="/" className="cursor-pointer">
-                    <Undo2 className="text-stone-500 dark:text-stone-300" />
+                    <Undo2 className="text-stone-500 dark:text-stone-400" />
                   </Link>
                 </Button>
               </TooltipTrigger>
@@ -383,7 +383,7 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
                       className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50"
                     >
                       <Heart className={cn(
-                        isLiked ? "text-red-500 fill-red-500/20" : "text-stone-500 dark:text-stone-300",
+                        isLiked ? "text-red-500 fill-red-500/20" : "text-stone-500 dark:text-stone-400",
                         shouldAnimate && "heart-bounce"
                       )} />
                     </Toggle>
@@ -417,10 +417,10 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
                     disabled={copied}
                   >
                     <div className={cn("transition-all absolute inset-0 flex items-center justify-center", copied ? "scale-100 opacity-100" : "scale-0 opacity-0")}>
-                      <Check className="text-stone-500 dark:text-stone-300" />
+                      <Check className="text-stone-500 dark:text-stone-400" />
                     </div>
                     <div className={cn("transition-all", copied ? "scale-0 opacity-0" : "scale-100 opacity-100")}>
-                      <Clipboard className="text-stone-500 dark:text-stone-300" />
+                      <Clipboard className="text-stone-500 dark:text-stone-400" />
                     </div>
                   </Button>
                 </TooltipTrigger>
@@ -441,8 +441,8 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
             onClick={scrollToTop}
             className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50 gap-[6px] pl-4 pr-3 arrow-bounce-button"
           >
-            <span className="text-stone-600 dark:text-stone-200">Back to top</span>
-            <ArrowUp className="text-stone-600 dark:text-stone-200 arrow-bounce" />
+            <span className="text-stone-600 dark:text-stone-400">Back to top</span>
+            <ArrowUp className="text-stone-600 dark:text-stone-400 arrow-bounce" />
           </Button>
         </div>
       </div>

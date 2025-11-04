@@ -16,7 +16,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
           >
-            <span className="font-semibold">Sue Park</span>. Designer with engineering mindset, obsessed with why behind everything — from strategies to pixels.
+            <span className="font-semibold">Sue Park</span>. Product designer with engineering mindset, obsessed with why behind everything — from strategies to pixels.
           </motion.p>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -47,8 +47,8 @@ export default function Home() {
               className="!text-stone-400 dark:!text-stone-500 hover:!text-stone-600 dark:hover:!text-stone-300 transition-colors opacity-80"
               aria-label="Twitter"
             >
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+              <svg className="w-[22px] h-[22px]" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/>
               </svg>
             </a>
             <a 

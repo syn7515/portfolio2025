@@ -108,6 +108,10 @@ export default function TableOfContents({ className, labels }: TableOfContentsPr
         })
 
         if (headingsList.length > 0) {
+          console.log('[TOC DEBUG] Headings extracted:', {
+            count: headingsList.length,
+            headings: headingsList.map(h => ({ id: h.id, text: h.text, position: h.position }))
+          })
           setHeadings(headingsList)
         }
       })
@@ -145,17 +149,81 @@ export default function TableOfContents({ className, labels }: TableOfContentsPr
     }
   }, [headings.length, labels])
 
+  // Scroll listener to detect when near bottom and mark last heading as active
+  React.useEffect(() => {
+    if (headings.length === 0) return
+
+    const handleBottomScroll = () => {
+      const scrollHeight = document.documentElement.scrollHeight
+      const scrollTop = window.scrollY || document.documentElement.scrollTop
+      const clientHeight = window.innerHeight
+      const scrollBottom = scrollTop + clientHeight
+      const distanceFromBottom = scrollHeight - scrollBottom
+      const threshold20Percent = scrollHeight * 0.2
+      
+      console.log('[TOC DEBUG] Bottom scroll detection:', {
+        scrollHeight,
+        scrollTop,
+        clientHeight,
+        scrollBottom,
+        distanceFromBottom,
+        threshold20Percent,
+        isNearBottom: distanceFromBottom < threshold20Percent,
+        headingsCount: headings.length,
+        lastHeadingId: headings[headings.length - 1]?.id,
+        lastHeadingText: headings[headings.length - 1]?.text
+      })
+      
+      // If within last 20% of page scroll
+      if (distanceFromBottom < threshold20Percent) {
+        const lastHeading = headings[headings.length - 1]
+        if (lastHeading) {
+          const lastHeadingRect = lastHeading.element.getBoundingClientRect()
+          console.log('[TOC DEBUG] Checking last heading:', {
+            lastHeadingId: lastHeading.id,
+            lastHeadingText: lastHeading.text,
+            lastHeadingRectTop: lastHeadingRect.top,
+            shouldActivate: lastHeadingRect.top < 200,
+            currentActiveId: activeId
+          })
+          // If last heading is above the viewport threshold (within 200px from top), make it active
+          if (lastHeadingRect.top < 200) {
+            console.log('[TOC DEBUG] Setting last heading as active:', lastHeading.id)
+            setActiveId(lastHeading.id)
+          }
+        }
+      }
+    }
+
+    window.addEventListener('scroll', handleBottomScroll, { passive: true })
+
+    return () => {
+      window.removeEventListener('scroll', handleBottomScroll)
+    }
+  }, [headings, activeId])
+
   React.useEffect(() => {
     if (headings.length === 0) return
 
     const observer = new IntersectionObserver(
       (entries) => {
+        console.log('[TOC DEBUG] IntersectionObserver callback triggered, entries count:', entries.length)
+        
         let activeHeading: IntersectionObserverEntry | null = null
         let closestDistance = Infinity
 
         entries.forEach((entry) => {
           const rect = entry.boundingClientRect
           const distanceFromTop = Math.abs(rect.top)
+          const targetId = (entry.target as HTMLElement).id
+
+          console.log('[TOC DEBUG] IntersectionObserver entry:', {
+            targetId,
+            isIntersecting: entry.isIntersecting,
+            rectTop: rect.top,
+            distanceFromTop,
+            intersectionRatio: entry.intersectionRatio
+          })
 
           if (entry.isIntersecting && distanceFromTop < closestDistance) {
             closestDistance = distanceFromTop
@@ -164,7 +232,34 @@ export default function TableOfContents({ className, labels }: TableOfContentsPr
         })
 
         let finalActiveHeading: IntersectionObserverEntry | null = activeHeading
+        if (activeHeading) {
+          const target = (activeHeading as IntersectionObserverEntry).target as HTMLElement
+          const targetId = target?.id || null
+          console.log('[TOC DEBUG] Initial activeHeading:', targetId)
+        } else {
+          console.log('[TOC DEBUG] Initial activeHeading:', null)
+        }
+        
         if (!finalActiveHeading) {
+          // Check if we're near the bottom of the page
+          const scrollHeight = document.documentElement.scrollHeight
+          const scrollTop = window.scrollY || document.documentElement.scrollTop
+          const clientHeight = window.innerHeight
+          const scrollBottom = scrollTop + clientHeight
+          const distanceFromBottom = scrollHeight - scrollBottom
+          const isNearBottom = distanceFromBottom < scrollHeight * 0.2 // Within last 20% of page
+
+          console.log('[TOC DEBUG] No active heading, checking bottom:', {
+            scrollHeight,
+            scrollTop,
+            clientHeight,
+            scrollBottom,
+            distanceFromBottom,
+            isNearBottom,
+            headingsCount: headings.length,
+            lastHeadingId: headings[headings.length - 1]?.id
+          })
+
           let mostRecentPastHeading: IntersectionObserverEntry | null = null
           entries.forEach((entry) => {
             const rect = entry.boundingClientRect
@@ -172,16 +267,63 @@ export default function TableOfContents({ className, labels }: TableOfContentsPr
               mostRecentPastHeading = entry
             }
           })
+
           if (mostRecentPastHeading) {
+            const target = (mostRecentPastHeading as IntersectionObserverEntry).target as HTMLElement
+            const targetId = target?.id || null
+            console.log('[TOC DEBUG] Most recent past heading:', targetId)
+          } else {
+            console.log('[TOC DEBUG] Most recent past heading:', null)
+          }
+
+          // If near bottom and we have headings, prioritize the last heading
+          if (isNearBottom && headings.length > 0) {
+            const lastHeading = headings[headings.length - 1]
+            const lastHeadingElement = entries.find(entry => (entry.target as HTMLElement).id === lastHeading.id)
+            console.log('[TOC DEBUG] Looking for last heading in entries:', {
+              lastHeadingId: lastHeading.id,
+              lastHeadingFound: !!lastHeadingElement,
+              entriesIds: entries.map(e => (e.target as HTMLElement).id)
+            })
+            
+            if (lastHeadingElement) {
+              const lastHeadingRect = lastHeadingElement.boundingClientRect
+              console.log('[TOC DEBUG] Last heading rect:', {
+                top: lastHeadingRect.top,
+                shouldActivate: lastHeadingRect.top < 200
+              })
+              // If last heading is above the threshold (within 200px from top), make it active
+              if (lastHeadingRect.top < 200) {
+                finalActiveHeading = lastHeadingElement
+                console.log('[TOC DEBUG] Setting last heading as finalActiveHeading:', lastHeading.id)
+              } else if (mostRecentPastHeading) {
+                finalActiveHeading = mostRecentPastHeading
+                const target = (mostRecentPastHeading as IntersectionObserverEntry).target as HTMLElement
+                const targetId = target?.id || null
+                console.log('[TOC DEBUG] Using mostRecentPastHeading instead:', targetId)
+              }
+            } else if (mostRecentPastHeading) {
+              finalActiveHeading = mostRecentPastHeading
+              const target = (mostRecentPastHeading as IntersectionObserverEntry).target as HTMLElement
+              const targetId = target?.id || null
+              console.log('[TOC DEBUG] Last heading not in entries, using mostRecentPastHeading:', targetId)
+            }
+          } else if (mostRecentPastHeading) {
             finalActiveHeading = mostRecentPastHeading
+            const target = (mostRecentPastHeading as IntersectionObserverEntry).target as HTMLElement
+            const targetId = target?.id || null
+            console.log('[TOC DEBUG] Not near bottom, using mostRecentPastHeading:', targetId)
           }
         }
 
         if (finalActiveHeading) {
           const target = (finalActiveHeading as IntersectionObserverEntry).target as HTMLElement
           if (target?.id) {
+            console.log('[TOC DEBUG] Setting activeId to:', target.id)
             setActiveId(target.id)
           }
+        } else {
+          console.log('[TOC DEBUG] No finalActiveHeading found, not updating activeId')
         }
       },
       {
@@ -202,16 +344,36 @@ export default function TableOfContents({ className, labels }: TableOfContentsPr
   }, [headings])
 
   const handleClick = (id: string) => {
+    console.log('[TOC DEBUG] handleClick called:', {
+      clickedId: id,
+      headingsCount: headings.length,
+      allHeadingIds: headings.map(h => h.id),
+      isLastHeading: headings[headings.length - 1]?.id === id
+    })
+    
+    // Immediately set the clicked item as active
+    setActiveId(id)
+    console.log('[TOC DEBUG] Set activeId to:', id)
+    
     const element = document.getElementById(id)
     if (element) {
       const offset = 100
       const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
       const offsetPosition = elementPosition - offset
 
+      console.log('[TOC DEBUG] Scrolling to element:', {
+        elementFound: true,
+        elementPosition,
+        offsetPosition,
+        scrollHeight: document.documentElement.scrollHeight
+      })
+
       window.scrollTo({
         top: offsetPosition,
         behavior: 'smooth'
       })
+    } else {
+      console.log('[TOC DEBUG] Element not found for id:', id)
     }
   }
 
@@ -224,7 +386,7 @@ export default function TableOfContents({ className, labels }: TableOfContentsPr
     return null
   }
 
-  const railSpacing = isTocHovered ? 12 : 4
+  const railSpacing = isTocHovered ? 12 : 2
 
   return (
       <div 
@@ -283,10 +445,10 @@ export default function TableOfContents({ className, labels }: TableOfContentsPr
                   className={cn(
                     "flex-shrink-0 rounded-full",
                     isActive || isHovered
-                      ? isTocHovered ? "h-[1.5px] w-1,5" : "h-[2.2px] w-8"
-                      : isTocHovered ? "opacity-60 h-[1.5px] w-1,5" : "opacity-60 h-[2.2px] w-5",
+                      ? isTocHovered ? "h-[1.5px] w-[1.5px]" : "h-[2.2px] w-8"
+                      : isTocHovered ? "opacity-70 dark:opacity-80 h-[1.5px] w-[1.5px]" : "opacity-70 dark:opacity-80 h-[2.2px] w-5",
                     isActive || isHovered
-                      ? "bg-stone-700 dark:bg-zinc-300"
+                      ? "bg-stone-600 dark:bg-zinc-300"
                       : "bg-stone-400 dark:bg-zinc-600"
                   )}
                   style={{ 
@@ -329,4 +491,3 @@ export default function TableOfContents({ className, labels }: TableOfContentsPr
         </div>
   )
 }
-
