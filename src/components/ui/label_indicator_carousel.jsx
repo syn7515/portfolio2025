@@ -315,7 +315,7 @@ export default function LabelIndicatorCarousel({
                     }
                   }
                 }}
-                className="group relative rounded-[8px] bg-stone-200/60 transition-all duration-150 dark:bg-stone-800 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-stone-400"
+                className="group relative bg-stone-200/60 transition-all duration-150 dark:bg-stone-800 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-stone-400"
                 style={{ width: "100%", height: effHeight }}
                 transition={transition}
                 whileTap={{ scale: 0.98 }}
@@ -326,10 +326,10 @@ export default function LabelIndicatorCarousel({
                       <img 
                         src={imageUrl} 
                         alt={alt ?? label}
-                        className="w-full h-full object-cover rounded-[8px]"
+                        className="w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full bg-stone-200/60 dark:bg-stone-800 rounded-[8px] flex items-center justify-center">
+                      <div className="w-full h-full bg-stone-200/60 dark:bg-stone-800 flex items-center justify-center">
                         <span className="text-stone-500 text-sm">{label}</span>
                       </div>
                     )}

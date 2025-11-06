@@ -1,7 +1,7 @@
 "use client";
 
-import Link from 'next/link';
 import { motion } from 'framer-motion';
+import ProjectItem from '@/components/ui/project-item';
 
 export default function Home() {
 
@@ -10,7 +10,7 @@ export default function Home() {
 
     <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen pb-20 gap-16 sm: overflow-x-hidden">
       <main className="w-full flex flex-col gap-[32px] row-start-2 items-center sm:items-start overflow-x-hidden">
-        <div className="max-w-[480px] mx-auto px-4">
+        <div className="max-w-[480px] mx-auto px-4" style={{ paddingTop: 'clamp(40px, 10vh, 120px)' }}>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -35,7 +35,7 @@ export default function Home() {
           </motion.p>
           
           <motion.div
-            className="flex gap-4 mt-10"
+            className="flex gap-4 mt-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.3 }}
@@ -44,7 +44,7 @@ export default function Home() {
               href="https://x.com/spark7515" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="!text-stone-400 dark:!text-stone-500 hover:!text-stone-600 dark:hover:!text-stone-300 transition-colors opacity-80"
+              className="!text-stone-400 dark:!text-stone-500 hover:!text-stone-600 dark:hover:!text-stone-300 opacity-80"
               aria-label="Twitter"
             >
               <svg className="w-[22px] h-[22px]" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -55,7 +55,7 @@ export default function Home() {
               href="https://www.linkedin.com/in/sooyeonp/" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="!text-stone-400 dark:!text-stone-500 hover:!text-stone-600 dark:hover:!text-stone-300 transition-colors opacity-80"
+              className="!text-stone-400 dark:!text-stone-500 hover:!text-stone-600 dark:hover:!text-stone-300 opacity-80"
               aria-label="LinkedIn"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -65,36 +65,28 @@ export default function Home() {
           </motion.div>
         </div>
         
-        <div className="max-w-4xl mx-auto px-4 w-full">
-          <div className="grid gap-6">
-            <article className="border border-gray-200 dark:border-gray-700 rounded-lg p-6">
-              <h2>
-                <Link href="/aniai">
-                  Building the Tools Behind Smarter Robots
-                </Link>
-              </h2>
-              <p>
-                A comprehensive example demonstrating MDX features including Markdown syntax, 
-                React components, code blocks, and interactive elements.
-              </p>
-              <div className="text-sm text-gray-500 dark:text-gray-400">
-                Published on {new Date().toLocaleDateString()}
-              </div>
-            </article>
-
-            <article className="border border-gray-200 dark:border-gray-700 rounded-lg p-6">
-              <h2>
-                <Link href="/athenahealth">
-                  Encouraging prompt medical bill payment
-                </Link>
-              </h2>
-              <p>
-                A template showing how easy it is to create new blog posts with shared styling and layout.
-              </p>
-              <div className="text-sm text-gray-500 dark:text-gray-400">
-                Published on {new Date().toLocaleDateString()}
-              </div>
-            </article>
+        <div className="max-w-4xl mx-auto px-4 w-full mt-12">
+          <div className="grid gap-10">
+            <ProjectItem
+              imageUrl="https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/aniai.png"
+              organization="Aniai"
+              dates="2024-2025"
+              description="Building the Tools Behind Smarter Robots"
+              href="/aniai"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.4 }}
+            />
+            <ProjectItem
+              imageUrl="https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/athena.png"
+              organization="AthenaHealth"
+              dates="2023"
+              description="Encouraging Prompt Bill Payment"
+              href="/athenahealth"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.5 }}
+            />
           </div>
         </div>
         
