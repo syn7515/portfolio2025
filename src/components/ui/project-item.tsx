@@ -23,7 +23,7 @@ export default function ProjectItem({
   href,
   initial = { opacity: 0, y: 20 },
   animate = { opacity: 1, y: 0 },
-  transition = { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] },
+  transition = { duration: 0.1, ease: [0.25, 0.1, 0.25, 1] },
 }: ProjectItemProps) {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -59,7 +59,7 @@ export default function ProjectItem({
           />
           {/* Overlay with 15% opacity black on hover */}
           <div
-            className={`absolute inset-0 bg-black transition-opacity ${
+            className={`absolute inset-0 bg-black transition-opacity duration-20 ${
               isHovered ? 'opacity-15' : 'opacity-0'
             }`}
           />
