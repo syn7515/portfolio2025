@@ -116,6 +116,22 @@ export default function LabelIndicatorCarousel({
   const [uncontrolledIndex, setUncontrolledIndex] = useState(defaultIndex);
   const index = isControlled ? currentIndex : uncontrolledIndex;
 
+  // Viewport detection for mobile mode (< 640px) - vertical layout
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.innerWidth < 640;
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, []);
+
   // Viewport detection for disabling lightbox on sm and below
   const [isSmOrBelow, setIsSmOrBelow] = useState(() => {
     if (typeof window === 'undefined') return false;
@@ -136,8 +152,8 @@ export default function LabelIndicatorCarousel({
   const [isLightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(index);
   
-  // Disable lightbox on sm and below
-  const effectiveLightboxEnabled = enableLightbox && !isSmOrBelow;
+  // Disable lightbox on mobile (< 640px) and sm and below
+  const effectiveLightboxEnabled = enableLightbox && !isMobile && !isSmOrBelow;
 
   const openLightbox = useCallback((i) => {
     if (!effectiveLightboxEnabled) return;
@@ -229,6 +245,8 @@ export default function LabelIndicatorCarousel({
   }, [indicatorExpandedWidth, indicatorCollapsedSize, indicatorHeight]);
 
   const onKeyDown = (e) => {
+    // Disable keyboard navigation in mobile/vertical mode
+    if (isMobile) return;
     if (e.key === "ArrowRight") {
       e.preventDefault();
       setIndex(Math.min(index + 1, normalized.length - 1));
@@ -245,7 +263,8 @@ export default function LabelIndicatorCarousel({
   };
 
   const onWheel = (e) => {
-    if (!wheelToNavigate) return;
+    // Disable wheel navigation in mobile/vertical mode
+    if (isMobile || !wheelToNavigate) return;
     const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : 0;
     if (delta > 20) setIndex(index + 1);
     else if (delta < -20) setIndex(index - 1);
@@ -260,114 +279,161 @@ export default function LabelIndicatorCarousel({
       tabIndex={0}
     >
       <div className="flex flex-col items-center justify-center">
-        <motion.div
-          initial={false}
-          className="flex justify-start"
-          style={{ columnGap: effGap }}
-          animate={{ x: xOffset }}
-          transition={transition}
-          {...(enableDrag
-            ? {
-                drag: "x",
-                dragConstraints: { left: -100000, right: 100000 },
-                dragElastic: 0.1,
-                dragMomentum: false,
-                onDragEnd: (_, info) => {
-                  const delta = info.offset.x;
-                  const vx = info.velocity.x;
-                  const passed = Math.abs(delta) > span * swipeThreshold;
-                  let next = index;
-                  if (delta < 0) {
-                    if (passed || vx < -velocityThreshold)
-                      next = Math.min(index + 1, normalized.length - 1);
-                  } else if (delta > 0) {
-                    if (passed || vx > velocityThreshold)
-                      next = Math.max(index - 1, 0);
-                  }
-                  setIndex(next);
-                },
-              }
-            : {})}
-        >
-          {normalized.map((item, i) => {
-            const { label, caption, imageUrl, alt } = item;
-            return (
-            <div key={i} className="flex flex-col items-center" style={{ width: effWidth }}>
-              <motion.div
-                initial={false}
-                role="button"
-                tabIndex={0}
-                aria-label={`Select card ${i + 1}${label ? `: ${label}` : ""}`}
-                onClick={() => {
-                  if (i === index) {
-                    if (openLightboxOnCardClick && effectiveLightboxEnabled) openLightbox(i);
-                  } else {
-                    setIndex(i);
-                  }
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
+        {isMobile ? (
+          // Vertical layout for mobile (< 640px)
+          <div className="flex flex-col items-center w-full" style={{ rowGap: Math.max(effGap * 3, 24) }}>
+            {normalized.map((item, i) => {
+              const { label, caption, imageUrl, alt } = item;
+              return (
+                <div key={i} className="flex flex-col items-center w-full px-4" style={{ maxWidth: '100%' }}>
+                  <div
+                    className="group relative bg-stone-200/60 transition-all duration-150 dark:bg-stone-800 w-full"
+                    style={{ height: effHeight }}
+                  >
+                    {renderCard ? renderCard(i, i === index, item) : (
+                      <div className="w-full h-full relative">
+                        {imageUrl ? (
+                          <img 
+                            src={imageUrl} 
+                            alt={alt ?? label}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-stone-200/60 dark:bg-stone-800 flex items-center justify-center">
+                            <span className="text-stone-500 text-sm">{label}</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {caption != null && caption !== "" ? (
+                    renderCaption ? (
+                      renderCaption({ index: i, label, caption, active: i === index })
+                    ) : (
+                      <div
+                        className={`font-sans text-center text-stone-600 dark:text-stone-300 text-xs sm:text-sm mt-2 sm:mt-3`}
+                        style={{ width: "100%", ...(captionStyle || {}) }}
+                      >
+                        {caption}
+                      </div>
+                    )
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          // Horizontal carousel layout for >= 640px
+          <motion.div
+            initial={false}
+            className="flex justify-start"
+            style={{ columnGap: effGap }}
+            animate={{ x: xOffset }}
+            transition={transition}
+            {...(enableDrag
+              ? {
+                  drag: "x",
+                  dragConstraints: { left: -100000, right: 100000 },
+                  dragElastic: 0.1,
+                  dragMomentum: false,
+                  onDragEnd: (_, info) => {
+                    const delta = info.offset.x;
+                    const vx = info.velocity.x;
+                    const passed = Math.abs(delta) > span * swipeThreshold;
+                    let next = index;
+                    if (delta < 0) {
+                      if (passed || vx < -velocityThreshold)
+                        next = Math.min(index + 1, normalized.length - 1);
+                    } else if (delta > 0) {
+                      if (passed || vx > velocityThreshold)
+                        next = Math.max(index - 1, 0);
+                    }
+                    setIndex(next);
+                  },
+                }
+              : {})}
+          >
+            {normalized.map((item, i) => {
+              const { label, caption, imageUrl, alt } = item;
+              return (
+              <div key={i} className="flex flex-col items-center" style={{ width: effWidth }}>
+                <motion.div
+                  initial={false}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Select card ${i + 1}${label ? `: ${label}` : ""}`}
+                  onClick={() => {
                     if (i === index) {
                       if (openLightboxOnCardClick && effectiveLightboxEnabled) openLightbox(i);
                     } else {
                       setIndex(i);
                     }
-                  }
-                }}
-                className="group relative bg-stone-200/60 transition-all duration-150 dark:bg-stone-800 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-stone-400"
-                style={{ width: "100%", height: effHeight }}
-                transition={transition}
-                whileTap={{ scale: 0.98 }}
-              >
-                {renderCard ? renderCard(i, i === index, item) : (
-                  <div className="w-full h-full relative">
-                    {imageUrl ? (
-                      <img 
-                        src={imageUrl} 
-                        alt={alt ?? label}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-stone-200/60 dark:bg-stone-800 flex items-center justify-center">
-                        <span className="text-stone-500 text-sm">{label}</span>
-                      </div>
-                    )}
-                  </div>
-                )}
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      if (i === index) {
+                        if (openLightboxOnCardClick && effectiveLightboxEnabled) openLightbox(i);
+                      } else {
+                        setIndex(i);
+                      }
+                    }
+                  }}
+                  className="group relative bg-stone-200/60 transition-all duration-150 dark:bg-stone-800 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-stone-400"
+                  style={{ width: "100%", height: effHeight }}
+                  transition={transition}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  {renderCard ? renderCard(i, i === index, item) : (
+                    <div className="w-full h-full relative">
+                      {imageUrl ? (
+                        <img 
+                          src={imageUrl} 
+                          alt={alt ?? label}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-stone-200/60 dark:bg-stone-800 flex items-center justify-center">
+                          <span className="text-stone-500 text-sm">{label}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
-                {/* Optional top-right expand icon when lightbox enabled (hidden on sm and below) */}
-                {effectiveLightboxEnabled && i === index && imageUrl && (
-                  <button
-                    type="button"
-                    onClick={(e) => { e.stopPropagation(); openLightbox(i); }}
-                    className="hidden md:block absolute right-2 top-2 rounded-md bg-black/15 p-2 text-white backdrop-blur group-hover:bg-black/30 transition-colors"
-                    aria-label="Open in lightbox"
-                  >
-                    <Maximize2 className="h-4 w-4" />
-                  </button>
-                )}
-              </motion.div>
+                  {/* Optional top-right expand icon when lightbox enabled (hidden on sm and below) */}
+                  {effectiveLightboxEnabled && i === index && imageUrl && (
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); openLightbox(i); }}
+                      className="hidden md:block absolute right-2 top-2 rounded-md bg-black/15 p-2 text-white backdrop-blur group-hover:bg-black/30 transition-colors"
+                      aria-label="Open in lightbox"
+                    >
+                      <Maximize2 className="h-4 w-4" />
+                    </button>
+                  )}
+                </motion.div>
 
-              {caption != null && caption !== "" ? (
-                renderCaption ? (
-                  renderCaption({ index: i, label, caption, active: i === index })
-                ) : (
-                  <div
-                    className={`font-sans text-center text-stone-600 dark:text-stone-300 text-xs sm:text-sm mt-2 sm:mt-3`}
-                    style={{ width: "100%", ...(captionStyle || {}) }}
-                  >
-                    {caption}
-                  </div>
-                )
-              ) : null}
-            </div>
-            );
-          })}
-        </motion.div>
+                {caption != null && caption !== "" ? (
+                  renderCaption ? (
+                    renderCaption({ index: i, label, caption, active: i === index })
+                  ) : (
+                    <div
+                      className={`font-sans text-center text-stone-600 dark:text-stone-300 text-xs sm:text-sm mt-2 sm:mt-3`}
+                      style={{ width: "100%", ...(captionStyle || {}) }}
+                    >
+                      {caption}
+                    </div>
+                  )
+                ) : null}
+              </div>
+              );
+            })}
+          </motion.div>
+        )}
 
-        {/* Indicators */}
-        {showIndicators && (
+        {/* Indicators - hidden in mobile/vertical mode */}
+        {showIndicators && !isMobile && (
           <div className="mt-4 sm:mt-8 flex h-8 items-center justify-center" style={{ columnGap: 8 }}>
             {normalized.map(({ label }, i) => {
               const active = index === i;

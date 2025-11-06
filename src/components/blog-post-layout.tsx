@@ -346,7 +346,7 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
                 <p>Back to home</p>
               </TooltipContent>
             </Tooltip>
-            <div className="flex gap-1">
+            <div className="flex gap-1 -mr-2">
               <Tooltip 
                 open={
                   // Don't show tooltip if button is already liked (unless showing liked message)
@@ -383,7 +383,7 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
                       className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50"
                     >
                       <Heart className={cn(
-                        isLiked ? "text-red-500 fill-red-500/20" : "text-stone-500 dark:text-stone-400",
+                        isLiked ? "text-red-500 dark:text-red-700 fill-red-500/20" : "text-stone-500 dark:text-stone-400",
                         shouldAnimate && "heart-bounce"
                       )} />
                     </Toggle>
@@ -441,8 +441,8 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
             onClick={scrollToTop}
             className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50 gap-[6px] pl-4 pr-3 arrow-bounce-button"
           >
-            <span className="text-stone-600 dark:text-stone-400">Back to top</span>
-            <ArrowUp className="text-stone-600 dark:text-stone-400 arrow-bounce" />
+            <span className="text-stone-600 dark:text-zinc-400">Back to top</span>
+            <ArrowUp className="text-stone-600 dark:text-zinc-400 arrow-bounce" />
           </Button>
         </div>
       </div>

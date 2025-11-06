@@ -29,7 +29,7 @@ export default function ProjectItem({
 
   return (
     <motion.div
-      className="max-w-3xl mx-auto"
+      className="w-full"
       initial={initial}
       animate={animate}
       transition={transition}
@@ -38,30 +38,37 @@ export default function ProjectItem({
     >
       <Link 
         href={href} 
-        className="block group font-sans"
+        className="block group font-sans cursor-pointer"
         style={{ 
           textDecoration: 'none',
           color: 'inherit'
         }}
       >
-        <div className="relative">
+        <div className="relative w-full aspect-video bg-stone-200 dark:bg-zinc-700/80 overflow-hidden">
           <img
             src={imageUrl}
             alt={`${organization} project screenshot`}
-            className="w-full object-cover"
+            className="absolute object-cover"
+            style={{
+              left: '12.5%',
+              top: '12.5%',
+              width: '88%',
+              height: '88%',
+              objectPosition: 'left top',
+            }}
           />
-          {/* Overlay with 10% opacity black on hover */}
+          {/* Overlay with 15% opacity black on hover */}
           <div
             className={`absolute inset-0 bg-black transition-opacity ${
-              isHovered ? 'opacity-10' : 'opacity-0'
+              isHovered ? 'opacity-15' : 'opacity-0'
             }`}
           />
         </div>
         <div className="mt-4 font-sans not-italic">
-          <div className="text-[13px] text-stone-500 dark:text-stone-400 font-normal not-italic" style={{ fontFamily: 'Inter' }}>
+          <div className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic" style={{ fontFamily: 'Inter' }}>
             {organization} · <span>{dates}</span>
           </div>
-          <p className="text-[13px] text-stone-500 dark:text-stone-400 mt-0.5 not-italic">
+          <p className="text-[13px] text-stone-500 dark:text-zinc-400 mt-0.5 not-italic">
             {description}
           </p>
         </div>

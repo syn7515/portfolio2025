@@ -42,7 +42,7 @@
     font-weight: 500;
     /* font-medium */
     margin-bottom: 1.75rem;
-    margin-top: 3rem;
+    margin-top: 3.5rem;
     /* mb-2 */
 }
 
@@ -50,15 +50,15 @@
 .mdxContent h5 {
     color: rgb(120 113 108) !important;
     /* stone-500 */
-    font-size: 0.9375rem;
+    font-size: 0.9rem;
     /* 15pt */
     font-weight: 400;
     /* regular */
     line-height: 155%;
     /* 155% */
-    letter-spacing: 0.0125em;
+    letter-spacing: 0.01em;
     /* 0.8% */
-    margin-bottom: 0.1rem;
+    margin-bottom: 0.2rem;
 }
 
 .mdxContent p {
