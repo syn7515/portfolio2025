@@ -267,3 +267,14 @@
         /* dark:bg-gray-800 */
     }
 }
+
+/* Project navigation description - override global paragraph color */
+.project-nav-description {
+    color: rgb(41 37 36) !important; /* stone-800 for light mode */
+}
+
+@media (prefers-color-scheme: dark) {
+    .project-nav-description {
+        color: rgb(244 244 245) !important; /* zinc-100 for dark mode */
+    }
+}

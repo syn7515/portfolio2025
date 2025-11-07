@@ -8,12 +8,79 @@ import { Button } from '@/components/ui/button'
 import { Toggle } from '@/components/ui/toggle'
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipArrow, TooltipProvider } from '@/components/ui/tooltip'
 import TableOfContents from '@/components/ui/table-of-contents'
+import { Divider } from '@/components/ui/divider'
 import { cn } from '@/lib/utils'
 import styles from './blog-post.module.css'
 
 interface BlogPostLayoutProps {
   children: React.ReactNode
   slug?: string
+}
+
+// Project navigation data
+const PROJECTS = [
+  {
+    slug: 'aniai',
+    title: 'Aniai',
+    description: 'Building the Tools Behind Smarter Robots'
+  },
+  {
+    slug: 'athenahealth',
+    title: 'AthenaHealth',
+    description: 'Encouraging Prompt Medical Bill Payment'
+  }
+] as const
+
+interface ProjectNavigation {
+  previousProject?: {
+    slug: string
+    title: string
+    description: string
+  }
+  nextProject?: {
+    slug: string
+    title: string
+    description: string
+  }
+}
+
+function getProjectNavigation(slug?: string): ProjectNavigation {
+  if (!slug) return {}
+  
+  const currentIndex = PROJECTS.findIndex(p => p.slug === slug)
+  if (currentIndex === -1) return {}
+  
+  const previousProject = currentIndex > 0 ? PROJECTS[currentIndex - 1] : undefined
+  const nextProject = currentIndex < PROJECTS.length - 1 ? PROJECTS[currentIndex + 1] : undefined
+  
+  return {
+    previousProject: previousProject ? {
+      slug: previousProject.slug,
+      title: previousProject.title,
+      description: previousProject.description
+    } : undefined,
+    nextProject: nextProject ? {
+      slug: nextProject.slug,
+      title: nextProject.title,
+      description: nextProject.description
+    } : undefined
+  }
+}
+
+// Helper function to prevent widows by wrapping last two words
+function preventWidow(text: string): React.ReactNode {
+  const words = text.split(' ')
+  if (words.length <= 2) return text
+  
+  const lastTwoWords = words.slice(-2).join(' ')
+  const restOfText = words.slice(0, -2).join(' ')
+  
+  return (
+    <>
+      {restOfText && `${restOfText} `}
+      <span style={{ whiteSpace: 'nowrap' }}>{lastTwoWords}</span>
+    </>
+  )
 }
 
 export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) {
@@ -323,6 +390,9 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
     "Closing thoughts": "Thoughts"
   } : undefined
 
+  // Get project navigation
+  const { previousProject, nextProject } = getProjectNavigation(slug)
+
   return (
     <TooltipProvider>
       <TableOfContents labels={tocLabels} />
@@ -445,6 +515,62 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
             <ArrowUp className="text-stone-600 dark:text-zinc-400 arrow-bounce" />
           </Button>
         </div>
+
+        {/* Project Navigation Footer */}
+        {(previousProject || nextProject) && (
+          <div className="max-w-[480px] mx-auto mt-16 mb-8 sm:mb-16">
+            <Divider variant="default" color="stone" spacing="xl" />
+            <div className="flex justify-between items-start mt-6 gap-8">
+              {/* Previous Project */}
+              {previousProject ? (
+                <Link 
+                  href={`/${previousProject.slug}`}
+                  className="flex-1 group cursor-pointer hover:opacity-80 transition-opacity"
+                  style={{ textDecoration: 'none' }}
+                >
+                  <div 
+                    className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic mb-2"
+                    style={{ fontFamily: 'Inter' }}
+                  >
+                    Previous
+                  </div>
+                  <p 
+                    className="mt-0 not-italic project-nav-description"
+                    style={{ fontSize: '14px' }}
+                  >
+                    {preventWidow(previousProject.description)}
+                  </p>
+                </Link>
+              ) : (
+                <div className="flex-1" />
+              )}
+
+              {/* Next Project */}
+              {nextProject ? (
+                <Link 
+                  href={`/${nextProject.slug}`}
+                  className="flex-1 text-right group cursor-pointer hover:opacity-80 transition-opacity"
+                  style={{ textDecoration: 'none' }}
+                >
+                  <div 
+                    className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic mb-2"
+                    style={{ fontFamily: 'Inter' }}
+                  >
+                    Next
+                  </div>
+                  <p 
+                    className="mt-0 not-italic project-nav-description"
+                    style={{ fontSize: '14px' }}
+                  >
+                    {preventWidow(nextProject.description)}
+                  </p>
+                </Link>
+              ) : (
+                <div className="flex-1" />
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </TooltipProvider>
   )

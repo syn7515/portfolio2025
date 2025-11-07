@@ -28,10 +28,18 @@ export function Divider({
   };
   
   const colorClasses = {
-    gray: 'border-gray-300 dark:border-zinc-700',
-    stone: 'border-stone-300 dark:border-zinc-700',
-    slate: 'border-slate-300 dark:border-zinc-700',
-    zinc: 'border-zinc-300 dark:border-zinc-700',
+    gray: variant === 'default' 
+      ? 'border-gray-300/50 dark:border-zinc-700/50'
+      : 'border-gray-300 dark:border-zinc-700',
+    stone: variant === 'default'
+      ? 'border-stone-300/50 dark:border-zinc-700/50'
+      : 'border-stone-300 dark:border-zinc-700',
+    slate: variant === 'default'
+      ? 'border-slate-300/50 dark:border-zinc-700/50'
+      : 'border-slate-300 dark:border-zinc-700',
+    zinc: variant === 'default'
+      ? 'border-zinc-300/50 dark:border-zinc-700/50'
+      : 'border-zinc-300 dark:border-zinc-700',
   };
   
   const spacingClasses = {
