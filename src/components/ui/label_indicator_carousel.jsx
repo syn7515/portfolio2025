@@ -620,17 +620,19 @@ export default function LabelIndicatorCarousel({
               aria-modal="true"
             >
               {/* Close button - top-right corner of viewport */}
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  closeLightbox();
-                }}
-                className="absolute top-4 right-4 rounded-md p-2 text-white hover:bg-white/10 transition-colors z-20 pointer-events-auto"
-                aria-label="Close"
-              >
-                <X className="w-6 h-6" />
-              </button>
+              {!exitTransform && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    closeLightbox();
+                  }}
+                  className="absolute top-4 right-4 rounded-md p-2 text-white hover:bg-white/10 transition-colors z-20 pointer-events-auto"
+                  aria-label="Close"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              )}
 
               {/* Image container - positioned absolutely to allow animation without clipping */}
               <div 
@@ -683,42 +685,46 @@ export default function LabelIndicatorCarousel({
                 </div>
 
                 {/* Prev button - outside image, close to it on the left */}
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    prevLightbox();
-                  }}
-                  disabled={lightboxIndex === 0}
-                  className="absolute rounded-md p-1.5 sm:p-2 text-white hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-transparent transition-colors z-20 pointer-events-auto"
-                  style={{
-                    left: 'calc(50% - min(640px, calc(50vw - 16px)) - 16px)',
-                    top: '50%',
-                    transform: 'translate(-100%, -50%)',
-                  }}
-                  aria-label="Previous"
-                >
-                  <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
-                </button>
+                {!exitTransform && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      prevLightbox();
+                    }}
+                    disabled={lightboxIndex === 0}
+                    className="absolute rounded-md p-1.5 sm:p-2 text-white hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-transparent transition-colors z-20 pointer-events-auto"
+                    style={{
+                      left: 'calc(50% - min(640px, calc(50vw - 16px)) - 16px)',
+                      top: '50%',
+                      transform: 'translate(-100%, -50%)',
+                    }}
+                    aria-label="Previous"
+                  >
+                    <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+                  </button>
+                )}
 
                 {/* Next button - outside image, close to it on the right */}
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    nextLightbox();
-                  }}
-                  disabled={lightboxIndex >= normalized.length - 1}
-                  className="absolute rounded-md p-1.5 sm:p-2 text-white hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-transparent transition-colors z-20 pointer-events-auto"
-                  style={{
-                    left: 'calc(50% + min(640px, calc(50vw - 16px)) + 16px)',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                  }}
-                  aria-label="Next"
-                >
-                  <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
-                </button>
+                {!exitTransform && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      nextLightbox();
+                    }}
+                    disabled={lightboxIndex >= normalized.length - 1}
+                    className="absolute rounded-md p-1.5 sm:p-2 text-white hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-transparent transition-colors z-20 pointer-events-auto"
+                    style={{
+                      left: 'calc(50% + min(640px, calc(50vw - 16px)) + 16px)',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                    }}
+                    aria-label="Next"
+                  >
+                    <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+                  </button>
+                )}
               </div>
             </div>
           </>
