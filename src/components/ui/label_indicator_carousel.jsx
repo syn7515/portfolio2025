@@ -1,7 +1,7 @@
 "use client"
 
-import { motion } from "framer-motion";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { X, ChevronLeft, ChevronRight, Maximize2 } from "lucide-react";
 
 // LabelIndicatorCarousel Component (Responsive)
@@ -97,7 +97,6 @@ export default function LabelIndicatorCarousel({
   indicatorExpandedWidth,
   indicatorCollapsedSize,
   indicatorHeight,
-  withEdgeBlur = false,
   ariaLabel = "Label indicator carousel",
   className = "h-auto w-full max-w-full overflow-hidden",
   enableDrag = true,
@@ -151,32 +150,78 @@ export default function LabelIndicatorCarousel({
   // Lightbox state
   const [isLightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(index);
+  const [initialTransform, setInitialTransform] = useState(null);
+  const [exitTransform, setExitTransform] = useState(null);
+  const [exitDuration, setExitDuration] = useState(0.4);
+  const cardRefs = useRef({});
   
   // Disable lightbox on mobile (< 640px) and sm and below
   const effectiveLightboxEnabled = enableLightbox && !isMobile && !isSmOrBelow;
 
-  const openLightbox = useCallback((i) => {
-    if (!effectiveLightboxEnabled) return;
-    setLightboxIndex(i);
-    setLightboxOpen(true);
-  }, [effectiveLightboxEnabled]);
+  const calculateCardTransform = useCallback((cardIndex) => {
+    const cardElement = cardRefs.current[cardIndex];
+    if (!cardElement) return null;
 
-  const closeLightbox = useCallback(() => setLightboxOpen(false), []);
-  const prevLightbox = useCallback(() => setLightboxIndex((i) => Math.max(0, i - 1)), []);
-  const nextLightbox = useCallback(() => setLightboxIndex((i) => Math.min(normalized.length - 1, i + 1)), [normalized.length]);
+    // Get the actual image element inside the card
+    const imageElement = cardElement.querySelector('img');
+    if (!imageElement) return null;
 
-  useEffect(() => {
-    if (!isLightboxOpen) return;
-    const onKey = (e) => {
-      if (e.key === "Escape") closeLightbox();
-      if (e.key === "ArrowLeft") prevLightbox();
-      if (e.key === "ArrowRight") nextLightbox();
-    };
-    if (typeof window !== 'undefined') {
-      window.addEventListener("keydown", onKey);
-      return () => window.removeEventListener("keydown", onKey);
+    // Get bounding rect of the image element (not the container)
+    const imageRect = imageElement.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    
+    // Calculate final position (center of viewport)
+    const finalX = viewportWidth / 2;
+    const finalY = viewportHeight / 2;
+    
+    // Calculate initial position (center of visible image)
+    const initialX = imageRect.left + imageRect.width / 2;
+    const initialY = imageRect.top + imageRect.height / 2;
+    
+    // Get natural image dimensions
+    let imageNaturalWidth = imageRect.width;
+    let imageNaturalHeight = imageRect.height;
+    
+    if (imageElement.complete) {
+      imageNaturalWidth = imageElement.naturalWidth;
+      imageNaturalHeight = imageElement.naturalHeight;
     }
-  }, [isLightboxOpen, closeLightbox, prevLightbox, nextLightbox]);
+    
+    // Calculate the image's natural aspect ratio
+    const imageAspectRatio = imageNaturalWidth / imageNaturalHeight;
+    
+    // Calculate scale factors
+    // Final size: max-w-7xl (1280px) or max-h-[90vh], whichever is smaller
+    const maxFinalWidth = Math.min(1280, viewportWidth - 32); // 32px for padding
+    const maxFinalHeight = viewportHeight * 0.9;
+    
+    // Determine final rendered dimensions based on image aspect ratio and container constraints
+    // This simulates what object-contain will do
+    let finalRenderedWidth, finalRenderedHeight;
+    if (maxFinalWidth / maxFinalHeight > imageAspectRatio) {
+      // Height is the limiting factor
+      finalRenderedHeight = maxFinalHeight;
+      finalRenderedWidth = finalRenderedHeight * imageAspectRatio;
+    } else {
+      // Width is the limiting factor
+      finalRenderedWidth = maxFinalWidth;
+      finalRenderedHeight = finalRenderedWidth / imageAspectRatio;
+    }
+    
+    // Calculate offset from viewport center (where the image will be centered)
+    const offsetX = initialX - finalX;
+    const offsetY = initialY - finalY;
+    
+    return {
+      x: offsetX, // Offset from center
+      y: offsetY, // Offset from center
+      width: imageRect.width, // Use image rect, not container rect
+      height: imageRect.height, // Use image rect, not container rect
+      finalWidth: finalRenderedWidth,
+      finalHeight: finalRenderedHeight,
+    };
+  }, []);
 
   const { cardWidth: effWidth, cardHeight: effHeight, gap: effGap } = useResponsiveSizing(
     cardWidth,
@@ -199,6 +244,81 @@ export default function LabelIndicatorCarousel({
     },
     [isControlled, normalized.length, onChange]
   );
+
+  // Lightbox callbacks (defined after setIndex)
+  const openLightbox = useCallback((i) => {
+    if (!effectiveLightboxEnabled) return;
+    
+    // Calculate transform from card position
+    const transform = calculateCardTransform(i);
+    setInitialTransform(transform);
+    setLightboxIndex(i);
+    // Sync carousel index with lightbox index
+    setIndex(i);
+    setLightboxOpen(true);
+  }, [effectiveLightboxEnabled, calculateCardTransform, setIndex]);
+
+  const prevLightbox = useCallback(() => {
+    const newIndex = Math.max(0, lightboxIndex - 1);
+    setLightboxIndex(newIndex);
+    // Sync carousel index with lightbox index
+    setIndex(newIndex);
+  }, [lightboxIndex, setIndex]);
+  
+  const nextLightbox = useCallback(() => {
+    const newIndex = Math.min(normalized.length - 1, lightboxIndex + 1);
+    setLightboxIndex(newIndex);
+    // Sync carousel index with lightbox index
+    setIndex(newIndex);
+  }, [lightboxIndex, normalized.length, setIndex]);
+
+  const closeLightbox = useCallback(() => {
+    // Since carousel index is synced with lightbox index, no sliding needed
+    // Just animate back to the current card position
+    const transform = calculateCardTransform(lightboxIndex);
+    if (transform) {
+      setExitTransform(transform);
+      setExitDuration(0.4); // Fixed duration since no sliding
+      // Use requestAnimationFrame to ensure state is updated before exit animation
+      requestAnimationFrame(() => {
+        setLightboxOpen(false);
+      });
+    } else {
+      setLightboxOpen(false);
+    }
+    // Reset transform after animation completes
+    setTimeout(() => {
+      setInitialTransform(null);
+      setExitTransform(null);
+      setExitDuration(0.4);
+    }, 400);
+  }, [lightboxIndex, calculateCardTransform]);
+
+  // Keyboard handler for lightbox (defined after callbacks)
+  useEffect(() => {
+    if (!isLightboxOpen) return;
+    const onKey = (e) => {
+      // Only handle lightbox navigation keys
+      if (e.key === "Escape") {
+        e.preventDefault();
+        e.stopPropagation();
+        closeLightbox();
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        e.stopPropagation();
+        prevLightbox();
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        e.stopPropagation();
+        nextLightbox();
+      }
+    };
+    if (typeof window !== 'undefined') {
+      // Use capture phase to intercept before carousel handler
+      window.addEventListener("keydown", onKey, true);
+      return () => window.removeEventListener("keydown", onKey, true);
+    }
+  }, [isLightboxOpen, closeLightbox, prevLightbox, nextLightbox]);
 
   const xOffset = useMemo(
     () => -index * span + centerOffset,
@@ -245,6 +365,8 @@ export default function LabelIndicatorCarousel({
   }, [indicatorExpandedWidth, indicatorCollapsedSize, indicatorHeight]);
 
   const onKeyDown = (e) => {
+    // Disable keyboard navigation when lightbox is open
+    if (isLightboxOpen) return;
     // Disable keyboard navigation in mobile/vertical mode
     if (isMobile) return;
     if (e.key === "ArrowRight") {
@@ -359,6 +481,11 @@ export default function LabelIndicatorCarousel({
               return (
               <div key={i} className="flex flex-col items-center" style={{ width: effWidth }}>
                 <motion.div
+                  ref={(el) => {
+                    if (effectiveLightboxEnabled && imageUrl) {
+                      cardRefs.current[i] = el;
+                    }
+                  }}
                   initial={false}
                   role="button"
                   tabIndex={0}
@@ -386,7 +513,7 @@ export default function LabelIndicatorCarousel({
                   whileTap={{ scale: 0.98 }}
                 >
                   {renderCard ? renderCard(i, i === index, item) : (
-                    <div className="w-full h-full relative">
+                    <div className="w-full h-full relative overflow-hidden">
                       {imageUrl ? (
                         <img 
                           src={imageUrl} 
@@ -406,7 +533,7 @@ export default function LabelIndicatorCarousel({
                     <button
                       type="button"
                       onClick={(e) => { e.stopPropagation(); openLightbox(i); }}
-                      className="hidden md:block absolute right-2 top-2 rounded-md bg-black/15 p-2 text-white backdrop-blur group-hover:bg-black/30 transition-colors"
+                      className="hidden md:block absolute right-2 top-2 rounded-md bg-black/10 p-2 text-white backdrop-blur group-hover:bg-black/30 transition-colors"
                       aria-label="Open in lightbox"
                     >
                       <Maximize2 className="h-4 w-4" />
@@ -473,66 +600,130 @@ export default function LabelIndicatorCarousel({
       </div>
 
       {/* Lightbox Overlay */}
-      {effectiveLightboxEnabled && isLightboxOpen && (
-        <div 
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" 
-          role="dialog" 
-          aria-modal="true"
-          onClick={closeLightbox}
-        >
-          {/* Close button - top-right corner of viewport */}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              closeLightbox();
-            }}
-            className="absolute top-4 right-4 rounded-md p-2 text-white hover:bg-white/10 transition-colors z-10"
-            aria-label="Close"
-          >
-            <X className="w-6 h-6" />
-          </button>
-
-          {/* Prev button - outside image on the left */}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              prevLightbox();
-            }}
-            disabled={lightboxIndex === 0}
-            className="rounded-md p-1.5 sm:p-2 text-white hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-transparent transition-colors mr-2 sm:mr-4"
-            aria-label="Previous"
-          >
-            <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
-          </button>
-
-          <div 
-            className="relative w-full max-w-7xl max-h-[90vh] overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <img
-              src={normalized[lightboxIndex]?.imageUrl || "/placeholder.svg"}
-              alt={normalized[lightboxIndex]?.alt || normalized[lightboxIndex]?.label || "Lightbox image"}
-              className="h-full w-full object-contain"
+      <AnimatePresence>
+        {effectiveLightboxEnabled && isLightboxOpen && (
+          <>
+            {/* Background overlay with opacity */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.8 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4, ease: [0.77, 0, 0.175, 1] }}
+              className="fixed inset-0 z-50 bg-black" 
+              onClick={closeLightbox}
             />
-          </div>
+            
+            {/* Lightbox content container */}
+            <div 
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
+              role="dialog" 
+              aria-modal="true"
+            >
+              {/* Close button - top-right corner of viewport */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  closeLightbox();
+                }}
+                className="absolute top-4 right-4 rounded-md p-2 text-white hover:bg-white/10 transition-colors z-20 pointer-events-auto"
+                aria-label="Close"
+              >
+                <X className="w-6 h-6" />
+              </button>
 
-          {/* Next button - outside image on the right */}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              nextLightbox();
-            }}
-            disabled={lightboxIndex >= normalized.length - 1}
-            className="rounded-md p-1.5 sm:p-2 text-white hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-transparent transition-colors ml-2 sm:ml-4"
-            aria-label="Next"
-          >
-            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
-          </button>
-        </div>
-      )}
+              {/* Image container - positioned absolutely to allow animation without clipping */}
+              <div 
+                className="absolute inset-0 pointer-events-none flex items-center justify-center"
+                style={{ overflow: 'visible' }}
+              >
+                <div 
+                  className="relative pointer-events-auto"
+                  style={{ 
+                    maxWidth: 'min(1280px, calc(100vw - 32px))',
+                    maxHeight: '90vh',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <motion.img
+                    initial={initialTransform ? {
+                      x: initialTransform.x,
+                      y: initialTransform.y,
+                      width: initialTransform.width,
+                      height: initialTransform.height,
+                    } : false}
+                    animate={{
+                      x: 0,
+                      y: 0,
+                      width: initialTransform ? initialTransform.finalWidth : 'auto',
+                      height: initialTransform ? initialTransform.finalHeight : 'auto',
+                    }}
+                    exit={exitTransform ? {
+                      x: exitTransform.x,
+                      y: exitTransform.y,
+                      width: exitTransform.width,
+                      height: exitTransform.height,
+                    } : {}}
+                    transition={{
+                      duration: exitTransform ? exitDuration : 0.4,
+                      ease: [0.77, 0, 0.175, 1]
+                    }}
+                    src={normalized[lightboxIndex]?.imageUrl || "/placeholder.svg"}
+                    alt={normalized[lightboxIndex]?.alt || normalized[lightboxIndex]?.label || "Lightbox image"}
+                    className="object-contain"
+                    style={{ 
+                      opacity: 1, 
+                      display: 'block',
+                      transformOrigin: 'center center',
+                    }}
+                  />
+                </div>
+
+                {/* Prev button - outside image, close to it on the left */}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    prevLightbox();
+                  }}
+                  disabled={lightboxIndex === 0}
+                  className="absolute rounded-md p-1.5 sm:p-2 text-white hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-transparent transition-colors z-20 pointer-events-auto"
+                  style={{
+                    left: 'calc(50% - min(640px, calc(50vw - 16px)) - 16px)',
+                    top: '50%',
+                    transform: 'translate(-100%, -50%)',
+                  }}
+                  aria-label="Previous"
+                >
+                  <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+                </button>
+
+                {/* Next button - outside image, close to it on the right */}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    nextLightbox();
+                  }}
+                  disabled={lightboxIndex >= normalized.length - 1}
+                  className="absolute rounded-md p-1.5 sm:p-2 text-white hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-transparent transition-colors z-20 pointer-events-auto"
+                  style={{
+                    left: 'calc(50% + min(640px, calc(50vw - 16px)) + 16px)',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                  }}
+                  aria-label="Next"
+                >
+                  <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
