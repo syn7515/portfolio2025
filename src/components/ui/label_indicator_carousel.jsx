@@ -312,7 +312,7 @@ export default function LabelIndicatorCarousel({
                       renderCaption({ index: i, label, caption, active: i === index })
                     ) : (
                       <div
-                        className={`font-sans text-center text-stone-600 dark:text-stone-300 text-xs sm:text-sm mt-2 sm:mt-3`}
+                        className={`font-sans text-center text-stone-600 dark:text-zinc-300 text-xs sm:text-sm mt-2 sm:mt-3`}
                         style={{ width: "100%", ...(captionStyle || {}) }}
                       >
                         {caption}

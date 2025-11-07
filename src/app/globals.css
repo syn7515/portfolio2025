@@ -383,6 +383,33 @@ pre code {
   }
 }
 
+/* Social icon styles */
+.social-icon {
+  color: rgb(168 162 158) !important;
+  /* stone-400 */
+  opacity: 0.8;
+  transition-property: color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.social-icon:hover {
+  color: rgb(87 83 78) !important;
+  /* stone-600 */
+}
+
+@media (prefers-color-scheme: dark) {
+  .social-icon {
+    color: rgb(113 113 122) !important;
+    /* zinc-500 */
+  }
+
+  .social-icon:hover {
+    color: rgb(212 212 216) !important;
+    /* zinc-300 */
+  }
+}
+
 /* Arrow up bounce animation */
 @keyframes arrow-bounce-up {
   0% {

@@ -337,7 +337,7 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
               <TooltipTrigger asChild>
                 <Button variant="ghost" size="icon-sm" asChild aria-label="Back to home" className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50 -ml-2">
                   <Link href="/" className="cursor-pointer">
-                    <Undo2 className="text-stone-500 dark:text-stone-400" />
+                    <Undo2 className="text-stone-500 dark:text-zinc-400" />
                   </Link>
                 </Button>
               </TooltipTrigger>
@@ -383,7 +383,7 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
                       className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50"
                     >
                       <Heart className={cn(
-                        isLiked ? "text-red-500 dark:text-red-700 fill-red-500/20" : "text-stone-500 dark:text-stone-400",
+                        isLiked ? "text-red-500 dark:text-red-700 fill-red-500/20" : "text-stone-500 dark:text-zinc-400",
                         shouldAnimate && "heart-bounce"
                       )} />
                     </Toggle>
@@ -417,10 +417,10 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
                     disabled={copied}
                   >
                     <div className={cn("transition-all absolute inset-0 flex items-center justify-center", copied ? "scale-100 opacity-100" : "scale-0 opacity-0")}>
-                      <Check className="text-stone-500 dark:text-stone-400" />
+                      <Check className="text-stone-500 dark:text-zinc-400" />
                     </div>
                     <div className={cn("transition-all", copied ? "scale-0 opacity-0" : "scale-100 opacity-100")}>
-                      <Clipboard className="text-stone-500 dark:text-stone-400" />
+                      <Clipboard className="text-stone-500 dark:text-zinc-400" />
                     </div>
                   </Button>
                 </TooltipTrigger>

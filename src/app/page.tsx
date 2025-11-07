@@ -44,7 +44,7 @@ export default function Home() {
               href="https://x.com/spark7515" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="!text-stone-400 dark:!text-zinc-500 hover:!text-stone-600 dark:hover:!text-zinc-300 opacity-80"
+              className="social-icon"
               aria-label="Twitter"
             >
               <svg className="w-[22px] h-[22px]" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -55,7 +55,7 @@ export default function Home() {
               href="https://www.linkedin.com/in/sooyeonp/" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="!text-stone-400 dark:!text-zinc-500 hover:!text-stone-600 dark:hover:!text-zinc-300 opacity-80"
+              className="social-icon"
               aria-label="LinkedIn"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -65,7 +65,7 @@ export default function Home() {
           </motion.div>
         </div>
         
-        <div className="max-w-[792px] mx-auto w-full px-4 mt-12 md:mt-20">
+        <div className="max-w-[800px] mx-auto w-full px-4 mt-20">
           <div className="grid gap-12 md:gap-16">
             <ProjectItem
               imageUrl="https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/aniai-main.png"
