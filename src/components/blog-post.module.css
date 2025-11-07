@@ -151,6 +151,13 @@
     /* stone-500 - lighter text color */
 }
 
+.mdxContent strong {
+    color: rgb(28 25 23) !important;
+    /* stone-900 */
+    font-weight: 600;
+    opacity: 1;
+}
+
 .mdxContent code {
     background-color: rgb(243 244 246);
     /* bg-gray-100 */
@@ -210,8 +217,8 @@
     .mdxContent p {
         color: rgb(212 212 216) !important;
         /* zinc-300 */
-        opacity: 0.9;
-        /* 90% opacity for slightly darker appearance in dark mode */
+        opacity: 0.78;
+        /* 78% opacity for slightly darker appearance in dark mode */
     }
 
     .mdxContent h5 {
@@ -238,6 +245,12 @@
     .mdxContent sup {
         color: rgb(161 161 170) !important;
         /* zinc-400 - lighter text color for dark mode */
+    }
+
+    .mdxContent strong {
+        color: rgb(244 244 245) !important;
+        /* zinc-100 */
+        opacity: 1;
     }
 
     .mdxContent code {
