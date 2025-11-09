@@ -294,6 +294,43 @@ export default function LabelIndicatorCarousel({
     }, 400);
   }, [lightboxIndex, calculateCardTransform]);
 
+  // Prevent body scroll when lightbox is open
+  useEffect(() => {
+    if (!effectiveLightboxEnabled) return;
+    
+    if (isLightboxOpen) {
+      // Save current scroll position
+      const scrollY = window.scrollY;
+      const body = document.body;
+      const html = document.documentElement;
+      
+      // Prevent scrolling by setting position fixed and maintaining scroll position
+      body.style.position = 'fixed';
+      body.style.top = `-${scrollY}px`;
+      body.style.width = '100%';
+      body.style.overflow = 'hidden';
+      
+      // Also prevent scrolling on html element
+      html.style.overflow = 'hidden';
+      
+      // Store scroll position for restoration
+      return () => {
+        // When closing, wait for exit animation to complete before restoring scroll
+        const savedScrollY = scrollY; // Capture scroll position in closure
+        const animationDuration = exitDuration * 1000; // Convert to milliseconds
+        setTimeout(() => {
+          // Restore scroll position and styles
+          body.style.position = '';
+          body.style.top = '';
+          body.style.width = '';
+          body.style.overflow = '';
+          html.style.overflow = '';
+          window.scrollTo(0, savedScrollY);
+        }, animationDuration);
+      };
+    }
+  }, [effectiveLightboxEnabled, isLightboxOpen, exitDuration]);
+
   // Keyboard handler for lightbox (defined after callbacks)
   useEffect(() => {
     if (!isLightboxOpen) return;
