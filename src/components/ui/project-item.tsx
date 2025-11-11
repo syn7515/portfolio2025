@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
 
 interface ProjectItemProps {
   imageUrl: string;
@@ -25,16 +24,12 @@ export default function ProjectItem({
   animate = { opacity: 1, y: 0 },
   transition = { duration: 0.1, ease: [0.25, 0.1, 0.25, 1] },
 }: ProjectItemProps) {
-  const [isHovered, setIsHovered] = useState(false);
-
   return (
     <motion.div
       className="w-full"
       initial={initial}
       animate={animate}
       transition={transition}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
       <Link 
         href={href} 
@@ -48,7 +43,7 @@ export default function ProjectItem({
           <img
             src={imageUrl}
             alt={`${organization} project screenshot`}
-            className="absolute object-cover"
+            className="absolute object-cover group-hover:opacity-80 transition-opacity"
             style={{
               left: '12.5%',
               top: '12.5%',
@@ -56,12 +51,6 @@ export default function ProjectItem({
               height: '88%',
               objectPosition: 'left top',
             }}
-          />
-          {/* Overlay with 15% opacity black on hover */}
-          <div
-            className={`absolute inset-0 bg-black transition-opacity duration-20 ${
-              isHovered ? 'opacity-15' : 'opacity-0'
-            }`}
           />
         </div>
         <div className="mt-4 font-sans not-italic">

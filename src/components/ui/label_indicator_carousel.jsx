@@ -455,7 +455,7 @@ export default function LabelIndicatorCarousel({
                           <img 
                             src={imageUrl} 
                             alt={alt ?? label}
-                            className="w-full h-full object-cover"
+                            className={`w-full h-full object-cover transition-opacity ${i !== index ? 'group-hover:opacity-80' : ''}`}
                           />
                         ) : (
                           <div className="w-full h-full bg-stone-200/60 dark:bg-stone-800 flex items-center justify-center">
@@ -555,7 +555,7 @@ export default function LabelIndicatorCarousel({
                         <img 
                           src={imageUrl} 
                           alt={alt ?? label}
-                          className="w-full h-full object-cover"
+                          className={`w-full h-full object-cover transition-opacity ${i !== index ? 'group-hover:opacity-80' : ''}`}
                         />
                       ) : (
                         <div className="w-full h-full bg-stone-200/60 dark:bg-stone-800 flex items-center justify-center">
