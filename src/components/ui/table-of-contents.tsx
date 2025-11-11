@@ -390,7 +390,7 @@ export default function TableOfContents({ className, labels }: TableOfContentsPr
 
   return (
       <div 
-          className={cn("hidden lg:block fixed left-8 top-1/2 -translate-y-1/2 z-50", className)} 
+          className={cn("hidden lg:block fixed left-8 top-[128px] z-50", className)} 
           style={{ 
             pointerEvents: 'none',
             width: 'auto',
