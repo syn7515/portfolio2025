@@ -193,7 +193,8 @@ export default function LabelIndicatorCarousel({
     
     // Calculate scale factors
     // Final size: max-w-7xl (1280px) or max-h-[90vh], whichever is smaller
-    const maxFinalWidth = Math.min(1280, viewportWidth - 32); // 32px for padding
+    // Account for: 32px padding + 80px buttons (40px each) + 8px gaps (4px each side)
+    const maxFinalWidth = Math.min(1280, viewportWidth - 32 - 80 - 8);
     const maxFinalHeight = viewportHeight * 0.9;
     
     // Determine final rendered dimensions based on image aspect ratio and container constraints
@@ -679,7 +680,7 @@ export default function LabelIndicatorCarousel({
                 <div 
                   className="relative pointer-events-auto"
                   style={{ 
-                    maxWidth: 'min(1280px, calc(100vw - 32px))',
+                    maxWidth: 'min(1280px, calc(100vw - 32px - 80px - 8px))',
                     maxHeight: '90vh',
                     display: 'flex',
                     alignItems: 'center',
@@ -732,7 +733,7 @@ export default function LabelIndicatorCarousel({
                     disabled={lightboxIndex === 0}
                     className="absolute rounded-md p-1.5 sm:p-2 text-white hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-transparent transition-colors z-20 pointer-events-auto"
                     style={{
-                      left: 'calc(50% - min(640px, calc(50vw - 16px)) - 16px)',
+                      left: 'calc(50% - min(640px, calc(50vw - 16px - 40px - 4px)) - 4px)',
                       top: '50%',
                       transform: 'translate(-100%, -50%)',
                     }}
@@ -753,7 +754,7 @@ export default function LabelIndicatorCarousel({
                     disabled={lightboxIndex >= normalized.length - 1}
                     className="absolute rounded-md p-1.5 sm:p-2 text-white hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-transparent transition-colors z-20 pointer-events-auto"
                     style={{
-                      left: 'calc(50% + min(640px, calc(50vw - 16px)) + 16px)',
+                      left: 'calc(50% + min(640px, calc(50vw - 16px - 40px - 4px)) + 4px)',
                       top: '50%',
                       transform: 'translateY(-50%)',
                     }}
