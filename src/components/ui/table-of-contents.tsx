@@ -386,7 +386,7 @@ export default function TableOfContents({ className, labels }: TableOfContentsPr
     return null
   }
 
-  const railSpacing = isTocHovered ? 12 : 2
+  const railSpacing = isTocHovered ? 12 : 0
 
   return (
       <div 
@@ -437,6 +437,9 @@ export default function TableOfContents({ className, labels }: TableOfContentsPr
               <div
                 key={heading.id}
                 className="flex items-center gap-2 cursor-pointer group"
+                style={{
+                  marginBottom: !isTocHovered ? '-8px' : '0'
+                }}
                 onMouseEnter={() => setHoveredId(heading.id)}
                 onMouseLeave={() => setHoveredId(null)}
                 onClick={() => handleClick(heading.id)}
@@ -445,15 +448,15 @@ export default function TableOfContents({ className, labels }: TableOfContentsPr
                   className={cn(
                     "flex-shrink-0 rounded-full",
                     isActive || isHovered
-                      ? isTocHovered ? "h-[1.5px] w-[1.5px]" : "h-[2.2px] w-8"
-                      : isTocHovered ? "opacity-70 dark:opacity-80 h-[1.5px] w-[1.5px]" : "opacity-70 dark:opacity-80 h-[2.2px] w-5",
+                      ? isTocHovered ? "h-[1.5px] w-[1.5px]" : "h-[1.5px] w-8"
+                      : isTocHovered ? "opacity-70 dark:opacity-80 h-[1.5px] w-[1.5px]" : "opacity-70 dark:opacity-80 h-[1.5px] w-3",
                     isActive || isHovered
                       ? "bg-stone-600 dark:bg-zinc-300"
                       : "bg-stone-400 dark:bg-zinc-600"
                   )}
                   style={{ 
-                    minWidth: (isActive || isHovered) && !isTocHovered ? '32px' : (isTocHovered ? '8px' : '20px'),
-                    minHeight: isActive || isHovered ? (isTocHovered ? '1.5px' : '2.5px') : (isTocHovered ? '1.5px' : '2px'),
+                    minWidth: (isActive || isHovered) && !isTocHovered ? '32px' : (isTocHovered ? '6px' : '12px'),
+                    minHeight: isActive || isHovered ? (isTocHovered ? '1.5px' : '1.5px') : (isTocHovered ? '1.5px' : '1.5px'),
                     opacity: isActive || isHovered ? 0.8 : undefined,
                     transition: (hasExpanded && isTocHovered && hoveredId !== null && prevIsTocHovered.current) ? 'none' : 'all 350ms cubic-bezier(0.4, 0, 0.2, 1)'
                   }}
