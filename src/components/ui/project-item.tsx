@@ -39,11 +39,11 @@ export default function ProjectItem({
           color: 'inherit'
         }}
       >
-        <div className="relative w-full aspect-video bg-stone-200 dark:bg-zinc-700/80 overflow-hidden">
+        <div className="relative w-full aspect-video bg-stone-200 dark:bg-zinc-700/80 group-hover:bg-stone-300 dark:group-hover:bg-zinc-600 transition-colors duration-100 overflow-hidden">
           <img
             src={imageUrl}
             alt={`${organization} project screenshot`}
-            className="absolute object-cover group-hover:opacity-80 transition-opacity"
+            className="absolute object-cover"
             style={{
               left: '12.5%',
               top: '12.5%',

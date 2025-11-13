@@ -388,9 +388,7 @@ pre code {
   color: rgb(168 162 158) !important;
   /* stone-400 */
   opacity: 0.8;
-  transition-property: color;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
+  transition-duration: 0ms;
 }
 
 .social-icon:hover {
