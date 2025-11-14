@@ -90,6 +90,8 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
   const [likeTooltipOpen, setLikeTooltipOpen] = React.useState<boolean | undefined>(undefined)
   const [isLiked, setIsLiked] = React.useState(false)
   const [shouldAnimate, setShouldAnimate] = React.useState(false)
+  const [likeCount, setLikeCount] = React.useState<number | null>(null)
+  const [isUpdatingCount, setIsUpdatingCount] = React.useState(false)
 
   // Initialize liked state from localStorage on mount
   React.useEffect(() => {
@@ -107,13 +109,44 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
     }
   }, [slug])
 
+  // Fetch initial like count on mount
+  React.useEffect(() => {
+    if (!slug) return
+
+    const fetchLikeCount = async () => {
+      try {
+        const response = await fetch(`/api/likes/${slug}`)
+        if (response.ok) {
+          const data = await response.json()
+          setLikeCount(data.count)
+        } else {
+          // If API fails, set to 0
+          setLikeCount(0)
+        }
+      } catch (error) {
+        console.error('Failed to fetch like count:', error)
+        setLikeCount(0)
+      }
+    }
+
+    fetchLikeCount()
+  }, [slug])
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const handleLike = (pressed: boolean) => {
+  const handleLike = async (pressed: boolean) => {
+    if (!slug || isUpdatingCount) return
+
     const wasLiked = isLiked
     setIsLiked(pressed)
+    
+    // Optimistic UI update
+    const currentCount = likeCount ?? 0
+    const optimisticCount = pressed ? currentCount + 1 : Math.max(0, currentCount - 1)
+    setLikeCount(optimisticCount)
+    setIsUpdatingCount(true)
     
     // Trigger animation when transitioning from unliked to liked
     if (pressed && !wasLiked) {
@@ -147,17 +180,47 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
       }
     }
     
+    // Update count on server
+    try {
+      const method = pressed ? 'POST' : 'DELETE'
+      const response = await fetch(`/api/likes/${slug}`, { method })
+      
+      if (response.ok) {
+        const data = await response.json()
+        setLikeCount(data.count)
+      } else {
+        // Revert optimistic update on error
+        setLikeCount(currentCount)
+        const errorData = await response.json().catch(() => ({}))
+        console.error('Failed to update like count:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorData
+        })
+      }
+    } catch (error) {
+      // Revert optimistic update on error
+      setLikeCount(currentCount)
+      console.error('Error updating like count:', error)
+    } finally {
+      setIsUpdatingCount(false)
+    }
+    
     if (pressed) {
       // Check if tooltip is already open (user hovered and it's visible)
       const wasAlreadyOpen = likeTooltipOpen === true
       
-      // Random messages
+      // Random messages - will include count
       const messages = ["You liked this!", "Thanks for the 💖", "Appreciated ;)"]
       const randomMessage = messages[Math.floor(Math.random() * messages.length)]
       
+      // Capture the optimistic count for the message (the count that was just incremented)
+      const countForMessage = optimisticCount
+      const messageWithCount = `${randomMessage}\n${countForMessage} ${countForMessage === 1 ? 'like' : 'likes'}`
+      
       // Delay showing the message by 0.3s
       setTimeout(() => {
-        setLikedMessage(randomMessage)
+        setLikedMessage(messageWithCount)
         
         // If tooltip was already open, keep it open (content changes without animation)
         // If tooltip is not open, open it now with the message (will animate)
@@ -451,6 +514,7 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
                       size="icon-sm"
                       aria-label="Like"
                       className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50"
+                      disabled={isUpdatingCount}
                     >
                       <Heart className={cn(
                         isLiked ? "text-red-500 dark:text-red-700 fill-red-500/20" : "text-stone-500 dark:text-zinc-400",
@@ -461,7 +525,23 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
                 </TooltipTrigger>
                 <TooltipContent side="top">
                   <TooltipArrow />
-                  <p>{likedMessage || 'Show some love'}</p>
+                  {likedMessage ? (
+                    <div style={{ textAlign: 'center' }}>
+                      {likedMessage.split('\n').map((line, index) => (
+                        <div 
+                          key={index}
+                          className={index === 1 ? 'text-stone-400 dark:text-zinc-500' : ''}
+                          style={{ 
+                            marginTop: index === 1 ? '0.125rem' : '0'
+                          }}
+                        >
+                          {line}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p style={{ textAlign: 'center' }}>Show some love</p>
+                  )}
                 </TooltipContent>
               </Tooltip>
               <Tooltip 
