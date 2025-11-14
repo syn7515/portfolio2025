@@ -15,6 +15,7 @@ import styles from './blog-post.module.css'
 interface BlogPostLayoutProps {
   children: React.ReactNode
   slug?: string
+  initialCount?: number
 }
 
 // Project navigation data
@@ -83,14 +84,14 @@ function preventWidow(text: string): React.ReactNode {
   )
 }
 
-export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) {
+export default function BlogPostLayout({ children, slug, initialCount }: BlogPostLayoutProps) {
   const [copied, setCopied] = React.useState(false)
   const [tooltipOpen, setTooltipOpen] = React.useState<boolean | undefined>(undefined)
   const [likedMessage, setLikedMessage] = React.useState<string | null>(null)
   const [likeTooltipOpen, setLikeTooltipOpen] = React.useState<boolean | undefined>(undefined)
   const [isLiked, setIsLiked] = React.useState(false)
   const [shouldAnimate, setShouldAnimate] = React.useState(false)
-  const [likeCount, setLikeCount] = React.useState<number | null>(null)
+  const [likeCount, setLikeCount] = React.useState<number | null>(initialCount ?? null)
   const [isUpdatingCount, setIsUpdatingCount] = React.useState(false)
 
   // Initialize liked state from localStorage on mount
@@ -109,9 +110,9 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
     }
   }, [slug])
 
-  // Fetch initial like count on mount
+  // Fetch initial like count on mount (only if not provided via prop)
   React.useEffect(() => {
-    if (!slug) return
+    if (!slug || initialCount !== undefined) return
 
     const fetchLikeCount = async () => {
       try {
@@ -130,7 +131,7 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
     }
 
     fetchLikeCount()
-  }, [slug])
+  }, [slug, initialCount])
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -142,10 +143,14 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
     const wasLiked = isLiked
     setIsLiked(pressed)
     
-    // Optimistic UI update
+    // Optimistic UI update - use current state immediately
     const currentCount = likeCount ?? 0
     const optimisticCount = pressed ? currentCount + 1 : Math.max(0, currentCount - 1)
     setLikeCount(optimisticCount)
+    
+    // Use optimistic count immediately for the tooltip message (don't wait for API)
+    const countForMessage = optimisticCount
+    
     setIsUpdatingCount(true)
     
     // Trigger animation when transitioning from unliked to liked

@@ -1,12 +1,8 @@
-"use client"
+import AniaiContentClient from './content-client'
+import { getLikeCount } from '@/lib/get-like-count'
 
-import BlogPostLayout from '@/components/blog-post-layout'
-import MDXContent from './content.mdx'
-
-export default function AniaiPost() {
-  return (
-    <BlogPostLayout slug="aniai">
-      <MDXContent />
-    </BlogPostLayout>
-  )
+export default async function AniaiPost() {
+  const initialCount = await getLikeCount('aniai')
+  
+  return <AniaiContentClient initialCount={initialCount} />
 }

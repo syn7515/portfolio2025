@@ -1,14 +1,10 @@
-"use client"
+import AthenahealthContentClient from './content-client'
+import { getLikeCount } from '@/lib/get-like-count'
 
-import BlogPostLayout from '@/components/blog-post-layout'
-import MDXContent from './content.mdx'
-
-export default function AthenahealthPost() {
-  return (
-    <BlogPostLayout slug="athenahealth">
-      <MDXContent />
-    </BlogPostLayout>
-  )
+export default async function AthenahealthPost() {
+  const initialCount = await getLikeCount('athenahealth')
+  
+  return <AthenahealthContentClient initialCount={initialCount} />
 }
 
 
