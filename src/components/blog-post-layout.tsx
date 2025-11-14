@@ -589,10 +589,10 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
           <Button 
             variant="ghost" 
             onClick={scrollToTop}
-            className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50 gap-[6px] pl-4 pr-3 arrow-bounce-button"
+            className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50 gap-[6px] pl-3 pr-4 arrow-bounce-button"
           >
-            <span className="text-stone-600 dark:text-zinc-400">Back to top</span>
             <ArrowUp className="text-stone-600 dark:text-zinc-400 arrow-bounce" />
+            <span className="text-stone-600 dark:text-zinc-400">Back to top</span>
           </Button>
         </div>
 
