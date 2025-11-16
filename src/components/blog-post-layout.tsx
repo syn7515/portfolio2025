@@ -585,16 +585,7 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
             {children}
           </div>
         </motion.div>
-        <div className="max-w-[480px] mx-auto mt-16 mb-8 sm:mb-16 flex justify-center">
-          <Button 
-            variant="ghost" 
-            onClick={scrollToTop}
-            className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50 gap-[6px] pl-3 pr-4 arrow-bounce-button"
-          >
-            <ArrowUp className="text-stone-600 dark:text-zinc-400 arrow-bounce" />
-            <span className="text-stone-600 dark:text-zinc-400">Back to top</span>
-          </Button>
-        </div>
+
 
         {/* Project Navigation Footer */}
         {(previousProject || nextProject) && (
