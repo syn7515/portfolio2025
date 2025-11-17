@@ -97,10 +97,10 @@ export default function Home() {
           transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.6 }}
         >
           <div 
-            className="text-[14px] text-stone-400 dark:text-zinc-500 font-normal not-italic"
+            className="text-[14px] text-stone-400 dark:text-zinc-500 font-normal"
             style={{ fontFamily: 'Inter' }}
           >
-            © {new Date().getFullYear()} Sue Park. — Built entirely with Cursor
+            © {new Date().getFullYear()} Sue Park. — Built with Cursor
           </div>
         </motion.div>
         
