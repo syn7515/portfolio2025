@@ -8,7 +8,7 @@ export default function Home() {
   return (
 
 
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen pb-20 gap-16 sm: overflow-x-hidden">
+    <div className="font-sans grid grid-rows-[80px_1fr_20px] items-center justify-items-center min-h-screen pb-0 gap-1 sm: overflow-x-hidden">
       <main className="w-full flex flex-col gap-[32px] row-start-2 items-center sm:items-start overflow-x-hidden">
         <div className="max-w-[480px] mx-auto px-4" style={{ paddingTop: 'clamp(40px, 10vh, 120px)' }}>
           <motion.p
@@ -65,7 +65,7 @@ export default function Home() {
           </motion.div>
         </div>
         
-        <div className="max-w-[800px] mx-auto w-full px-4 mt-20">
+        <div className="max-w-[800px] mx-auto w-full px-4 mt-24">
           <div className="grid gap-12 md:gap-16">
             <ProjectItem
               imageUrl="https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/aniai-main.png"
@@ -89,6 +89,20 @@ export default function Home() {
             />
           </div>
         </div>
+        
+        <motion.div
+          className="max-w-[480px] mx-auto px-4 mt-24 mb-0 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.6 }}
+        >
+          <div 
+            className="text-[14px] text-stone-400 dark:text-zinc-500 font-normal not-italic"
+            style={{ fontFamily: 'Inter' }}
+          >
+            © {new Date().getFullYear()} Sue Park. — Built entirely with Cursor
+          </div>
+        </motion.div>
         
       </main>
       
