@@ -1,6 +1,19 @@
 import * as React from "react";
 
-export type CarouselItem = string | { label: string; caption?: string; imageUrl?: string };
+export type ImagePosition = {
+  top?: number | 'center';
+  bottom?: number;
+  left?: number | 'center';
+  right?: number;
+};
+
+export type CarouselItem = string | { 
+  label: string; 
+  caption?: string; 
+  imageUrl?: string;
+  imageSizePercent?: number;
+  imagePosition?: ImagePosition;
+};
 
 export interface LabelIndicatorCarouselProps {
   items?: CarouselItem[];

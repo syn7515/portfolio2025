@@ -17,23 +17,59 @@ const defaultTransition = {
 const FALLBACK_ITEMS = ["Dean", "Lil B", "Lazer", "Simz", "Bladee"];
 
 function normalizeItem(item) {
-  if (typeof item === "string") return { label: item, caption: null, imageUrl: null, alt: item };
+  if (typeof item === "string") return { label: item, caption: null, imageUrl: null, alt: item, imageSizePercent: null, imagePosition: null };
   if (item && typeof item === "object") {
     if ("label" in item || "imageUrl" in item) {
       return { 
         label: item.label ?? "", 
         caption: item.caption ?? null,
         imageUrl: item.imageUrl ?? item.image ?? null, // allow image alias
-        alt: item.alt ?? item.label ?? ""
+        alt: item.alt ?? item.label ?? "",
+        imageSizePercent: item.imageSizePercent ?? null,
+        imagePosition: item.imagePosition ?? null
       };
     }
     const keys = Object.keys(item);
     if (keys.length > 0) {
       const k = keys[0];
-      return { label: k, caption: item[k] ?? null, imageUrl: null, alt: k };
+      return { label: k, caption: item[k] ?? null, imageUrl: null, alt: k, imageSizePercent: null, imagePosition: null };
     }
   }
-  return { label: String(item), caption: null, imageUrl: null, alt: String(item) };
+  return { label: String(item), caption: null, imageUrl: null, alt: String(item), imageSizePercent: null, imagePosition: null };
+}
+
+function calculateImagePosition(imagePosition, containerWidth, containerHeight) {
+  if (!imagePosition) return {};
+  
+  const style = {};
+  const transforms = [];
+  
+  // Handle horizontal positioning
+  if (imagePosition.left === 'center') {
+    style.left = '50%';
+    transforms.push('translateX(-50%)');
+  } else if (imagePosition.left != null) {
+    style.left = `${imagePosition.left}%`;
+  } else if (imagePosition.right != null) {
+    style.right = `${imagePosition.right}%`;
+  }
+  
+  // Handle vertical positioning
+  if (imagePosition.top === 'center') {
+    style.top = '50%';
+    transforms.push('translateY(-50%)');
+  } else if (imagePosition.top != null) {
+    style.top = `${imagePosition.top}%`;
+  } else if (imagePosition.bottom != null) {
+    style.bottom = `${imagePosition.bottom}%`;
+  }
+  
+  // Combine transforms if both center
+  if (transforms.length > 0) {
+    style.transform = transforms.join(' ');
+  }
+  
+  return style;
 }
 
 function useResponsiveSizing(explicitWidth, explicitHeight, explicitGap) {
@@ -147,6 +183,35 @@ export default function LabelIndicatorCarousel({
     }
   }, []);
 
+  // Viewport detection for lg+ (1024px+)
+  const [isLgOrAbove, setIsLgOrAbove] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.innerWidth >= 1024; // lg breakpoint
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsLgOrAbove(window.innerWidth >= 1024);
+    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, []);
+
+  // Dark mode detection - only set after hydration to avoid SSR mismatch
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    setIsHydrated(true);
+    setIsDarkMode(window.matchMedia('(prefers-color-scheme: dark)').matches);
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e) => setIsDarkMode(e.matches);
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
   // Lightbox state
   const [isLightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(index);
@@ -162,11 +227,12 @@ export default function LabelIndicatorCarousel({
     const cardElement = cardRefs.current[cardIndex];
     if (!cardElement) return null;
 
-    // Get the actual image element inside the card
+    // Get the actual image element inside the card for size calculations
     const imageElement = cardElement.querySelector('img');
     if (!imageElement) return null;
 
-    // Get bounding rect of the image element (not the container)
+    // Get bounding rect of the container (card element) for animation
+    const containerRect = cardElement.getBoundingClientRect();
     const imageRect = imageElement.getBoundingClientRect();
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
@@ -175,11 +241,11 @@ export default function LabelIndicatorCarousel({
     const finalX = viewportWidth / 2;
     const finalY = viewportHeight / 2;
     
-    // Calculate initial position (center of visible image)
-    const initialX = imageRect.left + imageRect.width / 2;
-    const initialY = imageRect.top + imageRect.height / 2;
+    // Calculate initial position (center of container bounding box)
+    const initialX = containerRect.left + containerRect.width / 2;
+    const initialY = containerRect.top + containerRect.height / 2;
     
-    // Get natural image dimensions
+    // Get natural image dimensions for size calculations
     let imageNaturalWidth = imageRect.width;
     let imageNaturalHeight = imageRect.height;
     
@@ -191,6 +257,28 @@ export default function LabelIndicatorCarousel({
     // Calculate the image's natural aspect ratio
     const imageAspectRatio = imageNaturalWidth / imageNaturalHeight;
     
+    // Check if this is a positioned image (has imageSizePercent)
+    const currentItem = normalized[cardIndex];
+    const hasPositionedImage = currentItem?.imageSizePercent != null && currentItem?.imageUrl;
+    
+    if (hasPositionedImage) {
+      // For positioned images, animate the container size
+      const maxFinalWidth = Math.min(1280, viewportWidth - 32 - 80 - 8);
+      const maxFinalHeight = viewportHeight * 0.9;
+      // Calculate dimensions to maintain 16:9 aspect ratio
+      const finalWidth = Math.min(maxFinalWidth, maxFinalHeight * 16 / 9);
+      const finalHeight = finalWidth * 9 / 16;
+      
+      return {
+        x: initialX - finalX, // Offset from center
+        y: initialY - finalY, // Offset from center
+        width: containerRect.width, // Use container rect for animation
+        height: containerRect.height, // Use container rect for animation
+        finalWidth: finalWidth,
+        finalHeight: finalHeight,
+      };
+    } else {
+      // For full-cover images, use existing logic
     // Calculate scale factors
     // Final size: max-w-7xl (1280px) or max-h-[90vh], whichever is smaller
     // Account for: 32px padding + 80px buttons (40px each) + 8px gaps (4px each side)
@@ -217,12 +305,13 @@ export default function LabelIndicatorCarousel({
     return {
       x: offsetX, // Offset from center
       y: offsetY, // Offset from center
-      width: imageRect.width, // Use image rect, not container rect
-      height: imageRect.height, // Use image rect, not container rect
+        width: imageRect.width, // Use image rect for full-cover
+        height: imageRect.height, // Use image rect for full-cover
       finalWidth: finalRenderedWidth,
       finalHeight: finalRenderedHeight,
     };
-  }, []);
+    }
+  }, [normalized]);
 
   const { cardWidth: effWidth, cardHeight: effHeight, gap: effGap } = useResponsiveSizing(
     cardWidth,
@@ -438,32 +527,67 @@ export default function LabelIndicatorCarousel({
       onWheel={onWheel}
       tabIndex={0}
     >
-      <div className="flex flex-col items-center justify-center">
+      <div className="flex flex-col items-center justify-center w-full">
         {isMobile ? (
           // Vertical layout for mobile (< 640px)
-          <div className="flex flex-col items-center w-full" style={{ rowGap: Math.max(effGap * 3, 24) }}>
+          <div className="flex flex-col w-full" style={{ rowGap: Math.max(effGap * 3, 24), width: '100%' }}>
             {normalized.map((item, i) => {
-              const { label, caption, imageUrl, alt } = item;
+              const { label, caption, imageUrl, alt, imageSizePercent, imagePosition } = item;
+              const hasPositionedImage = imageSizePercent != null && imageUrl;
+              const backgroundClass = hasPositionedImage 
+                ? "bg-stone-200/60 dark:bg-zinc-700/80" 
+                : "bg-stone-200/60 dark:bg-stone-800";
+              
               return (
-                <div key={i} className="flex flex-col items-center w-full px-4" style={{ maxWidth: '100%' }}>
+                <div key={i} className="flex flex-col w-full px-4" style={{ maxWidth: '100%' }}>
                   <div
-                    className="group relative bg-stone-200/60 transition-all duration-150 dark:bg-stone-800 w-full"
-                    style={{ height: effHeight }}
+                    className={`group relative ${backgroundClass} transition-all duration-150 w-full overflow-hidden ${i !== index ? 'hover:opacity-70' : ''}`}
+                    style={{ 
+                      aspectRatio: '16/9',
+                      boxSizing: 'border-box',
+                      width: '100%'
+                    }}
                   >
                     {renderCard ? renderCard(i, i === index, item) : (
                       <div className="w-full h-full relative">
                         {imageUrl ? (
-                          <img 
-                            src={imageUrl} 
-                            alt={alt ?? label}
-                            className={`w-full h-full object-cover transition-opacity ${i !== index ? 'group-hover:opacity-70' : ''}`}
-                          />
+                          hasPositionedImage ? (
+                            // Positioned image mode with background
+                            <img 
+                              src={imageUrl} 
+                              alt={alt ?? label}
+                              className="absolute object-contain"
+                              style={{
+                                height: `${imageSizePercent}%`,
+                                width: 'auto',
+                                ...calculateImagePosition(imagePosition, effWidth, effHeight)
+                              }}
+                            />
+                          ) : (
+                            // Full-cover image mode
+                            <img 
+                              src={imageUrl} 
+                              alt={alt ?? label}
+                              className="w-full h-full object-cover"
+                            />
+                          )
                         ) : (
                           <div className="w-full h-full bg-stone-200/60 dark:bg-stone-800 flex items-center justify-center">
                             <span className="text-stone-500 text-sm">{label}</span>
                           </div>
                         )}
                       </div>
+                    )}
+                    {/* Border layer on top */}
+                    {imageUrl && (
+                      <div
+                        className="absolute inset-0 pointer-events-none"
+                        style={{
+                          border: isHydrated ? (isDarkMode ? '1px solid rgba(255, 255, 255, 0.03)' : '1px solid rgba(0, 0, 0, 0.06)') : '1px solid rgba(0, 0, 0, 0.06)',
+                          boxSizing: 'border-box',
+                          zIndex: 10
+                        }}
+                      />
                     )}
                   </div>
 
@@ -472,8 +596,8 @@ export default function LabelIndicatorCarousel({
                       renderCaption({ index: i, label, caption, active: i === index })
                     ) : (
                       <div
-                        className={`font-sans text-center text-stone-600 dark:text-zinc-300 text-xs sm:text-sm mt-2 sm:mt-3`}
-                        style={{ width: "100%", ...(captionStyle || {}) }}
+                        className={`font-sans text-center text-stone-600 dark:text-zinc-300 text-xs sm:text-sm mt-2 sm:mt-3 w-full`}
+                        style={{ ...(captionStyle || {}) }}
                       >
                         {caption}
                       </div>
@@ -515,7 +639,12 @@ export default function LabelIndicatorCarousel({
               : {})}
           >
             {normalized.map((item, i) => {
-              const { label, caption, imageUrl, alt } = item;
+              const { label, caption, imageUrl, alt, imageSizePercent, imagePosition } = item;
+              const hasPositionedImage = imageSizePercent != null && imageUrl;
+              const backgroundClass = hasPositionedImage 
+                ? "bg-stone-200/60 dark:bg-zinc-700/80" 
+                : "bg-stone-200/60 dark:bg-stone-800";
+              
               return (
               <div key={i} className="flex flex-col items-center" style={{ width: effWidth }}>
                 <motion.div
@@ -545,25 +674,55 @@ export default function LabelIndicatorCarousel({
                       }
                     }
                   }}
-                  className="group relative bg-stone-200/60 transition-all duration-150 dark:bg-stone-800 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-stone-400"
-                  style={{ width: "100%", height: effHeight }}
+                  className={`group relative ${backgroundClass} transition-all duration-150 cursor-pointer focus-visible:ring-2 focus-visible:ring-stone-400 overflow-hidden ${i !== index ? 'hover:opacity-70' : ''}`}
+                  style={{ 
+                    width: "100%", 
+                    aspectRatio: '16/9',
+                    boxSizing: 'border-box'
+                  }}
                   transition={transition}
                   whileTap={{ scale: 0.98 }}
                 >
                   {renderCard ? renderCard(i, i === index, item) : (
                     <div className="w-full h-full relative overflow-hidden">
                       {imageUrl ? (
-                        <img 
-                          src={imageUrl} 
-                          alt={alt ?? label}
-                          className={`w-full h-full object-cover transition-opacity ${i !== index ? 'group-hover:opacity-70' : ''}`}
-                        />
+                        hasPositionedImage ? (
+                          // Positioned image mode with background
+                          <img 
+                            src={imageUrl} 
+                            alt={alt ?? label}
+                            className="absolute object-contain"
+                            style={{
+                              height: `${imageSizePercent}%`,
+                              width: 'auto',
+                              ...calculateImagePosition(imagePosition, effWidth, effHeight)
+                            }}
+                          />
+                        ) : (
+                          // Full-cover image mode
+                          <img 
+                            src={imageUrl} 
+                            alt={alt ?? label}
+                            className="w-full h-full object-cover"
+                          />
+                        )
                       ) : (
                         <div className="w-full h-full bg-stone-200/60 dark:bg-stone-800 flex items-center justify-center">
                           <span className="text-stone-500 text-sm">{label}</span>
                         </div>
                       )}
                     </div>
+                  )}
+                  {/* Border layer on top */}
+                  {imageUrl && (
+                    <div
+                      className="absolute inset-0 pointer-events-none"
+                      style={{
+                        border: isHydrated ? (isDarkMode ? '1px solid rgba(255, 255, 255, 0.03)' : '1px solid rgba(0, 0, 0, 0.02)') : '1px solid rgba(0, 0, 0, 0.02)',
+                        boxSizing: 'border-box',
+                        zIndex: 10
+                      }}
+                    />
                   )}
 
                   {/* Optional top-right expand icon when lightbox enabled (hidden on sm and below) */}
@@ -677,50 +836,136 @@ export default function LabelIndicatorCarousel({
                 className="absolute inset-0 pointer-events-none flex items-center justify-center"
                 style={{ overflow: 'visible' }}
               >
-                <div 
-                  className="relative pointer-events-auto"
-                  style={{ 
-                    maxWidth: 'min(1280px, calc(100vw - 32px - 80px - 8px))',
-                    maxHeight: '90vh',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <motion.img
-                    initial={initialTransform ? {
-                      x: initialTransform.x,
-                      y: initialTransform.y,
-                      width: initialTransform.width,
-                      height: initialTransform.height,
-                    } : false}
-                    animate={{
-                      x: 0,
-                      y: 0,
-                      width: initialTransform ? initialTransform.finalWidth : 'auto',
-                      height: initialTransform ? initialTransform.finalHeight : 'auto',
-                    }}
-                    exit={exitTransform ? {
-                      x: exitTransform.x,
-                      y: exitTransform.y,
-                      width: exitTransform.width,
-                      height: exitTransform.height,
-                    } : {}}
-                    transition={{
-                      duration: exitTransform ? exitDuration : 0.4,
-                      ease: [0.77, 0, 0.175, 1]
-                    }}
-                    src={normalized[lightboxIndex]?.imageUrl || "/placeholder.svg"}
-                    alt={normalized[lightboxIndex]?.alt || normalized[lightboxIndex]?.label || "Lightbox image"}
-                    className="object-contain"
-                    style={{ 
-                      opacity: 1, 
-                      display: 'block',
-                      transformOrigin: 'center center',
-                    }}
-                  />
-                </div>
+                {(() => {
+                  const currentItem = normalized[lightboxIndex];
+                  const hasPositionedImage = currentItem?.imageSizePercent != null && currentItem?.imageUrl;
+                  
+                  if (hasPositionedImage) {
+                    // Positioned image mode with background layers
+                    const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 1280;
+                    const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 720;
+                    const maxContainerWidth = Math.min(1280, viewportWidth - 32 - 80 - 8);
+                    const maxContainerHeight = viewportHeight * 0.9;
+                    // Calculate dimensions to maintain 16:9 aspect ratio
+                    const containerWidth = Math.min(maxContainerWidth, maxContainerHeight * 16 / 9);
+                    const containerHeight = containerWidth * 9 / 16;
+                    
+                    return (
+                      <motion.div 
+                        className="relative pointer-events-auto overflow-hidden"
+                        initial={initialTransform ? {
+                          x: initialTransform.x,
+                          y: initialTransform.y,
+                          width: initialTransform.width,
+                          height: initialTransform.height,
+                        } : false}
+                        animate={{
+                          x: 0,
+                          y: 0,
+                          width: initialTransform ? initialTransform.finalWidth : containerWidth,
+                          height: initialTransform ? initialTransform.finalHeight : containerHeight,
+                        }}
+                        exit={exitTransform ? {
+                          x: exitTransform.x,
+                          y: exitTransform.y,
+                          width: exitTransform.width,
+                          height: exitTransform.height,
+                        } : {}}
+                        transition={{
+                          duration: exitTransform ? exitDuration : 0.4,
+                          ease: [0.77, 0, 0.175, 1]
+                        }}
+                        style={{ 
+                          aspectRatio: '16/9',
+                          boxSizing: 'border-box'
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {/* Base layer: page background */}
+                        <div 
+                          className="absolute inset-0"
+                          style={{
+                            backgroundColor: isDarkMode ? '#18181b' : '#ffffff'
+                          }}
+                        />
+                        {/* Top layer: project-item background */}
+                        <div 
+                          className="absolute inset-0 bg-stone-200/60 dark:bg-zinc-700/80"
+                        />
+                        {/* Image */}
+                        <img
+                          src={currentItem.imageUrl || "/placeholder.svg"}
+                          alt={currentItem.alt || currentItem.label || "Lightbox image"}
+                          className="absolute object-contain"
+                          style={{ 
+                            opacity: 1, 
+                            display: 'block',
+                            transformOrigin: 'center center',
+                            height: `${currentItem.imageSizePercent}%`,
+                            width: 'auto',
+                            ...calculateImagePosition(currentItem.imagePosition, containerWidth, containerHeight)
+                          }}
+                        />
+                      </motion.div>
+                    );
+                  } else {
+                    // Full-cover image mode
+                    const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 1280;
+                    const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 720;
+                    const maxContainerWidth = Math.min(1280, viewportWidth - 32 - 80 - 8);
+                    const maxContainerHeight = viewportHeight * 0.9;
+                    // Calculate dimensions to maintain 16:9 aspect ratio
+                    const containerWidth = Math.min(maxContainerWidth, maxContainerHeight * 16 / 9);
+                    const containerHeight = containerWidth * 9 / 16;
+                    
+                    return (
+                      <motion.div 
+                        className="relative pointer-events-auto overflow-hidden"
+                        initial={initialTransform ? {
+                          x: initialTransform.x,
+                          y: initialTransform.y,
+                          width: initialTransform.width,
+                          height: initialTransform.height,
+                        } : false}
+                        animate={{
+                          x: 0,
+                          y: 0,
+                          width: initialTransform ? initialTransform.finalWidth : containerWidth,
+                          height: initialTransform ? initialTransform.finalHeight : containerHeight,
+                        }}
+                        exit={exitTransform ? {
+                          x: exitTransform.x,
+                          y: exitTransform.y,
+                          width: exitTransform.width,
+                          height: exitTransform.height,
+                        } : {}}
+                        transition={{
+                          duration: exitTransform ? exitDuration : 0.4,
+                          ease: [0.77, 0, 0.175, 1]
+                        }}
+                        style={{ 
+                          aspectRatio: '16/9',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          boxSizing: 'border-box'
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <img
+                          src={currentItem?.imageUrl || "/placeholder.svg"}
+                          alt={currentItem?.alt || currentItem?.label || "Lightbox image"}
+                          className="object-contain w-full h-full"
+                          style={{ 
+                            opacity: 1, 
+                            display: 'block',
+                            transformOrigin: 'center center'
+                          }}
+                        />
+                      </motion.div>
+                    );
+                  }
+                })()}
 
                 {/* Prev button - outside image, close to it on the left */}
                 {!exitTransform && (
@@ -733,7 +978,7 @@ export default function LabelIndicatorCarousel({
                     disabled={lightboxIndex === 0}
                     className="absolute rounded-md p-1.5 sm:p-2 text-white hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-transparent transition-colors z-20 pointer-events-auto"
                     style={{
-                      left: 'calc(50% - min(640px, calc(50vw - 16px - 40px - 4px)) - 4px)',
+                      left: `calc(50% - min(640px, calc(50vw - 16px - 40px - ${isLgOrAbove ? '16px' : '4px'})) - ${isLgOrAbove ? '16px' : '4px'})`,
                       top: '50%',
                       transform: 'translate(-100%, -50%)',
                     }}
@@ -754,7 +999,7 @@ export default function LabelIndicatorCarousel({
                     disabled={lightboxIndex >= normalized.length - 1}
                     className="absolute rounded-md p-1.5 sm:p-2 text-white hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-transparent transition-colors z-20 pointer-events-auto"
                     style={{
-                      left: 'calc(50% + min(640px, calc(50vw - 16px - 40px - 4px)) + 4px)',
+                      left: `calc(50% + min(640px, calc(50vw - 16px - 40px - ${isLgOrAbove ? '16px' : '4px'})) + ${isLgOrAbove ? '16px' : '4px'})`,
                       top: '50%',
                       transform: 'translateY(-50%)',
                     }}

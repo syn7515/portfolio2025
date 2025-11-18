@@ -39,7 +39,7 @@ export default function ProjectItem({
           color: 'inherit'
         }}
       >
-        <div className="relative w-full aspect-video bg-stone-200 dark:bg-zinc-700/80 group-hover:bg-stone-300 dark:group-hover:bg-zinc-600 transition-colors duration-100 overflow-hidden">
+        <div className="relative w-full aspect-video bg-stone-200/60 dark:bg-zinc-700/80 group-hover:bg-stone-300 dark:group-hover:bg-zinc-600 transition-colors duration-100 overflow-hidden">
           <img
             src={imageUrl}
             alt={`${organization} project screenshot`}
@@ -50,6 +50,15 @@ export default function ProjectItem({
               width: '88%',
               height: '88%',
               objectPosition: 'left top',
+            }}
+          />
+          {/* Border layer on top */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              border: '1px solid rgba(0, 0, 0, 0.06)',
+              boxSizing: 'border-box',
+              zIndex: 10
             }}
           />
         </div>

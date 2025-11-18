@@ -587,7 +587,7 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
 
   return (
     <TooltipProvider>
-      <TableOfContents labels={tocLabels} />
+      {/* <TableOfContents labels={tocLabels} /> */}
       <div className="w-full px-4 pt-12 sm:pt-20">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
