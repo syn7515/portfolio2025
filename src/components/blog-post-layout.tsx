@@ -174,6 +174,10 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
       if (!headerRef.current) return
       const rect = headerRef.current.getBoundingClientRect()
       const scrollTop = window.scrollY || document.documentElement.scrollTop
+      
+      // Calculate threshold: the scroll position where header becomes sticky (rect.top = 0)
+      // If already sticky (rect.top <= 0), we need to calculate from the current position
+      // threshold = scrollTop + rect.top gives us the scroll position where rect.top would be 0
       const threshold = scrollTop + rect.top
       stickyThresholdRef.current = threshold
     }
@@ -188,24 +192,14 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
       const scrollTop = window.scrollY || document.documentElement.scrollTop
       const threshold = stickyThresholdRef.current
       
-      // Check if element is actually sticky by checking if it's at the top of viewport
-      const rect = headerRef.current.getBoundingClientRect()
-      const isSticky = rect.top <= 0
-      
-      if (isSticky) {
-        // Track the scroll position when it first becomes sticky
-        if (stickyStartScrollRef.current === null) {
-          stickyStartScrollRef.current = scrollTop
-        }
-        
-        // Calculate opacity based on scroll offset from when it became sticky
-        const scrollOffset = scrollTop - stickyStartScrollRef.current
-        // Opacity transitions from 0 to 100 over 40px, starting immediately when sticky
+      // Always calculate opacity based on threshold (absolute scroll position where sticky starts)
+      // Opacity transitions from 0 to 100 over 40px, starting at threshold
+      if (scrollTop >= threshold) {
+        const scrollOffset = scrollTop - threshold
         const opacity = Math.min(100, Math.max(0, (scrollOffset / 40) * 100))
         setBorderOpacity(opacity)
       } else {
-        // Header is not sticky yet - reset the sticky start position
-        stickyStartScrollRef.current = null
+        // Not yet at threshold - no border
         setBorderOpacity(0)
       }
     }
