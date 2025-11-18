@@ -92,6 +92,13 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
   const [shouldAnimate, setShouldAnimate] = React.useState(false)
   const [likeCount, setLikeCount] = React.useState<number | null>(null)
   const [isUpdatingCount, setIsUpdatingCount] = React.useState(false)
+  const headerRef = React.useRef<HTMLDivElement>(null)
+  const borderRef = React.useRef<HTMLDivElement>(null)
+  const [borderOpacity, setBorderOpacity] = React.useState(0)
+  const stickyThresholdRef = React.useRef<number | null>(null)
+  const stickyStartScrollRef = React.useRef<number | null>(null)
+  const [isDarkMode, setIsDarkMode] = React.useState(false)
+  const [cardWidth, setCardWidth] = React.useState(0)
 
   // Initialize liked state from localStorage on mount
   React.useEffect(() => {
@@ -131,6 +138,128 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
 
     fetchLikeCount()
   }, [slug])
+
+  // Calculate responsive card width matching carousel logic
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const calculateCardWidth = () => {
+      const w = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
+
+      if (w < 640) {
+        const width = Math.max(120, w - 40)
+        setCardWidth(width)
+      } else if (w < 768) {
+        setCardWidth(520)
+      } else if (w < 1024) {
+        setCardWidth(640)
+      } else {
+        setCardWidth(840)
+      }
+    }
+
+    calculateCardWidth()
+    window.addEventListener('resize', calculateCardWidth)
+
+    return () => {
+      window.removeEventListener('resize', calculateCardWidth)
+    }
+  }, [])
+
+  // Calculate sticky threshold and handle scroll for border opacity
+  React.useEffect(() => {
+    if (typeof window === 'undefined' || !headerRef.current) return
+
+    const calculateStickyThreshold = () => {
+      if (!headerRef.current) return
+      const rect = headerRef.current.getBoundingClientRect()
+      const scrollTop = window.scrollY || document.documentElement.scrollTop
+      const threshold = scrollTop + rect.top
+      stickyThresholdRef.current = threshold
+    }
+
+    // Calculate threshold on mount and resize
+    calculateStickyThreshold()
+    window.addEventListener('resize', calculateStickyThreshold)
+
+    const handleScroll = () => {
+      if (!headerRef.current || stickyThresholdRef.current === null) return
+
+      const scrollTop = window.scrollY || document.documentElement.scrollTop
+      const threshold = stickyThresholdRef.current
+      
+      // Check if element is actually sticky by checking if it's at the top of viewport
+      const rect = headerRef.current.getBoundingClientRect()
+      const isSticky = rect.top <= 0
+      
+      if (isSticky) {
+        // Track the scroll position when it first becomes sticky
+        if (stickyStartScrollRef.current === null) {
+          stickyStartScrollRef.current = scrollTop
+        }
+        
+        // Calculate opacity based on scroll offset from when it became sticky
+        const scrollOffset = scrollTop - stickyStartScrollRef.current
+        // Opacity transitions from 0 to 100 over 40px, starting immediately when sticky
+        const opacity = Math.min(100, Math.max(0, (scrollOffset / 40) * 100))
+        setBorderOpacity(opacity)
+      } else {
+        // Header is not sticky yet - reset the sticky start position
+        stickyStartScrollRef.current = null
+        setBorderOpacity(0)
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    
+    // Initial check
+    handleScroll()
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('resize', calculateStickyThreshold)
+    }
+  }, [])
+
+  // Detect dark mode and update border color
+  React.useEffect(() => {
+    if (typeof window === 'undefined' || !borderRef.current) return
+
+    const checkDarkMode = () => {
+      setIsDarkMode(document.documentElement.classList.contains('dark'))
+    }
+
+    checkDarkMode()
+
+    // Watch for theme changes
+    const observer = new MutationObserver(checkDarkMode)
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    })
+
+    // Update border gradient
+    const updateBorderGradient = () => {
+      if (!borderRef.current) return
+      const opacity = (borderOpacity / 100) * 0.2
+      // Base colors at full opacity
+      const lightBaseColor = 'rgba(168, 162, 158, 1)' // stone-400
+      const darkBaseColor = 'rgba(113, 113, 122, 1)' // zinc-500
+      // Apply opacity to the colors
+      const lightColor = lightBaseColor.replace('1)', `${opacity})`)
+      const darkColor = darkBaseColor.replace('1)', `${opacity})`)
+      const baseColor = isDarkMode ? darkColor : lightColor
+      // Gradient: 0% transparent, 5% full opacity, 95% full opacity, 100% transparent
+      const gradient = `linear-gradient(to right, transparent 0%, ${baseColor} 5%, ${baseColor} 95%, transparent 100%)`
+      borderRef.current.style.background = gradient
+    }
+
+    updateBorderGradient()
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [borderOpacity, isDarkMode])
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -459,13 +588,20 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
   return (
     <TooltipProvider>
       <TableOfContents labels={tocLabels} />
-      <div className="w-full px-4 pt-12 sm:pt-20 overflow-x-hidden">
+      <div className="w-full px-4 pt-12 sm:pt-20">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
         >
-          <div className="max-w-[480px] mx-auto mb-4 flex justify-between items-center">
+          {/* Sticky header */}
+          <div
+            ref={headerRef}
+            className="sticky top-0 h-12 z-50 bg-white dark:bg-zinc-900 flex items-center relative"
+            style={{ width: 'calc(100% + 2rem)', marginLeft: '-1rem', marginRight: '-1rem' }}
+          >
+            <div className="max-w-[480px] mx-auto w-full">
+              <div className="mx-4 sm:mx-0 flex justify-between items-center">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button variant="ghost" size="icon-sm" asChild aria-label="Back to home" className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50 -ml-2">
@@ -580,16 +716,29 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
                 </TooltipContent>
               </Tooltip>
             </div>
-          </div>   
-          <div className={styles.mdxContent}>
-            {children}
+              </div>
+            {/* Responsive border matching carousel card width */}
+            {cardWidth > 0 && (
+              <div
+                ref={borderRef}
+                className="absolute bottom-0 left-1/2 -translate-x-1/2"
+                style={{
+                  width: `${cardWidth}px`,
+                  height: '1px',
+                  background: 'transparent', // Will be set by updateBorderGradient
+                }}
+              />
+            )}
           </div>
-        </motion.div>
-
+        </div>
+        {/* Content with overflow-x-hidden */}
+        <div className={styles.mdxContent} style={{ overflowX: 'hidden' }}>
+          {children}
+        </div>
 
         {/* Project Navigation Footer */}
         {(previousProject || nextProject) && (
-          <div className="max-w-[480px] mx-auto mt-28 mb-8 sm:mb-16">
+          <div className="max-w-[480px] mx-auto mt-28 mb-8 sm:mb-16 overflow-x-hidden">
             <Divider variant="default" color="stone" spacing="xl" />
             <div className="flex justify-between items-start mt-6 gap-8">
               {/* Previous Project */}
@@ -642,6 +791,7 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
             </div>
           </div>
         )}
+        </motion.div>
       </div>
     </TooltipProvider>
   )
