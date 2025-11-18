@@ -82,8 +82,8 @@ p {
   /* font-normal */
   line-height: 155%;
   /* leading-[155%] */
-  letter-spacing: 0.0125em;
-  /* tracking-[0.0125em] */
+  letter-spacing: 0.012em;
+  /* tracking-[0.012em] */
   color: rgb(87 83 78);
   /* stone-600 */
   margin-bottom: 0.75rem;
