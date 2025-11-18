@@ -3,7 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { Undo2, ArrowUp, Heart, Clipboard, Check } from 'lucide-react'
+import { Undo2, Heart, Clipboard, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Toggle } from '@/components/ui/toggle'
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipArrow, TooltipProvider } from '@/components/ui/tooltip'
@@ -597,25 +597,25 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
           {/* Sticky header */}
           <div
             ref={headerRef}
-            className="sticky top-0 h-12 z-50 bg-white dark:bg-zinc-900 flex items-center relative"
+            className="sticky top-0 h-16 sm:h-12 z-50 bg-white dark:bg-zinc-900 flex items-center relative"
             style={{ width: 'calc(100% + 2rem)', marginLeft: '-1rem', marginRight: '-1rem' }}
           >
             <div className="max-w-[480px] mx-auto w-full">
               <div className="mx-4 sm:mx-0 flex justify-between items-center">
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon-sm" asChild aria-label="Back to home" className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50 -ml-2">
+                <Button variant="ghost" size="icon" asChild aria-label="Back to home" className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50 -ml-3 sm:-ml-2 sm:size-8">
                   <Link href="/" className="cursor-pointer">
-                    <Undo2 className="text-stone-500 dark:text-zinc-400" />
+                    <Undo2 className="text-stone-500 dark:text-zinc-400 size-6 sm:size-4" />
                   </Link>
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="top">
+              <TooltipContent side="top" sideOffset={4}>
                 <TooltipArrow />
                 <p>Back to home</p>
               </TooltipContent>
             </Tooltip>
-            <div className="flex gap-1 -mr-2">
+            <div className="flex gap-1 -mr-3 sm:-mr-2">
               <Tooltip 
                 open={
                   // Don't show tooltip if button is already liked (unless showing liked message)
@@ -647,19 +647,20 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
                       pressed={isLiked}
                       onPressedChange={handleLike}
                       variant="ghost"
-                      size="icon-sm"
+                      size="icon"
                       aria-label="Like"
-                      className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50"
+                      className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50 sm:size-8"
                       disabled={isUpdatingCount}
                     >
                       <Heart className={cn(
                         isLiked ? "text-red-500 dark:text-red-700 fill-red-500/20" : "text-stone-500 dark:text-zinc-400",
-                        shouldAnimate && "heart-bounce"
+                        shouldAnimate && "heart-bounce",
+                        "size-6 sm:size-4"
                       )} />
                     </Toggle>
                   </div>
                 </TooltipTrigger>
-                <TooltipContent side="top">
+                <TooltipContent side="top" sideOffset={4}>
                   <TooltipArrow />
                   {likedMessage ? (
                     <div style={{ textAlign: 'center' }}>
@@ -696,21 +697,21 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
                 <TooltipTrigger asChild>
                   <Button 
                     variant="ghost" 
-                    size="icon-sm" 
+                    size="icon" 
                     aria-label={copied ? "Copied" : "Copy as Markdown"} 
-                    className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50 disabled:opacity-100 relative"
+                    className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50 disabled:opacity-100 relative sm:size-8"
                     onClick={copyAsMarkdown}
                     disabled={copied}
                   >
                     <div className={cn("transition-all absolute inset-0 flex items-center justify-center", copied ? "scale-100 opacity-100" : "scale-0 opacity-0")}>
-                      <Check className="text-stone-500 dark:text-zinc-400" />
+                      <Check className="text-stone-500 dark:text-zinc-400 size-6 sm:size-4" />
                     </div>
                     <div className={cn("transition-all", copied ? "scale-0 opacity-0" : "scale-100 opacity-100")}>
-                      <Clipboard className="text-stone-500 dark:text-zinc-400" />
+                      <Clipboard className="text-stone-500 dark:text-zinc-400 size-6 sm:size-4" />
                     </div>
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent side="top">
+                <TooltipContent side="top" sideOffset={4}>
                   <TooltipArrow />
                   <p>{copied ? 'Copied!' : 'Copy as Markdown'}</p>
                 </TooltipContent>
@@ -732,7 +733,7 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
           </div>
         </div>
         {/* Content with overflow-x-hidden */}
-        <div className={styles.mdxContent} style={{ overflowX: 'hidden' }}>
+        <div className={styles.mdxContent} >
           {children}
         </div>
 
@@ -749,7 +750,7 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
                   style={{ textDecoration: 'none' }}
                 >
                   <div 
-                    className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic mb-2"
+                    className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic mb-1.5 opacity-80"
                     style={{ fontFamily: 'Inter' }}
                   >
                     Previous
@@ -773,7 +774,7 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
                   style={{ textDecoration: 'none' }}
                 >
                   <div 
-                    className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic mb-2"
+                    className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic mb-1.5 opacity-80"
                     style={{ fontFamily: 'Inter' }}
                   >
                     Next

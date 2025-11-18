@@ -432,7 +432,7 @@ export default function LabelIndicatorCarousel({
 
   return (
     <div
-      className={`relative flex h-auto py-1 w-full flex-col items-center justify-center ${className}`}
+      className={`relative flex h-auto py-1 md:py-4 lg:py-8 w-full flex-col items-center justify-center ${className}`}
       aria-label={ariaLabel}
       onKeyDown={onKeyDown}
       onWheel={onWheel}
