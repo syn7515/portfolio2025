@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
 
 interface ProjectItemProps {
   imageUrl: string;
@@ -24,6 +25,36 @@ export default function ProjectItem({
   animate = { opacity: 1, y: 0 },
   transition = { duration: 0.1, ease: [0.25, 0.1, 0.25, 1] },
 }: ProjectItemProps) {
+  // Dark mode detection - only set after hydration to avoid SSR mismatch
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    setIsHydrated(true);
+    setIsDarkMode(document.documentElement.classList.contains('dark') || window.matchMedia('(prefers-color-scheme: dark)').matches);
+    
+    // Watch for theme changes
+    const observer = new MutationObserver(() => {
+      setIsDarkMode(document.documentElement.classList.contains('dark') || window.matchMedia('(prefers-color-scheme: dark)').matches);
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+    
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e: MediaQueryListEvent) => {
+      if (!document.documentElement.classList.contains('dark') && !document.documentElement.classList.contains('light')) {
+        setIsDarkMode(e.matches);
+      }
+    };
+    mediaQuery.addEventListener('change', handleChange);
+    
+    return () => {
+      observer.disconnect();
+      mediaQuery.removeEventListener('change', handleChange);
+    };
+  }, []);
   return (
     <motion.div
       className="w-full"
@@ -56,7 +87,7 @@ export default function ProjectItem({
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
-              border: '1px solid rgba(0, 0, 0, 0.06)',
+              border: isHydrated ? (isDarkMode ? '1px solid rgba(255, 255, 255, 0.04)' : '1px solid rgba(0, 0, 0, 0.06)') : '1px solid rgba(0, 0, 0, 0.06)',
               boxSizing: 'border-box',
               zIndex: 10
             }}

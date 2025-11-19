@@ -583,7 +583,7 @@ export default function LabelIndicatorCarousel({
                       <div
                         className="absolute inset-0 pointer-events-none"
                         style={{
-                          border: isHydrated ? (isDarkMode ? '1px solid rgba(255, 255, 255, 0.03)' : '1px solid rgba(0, 0, 0, 0.06)') : '1px solid rgba(0, 0, 0, 0.06)',
+                          border: isHydrated ? (isDarkMode ? '1px solid rgba(255, 255, 255, 0.04)' : '1px solid rgba(0, 0, 0, 0.06)') : '1px solid rgba(0, 0, 0, 0.06)',
                           boxSizing: 'border-box',
                           zIndex: 10
                         }}
@@ -718,7 +718,7 @@ export default function LabelIndicatorCarousel({
                     <div
                       className="absolute inset-0 pointer-events-none"
                       style={{
-                        border: isHydrated ? (isDarkMode ? '1px solid rgba(255, 255, 255, 0.03)' : '1px solid rgba(0, 0, 0, 0.02)') : '1px solid rgba(0, 0, 0, 0.02)',
+                        border: isHydrated ? (isDarkMode ? '1px solid rgba(255, 255, 255, 0.04)' : '1px solid rgba(0, 0, 0, 0.02)') : '1px solid rgba(0, 0, 0, 0.02)',
                         boxSizing: 'border-box',
                         zIndex: 10
                       }}
