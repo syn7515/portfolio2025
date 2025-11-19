@@ -40,6 +40,14 @@ export const metadata: Metadata = {
     ],
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Sue Park",
+    description: "Sue Park's design portfolio",
+    images: [
+      "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/og-image.png",
+    ],
+  },
 };
 
 export default function RootLayout({
