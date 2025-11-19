@@ -20,9 +20,25 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Sue Park",
-  description: "Sue Park's portfolio website",
+  description: "Sue Park's design portfolio",
   icons: {
     icon: '/favicon.svg',
+  },
+  metadataBase: new URL("https://suepark.xyz"),
+  openGraph: {
+    title: "Sue Park",
+    description: "Sue Park's design portfolio",
+    url: "https://suepark.xyz",
+    siteName: "Sue Park",
+    images: [
+      {
+        url: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Sue Park Portfolio Open Graph Image",
+      },
+    ],
+    type: "website",
   },
 };
 
