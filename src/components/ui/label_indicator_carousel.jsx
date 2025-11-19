@@ -17,25 +17,31 @@ const defaultTransition = {
 const FALLBACK_ITEMS = ["Dean", "Lil B", "Lazer", "Simz", "Bladee"];
 
 function normalizeItem(item) {
-  if (typeof item === "string") return { label: item, caption: null, imageUrl: null, alt: item, imageSizePercent: null, imagePosition: null };
+  if (typeof item === "string") return { label: item, caption: null, imageUrl: null, videoUrl: null, alt: item, imageSizePercent: null, imagePosition: null, videoAutoplay: true, videoLoop: true, videoMuted: true, videoControls: false };
   if (item && typeof item === "object") {
-    if ("label" in item || "imageUrl" in item) {
+    if ("label" in item || "imageUrl" in item || "videoUrl" in item) {
+      const hasVideo = !!(item.videoUrl ?? item.video);
       return { 
         label: item.label ?? "", 
         caption: item.caption ?? null,
         imageUrl: item.imageUrl ?? item.image ?? null, // allow image alias
+        videoUrl: item.videoUrl ?? item.video ?? null, // allow video alias
         alt: item.alt ?? item.label ?? "",
         imageSizePercent: item.imageSizePercent ?? null,
-        imagePosition: item.imagePosition ?? null
+        imagePosition: item.imagePosition ?? null,
+        videoAutoplay: item.videoAutoplay ?? (hasVideo ? true : false),
+        videoLoop: item.videoLoop ?? true,
+        videoMuted: item.videoMuted ?? true,
+        videoControls: item.videoControls ?? false
       };
     }
     const keys = Object.keys(item);
     if (keys.length > 0) {
       const k = keys[0];
-      return { label: k, caption: item[k] ?? null, imageUrl: null, alt: k, imageSizePercent: null, imagePosition: null };
+      return { label: k, caption: item[k] ?? null, imageUrl: null, videoUrl: null, alt: k, imageSizePercent: null, imagePosition: null, videoAutoplay: true, videoLoop: true, videoMuted: true, videoControls: false };
     }
   }
-  return { label: String(item), caption: null, imageUrl: null, alt: String(item), imageSizePercent: null, imagePosition: null };
+  return { label: String(item), caption: null, imageUrl: null, videoUrl: null, alt: String(item), imageSizePercent: null, imagePosition: null, videoAutoplay: true, videoLoop: true, videoMuted: true, videoControls: false };
 }
 
 function calculateImagePosition(imagePosition, containerWidth, containerHeight) {
@@ -227,13 +233,15 @@ export default function LabelIndicatorCarousel({
     const cardElement = cardRefs.current[cardIndex];
     if (!cardElement) return null;
 
-    // Get the actual image element inside the card for size calculations
+    // Get the actual image or video element inside the card for size calculations
     const imageElement = cardElement.querySelector('img');
-    if (!imageElement) return null;
+    const videoElement = cardElement.querySelector('video');
+    const mediaElement = imageElement || videoElement;
+    if (!mediaElement) return null;
 
     // Get bounding rect of the container (card element) for animation
     const containerRect = cardElement.getBoundingClientRect();
-    const imageRect = imageElement.getBoundingClientRect();
+    const mediaRect = mediaElement.getBoundingClientRect();
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
     
@@ -245,23 +253,28 @@ export default function LabelIndicatorCarousel({
     const initialX = containerRect.left + containerRect.width / 2;
     const initialY = containerRect.top + containerRect.height / 2;
     
-    // Get natural image dimensions for size calculations
-    let imageNaturalWidth = imageRect.width;
-    let imageNaturalHeight = imageRect.height;
+    // Get natural media dimensions for size calculations
+    let mediaNaturalWidth = mediaRect.width;
+    let mediaNaturalHeight = mediaRect.height;
     
-    if (imageElement.complete) {
-      imageNaturalWidth = imageElement.naturalWidth;
-      imageNaturalHeight = imageElement.naturalHeight;
+    if (imageElement && imageElement.complete) {
+      mediaNaturalWidth = imageElement.naturalWidth;
+      mediaNaturalHeight = imageElement.naturalHeight;
+    } else if (videoElement && videoElement.readyState >= 2) {
+      mediaNaturalWidth = videoElement.videoWidth;
+      mediaNaturalHeight = videoElement.videoHeight;
     }
     
-    // Calculate the image's natural aspect ratio
-    const imageAspectRatio = imageNaturalWidth / imageNaturalHeight;
+    // Calculate the media's natural aspect ratio
+    const mediaAspectRatio = mediaNaturalWidth / mediaNaturalHeight;
     
-    // Check if this is a positioned image (has imageSizePercent)
+    // Check if this is a positioned image or video (has imageSizePercent)
     const currentItem = normalized[cardIndex];
     const hasPositionedImage = currentItem?.imageSizePercent != null && currentItem?.imageUrl;
+    const hasPositionedVideo = currentItem?.imageSizePercent != null && currentItem?.videoUrl;
+    const hasPositionedMedia = hasPositionedImage || hasPositionedVideo;
     
-    if (hasPositionedImage) {
+    if (hasPositionedMedia) {
       // For positioned images, animate the container size
       const maxFinalWidth = Math.min(1280, viewportWidth - 32 - 80 - 8);
       const maxFinalHeight = viewportHeight * 0.9;
@@ -285,28 +298,28 @@ export default function LabelIndicatorCarousel({
     const maxFinalWidth = Math.min(1280, viewportWidth - 32 - 80 - 8);
     const maxFinalHeight = viewportHeight * 0.9;
     
-    // Determine final rendered dimensions based on image aspect ratio and container constraints
+    // Determine final rendered dimensions based on media aspect ratio and container constraints
     // This simulates what object-contain will do
     let finalRenderedWidth, finalRenderedHeight;
-    if (maxFinalWidth / maxFinalHeight > imageAspectRatio) {
+    if (maxFinalWidth / maxFinalHeight > mediaAspectRatio) {
       // Height is the limiting factor
       finalRenderedHeight = maxFinalHeight;
-      finalRenderedWidth = finalRenderedHeight * imageAspectRatio;
+      finalRenderedWidth = finalRenderedHeight * mediaAspectRatio;
     } else {
       // Width is the limiting factor
       finalRenderedWidth = maxFinalWidth;
-      finalRenderedHeight = finalRenderedWidth / imageAspectRatio;
+      finalRenderedHeight = finalRenderedWidth / mediaAspectRatio;
     }
     
-    // Calculate offset from viewport center (where the image will be centered)
+    // Calculate offset from viewport center (where the media will be centered)
     const offsetX = initialX - finalX;
     const offsetY = initialY - finalY;
     
     return {
       x: offsetX, // Offset from center
       y: offsetY, // Offset from center
-        width: imageRect.width, // Use image rect for full-cover
-        height: imageRect.height, // Use image rect for full-cover
+        width: mediaRect.width, // Use media rect for full-cover
+        height: mediaRect.height, // Use media rect for full-cover
       finalWidth: finalRenderedWidth,
       finalHeight: finalRenderedHeight,
     };
@@ -532,9 +545,12 @@ export default function LabelIndicatorCarousel({
           // Vertical layout for mobile (< 640px)
           <div className="flex flex-col w-full" style={{ rowGap: Math.max(effGap * 3, 24), width: '100%' }}>
             {normalized.map((item, i) => {
-              const { label, caption, imageUrl, alt, imageSizePercent, imagePosition } = item;
+              const { label, caption, imageUrl, videoUrl, alt, imageSizePercent, imagePosition, videoAutoplay, videoLoop, videoMuted, videoControls } = item;
               const hasPositionedImage = imageSizePercent != null && imageUrl;
-              const backgroundClass = hasPositionedImage 
+              const hasPositionedVideo = imageSizePercent != null && videoUrl;
+              const hasVideo = !!videoUrl;
+              const hasPositionedMedia = hasPositionedImage || hasPositionedVideo;
+              const backgroundClass = hasPositionedMedia 
                 ? "bg-stone-200/60 dark:bg-zinc-700/80" 
                 : "bg-stone-200/60 dark:bg-stone-800";
               
@@ -550,7 +566,36 @@ export default function LabelIndicatorCarousel({
                   >
                     {renderCard ? renderCard(i, i === index, item) : (
                       <div className="w-full h-full relative">
-                        {imageUrl ? (
+                        {hasVideo ? (
+                          hasPositionedVideo ? (
+                            // Positioned video mode with background
+                            <video 
+                              src={videoUrl} 
+                              className="absolute object-contain"
+                              autoPlay={videoAutoplay}
+                              loop={videoLoop}
+                              muted={videoMuted}
+                              controls={videoControls}
+                              playsInline
+                              style={{
+                                height: `${imageSizePercent}%`,
+                                width: 'auto',
+                                ...calculateImagePosition(imagePosition, effWidth, effHeight)
+                              }}
+                            />
+                          ) : (
+                            // Full-cover video mode
+                            <video 
+                              src={videoUrl} 
+                              className="w-full h-full object-cover"
+                              autoPlay={videoAutoplay}
+                              loop={videoLoop}
+                              muted={videoMuted}
+                              controls={videoControls}
+                              playsInline
+                            />
+                          )
+                        ) : imageUrl ? (
                           hasPositionedImage ? (
                             // Positioned image mode with background
                             <img 
@@ -579,7 +624,7 @@ export default function LabelIndicatorCarousel({
                       </div>
                     )}
                     {/* Border layer on top */}
-                    {imageUrl && (
+                    {(imageUrl || videoUrl) && (
                       <div
                         className="absolute inset-0 pointer-events-none"
                         style={{
@@ -639,9 +684,12 @@ export default function LabelIndicatorCarousel({
               : {})}
           >
             {normalized.map((item, i) => {
-              const { label, caption, imageUrl, alt, imageSizePercent, imagePosition } = item;
+              const { label, caption, imageUrl, videoUrl, alt, imageSizePercent, imagePosition, videoAutoplay, videoLoop, videoMuted, videoControls } = item;
               const hasPositionedImage = imageSizePercent != null && imageUrl;
-              const backgroundClass = hasPositionedImage 
+              const hasPositionedVideo = imageSizePercent != null && videoUrl;
+              const hasVideo = !!videoUrl;
+              const hasPositionedMedia = hasPositionedImage || hasPositionedVideo;
+              const backgroundClass = hasPositionedMedia 
                 ? "bg-stone-200/60 dark:bg-zinc-700/80" 
                 : "bg-stone-200/60 dark:bg-stone-800";
               
@@ -649,7 +697,7 @@ export default function LabelIndicatorCarousel({
               <div key={i} className="flex flex-col items-center" style={{ width: effWidth }}>
                 <motion.div
                   ref={(el) => {
-                    if (effectiveLightboxEnabled && imageUrl) {
+                    if (effectiveLightboxEnabled && (imageUrl || videoUrl)) {
                       cardRefs.current[i] = el;
                     }
                   }}
@@ -685,7 +733,36 @@ export default function LabelIndicatorCarousel({
                 >
                   {renderCard ? renderCard(i, i === index, item) : (
                     <div className="w-full h-full relative overflow-hidden">
-                      {imageUrl ? (
+                      {hasVideo ? (
+                        hasPositionedVideo ? (
+                          // Positioned video mode with background
+                          <video 
+                            src={videoUrl} 
+                            className="absolute object-contain"
+                            autoPlay={videoAutoplay}
+                            loop={videoLoop}
+                            muted={videoMuted}
+                            controls={videoControls}
+                            playsInline
+                            style={{
+                              height: `${imageSizePercent}%`,
+                              width: 'auto',
+                              ...calculateImagePosition(imagePosition, effWidth, effHeight)
+                            }}
+                          />
+                        ) : (
+                          // Full-cover video mode
+                          <video 
+                            src={videoUrl} 
+                            className="w-full h-full object-cover"
+                            autoPlay={videoAutoplay}
+                            loop={videoLoop}
+                            muted={videoMuted}
+                            controls={videoControls}
+                            playsInline
+                          />
+                        )
+                      ) : imageUrl ? (
                         hasPositionedImage ? (
                           // Positioned image mode with background
                           <img 
@@ -714,7 +791,7 @@ export default function LabelIndicatorCarousel({
                     </div>
                   )}
                   {/* Border layer on top */}
-                  {imageUrl && (
+                  {(imageUrl || videoUrl) && (
                     <div
                       className="absolute inset-0 pointer-events-none"
                       style={{
@@ -726,7 +803,7 @@ export default function LabelIndicatorCarousel({
                   )}
 
                   {/* Optional top-right expand icon when lightbox enabled (hidden on sm and below) */}
-                  {effectiveLightboxEnabled && i === index && imageUrl && (
+                  {effectiveLightboxEnabled && i === index && (imageUrl || videoUrl) && (
                     <button
                       type="button"
                       onClick={(e) => { e.stopPropagation(); openLightbox(i); }}
@@ -839,9 +916,12 @@ export default function LabelIndicatorCarousel({
                 {(() => {
                   const currentItem = normalized[lightboxIndex];
                   const hasPositionedImage = currentItem?.imageSizePercent != null && currentItem?.imageUrl;
+                  const hasPositionedVideo = currentItem?.imageSizePercent != null && currentItem?.videoUrl;
+                  const hasPositionedMedia = hasPositionedImage || hasPositionedVideo;
+                  const hasVideo = !!currentItem?.videoUrl;
                   
-                  if (hasPositionedImage) {
-                    // Positioned image mode with background layers
+                  if (hasPositionedMedia) {
+                    // Positioned image or video mode with background layers
                     const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 1280;
                     const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 720;
                     const maxContainerWidth = Math.min(1280, viewportWidth - 32 - 80 - 8);
@@ -892,24 +972,45 @@ export default function LabelIndicatorCarousel({
                         <div 
                           className="absolute inset-0 bg-stone-200/60 dark:bg-zinc-700/80"
                         />
-                        {/* Image */}
-                        <img
-                          src={currentItem.imageUrl || "/placeholder.svg"}
-                          alt={currentItem.alt || currentItem.label || "Lightbox image"}
-                          className="absolute object-contain"
-                          style={{ 
-                            opacity: 1, 
-                            display: 'block',
-                            transformOrigin: 'center center',
-                            height: `${currentItem.imageSizePercent}%`,
-                            width: 'auto',
-                            ...calculateImagePosition(currentItem.imagePosition, containerWidth, containerHeight)
-                          }}
-                        />
+                        {/* Image or Video */}
+                        {hasPositionedVideo ? (
+                          <video
+                            src={currentItem.videoUrl}
+                            className="absolute object-contain"
+                            autoPlay={currentItem.videoAutoplay ?? true}
+                            loop={currentItem.videoLoop ?? true}
+                            muted={currentItem.videoMuted ?? true}
+                            controls={currentItem.videoControls ?? false}
+                            playsInline
+                            aria-label={currentItem.alt || currentItem.label || "Lightbox video"}
+                            style={{ 
+                              opacity: 1, 
+                              display: 'block',
+                              transformOrigin: 'center center',
+                              height: `${currentItem.imageSizePercent}%`,
+                              width: 'auto',
+                              ...calculateImagePosition(currentItem.imagePosition, containerWidth, containerHeight)
+                            }}
+                          />
+                        ) : (
+                          <img
+                            src={currentItem.imageUrl || "/placeholder.svg"}
+                            alt={currentItem.alt || currentItem.label || "Lightbox image"}
+                            className="absolute object-contain"
+                            style={{ 
+                              opacity: 1, 
+                              display: 'block',
+                              transformOrigin: 'center center',
+                              height: `${currentItem.imageSizePercent}%`,
+                              width: 'auto',
+                              ...calculateImagePosition(currentItem.imagePosition, containerWidth, containerHeight)
+                            }}
+                          />
+                        )}
                       </motion.div>
                     );
                   } else {
-                    // Full-cover image mode
+                    // Full-cover image or video mode
                     const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 1280;
                     const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 720;
                     const maxContainerWidth = Math.min(1280, viewportWidth - 32 - 80 - 8);
@@ -952,16 +1053,33 @@ export default function LabelIndicatorCarousel({
                         }}
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <img
-                          src={currentItem?.imageUrl || "/placeholder.svg"}
-                          alt={currentItem?.alt || currentItem?.label || "Lightbox image"}
-                          className="object-contain w-full h-full"
-                          style={{ 
-                            opacity: 1, 
-                            display: 'block',
-                            transformOrigin: 'center center'
-                          }}
-                        />
+                        {hasVideo ? (
+                          <video
+                            src={currentItem.videoUrl}
+                            className="object-contain w-full h-full"
+                            autoPlay={currentItem.videoAutoplay ?? true}
+                            loop={currentItem.videoLoop ?? true}
+                            muted={currentItem.videoMuted ?? true}
+                            controls={currentItem.videoControls ?? false}
+                            playsInline
+                            style={{ 
+                              opacity: 1, 
+                              display: 'block',
+                              transformOrigin: 'center center'
+                            }}
+                          />
+                        ) : (
+                          <img
+                            src={currentItem?.imageUrl || "/placeholder.svg"}
+                            alt={currentItem?.alt || currentItem?.label || "Lightbox image"}
+                            className="object-contain w-full h-full"
+                            style={{ 
+                              opacity: 1, 
+                              display: 'block',
+                              transformOrigin: 'center center'
+                            }}
+                          />
+                        )}
                       </motion.div>
                     );
                   }
@@ -1020,12 +1138,19 @@ export default function LabelIndicatorCarousel({
 // Example usage:
 // <LabelIndicatorCarousel
 //   items=[
-//     { label: "Aurora", caption: "A dazzling display of natural light." },
-//     { label: "Blaze", caption: "A fiery burst of energy and color." },
-//     { label: "Cascade", caption: "Flowing gently like a mountain stream." },
-//     { label: "Drift", caption: "Soft, quiet, and serene in motion." },
-//     { label: "Echo", caption: "Repeating through the valleys of sound." }
+//     { label: "Aurora", caption: "A dazzling display of natural light.", imageUrl: "/aurora.jpg" },
+//     { label: "Blaze", caption: "A fiery burst of energy and color.", videoUrl: "/blaze.mp4" },
+//     { label: "Cascade", caption: "Flowing gently like a mountain stream.", imageUrl: "/cascade.jpg" },
+//     { label: "Drift", caption: "Soft, quiet, and serene in motion.", videoUrl: "/drift.mp4" },
+//     { label: "Echo", caption: "Repeating through the valleys of sound.", imageUrl: "/echo.jpg" }
 //   ]
 // />
+// 
+// Video properties (defaults when videoUrl is provided):
+// - videoUrl: URL to the video file (or use 'video' as alias)
+// - videoAutoplay: Whether video should autoplay (default: true)
+// - videoLoop: Whether video should loop (default: true)
+// - videoMuted: Whether video should be muted (default: true, required for autoplay)
+// - videoControls: Whether to show video controls (default: false - no play/stop UI)
 
 
