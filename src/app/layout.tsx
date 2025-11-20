@@ -20,14 +20,14 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Sue Park",
-  description: "Sue Park's design portfolio",
+  description: "Sue Park — Portfolio",
   icons: {
     icon: '/favicon.svg',
   },
   metadataBase: new URL("https://suepark.xyz"),
   openGraph: {
     title: "Sue Park",
-    description: "Sue Park's design portfolio",
+    description: "Sue Park — Portfolio",
     url: "https://suepark.xyz",
     siteName: "Sue Park",
     images: [
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Sue Park",
-    description: "Sue Park's design portfolio",
+    description: "Sue Park — Portfolio",
     images: [
       "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/og-image.png",
     ],
