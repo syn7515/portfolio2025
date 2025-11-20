@@ -1,11 +1,13 @@
+/* eslint-disable @next/next/no-img-element */
 "use client"
 
-import { motion } from "framer-motion";
+import type { CSSProperties, ReactNode } from "react";
+import { motion, type Transition } from "framer-motion";
 import { Maximize2 } from "lucide-react";
-import { calculateImagePosition } from "./hooks";
+import { calculateImagePosition, type CarouselItem } from "./hooks";
 
 interface CarouselCardProps {
-  item: any;
+  item: CarouselItem;
   index: number;
   currentIndex: number;
   effWidth: number;
@@ -16,11 +18,16 @@ interface CarouselCardProps {
   openLightboxOnCardClick: boolean;
   openLightbox: (index: number) => void;
   setIndex: (index: number) => void;
-  cardRef?: (el: any) => void;
-  renderCard?: (index: number, isActive: boolean, item: any) => React.ReactNode;
-  renderCaption?: (props: { index: number, label: string, caption: string | null, active: boolean }) => React.ReactNode;
-  captionStyle?: React.CSSProperties;
-  transition?: any;
+  cardRef?: (el: HTMLDivElement | null) => void;
+  renderCard?: (index: number, isActive: boolean, item: CarouselItem) => ReactNode;
+  renderCaption?: (props: {
+    index: number;
+    label: string;
+    caption: string | null;
+    active: boolean;
+  }) => ReactNode;
+  captionStyle?: CSSProperties;
+  transition?: Transition;
 }
 
 export function CarouselCard({
@@ -100,7 +107,7 @@ export function CarouselCard({
                   style={{
                     height: `${imageSizePercent}%`,
                     width: 'auto',
-                    ...calculateImagePosition(imagePosition, effWidth, effHeight)
+                    ...calculateImagePosition(imagePosition)
                   }}
                 />
               ) : (
@@ -125,7 +132,7 @@ export function CarouselCard({
                   style={{
                     height: `${imageSizePercent}%`,
                     width: 'auto',
-                    ...calculateImagePosition(imagePosition, effWidth, effHeight)
+                    ...calculateImagePosition(imagePosition)
                   }}
                 />
               ) : (

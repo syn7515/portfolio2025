@@ -379,7 +379,7 @@ export default function BlogPostHeader({ slug }: BlogPostHeaderProps) {
               .join('\n\n')
             
             return markdownImages ? `\n${markdownImages}\n\n` : ''
-          } catch (e) {
+          } catch {
             return ''
           }
         })
@@ -438,7 +438,7 @@ export default function BlogPostHeader({ slug }: BlogPostHeaderProps) {
               .join('\n\n')
             
             return markdownImages ? `\n${markdownImages}\n\n` : ''
-          } catch (e) {
+          } catch {
             return ''
           }
         })

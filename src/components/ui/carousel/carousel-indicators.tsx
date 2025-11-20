@@ -1,16 +1,17 @@
 "use client"
 
-import { motion } from "framer-motion";
+import { motion, type Transition } from "framer-motion";
 import { useState, useEffect } from "react";
+import type { CarouselItem } from "./hooks";
 
 interface CarouselIndicatorsProps {
-  normalized: any[];
+  normalized: CarouselItem[];
   index: number;
   setIndex: (index: number) => void;
   indicatorExpandedWidth?: number;
   indicatorCollapsedSize?: number;
   indicatorHeight?: number;
-  transition?: any;
+  transition?: Transition;
 }
 
 export function CarouselIndicators({

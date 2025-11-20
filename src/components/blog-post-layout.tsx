@@ -80,14 +80,6 @@ function preventWidow(text: string): React.ReactNode {
 }
 
 export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) {
-  // Custom labels for aniai post
-  const tocLabels = slug === 'aniai' ? {
-    "Designing speed for robot development (2024-2025)": "Parametric firmware generator",
-    "Scaling robot updates with confidence (2025)": "Robot update manger",
-    "Building a foundation for fast, consistent design (2025)": "Minimum viable design system",
-    "Closing thoughts": "Thoughts"
-  } : undefined
-
   // Get project navigation
   const { previousProject, nextProject } = getProjectNavigation(slug)
 

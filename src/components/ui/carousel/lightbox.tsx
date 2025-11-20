@@ -1,8 +1,22 @@
+/* eslint-disable @next/next/no-img-element */
 "use client"
 
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
-import { useLightboxDimensions, calculateImagePosition } from "./hooks";
+import {
+  useLightboxDimensions,
+  calculateImagePosition,
+  type CarouselItem,
+} from "./hooks";
+
+export type TransformSnapshot = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  finalWidth: number;
+  finalHeight: number;
+};
 
 interface LightboxProps {
   isOpen: boolean;
@@ -10,24 +24,29 @@ interface LightboxProps {
   prevLightbox: () => void;
   nextLightbox: () => void;
   lightboxIndex: number;
-  normalizedItems: any[];
-  initialTransform: any;
-  exitTransform: any;
+  normalizedItems: CarouselItem[];
+  initialTransform: TransformSnapshot | null;
+  exitTransform: TransformSnapshot | null;
   exitDuration: number;
   isDarkMode: boolean;
   isLgOrAbove: boolean;
 }
 
-function LightboxContent({ 
-  currentItem, 
-  lightboxIndex, 
-  normalized, 
-  initialTransform, 
-  exitTransform, 
+interface LightboxContentProps {
+  currentItem: CarouselItem;
+  initialTransform: TransformSnapshot | null;
+  exitTransform: TransformSnapshot | null;
+  exitDuration: number;
+  isDarkMode: boolean;
+}
+
+function LightboxContent({
+  currentItem,
+  initialTransform,
+  exitTransform,
   exitDuration,
   isDarkMode,
-  isLgOrAbove
-}: any) {
+}: LightboxContentProps) {
   const dimensions = useLightboxDimensions();
   const hasPositionedImage = currentItem?.imageSizePercent != null && currentItem?.imageUrl;
   const hasPositionedVideo = currentItem?.imageSizePercent != null && currentItem?.videoUrl;
@@ -98,7 +117,7 @@ function LightboxContent({
               transformOrigin: 'center center',
               height: `${currentItem.imageSizePercent}%`,
               width: 'auto',
-              ...calculateImagePosition(currentItem.imagePosition, dimensions.width, dimensions.height)
+              ...calculateImagePosition(currentItem.imagePosition)
             }}
           />
         ) : (
@@ -112,7 +131,7 @@ function LightboxContent({
               transformOrigin: 'center center',
               height: `${currentItem.imageSizePercent}%`,
               width: 'auto',
-              ...calculateImagePosition(currentItem.imagePosition, dimensions.width, dimensions.height)
+              ...calculateImagePosition(currentItem.imagePosition)
             }}
           />
         )}
@@ -264,7 +283,7 @@ export function Lightbox({
                   disabled={lightboxIndex === 0}
                   className="absolute rounded-md p-1.5 sm:p-2 text-white hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-transparent transition-colors z-20 pointer-events-auto"
                   style={{
-                    left: `calc(50% - min(640px, calc(50vw - 16px - 40px - ${isLgOrAbove ? '16px' : '4px'})) - ${isLgOrAbove ? '16px' : '4px'})`,
+              left: `calc(50% - min(640px, calc(50vw - 16px - 40px - ${isLgOrAbove ? "16px" : "4px"})) - ${isLgOrAbove ? "16px" : "4px"})`,
                     top: '50%',
                     transform: 'translate(-100%, -50%)',
                   }}
@@ -285,7 +304,7 @@ export function Lightbox({
                   disabled={lightboxIndex >= normalizedItems.length - 1}
                   className="absolute rounded-md p-1.5 sm:p-2 text-white hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-transparent transition-colors z-20 pointer-events-auto"
                   style={{
-                    left: `calc(50% + min(640px, calc(50vw - 16px - 40px - ${isLgOrAbove ? '16px' : '4px'})) + ${isLgOrAbove ? '16px' : '4px'})`,
+              left: `calc(50% + min(640px, calc(50vw - 16px - 40px - ${isLgOrAbove ? "16px" : "4px"})) + ${isLgOrAbove ? "16px" : "4px"})`,
                     top: '50%',
                     transform: 'translateY(-50%)',
                   }}
