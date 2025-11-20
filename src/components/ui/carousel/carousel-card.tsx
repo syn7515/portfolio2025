@@ -11,7 +11,6 @@ interface CarouselCardProps {
   index: number;
   currentIndex: number;
   effWidth: number;
-  effHeight: number;
   isHydrated: boolean;
   isDarkMode: boolean;
   effectiveLightboxEnabled: boolean;
@@ -35,7 +34,6 @@ export function CarouselCard({
   index,
   currentIndex,
   effWidth,
-  effHeight,
   isHydrated,
   isDarkMode,
   effectiveLightboxEnabled,

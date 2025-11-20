@@ -416,7 +416,6 @@ export default function LabelIndicatorCarousel({
                 index={i}
                 currentIndex={index}
                 effWidth={effWidth}
-                effHeight={effHeight}
                 isHydrated={isHydrated}
                 isDarkMode={isDarkMode}
                 effectiveLightboxEnabled={false} // No lightbox in mobile
@@ -468,7 +467,6 @@ export default function LabelIndicatorCarousel({
                 index={i}
                 currentIndex={index}
                 effWidth={effWidth}
-                effHeight={effHeight}
                 isHydrated={isHydrated}
                 isDarkMode={isDarkMode}
                 effectiveLightboxEnabled={effectiveLightboxEnabled}

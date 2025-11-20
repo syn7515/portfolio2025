@@ -103,7 +103,7 @@ function LightboxContent({
         {/* Image or Video */}
         {hasPositionedVideo ? (
           <video
-            src={currentItem.videoUrl}
+            src={currentItem.videoUrl ?? undefined}
             className="absolute object-contain"
             autoPlay={currentItem.videoAutoplay ?? true}
             loop={currentItem.videoLoop ?? true}
@@ -122,7 +122,7 @@ function LightboxContent({
           />
         ) : (
           <img
-            src={currentItem.imageUrl || "/placeholder.svg"}
+            src={currentItem.imageUrl ?? "/placeholder.svg"}
             alt={currentItem.alt || currentItem.label || "Lightbox image"}
             className="absolute object-contain"
             style={{ 
@@ -178,7 +178,7 @@ function LightboxContent({
       >
         {hasVideo ? (
           <video
-            src={currentItem.videoUrl}
+            src={currentItem.videoUrl ?? undefined}
             className="object-contain w-full h-full"
             autoPlay={currentItem.videoAutoplay ?? true}
             loop={currentItem.videoLoop ?? true}
@@ -193,7 +193,7 @@ function LightboxContent({
           />
         ) : (
           <img
-            src={currentItem?.imageUrl || "/placeholder.svg"}
+            src={currentItem?.imageUrl ?? "/placeholder.svg"}
             alt={currentItem?.alt || currentItem?.label || "Lightbox image"}
             className="object-contain w-full h-full"
             style={{ 
@@ -263,13 +263,10 @@ export function Lightbox({
             >
               <LightboxContent 
                 currentItem={normalizedItems[lightboxIndex]}
-                lightboxIndex={lightboxIndex}
-                normalized={normalizedItems}
                 initialTransform={initialTransform}
                 exitTransform={exitTransform}
                 exitDuration={exitDuration}
                 isDarkMode={isDarkMode}
-                isLgOrAbove={isLgOrAbove}
               />
 
               {/* Prev button - outside image, close to it on the left */}
