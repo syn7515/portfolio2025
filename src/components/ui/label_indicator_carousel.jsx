@@ -408,25 +408,28 @@ export default function LabelIndicatorCarousel({
       <div className="flex flex-col items-center justify-center w-full">
         {isMobile ? (
           // Vertical layout for mobile (< 640px)
-          <div className="flex flex-col w-full" style={{ rowGap: Math.max(effGap * 3, 24), width: '100%' }}>
+          <div className="flex flex-col items-center w-full" style={{ rowGap: Math.max(effGap * 3, 24), width: '100%' }}>
             {normalized.map((item, i) => (
-              <CarouselCard
-                key={i}
-                item={item}
-                index={i}
-                currentIndex={index}
-                effWidth={effWidth}
-                isHydrated={isHydrated}
-                isDarkMode={isDarkMode}
-                effectiveLightboxEnabled={false} // No lightbox in mobile
-                openLightboxOnCardClick={openLightboxOnCardClick}
-                openLightbox={openLightbox}
-                setIndex={setIndex}
-                renderCard={renderCard}
-                renderCaption={renderCaption}
-                captionStyle={captionStyle}
-                transition={transition}
-              />
+              <div key={i} className="w-full flex flex-col items-center px-4">
+                <div style={{ width: '100%', maxWidth: effWidth }}>
+                  <CarouselCard
+                    item={item}
+                    index={i}
+                    currentIndex={index}
+                    effWidth={effWidth}
+                    isHydrated={isHydrated}
+                    isDarkMode={isDarkMode}
+                    effectiveLightboxEnabled={false} // No lightbox in mobile
+                    openLightboxOnCardClick={openLightboxOnCardClick}
+                    openLightbox={openLightbox}
+                    setIndex={setIndex}
+                    renderCard={renderCard}
+                    renderCaption={renderCaption}
+                    captionStyle={captionStyle}
+                    transition={transition}
+                  />
+                </div>
+              </div>
             ))}
           </div>
         ) : (
