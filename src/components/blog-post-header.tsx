@@ -100,14 +100,23 @@ export default function BlogPostHeader({ slug }: BlogPostHeaderProps) {
 
     const calculateStickyThreshold = () => {
       if (!headerRef.current) return
-      const rect = headerRef.current.getBoundingClientRect()
+      
+      // Use parent element to calculate the natural position of the header
+      // This avoids issues when the header is already sticky (and thus rect.top is 0)
+      const parent = headerRef.current.parentElement
       const scrollTop = window.scrollY || document.documentElement.scrollTop
       
-      // Calculate threshold: the scroll position where header becomes sticky (rect.top = 0)
-      // If already sticky (rect.top <= 0), we need to calculate from the current position
-      // threshold = scrollTop + rect.top gives us the scroll position where rect.top would be 0
-      const threshold = scrollTop + rect.top
-      stickyThresholdRef.current = threshold
+      if (parent) {
+        const parentRect = parent.getBoundingClientRect()
+        // The threshold is the absolute scroll position where the header (top of parent) hits the top of viewport
+        // absoluteTop = parentRect.top + scrollTop
+        // This works because parent is not sticky, so its rect.top reflects its current position relative to viewport
+        stickyThresholdRef.current = parentRect.top + scrollTop
+      } else {
+        // Fallback if no parent (shouldn't happen given the layout)
+        const rect = headerRef.current.getBoundingClientRect()
+        stickyThresholdRef.current = scrollTop + rect.top
+      }
     }
 
     // Calculate threshold on mount and resize
@@ -137,7 +146,14 @@ export default function BlogPostHeader({ slug }: BlogPostHeaderProps) {
     // Initial check
     handleScroll()
 
+    // Recalculate after animation (0.5s) to ensure accuracy
+    const timer = setTimeout(() => {
+      calculateStickyThreshold()
+      handleScroll()
+    }, 600)
+
     return () => {
+      clearTimeout(timer)
       window.removeEventListener('scroll', handleScroll)
       window.removeEventListener('resize', calculateStickyThreshold)
     }
