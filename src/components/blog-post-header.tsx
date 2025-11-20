@@ -27,6 +27,7 @@ export default function BlogPostHeader({ slug }: BlogPostHeaderProps) {
   const stickyThresholdRef = React.useRef<number | null>(null)
   const [isDarkMode, setIsDarkMode] = React.useState(false)
   const [cardWidth, setCardWidth] = React.useState(0)
+  const [isXsViewport, setIsXsViewport] = React.useState(false)
 
   // Initialize liked state from localStorage on mount
   React.useEffect(() => {
@@ -73,10 +74,13 @@ export default function BlogPostHeader({ slug }: BlogPostHeaderProps) {
 
     const calculateCardWidth = () => {
       const w = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
+      const isXs = w < 640
 
-      if (w < 640) {
-        const width = Math.max(120, w - 40)
-        setCardWidth(width)
+      setIsXsViewport(isXs)
+
+      if (isXs) {
+        // For xs viewport, use full viewport width for border
+        setCardWidth(w)
       } else if (w < 768) {
         setCardWidth(520)
       } else if (w < 1024) {
@@ -636,9 +640,19 @@ export default function BlogPostHeader({ slug }: BlogPostHeaderProps) {
         {cardWidth > 0 && (
           <div
             ref={borderRef}
-            className="absolute bottom-0 left-1/2 -translate-x-1/2"
+            className="absolute bottom-0"
             style={{
-              width: `${cardWidth}px`,
+              ...(isXsViewport 
+                ? { 
+                    left: '50%',
+                    width: '100vw',
+                    transform: 'translateX(-50%)'
+                  }
+                : { 
+                    left: '50%', 
+                    width: `${cardWidth}px`,
+                    transform: 'translateX(-50%)'
+                  }),
               height: '1px',
               background: 'transparent', // Will be set by updateBorderGradient
             }}
