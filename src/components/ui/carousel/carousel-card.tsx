@@ -168,7 +168,7 @@ export function CarouselCard({
             className="hidden md:block absolute right-2 top-2 rounded-md bg-black/0 p-2 text-white backdrop-blur group-hover:bg-black/30 transition-colors"
             aria-label="Open in lightbox"
           >
-            <Maximize2 className="h-4 w-4 opacity-50 group-hover:opacity-100 transition-opacity" />
+            <Maximize2 strokeWidth={1.5} className="h-4 w-4 opacity-50 group-hover:opacity-100 transition-opacity" />
           </button>
         )}
       </motion.div>
