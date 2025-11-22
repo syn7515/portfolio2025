@@ -1,0 +1,280 @@
+/* MDX Content Styles - High specificity to override global CSS */
+.mdxContent h1 {
+    color: rgb(68 64 60) !important;
+    /* stone-700 */
+    font-size: 2.25rem;
+    /* text-4xl */
+    font-weight: 700;
+    /* font-bold */
+    margin-bottom: 1.5rem;
+    /* mb-6 */
+}
+
+.mdxContent h2 {
+    color: rgb(68 64 60) !important;
+    /* stone-700 */
+    font-size: 1.875rem;
+    /* text-3xl */
+    font-weight: 600;
+    /* font-semibold */
+    margin-bottom: 1rem;
+    /* mb-4 */
+}
+
+.mdxContent h3 {
+    color: rgb(41 37 36) !important;
+    /* stone-800 */
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    /* font-sans */
+    font-size: 1.25rem;
+    font-weight: 500;
+    line-height: 1.875rem;
+    letter-spacing: 0.04em;
+    margin-bottom: 4rem;
+    margin-top: 0rem
+}
+
+.mdxContent h4 {
+    color: rgb(41 37 36) !important;
+    /* stone-800 */
+    font-size: 1.0625rem;
+    /* text-xl */
+    font-weight: 500;
+    /* font-medium */
+    margin-bottom: 2.25rem;
+    margin-top: 3.75rem;
+    /* mb-2 */
+}
+
+
+.mdxContent h5 {
+    color: rgb(120 113 108) !important;
+    /* stone-500 */
+    font-size: 0.9rem;
+    /* 15pt */
+    font-weight: 400;
+    /* regular */
+    line-height: 155%;
+    /* 155% */
+    letter-spacing: 0.01em;
+    /* 0.8% */
+    margin-bottom: 0.2rem;
+}
+
+.mdxContent p {
+    color: rgb(68 64 60) !important;
+    /* stone-700 */
+    font-size: 0.9375rem;
+    /* 15pt */
+    font-weight: 400;
+    /* regular */
+    line-height: 160%;
+    /* 155% */
+    letter-spacing: 0.01em;
+    /* 0.8% */
+    margin-bottom: 1.5rem;
+    /* mb-4 */
+}
+
+.mdxContent div {
+    color: rgb(68 64 60) !important;
+    /* stone-700 */
+}
+
+.mdxContent a {
+    color: rgb(68 64 60) !important;
+    /* text-blue-600 */
+    cursor: pointer !important;
+    text-decoration-line: underline;
+    text-decoration-style: solid;
+    text-decoration-skip-ink: auto;
+    text-decoration-color: rgb(212 212 216);
+    /* stone-300 */
+    text-decoration-thickness: 5%;
+    /* 0.75px */
+    text-underline-offset: 0.05rem;
+    /* underline-offset-1 = 2px */
+    text-underline-position: from-font;
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
+
+.mdxContent a:hover {
+    color: rgba(68 64 60, 0.5) !important;
+    /* hover:text-blue-800 */
+}
+
+.mdxContent ul {
+    color: rgb(68 64 60) !important;
+    /* stone-700 */
+    margin-bottom: 1rem;
+    /* mb-4 */
+    margin-left: 1.5rem;
+    /* ml-6 */
+    list-style-type: disc;
+}
+
+.mdxContent ol {
+    color: rgb(68 64 60) !important;
+    /* stone-700 */
+    margin-bottom: 1rem;
+    /* mb-4 */
+    margin-left: 1.5rem;
+    /* ml-6 */
+    list-style-type: decimal;
+}
+
+.mdxContent li {
+    margin-bottom: 0.5rem;
+    /* mb-2 */
+}
+
+.mdxContent blockquote {
+    color: rgb(68 64 60) !important;
+    /* stone-700 */
+    border-left-width: 4px;
+    /* border-l-4 */
+    border-color: rgb(59 130 246);
+    /* border-blue-500 */
+    padding-left: 1rem;
+    /* pl-4 */
+    font-style: italic;
+    margin-top: 1rem;
+    /* my-4 */
+    margin-bottom: 1rem;
+    /* my-4 */
+}
+
+.mdxContent sup {
+    color: rgb(120 113 108) !important;
+    /* stone-500 - lighter text color */
+}
+
+.mdxContent strong {
+    color: rgb(12 10 9) !important;
+    /* stone-950 */
+    font-weight: 560;
+    letter-spacing: 0.01em;
+    opacity: 1;
+}
+
+.mdxContent code {
+    background-color: rgb(243 244 246);
+    /* bg-gray-100 */
+    padding-left: 0.5rem;
+    /* px-2 */
+    padding-right: 0.5rem;
+    /* px-2 */
+    padding-top: 0.25rem;
+    /* py-1 */
+    padding-bottom: 0.25rem;
+    /* py-1 */
+    border-radius: 0.25rem;
+    /* rounded */
+    font-size: 0.875rem;
+    /* text-sm */
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    /* font-mono */
+}
+
+.mdxContent pre {
+    background-color: rgb(243 244 246);
+    /* bg-gray-100 */
+    padding: 1rem;
+    /* p-4 */
+    border-radius: 0.5rem;
+    /* rounded-lg */
+    overflow-x: auto;
+    /* overflow-x-auto */
+    margin-top: 1rem;
+    /* my-4 */
+    margin-bottom: 1rem;
+    /* my-4 */
+}
+
+.mdxContent pre code {
+    background-color: transparent;
+    /* bg-transparent */
+    padding: 0;
+    /* p-0 */
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+
+    .mdxContent h1,
+    .mdxContent h2,
+    .mdxContent h3,
+    .mdxContent h4,
+    .mdxContent div,
+    .mdxContent ul,
+    .mdxContent ol,
+    .mdxContent blockquote {
+        color: rgb(212 212 216) !important;
+        /* zinc-300 */
+    }
+
+    .mdxContent p {
+        color: rgb(212 212 216) !important;
+        /* zinc-300 */
+        opacity: 0.78;
+        /* 78% opacity for slightly darker appearance in dark mode */
+    }
+
+    .mdxContent h5 {
+        color: rgb(161 161 170) !important;
+        /* zinc-400 */
+    }
+
+    .mdxContent a {
+        color: rgb(212 212 216) !important;
+        /* zinc-300 - matches p text color */
+        opacity: 0.9;
+        /* matches p opacity */
+        text-decoration-color: rgb(82 82 91);
+        /* zinc-600 */
+    }
+
+    .mdxContent a:hover {
+        color: rgb(244 244 245) !important;
+        /* zinc-100 - lighter text color on hover */
+        opacity: 1;
+        /* full opacity on hover */
+    }
+
+    .mdxContent sup {
+        color: rgb(161 161 170) !important;
+        /* zinc-400 - lighter text color for dark mode */
+    }
+
+    .mdxContent strong {
+        color: rgb(254 254 253) !important;
+        /* zinc-50 */
+        font-weight: 600;
+        opacity: 1;
+    }
+
+    .mdxContent code {
+        background-color: rgb(31 41 55);
+        /* dark:bg-gray-800 */
+        color: rgb(229 231 235);
+        /* dark:text-gray-200 */
+    }
+
+    .mdxContent pre {
+        background-color: rgb(31 41 55);
+        /* dark:bg-gray-800 */
+    }
+}
+
+/* Project navigation description - override global paragraph color */
+.project-nav-description {
+    color: rgb(41 37 36) !important; /* stone-800 for light mode */
+}
+
+@media (prefers-color-scheme: dark) {
+    .project-nav-description {
+        color: rgb(244 244 245) !important; /* zinc-100 for dark mode */
+    }
+}
