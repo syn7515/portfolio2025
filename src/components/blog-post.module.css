@@ -101,8 +101,10 @@
 }
 
 .mdxContent a:hover {
-    color: rgba(68 64 60, 0.5) !important;
-    /* hover:text-blue-800 */
+    color: rgb(28 25 23) !important;
+    /* stone-900 - darker on hover */
+    text-decoration-color: rgb(120 113 108) !important;
+    /* stone-500 - darker underline on hover */
 }
 
 .mdxContent ul {
@@ -239,6 +241,8 @@
     .mdxContent a:hover {
         color: rgb(244 244 245) !important;
         /* zinc-100 - lighter text color on hover */
+        text-decoration-color: rgb(161 161 170) !important;
+        /* zinc-400 - lighter underline on hover */
         opacity: 1;
         /* full opacity on hover */
     }
@@ -270,11 +274,13 @@
 
 /* Project navigation description - override global paragraph color */
 .project-nav-description {
-    color: rgb(41 37 36) !important; /* stone-800 for light mode */
+    color: rgb(41 37 36) !important;
+    /* stone-800 for light mode */
 }
 
 @media (prefers-color-scheme: dark) {
     .project-nav-description {
-        color: rgb(244 244 245) !important; /* zinc-100 for dark mode */
+        color: rgb(244 244 245) !important;
+        /* zinc-100 for dark mode */
     }
 }

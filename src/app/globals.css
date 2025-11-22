@@ -324,7 +324,10 @@ pre code {
 }
 
 .intro-link:hover {
-  color: rgba(68 64 60, 0.5) !important;
+  color: rgb(28 25 23) !important;
+  /* stone-900 - even darker on hover */
+  text-decoration-color: rgb(120 113 108) !important;
+  /* stone-500 - darker underline on hover */
 }
 
 /* Intro link variant for lighter text paragraphs (stone-500/zinc-400) */
@@ -347,7 +350,10 @@ pre code {
 }
 
 .intro-link-light:hover {
-  color: rgba(120 113 108, 0.5) !important;
+  color: rgb(68 64 60) !important;
+  /* stone-700 - darker on hover */
+  text-decoration-color: rgb(120 113 108) !important;
+  /* stone-500 - darker underline on hover */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -362,7 +368,9 @@ pre code {
 
   .intro-link:hover {
     color: rgb(244 244 245) !important;
-    /* zinc-100 - lighter text color on hover */
+    /* zinc-100 - lighter on hover */
+    text-decoration-color: rgb(161 161 170) !important;
+    /* zinc-400 - lighter underline on hover */
     opacity: 1;
     /* full opacity on hover */
   }
@@ -378,7 +386,9 @@ pre code {
 
   .intro-link-light:hover {
     color: rgb(212 212 216) !important;
-    /* zinc-300 - lighter text color on hover */
+    /* zinc-300 - lighter on hover */
+    text-decoration-color: rgb(161 161 170) !important;
+    /* zinc-400 - lighter underline on hover */
     opacity: 1;
   }
 }
