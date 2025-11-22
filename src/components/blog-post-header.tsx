@@ -542,9 +542,9 @@ export default function BlogPostHeader({ slug }: BlogPostHeaderProps) {
         <div className="mx-4 sm:mx-0 flex justify-between items-center">
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon-lg" asChild aria-label="Back to home" className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50 -ml-1 sm:-ml-2 sm:size-8">
-                <Link href="/" className="cursor-pointer">
-                  <Undo2 strokeWidth={1.5} className="text-stone-500 dark:text-zinc-400 !size-[18px] sm:!size-4" />
+              <Button variant="ghost" size="icon-lg" asChild aria-label="Back to home" className="cursor-pointer -ml-1 sm:-ml-2 sm:size-8">
+                <Link href="/" className="cursor-pointer group">
+                  <Undo2 strokeWidth={1.5} className="text-stone-500 dark:text-zinc-400 group-hover:text-stone-800 dark:group-hover:text-zinc-200 !size-[18px] sm:!size-4" />
                 </Link>
               </Button>
             </TooltipTrigger>
@@ -587,11 +587,13 @@ export default function BlogPostHeader({ slug }: BlogPostHeaderProps) {
                     variant="ghost"
                     size="icon-lg"
                     aria-label="Like"
-                    className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50 sm:size-8"
+                    className="cursor-pointer group sm:size-8"
                     disabled={isUpdatingCount}
                   >
                     <Heart strokeWidth={1.5} className={cn(
-                      isLiked ? "text-red-500 dark:text-red-700 fill-red-500/30 dark:fill-red-700" : "text-stone-500 dark:text-zinc-400",
+                      isLiked 
+                        ? "text-red-500 dark:text-red-700 fill-red-500/30 dark:fill-red-700 group-hover:text-red-600 dark:group-hover:text-red-600" 
+                        : "text-stone-500 dark:text-zinc-400 group-hover:text-stone-700 dark:group-hover:text-zinc-200",
                       shouldAnimate && "heart-bounce",
                       "!size-[18px] sm:!size-4"
                     )} />
@@ -637,15 +639,15 @@ export default function BlogPostHeader({ slug }: BlogPostHeaderProps) {
                   variant="ghost" 
                   size="icon-lg" 
                   aria-label={copied ? "Copied" : "Copy as Markdown"} 
-                  className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50 disabled:opacity-100 relative sm:size-8"
+                  className="cursor-pointer group disabled:opacity-100 relative sm:size-8"
                   onClick={copyAsMarkdown}
                   disabled={copied}
                 >
                   <div className={cn("transition-all absolute inset-0 flex items-center justify-center", copied ? "scale-100 opacity-100" : "scale-0 opacity-0")}>
-                    <Check strokeWidth={1.5} className="text-stone-500 dark:text-zinc-400 !size-[18px] sm:!size-4" />
+                    <Check strokeWidth={1.5} className="text-stone-500 dark:text-zinc-400 group-hover:text-stone-700 dark:group-hover:text-zinc-200 !size-[18px] sm:!size-4" />
                   </div>
                   <div className={cn("transition-all", copied ? "scale-0 opacity-0" : "scale-100 opacity-100")}>
-                    <Clipboard strokeWidth={1.5} className="text-stone-500 dark:text-zinc-400 !size-[18px] sm:!size-4" />
+                    <Clipboard strokeWidth={1.5} className="text-stone-500 dark:text-zinc-400 group-hover:text-stone-700 dark:group-hover:text-zinc-200 !size-[18px] sm:!size-4" />
                   </div>
                 </Button>
               </TooltipTrigger>

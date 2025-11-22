@@ -478,13 +478,13 @@ export default function LabelIndicatorCarousel({
                 setIndex={setIndex}
                 cardRef={(el) => {
                   if (effectiveLightboxEnabled && (item.imageUrl || item.videoUrl)) {
-                    cardRefs.current[i] = el;
-                  }
-                }}
+                      cardRefs.current[i] = el;
+                    }
+                  }}
                 renderCard={renderCard}
                 renderCaption={renderCaption}
                 captionStyle={captionStyle}
-                transition={transition}
+                  transition={transition}
               />
             ))}
           </motion.div>
@@ -499,7 +499,7 @@ export default function LabelIndicatorCarousel({
             indicatorExpandedWidth={indicatorExpandedWidth}
             indicatorCollapsedSize={indicatorCollapsedSize}
             indicatorHeight={indicatorHeight}
-            transition={transition}
+                    transition={transition}
           />
         )}
       </div>
