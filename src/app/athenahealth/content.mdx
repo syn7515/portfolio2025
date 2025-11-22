@@ -19,15 +19,22 @@ I focused on improving how the system guides payer actions at critical decision 
 <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] my-20">
   <LabelIndicatorCarousel
     showIndicators={false}
+    renderCaption={({ caption }) => (
+      <div className="font-sans text-center text-stone-600 dark:text-stone-300 text-xs sm:text-sm mt-2 sm:mt-3">
+        {caption && (
+          <span dangerouslySetInnerHTML={{ __html: caption }} />
+        )}
+      </div>
+    )}
     items={[
       { 
         label: "", 
-        caption: "[1] Color-coded status tags indicating invoice urgency",
+        caption: "Color-coded status tags indicating invoice urgency <sup>1</sup>",
         imageUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/athena-1.jpg" 
       },
       { 
         label: "", 
-        caption: "[2] Chat-based communication for faster claim resolution",
+        caption: "Chat-based communication for faster claim resolution <sup>2</sup>",
         imageUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/athena-2.jpg"
       },
     ]}
