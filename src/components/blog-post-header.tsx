@@ -168,17 +168,12 @@ export default function BlogPostHeader({ slug }: BlogPostHeaderProps) {
     if (typeof window === 'undefined' || !borderRef.current) return
 
     const checkDarkMode = () => {
-      setIsDarkMode(document.documentElement.classList.contains('dark'))
+      const isDarkClass = document.documentElement.classList.contains('dark')
+      const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+      setIsDarkMode(isDarkClass || isSystemDark)
     }
 
     checkDarkMode()
-
-    // Watch for theme changes
-    const observer = new MutationObserver(checkDarkMode)
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class']
-    })
 
     // Update border gradient
     const updateBorderGradient = () => {
@@ -186,11 +181,15 @@ export default function BlogPostHeader({ slug }: BlogPostHeaderProps) {
       const opacity = (borderOpacity / 100) * 0.2
       // Base colors at full opacity
       const lightBaseColor = 'rgba(168, 162, 158, 1)' // stone-400
-      const darkBaseColor = 'rgba(113, 113, 122, 1)' // zinc-500
+      const darkBaseColor = 'rgba(161, 161, 170, 1)' // zinc-400
       // Apply opacity to the colors
       const lightColor = lightBaseColor.replace('1)', `${opacity})`)
       const darkColor = darkBaseColor.replace('1)', `${opacity})`)
-      const baseColor = isDarkMode ? darkColor : lightColor
+      // Check dark mode directly from DOM to get the current value immediately
+      const isDarkClass = document.documentElement.classList.contains('dark')
+      const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+      const currentIsDarkMode = isDarkClass || isSystemDark
+      const baseColor = currentIsDarkMode ? darkColor : lightColor
       // Gradient: 0% transparent, 5% full opacity, 95% full opacity, 100% transparent
       const gradient = `linear-gradient(to right, transparent 0%, ${baseColor} 5%, ${baseColor} 95%, transparent 100%)`
       borderRef.current.style.background = gradient
@@ -198,8 +197,29 @@ export default function BlogPostHeader({ slug }: BlogPostHeaderProps) {
 
     updateBorderGradient()
 
+    // Watch for theme changes and update both state and border
+    const handleThemeChange = () => {
+      checkDarkMode()
+      // Update border immediately using current DOM state
+      updateBorderGradient()
+    }
+
+    const observer = new MutationObserver(handleThemeChange)
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    })
+
+    // Also listen for system theme changes
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    const handleSystemThemeChange = () => {
+      handleThemeChange()
+    }
+    mediaQuery.addEventListener('change', handleSystemThemeChange)
+
     return () => {
       observer.disconnect()
+      mediaQuery.removeEventListener('change', handleSystemThemeChange)
     }
   }, [borderOpacity, isDarkMode])
 
@@ -258,17 +278,7 @@ export default function BlogPostHeader({ slug }: BlogPostHeaderProps) {
       } else {
         // Revert optimistic update on error
         setLikeCount(currentCount)
-        // Try to parse error response, but handle cases where response body might be empty
-        let errorData = {}
-        try {
-          const text = await response.text()
-          if (text) {
-            errorData = JSON.parse(text)
-          }
-        } catch (parseError) {
-          // If parsing fails, use empty object
-          errorData = {}
-        }
+        const errorData = await response.json().catch(() => ({}))
         console.error('Failed to update like count:', {
           status: response.status,
           statusText: response.statusText,
@@ -534,7 +544,7 @@ export default function BlogPostHeader({ slug }: BlogPostHeaderProps) {
             <TooltipTrigger asChild>
               <Button variant="ghost" size="icon-lg" asChild aria-label="Back to home" className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50 -ml-1 sm:-ml-2 sm:size-8">
                 <Link href="/" className="cursor-pointer">
-                  <Undo2 className="text-stone-500 dark:text-zinc-400 !size-[18px] sm:!size-4" />
+                  <Undo2 strokeWidth={1.5} className="text-stone-500 dark:text-zinc-400 !size-[18px] sm:!size-4" />
                 </Link>
               </Button>
             </TooltipTrigger>
@@ -580,7 +590,7 @@ export default function BlogPostHeader({ slug }: BlogPostHeaderProps) {
                     className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700/50 sm:size-8"
                     disabled={isUpdatingCount}
                   >
-                    <Heart className={cn(
+                    <Heart strokeWidth={1.5} className={cn(
                       isLiked ? "text-red-500 dark:text-red-700 fill-red-500/30 dark:fill-red-700" : "text-stone-500 dark:text-zinc-400",
                       shouldAnimate && "heart-bounce",
                       "!size-[18px] sm:!size-4"
@@ -632,10 +642,10 @@ export default function BlogPostHeader({ slug }: BlogPostHeaderProps) {
                   disabled={copied}
                 >
                   <div className={cn("transition-all absolute inset-0 flex items-center justify-center", copied ? "scale-100 opacity-100" : "scale-0 opacity-0")}>
-                    <Check className="text-stone-500 dark:text-zinc-400 !size-[18px] sm:!size-4" />
+                    <Check strokeWidth={1.5} className="text-stone-500 dark:text-zinc-400 !size-[18px] sm:!size-4" />
                   </div>
                   <div className={cn("transition-all", copied ? "scale-0 opacity-0" : "scale-100 opacity-100")}>
-                    <Clipboard className="text-stone-500 dark:text-zinc-400 !size-[18px] sm:!size-4" />
+                    <Clipboard strokeWidth={1.5} className="text-stone-500 dark:text-zinc-400 !size-[18px] sm:!size-4" />
                   </div>
                 </Button>
               </TooltipTrigger>
