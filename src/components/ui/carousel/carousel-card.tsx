@@ -52,8 +52,8 @@ export function CarouselCard({
   const hasVideo = !!videoUrl;
   const hasPositionedMedia = hasPositionedImage || hasPositionedVideo;
   const backgroundClass = hasPositionedMedia 
-    ? "bg-stone-200/60 dark:bg-zinc-700/80" 
-    : "bg-stone-200/60 dark:bg-stone-800";
+    ? `bg-stone-200/60 dark:bg-zinc-700/80 ${index === currentIndex ? 'hover:bg-stone-300 dark:hover:bg-zinc-600' : ''}` 
+    : `bg-stone-200/60 dark:bg-stone-800 ${index === currentIndex ? 'hover:bg-stone-300 dark:hover:bg-stone-700' : ''}`;
   
   return (
     <div className="flex flex-col items-center" style={{ width: effWidth }}>
