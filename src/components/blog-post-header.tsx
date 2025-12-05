@@ -320,7 +320,7 @@ export default function BlogPostHeader({ slug }: BlogPostHeaderProps) {
           // Close tooltip first (will animate out)
           setLikeTooltipOpen(false)
           // Wait for closing animation (0.1s) before resetting likedMessage state
-          // This prevents showing "Show some love" during the closing animation
+          // This prevents showing "Liked?" during the closing animation
           setTimeout(() => {
             setLikedMessage(null)
             setLikeTooltipOpen(undefined) // Reset to undefined to allow hover control again
@@ -617,7 +617,7 @@ export default function BlogPostHeader({ slug }: BlogPostHeaderProps) {
                     ))}
                   </div>
                 ) : (
-                  <p style={{ textAlign: 'center' }}>Show some love</p>
+                  <p style={{ textAlign: 'center' }}>Liked?</p>
                 )}
               </TooltipContent>
             </Tooltip>
