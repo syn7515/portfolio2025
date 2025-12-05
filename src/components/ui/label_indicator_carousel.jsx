@@ -117,7 +117,9 @@ export default function LabelIndicatorCarousel({
   const [initialTransform, setInitialTransform] = useState(null);
   const [exitTransform, setExitTransform] = useState(null);
   const [exitDuration, setExitDuration] = useState(0.4);
+  const [pendingLightboxIndex, setPendingLightboxIndex] = useState(null); // For delayed transform calculation
   const cardRefs = useRef({});
+  const scrollbarGutterRef = useRef(0); // Store scrollbar gutter for exit animation
   
   // Disable lightbox on mobile (< 640px) and sm and below
   const effectiveLightboxEnabled = enableLightbox && !isMobile && !isSmOrBelow;
@@ -143,6 +145,7 @@ export default function LabelIndicatorCarousel({
     const finalY = viewportHeight / 2;
     
     // Calculate initial position (center of container bounding box)
+    // Note: scrollbar compensation is now handled in the effect that calls this function
     const initialX = containerRect.left + containerRect.width / 2;
     const initialY = containerRect.top + containerRect.height / 2;
     
@@ -245,14 +248,11 @@ export default function LabelIndicatorCarousel({
   const openLightbox = useCallback((i) => {
     if (!effectiveLightboxEnabled) return;
     
-    // Calculate transform from card position
-    const transform = calculateCardTransform(i);
-    setInitialTransform(transform);
+    // FIX 2: Set pending index to trigger scroll lock, then calculate transform after layout stabilizes
     setLightboxIndex(i);
-    // Sync carousel index with lightbox index
     setIndex(i);
-    setLightboxOpen(true);
-  }, [effectiveLightboxEnabled, calculateCardTransform, setIndex]);
+    setPendingLightboxIndex(i); // This triggers scroll lock effect, then transform calculation
+  }, [effectiveLightboxEnabled, setIndex]);
 
   const prevLightbox = useCallback(() => {
     const newIndex = Math.max(0, lightboxIndex - 1);
@@ -273,6 +273,12 @@ export default function LabelIndicatorCarousel({
     // Just animate back to the current card position
     const transform = calculateCardTransform(lightboxIndex);
     if (transform) {
+      // Apply same scrollbar gutter compensation as opening
+      // When scroll lock is removed, the gutter will reappear and content shifts left
+      const scrollbarGutter = scrollbarGutterRef.current;
+      if (scrollbarGutter > 0) {
+        transform.x = transform.x + scrollbarGutter / 2;
+      }
       setExitTransform(transform);
       setExitDuration(0.4); // Fixed duration since no sliding
       // Use requestAnimationFrame to ensure state is updated before exit animation
@@ -290,6 +296,39 @@ export default function LabelIndicatorCarousel({
     }, 400);
   }, [lightboxIndex, calculateCardTransform]);
 
+  // FIX 2: Measure BEFORE scroll lock, then apply scroll lock and open lightbox
+  useEffect(() => {
+    if (pendingLightboxIndex === null) return;
+    
+    // Step 1: Measure scrollbar gutter BEFORE scroll lock (this is the key fix!)
+    const scrollbarGutterBeforeLock = window.innerWidth - document.documentElement.clientWidth;
+    scrollbarGutterRef.current = scrollbarGutterBeforeLock; // Store for exit animation
+    
+    // Step 2: Calculate transform BEFORE scroll lock (card position is accurate)
+    const transform = calculateCardTransform(pendingLightboxIndex);
+    
+    // Step 3: Adjust transform to compensate for scrollbar gutter that will disappear
+    if (transform && scrollbarGutterBeforeLock > 0) {
+      // When scroll lock is applied, content shifts right by half the gutter
+      // The lightbox stays centered, so we need to adjust the starting x position
+      transform.x = transform.x + scrollbarGutterBeforeLock / 2;
+    }
+    
+    // Step 4: Apply scroll lock
+    const scrollY = window.scrollY;
+    const body = document.body;
+    
+    body.style.position = 'fixed';
+    body.style.top = `-${scrollY}px`;
+    body.style.width = '100%';
+    body.style.overflow = 'hidden';
+    
+    // Step 5: Open lightbox with pre-calculated transform
+    setInitialTransform(transform);
+    setLightboxOpen(true);
+    setPendingLightboxIndex(null);
+  }, [pendingLightboxIndex, calculateCardTransform]);
+
   // After the entrance animation completes, clear the initial transform so the lightbox can resize responsively
   useEffect(() => {
     if (!isLightboxOpen || !initialTransform) return;
@@ -301,37 +340,25 @@ export default function LabelIndicatorCarousel({
     return () => clearTimeout(timer);
   }, [isLightboxOpen, initialTransform]);
 
-  // Prevent body scroll when lightbox is open
+  // Restore scroll when lightbox closes (scroll lock is applied in pendingLightboxIndex effect)
   useEffect(() => {
     if (!effectiveLightboxEnabled) return;
     
+    // Only handle cleanup - scroll lock is applied when pendingLightboxIndex is set
     if (isLightboxOpen) {
-      // Save current scroll position
-      const scrollY = window.scrollY;
-      const body = document.body;
-      const html = document.documentElement;
+      // Capture scroll position from body.style.top
+      const scrollY = parseInt(document.body.style.top || '0', 10) * -1;
       
-      // Prevent scrolling by setting position fixed and maintaining scroll position
-      body.style.position = 'fixed';
-      body.style.top = `-${scrollY}px`;
-      body.style.width = '100%';
-      body.style.overflow = 'hidden';
-      
-      // Also prevent scrolling on html element
-      html.style.overflow = 'hidden';
-      
-      // Store scroll position for restoration
       return () => {
         // When closing, wait for exit animation to complete before restoring scroll
-        const savedScrollY = scrollY; // Capture scroll position in closure
-        const animationDuration = exitDuration * 1000; // Convert to milliseconds
+        const savedScrollY = scrollY;
+        const animationDuration = exitDuration * 1000;
         setTimeout(() => {
-          // Restore scroll position and styles
+          const body = document.body;
           body.style.position = '';
           body.style.top = '';
           body.style.width = '';
           body.style.overflow = '';
-          html.style.overflow = '';
           window.scrollTo(0, savedScrollY);
         }, animationDuration);
       };
