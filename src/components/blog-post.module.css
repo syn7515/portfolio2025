@@ -187,7 +187,7 @@
     /* p-4 */
     border-radius: 0.5rem;
     /* rounded-lg */
-    overflow-x: auto;
+    overflow-x: clip;
     /* overflow-x-auto */
     margin-top: 1rem;
     /* my-4 */

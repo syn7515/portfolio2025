@@ -8,8 +8,8 @@ export default function Home() {
   return (
 
 
-    <div className="font-sans grid grid-rows-[80px_1fr_20px] items-center justify-items-center min-h-screen pb-0 gap-1 sm: overflow-x-hidden">
-      <main className="w-full flex flex-col gap-[32px] row-start-2 items-center sm:items-start overflow-x-hidden">
+    <div className="font-sans grid grid-rows-[80px_1fr_20px] items-center justify-items-center min-h-screen pb-0 gap-1">
+      <main className="w-full flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
         <div className="max-w-[480px] mx-auto px-4" style={{ paddingTop: 'clamp(40px, 10vh, 120px)' }}>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
