@@ -79,6 +79,13 @@ I shifted to managing updates **by group** instead of tracking each individual r
 <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] my-20">
   <LabelIndicatorCarousel
     showIndicators={false}
+    renderCaption={({ caption }) => (
+      <div className="text-center text-stone-600 dark:text-stone-300 text-xs sm:text-sm mt-2 sm:mt-3 md:mt-5" style={{ fontFamily: 'Inter' }}>
+        {caption && (
+          <span dangerouslySetInnerHTML={{ __html: caption }} />
+        )}
+      </div>
+    )}
     items={[
       { 
         label: "Schedule", 
@@ -96,7 +103,7 @@ I shifted to managing updates **by group** instead of tracking each individual r
       },
       { 
         label: "Review", 
-        caption: "Software update history of hardware groups",
+        caption: "Software update history of hardware groups <sup>2</sup>",
         imageUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/manager-6.png",
         imageSizePercent: 84,
         imagePosition: { top: 'center', left: 'center' }
@@ -105,7 +112,7 @@ I shifted to managing updates **by group** instead of tracking each individual r
   />
 </div>
 
-A key design challenge was creating a clear software update overview that helped all stakeholders quickly align. Since the naming system was hard to read at a glance, I focused on table layout and typography to make information scannable and easy to interpret.
+A key design challenge was creating a clear software update overview that helped all stakeholders quickly align. Since the naming system was hard to read at a glance, I focused on table layout and typography to make information scannable and easy to interpret<sup>2</sup>.
 
 The design emphasized transparency and predictability, so that updates could scale smoothly across teams.
 
