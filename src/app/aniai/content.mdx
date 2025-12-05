@@ -19,15 +19,22 @@ Cooking robots handle a delicate job — even a few millimeters of deviation can
 
 Our team needed a platform for engineers with little programming experience to **adjust minor robot actions** (e.g., the number of repetitions) for testing.
 
-With the renewal of our internal platform, I reimagined this workflow: from request–response to **direct control**. Instead of a back-and-forth pipeline, I wanted robot and QA engineers to directly control robot actions themselves with key parameters — quickly, confidently, and safely.
+With the renewal of our internal platform, I reimagined this workflow: from request–response to **direct control**. Instead of a back-and-forth pipeline, I wanted robot and QA engineers to directly control robot actions themselves with key parameters<sup>1</sup> — quickly, confidently, and safely.
 
 <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] my-20">
   <LabelIndicatorCarousel
     showIndicators={false}
+    renderCaption={({ caption }) => (
+      <div className="text-center text-stone-600 dark:text-stone-300 text-xs sm:text-sm mt-2 sm:mt-3 md:mt-5" style={{ fontFamily: 'Inter' }}>
+        {caption && (
+          <span dangerouslySetInnerHTML={{ __html: caption }} />
+        )}
+      </div>
+    )}
     items={[
       { 
         label: "Edit", 
-        caption: "Fine-tuning robot behavior by editing key firmware parameters",
+        caption: "Fine-tuning robot behavior by editing key firmware parameters  <sup>1</sup>",
         imageUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/generator-4.png",
         videoUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/generator-demo.mov",
         imageSizePercent: 84,
