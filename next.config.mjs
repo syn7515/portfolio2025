@@ -15,6 +15,16 @@ const nextConfig = {
       },
     ],
   },
+  // Redirect /work to Figma portfolio
+  redirects: async () => {
+    return [
+      {
+        source: '/work',
+        destination: 'https://www.figma.com/deck/TFUfKfOJQnaVxak2kskr90/SuePark----Portfolio?node-id=15-99&viewport=75%2C-4693%2C0.39&t=9whDS9KG8w8Hc4KL-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1',
+        permanent: true, // 301 redirect
+      },
+    ]
+  },
   // Optionally, add any other Next.js config below
 }
 
