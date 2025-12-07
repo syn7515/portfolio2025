@@ -15,6 +15,10 @@ const nextConfig = {
       },
     ],
   },
+  // Set Turbopack root to current directory
+  turbopack: {
+    root: process.cwd(),
+  },
   // Redirect /work to Figma portfolio
   redirects: async () => {
     return [
