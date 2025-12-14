@@ -38,10 +38,10 @@ function isRedisConfigured(): boolean {
 // GET: Fetch like count for a slug
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
+  context: { params: Promise<{ slug: string }> }
 ) {
+  const { slug } = await context.params
   try {
-    const { slug } = await params
     
     if (!slug) {
       return NextResponse.json(
@@ -86,10 +86,10 @@ export async function GET(
 // POST: Increment like count
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
+  context: { params: Promise<{ slug: string }> }
 ) {
+  const { slug } = await context.params
   try {
-    const { slug } = await params
     
     if (!isRedisConfigured()) {
       // Return success with count 0 when Redis is not configured
@@ -145,10 +145,10 @@ export async function POST(
 // DELETE: Decrement like count
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
+  context: { params: Promise<{ slug: string }> }
 ) {
+  const { slug } = await context.params
   try {
-    const { slug } = await params
     
     if (!isRedisConfigured()) {
       // Return success with count 0 when Redis is not configured
