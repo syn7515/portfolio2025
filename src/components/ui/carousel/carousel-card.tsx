@@ -170,10 +170,6 @@ export function CarouselCard({
           >
             <span className="relative block h-4 w-4">
               <Maximize2
-                strokeWidth={1.7}
-                className="absolute inset-0 h-4 w-4 opacity-50 transition-opacity group-hover:opacity-0"
-              />
-              <Maximize2
                 strokeWidth={1.5}
                 className="absolute inset-0 h-4 w-4 opacity-0 transition-opacity group-hover:opacity-100"
               />
