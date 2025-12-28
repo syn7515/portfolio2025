@@ -46,7 +46,7 @@ export default function Home() {
               href="https://x.com/spark7515" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="social-icon"
+              className="social-icon cursor-pointer"
               aria-label="Twitter"
             >
               <svg className="w-[22px] h-[22px]" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -57,7 +57,7 @@ export default function Home() {
               href="https://www.linkedin.com/in/sooyeonp/" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="social-icon"
+              className="social-icon cursor-pointer"
               aria-label="LinkedIn"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
