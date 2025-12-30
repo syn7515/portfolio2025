@@ -422,6 +422,15 @@ pre code {
   }
 }
 
+/* Button link styles - override global a styles when anchor is rendered as button */
+button a,
+[role="button"] a,
+a[role="button"],
+a.inline-flex.items-center {
+  text-decoration: none !important;
+  font-style: normal !important;
+}
+
 /* Arrow up bounce animation */
 @keyframes arrow-bounce-up {
   0% {

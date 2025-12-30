@@ -97,7 +97,7 @@ export default function ProjectItem({
           <div className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic" style={{ fontFamily: 'Inter' }}>
             {organization} · <span>{dates}</span>
           </div>
-          <p className="mt-0.5 not-italic">
+          <p className="mt-0.5 not-italic !text-stone-800 dark:!text-zinc-200">
             {description}
           </p>
         </div>

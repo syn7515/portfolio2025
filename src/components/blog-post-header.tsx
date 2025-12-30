@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { Undo2, Heart, Clipboard, Check } from 'lucide-react'
+import { Undo2, Heart, Copy, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Toggle } from '@/components/ui/toggle'
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipArrow } from '@/components/ui/tooltip'
@@ -647,7 +647,7 @@ export default function BlogPostHeader({ slug }: BlogPostHeaderProps) {
                     <Check strokeWidth={isDarkMode ? 1.5 : 1.7} className="text-stone-500 dark:text-zinc-400 group-hover:text-stone-800 dark:group-hover:text-zinc-200 !size-[18px] sm:!size-4" />
                   </div>
                   <div className={cn("transition-all", copied ? "scale-0 opacity-0" : "scale-100 opacity-100")}>
-                    <Clipboard strokeWidth={isDarkMode ? 1.5 : 1.7} className="text-stone-500 dark:text-zinc-400 group-hover:text-stone-800 dark:group-hover:text-zinc-200 !size-[18px] sm:!size-4" />
+                    <Copy strokeWidth={isDarkMode ? 1.5 : 1.7} className="text-stone-500 dark:text-zinc-400 group-hover:text-stone-800 dark:group-hover:text-zinc-200 !size-[18px] sm:!size-4" />
                   </div>
                 </Button>
               </TooltipTrigger>
