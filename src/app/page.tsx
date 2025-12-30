@@ -18,7 +18,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
           >
-            <span className="font-semibold">Sue Park</span>. Product designer with engineering mindset, obsessed with <span className="italic">why</span> behind everything — from strategies to pixels.
+            <span className="font-medium">Sue Park</span>. Product designer with engineering mindset, obsessed with <span className="italic">why</span> behind everything — from strategies to pixels.
           </motion.p>
           <motion.p
             className="!text-stone-800 dark:!text-inherit"
