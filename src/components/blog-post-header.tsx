@@ -542,7 +542,7 @@ export default function BlogPostHeader({ slug }: BlogPostHeaderProps) {
         <div className="mx-4 sm:mx-0 flex justify-between items-center">
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon-lg" asChild aria-label="Back to home" className="cursor-pointer -ml-1 sm:-ml-2 sm:size-8">
+              <Button variant="ghost" size="icon-lg" asChild aria-label="Back to home" className="cursor-pointer -ml-1 sm:-ml-2 sm:size-8 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2">
                 <Link href="/" className="cursor-pointer group">
                   <Undo2 strokeWidth={isDarkMode ? 1.5 : 1.7} className="text-stone-500 dark:text-zinc-400 group-hover:text-stone-800 dark:group-hover:text-zinc-200 !size-[18px] sm:!size-4" />
                 </Link>
@@ -587,7 +587,7 @@ export default function BlogPostHeader({ slug }: BlogPostHeaderProps) {
                     variant="ghost"
                     size="icon-lg"
                     aria-label="Like"
-                    className="cursor-pointer group sm:size-8"
+                    className="cursor-pointer group sm:size-8 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
                     disabled={isUpdatingCount}
                   >
                     <Heart strokeWidth={isDarkMode ? 1.5 : 1.7} className={cn(
@@ -639,7 +639,7 @@ export default function BlogPostHeader({ slug }: BlogPostHeaderProps) {
                   variant="ghost" 
                   size="icon-lg" 
                   aria-label={copied ? "Copied" : "Copy as Markdown"} 
-                  className="cursor-pointer group disabled:opacity-100 relative sm:size-8"
+                  className="cursor-pointer group disabled:opacity-100 relative sm:size-8 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
                   onClick={copyAsMarkdown}
                   disabled={copied}
                 >
