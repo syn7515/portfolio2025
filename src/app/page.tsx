@@ -70,7 +70,7 @@ export default function Home() {
             <Button 
               variant="ghost" 
               asChild
-              className="bg-stone-100 dark:bg-zinc-800 [&>a]:bg-stone-100 [&>a]:dark:bg-zinc-800 px-3.5 py-0 [&>a]:px-3.5 [&>a]:py-0 leading-none [&>a]:leading-none h-[32px] [&>a]:h-[32px]"
+              className="bg-stone-100 dark:bg-zinc-800 [&>a]:bg-stone-100 [&>a]:dark:bg-zinc-800 px-3.5 py-0 [&>a]:px-3.5 [&>a]:py-0 leading-none [&>a]:leading-none h-[32px] [&>a]:h-[32px] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 [&>a]:focus-visible:ring-2 [&>a]:focus-visible:ring-blue-500 [&>a]:focus-visible:ring-offset-2"
             >
               <a 
                 href="/resume.pdf" 
