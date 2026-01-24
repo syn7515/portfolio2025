@@ -467,7 +467,7 @@ export default function BlogPostHeader({ slug }: BlogPostHeaderProps) {
           }
         })
         // Remove the max-w wrapper div opening
-        .replace(/<div className="max-w-\[480px\] mx-auto">\s*/g, '')
+        .replace(/<div className="max-w-\[560px\] mx-auto">\s*/g, '')
         // Remove full-width container divs with all their attributes
         .replace(/<div className="w-screen[^"]*">\s*/g, '')
         // Remove all closing divs
@@ -538,7 +538,7 @@ export default function BlogPostHeader({ slug }: BlogPostHeaderProps) {
       className="sticky top-0 h-16 sm:h-12 z-50 bg-white dark:bg-zinc-900 flex items-center relative"
       style={{ width: 'calc(100% + 2rem)', marginLeft: '-1rem', marginRight: '-1rem' }}
     >
-      <div className="max-w-[480px] mx-auto w-full">
+      <div className="max-w-[560px] mx-auto w-full">
         <div className="mx-4 sm:mx-0 flex justify-between items-center">
           <Tooltip>
             <TooltipTrigger asChild>
