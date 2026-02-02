@@ -6,9 +6,7 @@ import Divider from '@/components/ui/divider'
 ##### Aniai · 2024-2025 
 ### Building the Tools Behind Smarter Robots
 
-As a founding product designer at a <a href="https://www.aniai.ai/" target="_blank" rel="noopener noreferrer"><em>robotics startup</em></a>,  I played a key role in both design and product strategy, working closely with cross-functional teams to define how robots are built, tested, and managed.
-
-Here are a few highlights of how design influenced robot development process.
+As a founding product designer at a <a href="https://www.aniai.ai/" target="_blank" rel="noopener noreferrer"><em>robotics startup</em></a>,  I played a key role in both design and product strategy, working closely with cross-functional teams to define how robots are built, tested, and managed. 
 
 
 #### Designing speed for robot development (2024-2025)
@@ -16,8 +14,6 @@ Here are a few highlights of how design influenced robot development process.
 Robots handle a delicate job — even a few millimeters of deviation can make the difference between success and failure. To ensure reliability, robots must be tested under extreme conditions.
 
 Our team needed a platform for engineers with little programming experience to **adjust minor robot actions** (e.g., the number of repetitions) for testing.
-
-With the renewal of our internal platform, I reimagined this workflow: from request–response to **direct control**. Instead of a back-and-forth pipeline, I wanted robot and QA engineers to directly control robot actions themselves with key parameters<sup>1</sup> — quickly, confidently, and safely.
 
 <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] my-20">
   <LabelIndicatorCarousel
@@ -57,9 +53,9 @@ With the renewal of our internal platform, I reimagined this workflow: from requ
   />
 </div>
 
-Because every edit has real impact, I designed the parametric firmware generator around guidance, clarity, and control. 
+With the renewal of our internal platform, I reimagined this workflow: from request–response to **direct control**. Instead of a back-and-forth pipeline, I wanted robot and QA engineers to directly control robot actions themselves with key parameters<sup>1</sup> — quickly, confidently, and safely.
 
-The layout was designed for quick scanning — users can immediately assess current states and spot what had been changed. Information panel on right provides guidance on parameters so that users can adjust without guesswork.
+Because every edit has real impact, I designed the parametric firmware generator around guidance, clarity, and control. The layout was designed for quick scanning and info panel provides guidance on parameters so that users can adjust without guesswork.
 
 The test firmware generator accelerated development process tremendously. The average time to create test firmware reduced from 2-3 business days to **5 minutes**, and the number of tests conducted during the same time span has increased by **3x**.
 
@@ -72,7 +68,7 @@ Timely robot upgrades are critical — customers expect smooth updates without d
 
 We needed **an update management system** that everyone — from robot engineers and product managers to manufacturing and field service — could rely on to coordinate updates.
 
-I shifted to managing updates **by group** instead of tracking each individual robot. At the hardware version level, everyone now had a single source of truth — replacing the scattered, product-by-product approach.
+I shifted to managing updates by group instead of tracking each individual robot. At the hardware version level, everyone now had a single source of truth — replacing the scattered, product-by-product approach.
 
 <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] my-20">
   <LabelIndicatorCarousel
@@ -87,21 +83,21 @@ I shifted to managing updates **by group** instead of tracking each individual r
     items={[
       { 
         label: "Schedule", 
-        caption: "Assigning updates to groups",
+        caption: "Assigning updates to robot groups",
         imageUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/manager-4.png",
         imageSizePercent: 84,
         imagePosition: { top: 'center', left: 'center' } 
       },
       { 
         label: "Update", 
-        caption: "Reviewing and confirming updates",
+        caption: "Reviewing and confirming individual robot updates",
         imageUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/manager-5.png",
         imageSizePercent: 104,
         imagePosition: { top: 9, left: 'center' }
       },
       { 
         label: "Review", 
-        caption: "Software update history of hardware groups <sup>2</sup>",
+        caption: "Software update history of robot groups <sup>2</sup>",
         imageUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/manager-6.png",
         imageSizePercent: 84,
         imagePosition: { top: 'center', left: 'center' }
