@@ -11,14 +11,14 @@ export default function Home() {
 
     <div className="font-sans grid grid-rows-[80px_1fr_20px] items-center justify-items-center min-h-screen pb-0 gap-1">
       <main className="w-full flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <div className="max-w-[480px] mx-auto px-4" style={{ paddingTop: 'clamp(40px, 10vh, 120px)' }}>
+        <div className="max-w-[480px] mx-auto px-4" style={{ paddingTop: 'clamp(40px, 10vh, 100px)' }}>
           <motion.p
-            className="!text-stone-800 dark:!text-inherit"
+            className="!text-stone-800 dark:!text-inherit md:!mb-5"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
           >
-            <span className="!text-base font-medium">Sue Park</span>
+            <span className="!text-base md:!text-lg font-medium">Sue Park</span>
           </motion.p>
           <motion.p
             className="!text-stone-800 dark:!text-inherit"
