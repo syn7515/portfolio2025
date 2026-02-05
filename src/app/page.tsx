@@ -18,13 +18,21 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
           >
-            <span className="font-medium">Sue Park</span>. Product designer with engineering mindset, obsessed with <span className="italic">why</span> behind everything — from strategies to pixels.
+            <span className="!text-base font-medium">Sue Park</span>
           </motion.p>
           <motion.p
             className="!text-stone-800 dark:!text-inherit"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.1 }}
+            transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.08  }}
+          >
+            Product designer with engineering mindset, obsessed with <span className="italic">why</span> behind everything — from strategies to pixels.
+          </motion.p>
+          <motion.p
+            className="!text-stone-800 dark:!text-inherit"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.16 }}
           >
             Currently a founding product designer at <a href="https://www.aniai.ai/" target="_blank" rel="noopener noreferrer" className="intro-link">Aniai</a>, designing a robot interface.
           </motion.p>
@@ -32,7 +40,7 @@ export default function Home() {
             className="!text-stone-500 dark:!text-zinc-400"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.2 }}
+            transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.24 }}
           >
             Previously, reimagined public benefits at <a href="https://goinvo.com/" target="_blank" rel="noopener noreferrer" className="intro-link-light">Goinvo</a> and advanced healthcare accessibility at <a href="https://www.athenahealth.com/" target="_blank" rel="noopener noreferrer" className="intro-link-light">AthenaHealth</a>.
           </motion.p>
@@ -41,7 +49,7 @@ export default function Home() {
             className="flex gap-4 mt-8 justify-between items-center"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.3 }}
+            transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.32 }}
           >
             <div className="flex gap-4">
               <a 
@@ -104,7 +112,7 @@ export default function Home() {
               href="/athenahealth"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.5 }}
+              transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.48 }}
             />
           </div>
         </div>
@@ -113,7 +121,7 @@ export default function Home() {
           className="max-w-[480px] mx-auto px-4 mt-24 mb-0 text-center"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.6 }}
+          transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.56 }}
         >
           <div 
             className="text-[14px] text-stone-400 dark:text-zinc-500 font-normal"
