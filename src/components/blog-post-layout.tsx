@@ -114,7 +114,7 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
                   >
                     <div 
                       className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic mb-1.5 opacity-80"
-                      style={{ fontFamily: 'Inter' }}
+                      style={{ fontFamily: 'Inter var' }}
                     >
                       Previous
                     </div>
@@ -138,7 +138,7 @@ export default function BlogPostLayout({ children, slug }: BlogPostLayoutProps) 
                   >
                     <div 
                       className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic mb-1.5 opacity-80"
-                      style={{ fontFamily: 'Inter' }}
+                      style={{ fontFamily: 'Inter var' }}
                     >
                       Next
                     </div>

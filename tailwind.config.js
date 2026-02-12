@@ -9,9 +9,9 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: [
+          'Inter var',
           'var(--font-inter)',
           'var(--font-geist-sans)',
-          'Inter',
           'system-ui',
           '-apple-system',
           'BlinkMacSystemFont',
@@ -39,9 +39,9 @@ module.exports = {
           'serif',
         ],
         display: [
+          'Inter var',
           'var(--font-inter)',
           'var(--font-geist-sans)',
-          'Inter',
           'system-ui',
           'sans-serif',
         ],
