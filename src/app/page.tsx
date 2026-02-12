@@ -21,7 +21,7 @@ export default function Home() {
             <span className="!text-base md:!text-lg font-medium">Sue Park</span>
           </motion.p>
           <motion.p
-            className="!text-stone-800 dark:!text-inherit"
+            className="!text-stone-800 dark:!text-inherit !font-[450]"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.08  }}
@@ -29,7 +29,7 @@ export default function Home() {
             Product designer with engineering mindset, obsessed with <span className="italic">why</span> behind everything — from strategies to pixels.
           </motion.p>
           <motion.p
-            className="!text-stone-800 dark:!text-inherit"
+            className="!text-stone-800 dark:!text-inherit !font-[450]"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.16 }}
@@ -37,7 +37,7 @@ export default function Home() {
             Currently a founding product designer at <a href="https://www.aniai.ai/" target="_blank" rel="noopener noreferrer" className="intro-link">Aniai</a>, designing a robot interface.
           </motion.p>
           <motion.p
-            className="!text-stone-500 dark:!text-zinc-400"
+            className="!text-stone-500 dark:!text-zinc-400 !font-[450]"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.24 }}
@@ -78,7 +78,7 @@ export default function Home() {
             <Button 
               variant="ghost" 
               asChild
-              className="bg-stone-100 dark:bg-zinc-800 border border-stone-200 dark:border-zinc-700 [&>a]:bg-stone-100 [&>a]:dark:bg-zinc-800 px-3.5 py-0 [&>a]:px-3.5 [&>a]:py-0 leading-none [&>a]:leading-none h-[32px] [&>a]:h-[32px] focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 [&>a]:focus-visible:ring-2 [&>a]:focus-visible:ring-blue-600 [&>a]:focus-visible:ring-offset-2"
+              className="bg-stone-100 dark:bg-zinc-800 !font-[450] border border-stone-200 dark:border-zinc-700 [&>a]:bg-stone-100 [&>a]:dark:bg-zinc-800 px-3.5 py-0 [&>a]:px-3.5 [&>a]:py-0 leading-none [&>a]:leading-none h-[32px] [&>a]:h-[32px] focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 [&>a]:focus-visible:ring-2 [&>a]:focus-visible:ring-blue-600 [&>a]:focus-visible:ring-offset-2"
             >
               <a 
                 href="/resume.pdf" 

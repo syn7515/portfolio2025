@@ -24,7 +24,7 @@
 .mdxContent h3 {
     color: rgb(41 37 36) !important;
     /* stone-800 */
-    font-family: 'Inter var', var(--font-inter), var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: var(--font-inter), var(--font-geist-sans), Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     /* font-sans */
     font-size: 1.25rem;
     font-weight: 500;
@@ -48,11 +48,11 @@
 
 
 .mdxContent h5 {
-    color: rgb(120 113 108) !important;
-    /* stone-500 */
-    font-size: 0.9rem;
+    color: rgb(168 162 158) !important;
+    /* stone-400 */
+    font-size: 0.9375rem;
     /* 15pt */
-    font-weight: 400;
+    font-weight: 450;
     /* regular */
     line-height: 155%;
     /* 155% */
@@ -63,15 +63,15 @@
 }
 
 .mdxContent p {
-    color: rgb(87 83 78) !important;
-    /* stone-600 */
+    color: rgb(68 64 60) !important;
+    /* stone-700 */
     font-size: 0.9375rem;
     /* 15pt */
-    font-weight: 400;
+    font-weight: 450;
     /* regular */
     line-height: 160%;
     /* 155% */
-    letter-spacing: 0.01em;
+    letter-spacing: 0.005em;
     /* 0.8% */
     margin-bottom: 1.5rem;
     /* mb-4 */

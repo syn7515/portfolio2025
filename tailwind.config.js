@@ -9,15 +9,15 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: [
-          'Inter var',
+          '"Inter var"',
           'var(--font-inter)',
           'var(--font-geist-sans)',
           'system-ui',
           '-apple-system',
           'BlinkMacSystemFont',
-          'Segoe UI',
+          '"Segoe UI"',
           'Roboto',
-          'Helvetica Neue',
+          '"Helvetica Neue"',
           'Arial',
           'sans-serif',
         ],
@@ -39,7 +39,7 @@ module.exports = {
           'serif',
         ],
         display: [
-          'Inter var',
+          '"Inter var"',
           'var(--font-inter)',
           'var(--font-geist-sans)',
           'system-ui',

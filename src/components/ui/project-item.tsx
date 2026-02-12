@@ -94,10 +94,10 @@ export default function ProjectItem({
           />
         </div>
         <div className="mt-4 font-sans not-italic">
-          <div className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic font-sans">
+          <div className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic font-sans !font-[450]">
             {organization} · <span>{dates}</span>
           </div>
-          <p className="mt-0.5 not-italic !text-stone-800 dark:!text-zinc-200">
+          <p className="mt-0.5 not-italic !text-stone-800 dark:!text-zinc-200 !font-[450]">
             {description}
           </p>
         </div>
