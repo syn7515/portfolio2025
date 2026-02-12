@@ -71,7 +71,7 @@ export function CarouselIndicators({
             <motion.button
               type="button"
               initial={false}
-              className="flex cursor-pointer select-none items-center justify-center overflow-hidden rounded-full bg-stone-100 text-xs sm:text-sm text-stone-500 outline-none ring-0 focus-visible:ring-2 focus-visible:ring-stone-400 dark:bg-zinc-800 dark:text-zinc-300"
+              className="flex cursor-pointer select-none items-center justify-center overflow-hidden rounded-full bg-stone-100 text-xs sm:text-sm text-stone-500 outline-none ring-0 focus-visible:ring-2 focus-visible:ring-stone-400 dark:bg-zinc-800 dark:text-zinc-300 font-sans"
               animate={{
                 width: active ? effIndicators.expanded : effIndicators.collapsed,
                 height: active ? effIndicators.height : effIndicators.collapsed,

@@ -30,7 +30,7 @@
     font-weight: 500;
     line-height: 1.875rem;
     letter-spacing: 0.01em;
-    margin-bottom: 4rem;
+    margin-bottom: 5rem;
     margin-top: 0rem
 }
 
@@ -71,7 +71,7 @@
     /* regular */
     line-height: 160%;
     /* 155% */
-    letter-spacing: 0.005em;
+    letter-spacing: 0.00em;
     /* 0.8% */
     margin-bottom: 1.5rem;
     /* mb-4 */
