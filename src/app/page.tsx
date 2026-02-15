@@ -34,7 +34,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.16 }}
           >
-            Currently a founding product designer at <a href="https://www.aniai.ai/" target="_blank" rel="noopener noreferrer" className="intro-link">Aniai</a>, designing robots tools behind them.
+            Currently a founding product designer at <a href="https://www.aniai.ai/" target="_blank" rel="noopener noreferrer" className="intro-link">Aniai</a>, designing robots and tools behind them.
           </motion.p>
           <motion.p
             className="!text-stone-500 dark:!text-zinc-400 !font-[450]"
