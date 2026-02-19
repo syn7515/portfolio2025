@@ -70,7 +70,7 @@ export default function ProjectItem({
           color: 'inherit'
         }}
       >
-        <div className="relative w-full aspect-video bg-stone-200/60 dark:bg-zinc-700/80 group-hover:bg-stone-300 dark:group-hover:bg-zinc-600 transition-colors duration-100 overflow-hidden">
+        <div className="relative w-full aspect-video bg-stone-200/60 dark:bg-zinc-700/80 group-hover:bg-stone-300 dark:group-hover:bg-zinc-600 transition-colors duration-300 ease-out overflow-hidden">
           <img
             src={imageUrl}
             alt={`${organization} project screenshot`}
