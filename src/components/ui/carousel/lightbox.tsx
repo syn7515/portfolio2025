@@ -262,7 +262,14 @@ export function Lightbox({
               style={{ overflow: 'visible' }}
             >
               {/* Content + caption stacked so caption sits right below image/video */}
-              <div className="flex flex-col items-center gap-4">
+              <div
+                className="flex flex-col items-center gap-4"
+                style={
+                  normalizedItems[lightboxIndex]?.caption?.trim()
+                    ? { transform: "translateY(24px)" }
+                    : undefined
+                }
+              >
                 <LightboxContent 
                   currentItem={normalizedItems[lightboxIndex]}
                   initialTransform={initialTransform}
