@@ -261,15 +261,8 @@ export function Lightbox({
               className="absolute inset-0 pointer-events-none flex items-center justify-center"
               style={{ overflow: 'visible' }}
             >
-              {/* Content + caption stacked so caption sits right below image/video */}
-              <div
-                className="flex flex-col items-center gap-4"
-                style={
-                  normalizedItems[lightboxIndex]?.caption?.trim()
-                    ? { transform: "translateY(24px)" }
-                    : undefined
-                }
-              >
+              {/* Relative container sizes to LightboxContent only; caption is out of flow to avoid wrapper height change during animation */}
+              <div className="relative">
                 <LightboxContent 
                   currentItem={normalizedItems[lightboxIndex]}
                   initialTransform={initialTransform}
@@ -277,14 +270,14 @@ export function Lightbox({
                   exitDuration={exitDuration}
                   isDarkMode={isDarkMode}
                 />
-                {/* Caption - right below lightbox image/video, same enter/exit timing */}
+                {/* Caption - absolutely below media, same enter/exit timing */}
                 {(() => {
                   const caption = normalizedItems[lightboxIndex]?.caption?.trim();
                   const hasHtml = caption?.includes("<");
                   if (!caption) return null;
                   return (
                     <motion.div
-                      className="text-center font-sans text-xs !text-white sm:text-sm"
+                      className="absolute left-0 right-0 top-full mt-4 text-center font-sans text-xs !text-white sm:text-sm"
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={
                         exitTransform
