@@ -261,13 +261,40 @@ export function Lightbox({
               className="absolute inset-0 pointer-events-none flex items-center justify-center"
               style={{ overflow: 'visible' }}
             >
-              <LightboxContent 
-                currentItem={normalizedItems[lightboxIndex]}
-                initialTransform={initialTransform}
-                exitTransform={exitTransform}
-                exitDuration={exitDuration}
-                isDarkMode={isDarkMode}
-              />
+              {/* Content + caption stacked so caption sits right below image/video */}
+              <div className="flex flex-col items-center gap-4">
+                <LightboxContent 
+                  currentItem={normalizedItems[lightboxIndex]}
+                  initialTransform={initialTransform}
+                  exitTransform={exitTransform}
+                  exitDuration={exitDuration}
+                  isDarkMode={isDarkMode}
+                />
+                {/* Caption - right below lightbox image/video, same enter/exit timing */}
+                {(() => {
+                  const caption = normalizedItems[lightboxIndex]?.caption?.trim();
+                  const hasHtml = caption?.includes("<");
+                  if (!caption) return null;
+                  return (
+                    <motion.div
+                      className="text-center font-sans text-xs !text-white sm:text-sm"
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={
+                        exitTransform
+                          ? { opacity: 0, scale: 0.95 }
+                          : { opacity: 1, scale: 1 }
+                      }
+                      transition={{
+                        duration: exitTransform ? exitDuration : 0.4,
+                        ease: [0.77, 0, 0.175, 1],
+                      }}
+                      {...(hasHtml
+                        ? { dangerouslySetInnerHTML: { __html: caption } }
+                        : { children: caption })}
+                    />
+                  );
+                })()}
+              </div>
 
               {/* Prev button - outside image, close to it on the left */}
               {!exitTransform && (
