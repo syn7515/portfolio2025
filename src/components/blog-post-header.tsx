@@ -532,11 +532,25 @@ export default function BlogPostHeader({ slug }: BlogPostHeaderProps) {
     }
   }
 
+  // Progressive opacity and blur driven by scroll (same curve as border)
+  const headerBgOpacity = 0.6 + (borderOpacity / 100) * 0.35
+  const headerBlurPx = (borderOpacity / 100) * 12
+  const headerBg = isDarkMode
+    ? `rgba(24, 24, 27, ${headerBgOpacity})` // zinc-900
+    : `rgba(255, 255, 255, ${headerBgOpacity})`
+
   return (
     <div
       ref={headerRef}
-      className="sticky top-0 h-16 sm:h-12 z-50 bg-white dark:bg-zinc-900 flex items-center relative"
-      style={{ width: 'calc(100% + 2rem)', marginLeft: '-1rem', marginRight: '-1rem' }}
+      className="sticky top-0 h-16 sm:h-12 z-50 flex items-center relative"
+      style={{
+        width: 'calc(100% + 2rem)',
+        marginLeft: '-1rem',
+        marginRight: '-1rem',
+        backgroundColor: headerBg,
+        backdropFilter: `blur(${headerBlurPx}px)`,
+        WebkitBackdropFilter: `blur(${headerBlurPx}px)`,
+      }}
     >
       <div className="max-w-[560px] mx-auto w-full">
         <div className="mx-4 sm:mx-0 flex justify-between items-center">
