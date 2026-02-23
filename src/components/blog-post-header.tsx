@@ -535,9 +535,8 @@ export default function BlogPostHeader({ slug }: BlogPostHeaderProps) {
   // Progressive opacity and blur driven by scroll (same curve as border)
   const headerBgOpacity = 0.6 + (borderOpacity / 100) * 0.35
   const headerBlurPx = (borderOpacity / 100) * 12
-  const headerBg = isDarkMode
-    ? `rgba(24, 24, 27, ${headerBgOpacity})` // zinc-900
-    : `rgba(255, 255, 255, ${headerBgOpacity})`
+  // Use var(--background) to match body; avoids wrong color on first paint before isDarkMode is set
+  const headerBg = `color-mix(in srgb, var(--background) ${headerBgOpacity * 100}%, transparent)`
 
   return (
     <div
