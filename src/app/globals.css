@@ -412,13 +412,13 @@ pre code {
 
 @media (prefers-color-scheme: dark) {
   .social-icon {
-    color: rgb(161 161 170) !important;
-    /* zinc-400 - lighter */
+    color: rgb(113 113 122) !important;
+    /* zinc-500 */
   }
 
   .social-icon:hover {
-    color: rgb(244 244 245) !important;
-    /* zinc-100 - more lighter hover */
+    color: rgb(161 161 170) !important;
+    /* zinc-400 - darker hover */
   }
 }
 
