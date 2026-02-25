@@ -73,7 +73,7 @@ export default function Home() {
             Product designer with engineering mindset, obsessed with <span className="italic">why</span> behind everything — from strategies to pixels.
           </motion.p>
           <motion.p
-            className="!text-stone-800 dark:!text-inherit !font-[450] mb-6"
+            className="!text-stone-800 dark:!text-inherit !font-[450] !mb-5"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.16 }}
