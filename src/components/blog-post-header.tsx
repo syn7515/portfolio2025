@@ -466,6 +466,15 @@ export default function BlogPostHeader({ slug }: BlogPostHeaderProps) {
             return ''
           }
         })
+        // Replace Heading component with markdown heading (title and optional year)
+        .replace(/<Heading\s+([^/>]+)\s*\/>/g, (_match: string, attrs: string) => {
+          const titleMatch = attrs.match(/title\s*=\s*["']([^"']*)["']/)
+          const yearMatch = attrs.match(/year\s*=\s*["']([^"']*)["']/)
+          const title = titleMatch?.[1]?.trim() ?? ''
+          const year = yearMatch?.[1]?.trim()
+          if (!title) return ''
+          return year ? `#### ${title} (${year})` : `#### ${title}`
+        })
         // Remove the max-w wrapper div opening
         .replace(/<div className="max-w-\[560px\] mx-auto">\s*/g, '')
         // Remove full-width container divs with all their attributes
