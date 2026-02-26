@@ -2,7 +2,7 @@
 "use client"
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   useLightboxDimensions,
   calculateImagePosition,
@@ -87,7 +87,6 @@ function LightboxContent({
           width: !initialTransform && !exitTransform ? dimensions.width : undefined,
           height: !initialTransform && !exitTransform ? dimensions.height : undefined,
         }}
-        onClick={(e) => e.stopPropagation()}
       >
         {/* Base layer: page background */}
         <div 
@@ -174,7 +173,6 @@ function LightboxContent({
           width: !initialTransform && !exitTransform ? dimensions.width : undefined,
           height: !initialTransform && !exitTransform ? dimensions.height : undefined,
         }}
-        onClick={(e) => e.stopPropagation()}
       >
         {hasVideo ? (
           <video
@@ -231,7 +229,7 @@ export function Lightbox({
             animate={{ opacity: 0.8 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4, ease: [0.77, 0, 0.175, 1] }}
-            className="fixed inset-0 z-50 bg-black" 
+            className="fixed inset-0 z-50 bg-black cursor-zoom-out" 
             onClick={closeLightbox}
           />
           
@@ -241,25 +239,11 @@ export function Lightbox({
             role="dialog" 
             aria-modal="true"
           >
-            {/* Close button - top-right corner of viewport */}
-            {!exitTransform && (
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  closeLightbox();
-                }}
-                className="absolute top-4 right-4 rounded-md p-2 text-white hover:bg-white/10 transition-colors z-20 pointer-events-auto"
-                aria-label="Close"
-              >
-                <X className="w-6 h-6" />
-              </button>
-            )}
-
             {/* Image container - positioned absolutely to allow animation without clipping */}
             <div 
-              className="absolute inset-0 pointer-events-none flex items-center justify-center"
+              className="absolute inset-0 pointer-events-auto flex items-center justify-center cursor-zoom-out"
               style={{ overflow: 'visible' }}
+              onClick={closeLightbox}
             >
               {/* Relative container sizes to LightboxContent only; caption is out of flow to avoid wrapper height change during animation */}
               <div className="relative">
@@ -305,7 +289,7 @@ export function Lightbox({
                     prevLightbox();
                   }}
                   disabled={lightboxIndex === 0}
-                  className="absolute rounded-md p-1.5 sm:p-2 text-white hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-transparent transition-colors z-20 pointer-events-auto"
+                  className="absolute rounded-full p-2 sm:p-3 text-white bg-white/20 hover:bg-white/30 disabled:opacity-40 disabled:hover:bg-transparent transition-colors z-20 pointer-events-auto cursor-pointer"
                   style={{
               left: `calc(50% - min(640px, calc(50vw - 16px - 40px - ${isLgOrAbove ? "16px" : "4px"})) - ${isLgOrAbove ? "16px" : "4px"})`,
                     top: '50%',
@@ -326,7 +310,7 @@ export function Lightbox({
                     nextLightbox();
                   }}
                   disabled={lightboxIndex >= normalizedItems.length - 1}
-                  className="absolute rounded-md p-1.5 sm:p-2 text-white hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-transparent transition-colors z-20 pointer-events-auto"
+                  className="absolute rounded-full p-2 sm:p-3 text-white bg-white/20 hover:bg-white/30 disabled:opacity-40 disabled:hover:bg-transparent transition-colors z-20 pointer-events-auto cursor-pointer"
                   style={{
               left: `calc(50% + min(640px, calc(50vw - 16px - 40px - ${isLgOrAbove ? "16px" : "4px"})) + ${isLgOrAbove ? "16px" : "4px"})`,
                     top: '50%',

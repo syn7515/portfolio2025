@@ -3,7 +3,6 @@
 
 import type { CSSProperties, ReactNode } from "react";
 import { motion, type Transition } from "framer-motion";
-import { Maximize2 } from "lucide-react";
 import { calculateImagePosition, type CarouselItem } from "./hooks";
 
 interface CarouselCardProps {
@@ -54,6 +53,7 @@ export function CarouselCard({
   const backgroundClass = hasPositionedMedia 
     ? `bg-stone-200/60 dark:bg-zinc-700/80 ${index === currentIndex ? 'hover:bg-stone-300 dark:hover:bg-zinc-600' : ''}` 
     : `bg-stone-200/60 dark:bg-stone-800 ${index === currentIndex ? 'hover:bg-stone-300 dark:hover:bg-stone-700' : ''}`;
+  const canOpenLightboxFromCard = effectiveLightboxEnabled && openLightboxOnCardClick && (imageUrl || videoUrl);
   
   return (
     <div className="flex flex-col items-center" style={{ width: effWidth }}>
@@ -80,7 +80,7 @@ export function CarouselCard({
             }
           }
         }}
-        className={`group relative ${backgroundClass} transition-all duration-150 cursor-pointer focus-visible:ring-2 focus-visible:ring-stone-400 overflow-hidden ${index !== currentIndex ? 'hover:opacity-70' : ''}`}
+        className={`group relative ${backgroundClass} transition-all duration-150 ${canOpenLightboxFromCard && index === currentIndex ? 'cursor-zoom-in' : 'cursor-pointer'} focus-visible:ring-2 focus-visible:ring-stone-400 overflow-hidden ${index !== currentIndex ? 'hover:opacity-70' : ''}`}
         style={{ 
           width: "100%", 
           aspectRatio: '16/9',
@@ -160,26 +160,6 @@ export function CarouselCard({
           />
         )}
 
-        {/* Optional top-right expand icon when lightbox enabled (hidden on sm and below) */}
-        {effectiveLightboxEnabled && index === currentIndex && (imageUrl || videoUrl) && (
-          <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); openLightbox(index); }}
-            className="hidden md:block absolute right-2 top-2 rounded-md bg-black/0 p-2 text-black dark:text-white group-hover:text-white backdrop-blur group-hover:bg-black/30 transition-colors"
-            aria-label="Open in lightbox"
-          >
-            <span className="relative block h-4 w-4">
-              <Maximize2
-                strokeWidth={1.7}
-                className="absolute inset-0 h-4 w-4 opacity-0 transition-opacity group-hover:opacity-0"
-              />
-              <Maximize2
-                strokeWidth={1.5}
-                className="absolute inset-0 h-4 w-4 opacity-0 transition-opacity group-hover:opacity-100"
-              />
-            </span>
-          </button>
-        )}
       </motion.div>
 
       {caption != null && caption !== "" ? (
