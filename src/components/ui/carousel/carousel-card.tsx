@@ -51,8 +51,8 @@ export function CarouselCard({
   const hasVideo = !!videoUrl;
   const hasPositionedMedia = hasPositionedImage || hasPositionedVideo;
   const backgroundClass = hasPositionedMedia 
-    ? `bg-stone-200/60 dark:bg-zinc-700/80 ${index === currentIndex ? 'hover:bg-stone-300 dark:hover:bg-zinc-600' : ''}` 
-    : `bg-stone-200/60 dark:bg-stone-800 ${index === currentIndex ? 'hover:bg-stone-300 dark:hover:bg-stone-700' : ''}`;
+    ? `bg-stone-200/50 dark:bg-zinc-800/70 ${index === currentIndex ? 'hover:bg-stone-200 dark:hover:bg-zinc-800' : ''}` 
+    : `bg-stone-200/50 dark:bg-zinc-800/70 ${index === currentIndex ? 'hover:bg-stone-200 dark:hover:bg-zinc-800' : ''}`;
   const canOpenLightboxFromCard = effectiveLightboxEnabled && openLightboxOnCardClick && (imageUrl || videoUrl);
   
   return (
@@ -153,7 +153,7 @@ export function CarouselCard({
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
-              border: isHydrated ? (isDarkMode ? '1px solid rgba(255, 255, 255, 0.04)' : '1px solid rgba(0, 0, 0, 0.02)') : '1px solid rgba(0, 0, 0, 0.02)',
+              border: isHydrated && !isDarkMode ? '1px solid rgba(0, 0, 0, 0.02)' : 'none',
               boxSizing: 'border-box',
               zIndex: 10
             }}
@@ -167,7 +167,7 @@ export function CarouselCard({
           renderCaption({ index, label, caption, active: index === currentIndex })
         ) : (
           <div
-            className={`text-center text-stone-600 dark:text-stone-300 text-xs sm:text-sm mt-2 sm:mt-3 md:mt-5 font-sans`}
+            className={`text-center text-stone-500 dark:text-zinc-400 text-xs sm:text-sm mt-2 sm:mt-3 md:mt-4 font-sans`}
             style={{ width: "100%", ...(captionStyle || {}) }}
           >
             {caption}

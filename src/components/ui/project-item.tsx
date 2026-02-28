@@ -70,7 +70,7 @@ export default function ProjectItem({
           color: 'inherit'
         }}
       >
-        <div className="relative w-full aspect-video bg-stone-200/60 dark:bg-zinc-700/80 group-hover:bg-stone-300 dark:group-hover:bg-zinc-600 transition-colors duration-300 ease-out overflow-hidden">
+        <div className="relative w-full aspect-video bg-stone-200/50 dark:bg-zinc-800/70 dark:group-hover:bg-zinc-800 group-hover:bg-stone-200 transition-colors duration-300 ease-out overflow-hidden">
           <img
             src={imageUrl}
             alt={`${organization} project screenshot`}
@@ -87,7 +87,7 @@ export default function ProjectItem({
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
-              border: isHydrated ? (isDarkMode ? '1px solid rgba(255, 255, 255, 0.04)' : '1px solid rgba(0, 0, 0, 0.06)') : '1px solid rgba(0, 0, 0, 0.06)',
+              border: isHydrated && !isDarkMode ? '1px solid rgba(0, 0, 0, 0.02)' : 'none',
               boxSizing: 'border-box',
               zIndex: 10
             }}
