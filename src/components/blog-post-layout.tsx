@@ -96,7 +96,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
         aria-label="Post navigation"
       >
         <div className="flex flex-col gap-6">
-          <Button variant="ghost" size="sm" asChild className="no-hover-bg cursor-pointer w-fit inline-flex text-sm font-normal !text-stone-400 dark:text-zinc-400 hover:opacity-90 h-auto py-0 px-0">
+          <Button variant="ghostNoBg" size="sm" asChild className="cursor-pointer w-fit inline-flex text-sm font-normal !text-stone-400 dark:text-zinc-400 hover:opacity-90 h-auto py-0 px-0">
             <Link href="/" className="flex items-center gap-2" aria-label="Back to home">
               <Undo2 className="size-4 flex-shrink-0" />
               Back
@@ -112,16 +112,6 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
         >
-          {/* Back button for small viewports (above main content) */}
-          <div className="lg:hidden mb-4">
-            <Button variant="ghost" size="sm" asChild className="no-hover-bg cursor-pointer w-fit inline-flex text-sm font-normal text-stone-400 dark:text-zinc-400 hover:opacity-90 h-auto py-0 px-0">
-              <Link href="/" className="flex items-center gap-2" aria-label="Back to home">
-                <Undo2 className="size-4 flex-shrink-0" />
-                Back
-              </Link>
-            </Button>
-          </div>
-
           {/* Header: title, subtitle, like/copy */}
           <BlogPostHeader slug={slug} title={title} subtitle={subtitle} />
 

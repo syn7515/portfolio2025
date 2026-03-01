@@ -296,7 +296,7 @@ export default function BlogPostHeader({ slug, title, subtitle }: BlogPostHeader
         {title}
       </h1>
       {/* Like and Copy - icon + label per Figma */}
-      <div className="flex items-center justify-center gap-4 pl-2">
+      <div className="flex items-center justify-center gap-4 pl-3">
         <Tooltip
           open={isLiked && !likedMessage ? false : likeTooltipOpen !== undefined ? likeTooltipOpen : undefined}
           onOpenChange={(open) => {
@@ -313,10 +313,10 @@ export default function BlogPostHeader({ slug, title, subtitle }: BlogPostHeader
               <Toggle
                 pressed={isLiked}
                 onPressedChange={handleLike}
-                variant="ghost"
+                variant="ghostNoBg"
                 size="sm"
                 aria-label="Like"
-                className="!no-hover-bg cursor-pointer gap-2 h-auto py-1.5 px-0 text-stone-500 dark:text-zinc-400 hover:text-stone-800 dark:hover:text-zinc-200 data-[state=on]:text-red-500 dark:data-[state=on]:text-red-600"
+                className="cursor-pointer gap-2 h-auto py-1.5 px-0 text-stone-500 dark:text-zinc-400 hover:text-stone-800 dark:hover:text-zinc-200 data-[state=on]:text-red-500 dark:data-[state=on]:text-red-600"
                 disabled={isUpdatingCount}
               >
                 <Heart
@@ -355,10 +355,10 @@ export default function BlogPostHeader({ slug, title, subtitle }: BlogPostHeader
         >
           <TooltipTrigger asChild>
             <Button
-              variant="ghost"
+              variant="ghostNoBg"
               size="sm"
               aria-label={copied ? 'Copied' : 'Copy as Markdown'}
-              className="!no-hover-bg cursor-pointer gap-2 h-auto py-1.5 px-0 text-stone-500 dark:text-zinc-400 hover:text-stone-800 dark:hover:text-zinc-200 disabled:opacity-100"
+              className="cursor-pointer gap-2 h-auto py-1.5 px-0 text-stone-500 dark:text-zinc-400 hover:text-stone-800 dark:hover:text-zinc-200 disabled:opacity-100"
               onClick={copyAsMarkdown}
               disabled={copied}
             >

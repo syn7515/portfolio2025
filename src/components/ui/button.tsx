@@ -18,6 +18,7 @@ const buttonVariants = cva(
         secondary:
           "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
         ghost: "rounded-full text-stone-500 dark:text-zinc-400 hover:bg-stone-100 dark:hover:bg-zinc-800 hover:text-stone-800 dark:hover:text-zinc-200 hover:cursor-pointer [&>a]:!not-italic [&>a]:!text-stone-500 [&>a]:dark:!text-zinc-400 [&>a]:hover:!bg-stone-100 [&>a]:dark:hover:!bg-zinc-800 [&>a]:hover:!text-stone-800 [&>a]:dark:hover:!text-zinc-200 [&>a]:hover:!cursor-pointer [&>a]:rounded-full [&]:!not-italic [&]:!text-stone-500 [&]:dark:!text-zinc-400 [&]:hover:!bg-stone-100 [&]:dark:hover:!bg-zinc-800 [&]:hover:!text-stone-800 [&]:dark:hover:!text-zinc-200 [&]:hover:!cursor-pointer [&]:rounded-full",
+        ghostNoBg: "rounded-full text-stone-500 dark:text-zinc-400 hover:text-stone-800 dark:hover:text-zinc-200 hover:cursor-pointer [&>a]:!not-italic [&>a]:!text-stone-500 [&>a]:dark:!text-zinc-400 [&>a]:hover:!text-stone-800 [&>a]:dark:hover:!text-zinc-200 [&>a]:hover:!cursor-pointer [&>a]:rounded-full [&]:!not-italic [&]:!text-stone-500 [&]:dark:!text-zinc-400 [&]:hover:!text-stone-800 [&]:dark:hover:!text-zinc-200 [&]:hover:!cursor-pointer [&]:rounded-full",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {

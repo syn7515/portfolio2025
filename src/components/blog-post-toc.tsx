@@ -23,9 +23,12 @@ function slugify(text: string): string {
     .replace(/^-|-$/g, '')
 }
 
+const SCROLL_SETTLE_MS = 1000
+
 export default function BlogPostToc({ contentSelector = CONTENT_SELECTOR, className }: BlogPostTocProps) {
   const [items, setItems] = React.useState<TocItem[]>([])
   const [activeId, setActiveId] = React.useState<string | null>(null)
+  const lastClickTimeRef = React.useRef<number>(0)
 
   React.useEffect(() => {
     let rafId: number
@@ -68,6 +71,7 @@ export default function BlogPostToc({ contentSelector = CONTENT_SELECTOR, classN
 
     const observer = new IntersectionObserver(
       (entries) => {
+        if (Date.now() - lastClickTimeRef.current < SCROLL_SETTLE_MS) return
         for (const entry of entries) {
           if (!entry.isIntersecting) continue
           const id = entry.target.id
@@ -86,6 +90,8 @@ export default function BlogPostToc({ contentSelector = CONTENT_SELECTOR, classN
   }, [contentSelector, items])
 
   const handleClick = (id: string) => {
+    lastClickTimeRef.current = Date.now()
+    setActiveId(id)
     const el = document.getElementById(id)
     el?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
@@ -100,7 +106,7 @@ export default function BlogPostToc({ contentSelector = CONTENT_SELECTOR, classN
           type="button"
           onClick={() => handleClick(id)}
           className={cn(
-            'text-left text-sm font-normal transition-colors hover:opacity-90',
+            'cursor-pointer text-left text-sm font-normal transition-colors hover:opacity-90',
             activeId === id
               ? 'text-stone-800 dark:text-zinc-200'
               : 'text-stone-400 dark:text-zinc-400'
