@@ -2,15 +2,29 @@ import React from 'react';
 import { Divider } from './divider';
 import { cn } from '@/lib/utils';
 
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
 interface HeadingProps {
   title: string;
   year?: string;
+  tocLabel?: string;
   className?: string;
 }
 
-export function Heading({ title, year, className }: HeadingProps) {
+export function Heading({ title, year, tocLabel, className }: HeadingProps) {
+  const id = slugify(title);
   return (
-    <div className={cn('flex items-center gap-3 mt-13 mb-8', className)}>
+    <div
+      id={id}
+      data-blog-heading
+      data-toc-label={tocLabel ?? title}
+      className={cn('flex items-center gap-3 mt-13 mb-8', className)}
+    >
       {/* Title text */}
       <span 
         className="text-[15px] font-[520] leading-[150%] tracking-[0.12px] font-sans text-stone-800 dark:text-zinc-200"
