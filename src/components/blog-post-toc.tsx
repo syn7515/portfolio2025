@@ -108,7 +108,7 @@ export default function BlogPostToc({ contentSelector = CONTENT_SELECTOR, classN
           className={cn(
             'cursor-pointer text-left text-sm font-normal transition-all duration-200 ease-out hover:opacity-90 hover:translate-x-[12px]',
             activeId === id
-              ? 'text-stone-800 dark:text-zinc-200'
+              ? 'text-stone-800 dark:text-zinc-100'
               : 'text-stone-400 dark:text-zinc-400'
           )}
         >

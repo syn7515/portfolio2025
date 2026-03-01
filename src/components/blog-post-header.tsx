@@ -280,9 +280,8 @@ export default function BlogPostHeader({ slug, title, subtitle }: BlogPostHeader
       )}
       {/* Title - typography per design spec */}
       <h1
-        className="font-sans !font-medium !leading-[1.5] !mt-1 !mb-4 !dark:text-zinc-100 whitespace-pre-line"
+        className="font-sans text-stone-800 dark:text-zinc-200 !font-medium !leading-[1.5] !mt-1 !mb-4 !dark:text-zinc-100 whitespace-pre-line"
         style={{
-          color: 'var(--h-4, #292524)',
           fontSize: '28px',
           letterSpacing: '-0.224px',
         }}
