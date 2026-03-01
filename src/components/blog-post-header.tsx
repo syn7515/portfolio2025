@@ -15,7 +15,6 @@ interface BlogPostHeaderProps {
 
 export default function BlogPostHeader({ slug, title, subtitle }: BlogPostHeaderProps) {
   const [copied, setCopied] = React.useState(false)
-  const [tooltipOpen, setTooltipOpen] = React.useState<boolean | undefined>(undefined)
   const [likedMessage, setLikedMessage] = React.useState<string | null>(null)
   const [likeTooltipOpen, setLikeTooltipOpen] = React.useState<boolean | undefined>(undefined)
   const [isLiked, setIsLiked] = React.useState(false)
@@ -133,7 +132,6 @@ export default function BlogPostHeader({ slug, title, subtitle }: BlogPostHeader
 
   const copyAsMarkdown = async () => {
     if (!slug) return
-    const wasAlreadyOpen = tooltipOpen === true
     try {
       const response = await fetch(`/api/get-mdx?slug=${slug}`)
       if (!response.ok) throw new Error('Failed to fetch content')
@@ -266,11 +264,7 @@ export default function BlogPostHeader({ slug, title, subtitle }: BlogPostHeader
       }
 
       setCopied(true)
-      if (!wasAlreadyOpen) setTooltipOpen(true)
-      setTimeout(() => {
-        setTooltipOpen(false)
-        setTimeout(() => setCopied(false), 100)
-      }, 2000)
+      setTimeout(() => setCopied(false), 2000)
     } catch (error) {
       console.error('Failed to copy:', error)
     }
@@ -346,38 +340,24 @@ export default function BlogPostHeader({ slug, title, subtitle }: BlogPostHeader
             )}
           </TooltipContent>
         </Tooltip>
-        <Tooltip
-          open={tooltipOpen !== undefined ? tooltipOpen : undefined}
-          onOpenChange={(open) => {
-            if (!copied) setTooltipOpen(open)
-            else if (open === false) setTooltipOpen(true)
-          }}
+        <Button
+          variant="ghostNoBg"
+          size="sm"
+          aria-label={copied ? 'Copied' : 'Copy as Markdown'}
+          className="cursor-pointer gap-2 h-auto py-1.5 px-0 text-stone-500 dark:text-zinc-400 hover:text-stone-800 dark:hover:text-zinc-200 disabled:opacity-100"
+          onClick={copyAsMarkdown}
+          disabled={copied}
         >
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghostNoBg"
-              size="sm"
-              aria-label={copied ? 'Copied' : 'Copy as Markdown'}
-              className="cursor-pointer gap-2 h-auto py-1.5 px-0 text-stone-500 dark:text-zinc-400 hover:text-stone-800 dark:hover:text-zinc-200 disabled:opacity-100"
-              onClick={copyAsMarkdown}
-              disabled={copied}
-            >
-              <div className="relative size-4 flex-shrink-0">
-                <div className={cn('transition-all duration-200 absolute inset-0 flex items-center justify-center', copied ? 'scale-100 opacity-100' : 'scale-0 opacity-0')}>
-                  <Check strokeWidth={isDarkMode ? 1.5 : 1.7} className="size-4" />
-                </div>
-                <div className={cn('transition-all duration-200', copied ? 'scale-0 opacity-0' : 'scale-100 opacity-100')}>
-                  <Copy strokeWidth={isDarkMode ? 1.5 : 1.7} className="size-4" />
-                </div>
-              </div>
-              <span className="text-sm font-normal min-w-[3.5rem] inline-block text-left">{copied ? 'Copied' : 'Copy'}</span>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="top" sideOffset={4}>
-            <TooltipArrow />
-            <p>{copied ? 'Copied!' : 'Copy as Markdown'}</p>
-          </TooltipContent>
-        </Tooltip>
+          <div className="relative size-4 flex-shrink-0">
+            <div className={cn('transition-all duration-200 absolute inset-0 flex items-center justify-center', copied ? 'scale-100 opacity-100' : 'scale-0 opacity-0')}>
+              <Check strokeWidth={isDarkMode ? 1.5 : 1.7} className="size-4" />
+            </div>
+            <div className={cn('transition-all duration-200', copied ? 'scale-0 opacity-0' : 'scale-100 opacity-100')}>
+              <Copy strokeWidth={isDarkMode ? 1.5 : 1.7} className="size-4" />
+            </div>
+          </div>
+          <span className="text-sm font-normal min-w-[3.5rem] inline-block text-left">{copied ? 'Copied' : 'Copy'}</span>
+        </Button>
       </div>
     </header>
   )
