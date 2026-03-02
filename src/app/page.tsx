@@ -19,11 +19,17 @@ export default function Home() {
             transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
           >
             <motion.p
-              className="!text-stone-800 dark:!text-inherit !mb-0 md:!mb-0"
+              className="!text-stone-800 dark:!text-zinc-200 !mb-0 md:!mb-0 !font-medium !dark:!text-zinc-100"
               initial={false}
               animate={false}
+              style={{
+                fontFamily: 'var(--font-libre-caslon), serif',
+                fontSize: '32px',
+                lineHeight: '150%',
+                letterSpacing: '-0.03em',
+              }}
             >
-              <span className="!text-base md:!text-lg font-medium">Sue Park</span>
+              Sue Park
             </motion.p>
             <div className="flex gap-4 items-center">
               <a 

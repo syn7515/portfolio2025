@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Geist, Geist_Mono } from "next/font/google";
+import { Inter, Geist, Geist_Mono, Libre_Caslon_Text } from "next/font/google";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -18,6 +18,12 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const libreCaslonText = Libre_Caslon_Text({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-libre-caslon",
 });
 
 export const metadata: Metadata = {
@@ -91,7 +97,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       />
       {/* End Google Tag Manager */}
       <body
-        className={`${inter.variable} ${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${inter.variable} ${geistSans.variable} ${geistMono.variable} ${libreCaslonText.variable} antialiased`}
       >
         {/* Google Tag Manager (noscript) */}
         <noscript>
