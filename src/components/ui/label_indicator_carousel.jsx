@@ -431,6 +431,7 @@ export default function LabelIndicatorCarousel({
       onKeyDown={onKeyDown}
       onWheel={onWheel}
       tabIndex={0}
+      style={{ outline: "none" }}
     >
       <div className="flex flex-col items-center justify-center w-full">
         {isMobile ? (
