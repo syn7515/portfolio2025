@@ -15,7 +15,7 @@ export default function BlogPostHeader({ title, subtitle }: BlogPostHeaderProps)
       {/* Subtitle / metadata - small, light grey */}
       {subtitle && (
         <>
-          <p className="text-sm font-normal !text-stone-400 dark:text-zinc-400 !mb-1">
+          <p className="text-sm font-normal text-stone-400 dark:!text-zinc-400 !mb-1">
             {subtitle}
           </p>
           <div className="my-4 flex justify-center">
