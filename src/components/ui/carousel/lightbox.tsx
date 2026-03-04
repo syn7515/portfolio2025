@@ -219,6 +219,9 @@ export function Lightbox({
   isDarkMode,
   isLgOrAbove
 }: LightboxProps) {
+  const isPrevDisabled = lightboxIndex === 0;
+  const isNextDisabled = lightboxIndex >= normalizedItems.length - 1;
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -288,8 +291,12 @@ export function Lightbox({
                     e.stopPropagation();
                     prevLightbox();
                   }}
-                  disabled={lightboxIndex === 0}
-                  className="absolute rounded-full p-2 sm:p-3 text-white bg-white/20 hover:bg-white/30 disabled:opacity-40 disabled:hover:bg-transparent transition-colors z-20 pointer-events-auto cursor-pointer"
+                  disabled={isPrevDisabled}
+                  className={`absolute rounded-full p-2 sm:p-3 text-white bg-white/20 z-20 pointer-events-auto ${
+                    isPrevDisabled
+                      ? "opacity-40 cursor-default"
+                      : "hover:bg-white/30 transition-colors cursor-pointer"
+                  }`}
                   style={{
               left: `calc(50% - min(640px, calc(50vw - 16px - 40px - ${isLgOrAbove ? "16px" : "4px"})) - ${isLgOrAbove ? "16px" : "4px"})`,
                     top: '50%',
@@ -309,8 +316,12 @@ export function Lightbox({
                     e.stopPropagation();
                     nextLightbox();
                   }}
-                  disabled={lightboxIndex >= normalizedItems.length - 1}
-                  className="absolute rounded-full p-2 sm:p-3 text-white bg-white/20 hover:bg-white/30 disabled:opacity-40 disabled:hover:bg-transparent transition-colors z-20 pointer-events-auto cursor-pointer"
+                  disabled={isNextDisabled}
+                  className={`absolute rounded-full p-2 sm:p-3 text-white bg-white/20 z-20 pointer-events-auto ${
+                    isNextDisabled
+                      ? "opacity-40 cursor-default"
+                      : "hover:bg-white/30 transition-colors cursor-pointer"
+                  }`}
                   style={{
               left: `calc(50% + min(640px, calc(50vw - 16px - 40px - ${isLgOrAbove ? "16px" : "4px"})) + ${isLgOrAbove ? "16px" : "4px"})`,
                     top: '50%',
