@@ -7,6 +7,7 @@ interface DividerProps {
   color?: 'gray' | 'stone' | 'slate' | 'zinc';
   spacing?: 'sm' | 'md' | 'lg' | 'xl' | '3xl';
   orientation?: 'horizontal' | 'vertical';
+  style?: React.CSSProperties;
 }
 
 export function Divider({

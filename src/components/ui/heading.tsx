@@ -1,5 +1,4 @@
 import React from 'react';
-import { Divider } from './divider';
 import { cn } from '@/lib/utils';
 
 function slugify(text: string): string {
@@ -33,22 +32,26 @@ export function Heading({ title, year, tocLabel, className }: HeadingProps) {
         {title}
       </span>
       
-      {/* Horizontal divider - always shown */}
-      <Divider 
-        orientation="horizontal" 
-        color="stone" 
-        variant="default"
-        className="flex-1 h-px mx-0 my-0"
-      />
-      
-      {/* Year indication text - only show if provided */}
+      {/* Dotted divider and year - only show if year is provided */}
       {year && (
-        <span 
-          className="text-[15px] !font-[450] leading-[150%] tracking-[0.12px] font-sans text-stone-500 dark:text-zinc-400"
-          style={{ fontStyle: 'normal' }}
-        >
-          {year}
-        </span>
+        <>
+          <div className="flex-1 mx-0 my-0">
+            <div
+              className="w-full h-[2px] !text-stone-300 dark:!text-zinc-700"
+              style={{
+                backgroundImage: 'radial-gradient(circle, currentColor 1px, transparent 1px)',
+                backgroundSize: '5px 2px',
+                backgroundRepeat: 'repeat-x',
+              }}
+            />
+          </div>
+          <span 
+            className="text-[15px] !font-[450] leading-[150%] tracking-[0.12px] font-sans text-stone-400 dark:text-zinc-500"
+            style={{ fontStyle: 'normal' }}
+          >
+            {year}
+          </span>
+        </>
       )}
     </div>
   );
