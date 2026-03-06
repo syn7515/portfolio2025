@@ -218,8 +218,8 @@
     .mdxContent p {
         color: rgb(212 212 216) !important;
         /* zinc-300 */
-        opacity: 0.78;
-        /* 78% opacity for slightly darker appearance in dark mode */
+        opacity: 0.9;
+        /* 90% opacity for stronger appearance in dark mode */
     }
 
     .mdxContent h5 {
