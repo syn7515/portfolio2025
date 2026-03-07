@@ -52,11 +52,10 @@ export function CarouselCard({
   const hasVideo = !!videoUrl;
   const hasPositionedMedia = hasPositionedImage || hasPositionedVideo;
   const withBackgroundLines = cardVariant === "with-background-lines";
-  const backgroundClass = withBackgroundLines
-    ? `bg-stone-100 dark:bg-zinc-800 ${index === currentIndex ? "hover:bg-stone-100 dark:hover:bg-zinc-800" : ""}`
-    : hasPositionedMedia
-    ? `bg-stone-200/50 dark:bg-zinc-800/70 ${index === currentIndex ? 'hover:bg-stone-200 dark:hover:bg-zinc-800' : ''}` 
-    : `bg-stone-200/50 dark:bg-zinc-800/70 ${index === currentIndex ? 'hover:bg-stone-200 dark:hover:bg-zinc-800' : ''}`;
+  const backgroundClass =
+    hasPositionedMedia || withBackgroundLines
+      ? `bg-stone-200/50 dark:bg-zinc-800/70 ${index === currentIndex ? "hover:bg-stone-200 dark:hover:bg-zinc-800" : ""}`
+      : `bg-stone-200/50 dark:bg-zinc-800/70 ${index === currentIndex ? "hover:bg-stone-200 dark:hover:bg-zinc-800" : ""}`;
   const canOpenLightboxFromCard = effectiveLightboxEnabled && openLightboxOnCardClick && (imageUrl || videoUrl);
   
   return (
@@ -97,8 +96,8 @@ export function CarouselCard({
           <div className="w-full h-full relative overflow-hidden">
             {withBackgroundLines ? (
               <>
-                {/* Theme background */}
-                <div className="absolute inset-0 bg-stone-100 dark:bg-zinc-800" aria-hidden />
+                {/* Transparent so card background (and hover) show through */}
+                <div className="absolute inset-0 bg-transparent" aria-hidden />
                 {/* Theme-responsive line art behind video */}
                 {backgroundLines === "grill" && (
                   <div className="absolute inset-0 pointer-events-none z-0 text-stone-300 dark:text-zinc-700" aria-hidden>

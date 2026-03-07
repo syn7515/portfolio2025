@@ -15,7 +15,7 @@ export interface TableProps {
 
 const theadBorderClasses = 'border-b border-stone-200 dark:border-zinc-800'
 const thClasses =
-  'pt-2 pb-3 pr-4 last:pr-0 text-[12px] uppercase text-stone-400 dark:text-zinc-500 font-[450]'
+  'pt-2 pb-3 pr-4 last:pr-0 text-[12px] uppercase tracking-[0.008em] text-stone-400 dark:text-zinc-500 font-[450]'
 const tdBaseClasses =
   'py-1 pr-4 last:pr-0 text-[14px] text-stone-700 dark:text-zinc-300 dark:opacity-90 font-[450]'
 const tdFirstRowClasses = 'pt-3'
