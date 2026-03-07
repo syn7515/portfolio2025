@@ -123,8 +123,8 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           {/* Project Navigation Footer */}
           {(previousProject || nextProject) && (
             <div className="max-w-[560px] mx-auto mt-28 mb-8 sm:mb-16 overflow-x-hidden">
-              <Divider variant="default" color="stone" spacing="xl" />
-              <div className="flex justify-between items-start mt-6 gap-8">
+              <Divider variant="default" color="stone" spacing="md" />
+              <div className="flex justify-between items-start mt-4 gap-8">
                 {/* Previous Project */}
                 {previousProject ? (
                   <Link 

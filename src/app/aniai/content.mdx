@@ -4,14 +4,15 @@ import Heading from '@/components/ui/heading'
 
 <div className="max-w-[560px] mx-auto">
 
-As a founding product designer at a <a href="https://www.aniai.ai/" target="_blank" rel="noopener noreferrer"><em>robotics startup</em></a>,  I played a key role in both design and product strategy, working closely with cross-functional teams to define how robots are built, tested, and managed. 
+A <a href="https://www.aniai.ai/" target="_blank" rel="noopener noreferrer"><em>robotics startup</em></a> that handles development through operation needs reliable tools for collaboration.
 
+As a founding product designer, I helped build internal tools used across the company. These tools support how robots are built, tested, and deployed.
 
-<Heading title="Accelerating robot development cycle" year="2024 - 2025" tocLabel="Firmware generator" />
+<Heading title="Firmware generator" year="2024 - 2025" tocLabel="Firmware generator" />
 
-Robots handle a delicate job — even a few millimeters of deviation can make the difference between success and failure. To ensure reliability, robots must be tested under extreme conditions.
+Robots handle delicate tasks. Even a few millimeters of deviation can mean failure. To ensure reliability, robots must go through multiple rounds of testing before deployment.
 
-Our team needed a platform for engineers with little programming experience to adjust minor robot actions (e.g., the number of repetitions) in order to speed up testing within a short time frame.
+Testing requires firmware configured for specific test conditions. Creating this firmware previously required editing the codebase directly, which slowed down teams unfamiliar with the system.
 
 <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] my-20">
   <LabelIndicatorCarousel
@@ -51,19 +52,19 @@ Our team needed a platform for engineers with little programming experience to a
   />
 </div>
 
-With the renewal of our internal platform, I reimagined this workflow: from request–response to direct control. I wanted robot and QA engineers to directly control robot actions themselves with key parameters<sup>1</sup> — quickly, confidently, and safely.
+Making firmware parametric solved this problem. The firmware editor exposes parameters in a structured interface. The layout mirrors a spreadsheet, allowing users to scan and modify values quickly<sup>1</sup>.
 
-I focused on designing the parametric firmware generator around guidance, clarity, and control. The layout was designed for quick scanning and info panel provides guidance on parameters so that users can adjust without guesswork.
+An information panel provides guidance for each parameter, helping users adjust configurations without guesswork.
 
-With the launch of this feature, the average time to create test firmware reduced from 2-3 business days to 5 minutes, and the number of tests conducted during the same time span has increased by 3x.
+This feature significantly reduced the time required to create test firmware. What previously took 2–3 business days now takes about five minutes. As a result, the number of tests conducted in the same time span increased by 3x.
 
-<Heading title="Scaling robot updates across teams" year="2025" tocLabel="Update manager" />
+<Heading title="Robot update manager" year="2025" tocLabel="Update manager" />
 
-Timely robot upgrades are critical. Customers expect smooth updates without downtime. But as we scaled to mass production and began supporting multiple robot versions, the effort to coordinate updates grew rapidly.
+Timely robot upgrades are critical. Customers expect smooth updates without downtime. As production scaled and multiple robot versions emerged, coordinating updates became increasingly complex.
 
-We needed an update management system that everyone — from robot engineers and product managers to manufacturing and field service — could rely on to coordinate updates.
+Updates involved many teams — robot engineers, product managers, manufacturing, and field service. The process needed a shared system everyone could rely on. 
 
-I shifted to managing updates by group instead of tracking each individual robot. At the hardware version level, everyone now had a single source of truth — replacing the scattered, product-by-product approach.
+Managing updates at the level of individual robots did not scale. Updates were instead organized by robot group. Each hardware version became a single source of truth, replacing the scattered, robot-by-robot approach.
 
 <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] my-20">
   <LabelIndicatorCarousel
@@ -101,19 +102,20 @@ I shifted to managing updates by group instead of tracking each individual robot
   />
 </div>
 
-A key design challenge was creating a clear software update overview that helped all stakeholders quickly align. Since the naming system was hard to read at a glance, I focused on table layout and typography to make information scannable and easy to interpret<sup>2</sup>.
+I shifted to managing updates by group instead of tracking each individual robot. At the hardware version level, everyone now had a single source of truth — replacing the scattered, product-by-product approach.
 
-The design emphasized transparency and predictability, so that updates could scale smoothly across teams. The system made update planning reliable — cutting update errors from 5% to 0%.
+A key design challenge was making the update status easy to understand for all stakeholders. Software names and versions were difficult to parse at a glance. The interface focuses on scannability. A structured table layout and clear typography make update plans easy to read and compare<sup>2</sup>.
 
-<Heading title="Building a minimum viable Design System" year="2025" tocLabel="Design system" />
+The design emphasizes transparency and predictability, allowing updates to scale smoothly across teams. Update errors dropped from 5% to 0%.
 
-Beyond shipping features, I worked closely with engineers to create an minimum viable design system for the internal tool. 
+<Heading title="Minimum viable Design System" year="2025" tocLabel="Design system" />
 
-As a team of two (me and SWE), we built on top of <a href="https://ui.shadcn.com/" target="_blank" rel="noopener noreferrer"><em>shadcn</em></a> and tailored it to our product needs — helping us move faster. In about a month, we documented foundational tokens and built 14 production-ready core React components.
 
-The design system was designed primarily for robot engineers, our core users, with high information density in mind. Typography, spacing, and color choices were refined for readability and consistency across tools.
+Beyond shipping features, I worked closely with engineers to establish a minimal design system for our internal tools.
 
-The system gave the team a reliable foundation, speeding up interface development and ensuring consistency across products.
+As a two-person team (designer and software engineer), we built on top of <a href="https://ui.shadcn.com/" target="_blank" rel="noopener noreferrer"><em>shadcn</em></a> and tailored it to our product needs. This approach let us move quickly while maintaining consistency.
+
+In about a month, we documented foundational tokens and built 14 production-ready React components.
 
 <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] my-20">
   <LabelIndicatorCarousel
@@ -140,11 +142,16 @@ The system gave the team a reliable foundation, speeding up interface developmen
   />
 </div>
 
+The system was designed primarily for robot engineers, our core users. High information density was essential. Typography, spacing, and color were refined to support readability and consistency across tools.
+
+This system gave the team a reliable foundation. Interface development became faster, and product experiences remained consistent as the toolset expanded.
 
 <Heading title="Closing thoughts" />
 
-This work was highly collaborative, bringing together engineering, product, manufacturing, and customer success. 
+Building internal tools used across the company pushed my system thinking to a new level. Robot development is complex, and every workflow is tightly interconnected.
 
-It pushed me to dive into robot development and manufacturing processes, and gave me the chance to rethink how we work across teams.
+This also meant coordinating many stakeholders, each with different priorities and constraints. As the sole designer, I often had to advocate for the role of design — not just as visual polish, but as a system that shapes how teams collaborate and make decisions.
+
+Over time, this perspective gained strong support and helped establish design as part of the product development process.
 
 </div>
