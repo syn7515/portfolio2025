@@ -8,6 +8,7 @@ import {
   calculateImagePosition,
   type CarouselItem,
 } from "./hooks";
+import { GrillLines } from "./grill-lines";
 
 export type TransformSnapshot = {
   x: number;
@@ -52,6 +53,7 @@ function LightboxContent({
   const hasPositionedVideo = currentItem?.imageSizePercent != null && currentItem?.videoUrl;
   const hasPositionedMedia = hasPositionedImage || hasPositionedVideo;
   const hasVideo = !!currentItem?.videoUrl;
+  const withBackgroundLines = currentItem?.cardVariant === "with-background-lines";
   
   if (hasPositionedMedia) {
     // Positioned image or video mode with background layers
@@ -88,51 +90,90 @@ function LightboxContent({
           height: !initialTransform && !exitTransform ? dimensions.height : undefined,
         }}
       >
-        {/* Base layer: page background */}
-        <div 
-          className="absolute inset-0"
-          style={{
-            backgroundColor: isDarkMode ? '#18181b' : '#ffffff'
-          }}
-        />
-        {/* Top layer: project-item background */}
-        <div 
-          className="absolute inset-0 bg-stone-200/60 dark:bg-zinc-700/80"
-        />
-        {/* Image or Video */}
-        {hasPositionedVideo ? (
-          <video
-            src={currentItem.videoUrl ?? undefined}
-            className="absolute object-contain"
-            autoPlay={currentItem.videoAutoplay ?? true}
-            loop={currentItem.videoLoop ?? true}
-            muted={currentItem.videoMuted ?? true}
-            controls={currentItem.videoControls ?? false}
-            playsInline
-            aria-label={currentItem.alt || currentItem.label || "Lightbox video"}
-            style={{ 
-              opacity: 1, 
-              display: 'block',
-              transformOrigin: 'center center',
-              height: `${currentItem.imageSizePercent}%`,
-              width: 'auto',
-              ...calculateImagePosition(currentItem.imagePosition)
-            }}
-          />
+        {withBackgroundLines ? (
+          <>
+            {/* Theme background */}
+            <div 
+              className="absolute inset-0 bg-stone-100 dark:bg-zinc-800"
+              aria-hidden
+            />
+            {/* Theme-responsive line art */}
+            {currentItem?.backgroundLines === "grill" && (
+              <div className="absolute inset-0 pointer-events-none z-0 text-stone-300 dark:text-zinc-700" aria-hidden>
+                <GrillLines className="w-full h-full" />
+              </div>
+            )}
+            {/* Video on top */}
+            {hasPositionedVideo && (
+              <video
+                src={currentItem.videoUrl ?? undefined}
+                className="absolute object-contain z-[1]"
+                autoPlay={currentItem.videoAutoplay ?? true}
+                loop={currentItem.videoLoop ?? true}
+                muted={currentItem.videoMuted ?? true}
+                controls={currentItem.videoControls ?? false}
+                playsInline
+                aria-label={currentItem.alt || currentItem.label || "Lightbox video"}
+                style={{ 
+                  opacity: 1, 
+                  display: 'block',
+                  transformOrigin: 'center center',
+                  height: `${currentItem.imageSizePercent}%`,
+                  width: 'auto',
+                  ...calculateImagePosition(currentItem.imagePosition)
+                }}
+              />
+            )}
+          </>
         ) : (
-          <img
-            src={currentItem.imageUrl ?? "/placeholder.svg"}
-            alt={currentItem.alt || currentItem.label || "Lightbox image"}
-            className="absolute object-contain"
-            style={{ 
-              opacity: 1, 
-              display: 'block',
-              transformOrigin: 'center center',
-              height: `${currentItem.imageSizePercent}%`,
-              width: 'auto',
-              ...calculateImagePosition(currentItem.imagePosition)
-            }}
-          />
+          <>
+            {/* Base layer: page background */}
+            <div 
+              className="absolute inset-0"
+              style={{
+                backgroundColor: isDarkMode ? '#18181b' : '#ffffff'
+              }}
+            />
+            {/* Top layer: project-item background */}
+            <div 
+              className="absolute inset-0 bg-stone-200/60 dark:bg-zinc-700/80"
+            />
+            {/* Image or Video */}
+            {hasPositionedVideo ? (
+              <video
+                src={currentItem.videoUrl ?? undefined}
+                className="absolute object-contain"
+                autoPlay={currentItem.videoAutoplay ?? true}
+                loop={currentItem.videoLoop ?? true}
+                muted={currentItem.videoMuted ?? true}
+                controls={currentItem.videoControls ?? false}
+                playsInline
+                aria-label={currentItem.alt || currentItem.label || "Lightbox video"}
+                style={{ 
+                  opacity: 1, 
+                  display: 'block',
+                  transformOrigin: 'center center',
+                  height: `${currentItem.imageSizePercent}%`,
+                  width: 'auto',
+                  ...calculateImagePosition(currentItem.imagePosition)
+                }}
+              />
+            ) : (
+              <img
+                src={currentItem.imageUrl ?? "/placeholder.svg"}
+                alt={currentItem.alt || currentItem.label || "Lightbox image"}
+                className="absolute object-contain"
+                style={{ 
+                  opacity: 1, 
+                  display: 'block',
+                  transformOrigin: 'center center',
+                  height: `${currentItem.imageSizePercent}%`,
+                  width: 'auto',
+                  ...calculateImagePosition(currentItem.imagePosition)
+                }}
+              />
+            )}
+          </>
         )}
       </motion.div>
     );

@@ -1,0 +1,84 @@
+import LabelIndicatorCarousel from '@/components/ui/label_indicator_carousel'
+import Divider from '@/components/ui/divider'
+import Heading from '@/components/ui/heading'
+import { Table } from '@/components/ui/table'
+
+<div className="max-w-[560px] mx-auto">
+
+AlphaGrill is an automatic grilling robot for Quick Service Restaurants (QSRs) like McDonald's.
+
+For 3–4 years, the team shipped feature updates without a product or design owner. Design debt grew and it began affecting the business metrics.
+
+As the company prepared the next version of this grill bot, I proposed and led a redesign of robot interaction. I worked closely with the industrial designer and mechanical engineers through implementation.
+
+<Heading title="Designing the grill workflow" year="2025 - 2026" tocLabel="Grill workflow" />
+
+QSR kitchens move fast and AlphaGrill automates one task: grilling patties. The grill bot cooks and unloads patties automatically in few minutes.
+
+This efficiency lets one line cook manage grill line alongside other tasks. The redesign must support cooks managing multiple tasks.
+
+The robot runs through many internal states. For chefs, these collapse into two phases: cooking setup and cooking cycle. The interface mirrors this model.
+
+<Table
+  columns={['Phase', 'Chef focus', 'Jobs to Be Done']}
+  rows={[
+    ['Cooking setup', '"What do I need to start cooking?"', 'Start the grill'],
+    ['Cooking cycle', '"When will this batch finish?"', 'Prepare the next batch'],
+  ]}
+/>
+
+<div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] my-20">
+  <LabelIndicatorCarousel
+    showIndicators={false}
+    items={[
+      {
+        label: "GRILL",
+        caption: "Grill workflow status and countdown",
+        videoUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/grill-1.mov",
+        imageSizePercent: 85,
+        imagePosition: { top: "center", left: "center" },
+        cardVariant: "with-background-lines",
+        backgroundLines: "grill",
+      },
+    ]}
+  />
+</div>
+
+During cooking setup, chefs need to start cooking with minimal interaction. The layout keeps the key controls visible so chefs can begin cooking in a few taps.
+
+During the cooking cycle, the focus shifts to monitoring progress. The display becomes a status board, showing remaining time and grill status from a distance.
+
+Color also guides the workflow. The background gradient follows the color of the next action button, so chefs always know what to press next.
+
+<Heading title="Designing safe cleaning controls" year="2026" tocLabel="Cleaning controls" />
+
+Kitchen robots require regular cleaning. Oil mist and food debris quickly build up inside the grill. If not cleaned properly, the robot may cook unevenly or stop during operation. Cleaning must be simple and safe for chefs.
+
+Effective cleaning requires moving the grill into specific positions. Different areas become accessible only when the grill is repositioned.
+
+Through observation and testing of the cleaning process, three positions emerged as the most effective: cleaning the inner wall, the griddle surface, and the underside of the grill. These positions form the foundation of the cleaning workflow.
+
+The interface centers on repositioning the grill. Employees choose the area they are cleaning, and the robot moves to the correct position.
+
+<div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] my-20">
+  <LabelIndicatorCarousel
+    showIndicators={false}
+    items={[
+      {
+        label: "GRILL",
+        caption: "Choosing the cleaning area and repositioning the grill",
+        videoUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/clean-1.mov",
+        imageSizePercent: 85,
+        imagePosition: { top: "center", left: "center" },
+        cardVariant: "with-background-lines",
+        backgroundLines: "grill",
+      },
+    ]}
+  />
+</div>
+
+Safety was a key concern. Moving grill parts can cause burns or injuries if triggered accidentally. To prevent this, the interface requires a second confirmation before the robot moves.
+
+The slider provides the sense of physical control, while the confirmation step prevents unintended actions.
+
+</div>

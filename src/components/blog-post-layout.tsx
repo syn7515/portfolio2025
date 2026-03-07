@@ -26,6 +26,11 @@ const PROJECTS = [
     description: 'Building the Tools Behind Smarter Robots'
   },
   {
+    slug: 'alphagrill',
+    title: 'AlphaGrill',
+    description: 'Robot Interface for Collaboration in Kitchen'
+  },
+  {
     slug: 'athenahealth',
     title: 'AthenaHealth',
     description: 'Encouraging Prompt Medical Bill Payment'

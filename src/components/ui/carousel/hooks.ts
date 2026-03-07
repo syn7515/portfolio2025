@@ -22,6 +22,8 @@ export type CarouselItem = {
   videoLoop: boolean;
   videoMuted: boolean;
   videoControls: boolean;
+  cardVariant?: "default" | "with-background-lines";
+  backgroundLines?: string;
 };
 
 type Normalizable =
@@ -40,6 +42,8 @@ const DEFAULT_ITEM: CarouselItem = {
   videoLoop: true,
   videoMuted: true,
   videoControls: false,
+  cardVariant: "default",
+  backgroundLines: undefined,
 };
 
 export function normalizeItem(item: Normalizable): CarouselItem {
@@ -87,6 +91,12 @@ export function normalizeItem(item: Normalizable): CarouselItem {
           typeof item.videoMuted === "boolean" ? item.videoMuted : true,
         videoControls:
           typeof item.videoControls === "boolean" ? item.videoControls : false,
+        cardVariant:
+          item.cardVariant === "with-background-lines"
+            ? "with-background-lines"
+            : "default",
+        backgroundLines:
+          typeof item.backgroundLines === "string" ? item.backgroundLines : undefined,
       };
     }
 
