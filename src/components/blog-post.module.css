@@ -105,6 +105,23 @@
     /* stone-500 - darker underline on hover */
 }
 
+/* Inline YouTube preview trigger: force underline + italic (wins over preflight and .mdxContent a) */
+.mdxContent a.inline-youtube-preview-trigger {
+    text-decoration-line: underline !important;
+    text-decoration-style: solid !important;
+    text-decoration-skip-ink: auto !important;
+    text-decoration-color: rgb(212 212 216) !important;
+    text-decoration-thickness: 5% !important;
+    text-underline-offset: 0.05rem !important;
+    text-underline-position: from-font !important;
+    font-style: italic !important;
+}
+
+.mdxContent a.inline-youtube-preview-trigger:hover {
+    color: rgb(28 25 23) !important;
+    text-decoration-color: rgb(120 113 108) !important;
+}
+
 .mdxContent ul {
     color: rgb(68 64 60) !important;
     /* stone-700 */
@@ -243,6 +260,18 @@
         /* zinc-400 - lighter underline on hover */
         opacity: 1;
         /* full opacity on hover */
+    }
+
+    .mdxContent a.inline-youtube-preview-trigger {
+        color: rgb(212 212 216) !important;
+        opacity: 0.9;
+        text-decoration-color: rgb(82 82 91) !important;
+    }
+
+    .mdxContent a.inline-youtube-preview-trigger:hover {
+        color: rgb(244 244 245) !important;
+        text-decoration-color: rgb(161 161 170) !important;
+        opacity: 1;
     }
 
     .mdxContent sup {
