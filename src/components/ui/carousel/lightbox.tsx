@@ -324,54 +324,52 @@ export function Lightbox({
                 })()}
               </div>
 
-              {/* Prev button - outside image, close to it on the left */}
-              {!exitTransform && (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    prevLightbox();
-                  }}
-                  disabled={isPrevDisabled}
-                  className={`absolute rounded-full p-2 sm:p-3 text-white bg-white/20 z-20 pointer-events-auto ${
-                    isPrevDisabled
-                      ? "opacity-40 cursor-default"
-                      : "hover:bg-white/30 transition-colors cursor-pointer"
-                  }`}
-                  style={{
-              left: `calc(50% - min(640px, calc(50vw - 16px - 40px - ${isLgOrAbove ? "16px" : "4px"})) - ${isLgOrAbove ? "16px" : "4px"})`,
-                    top: '50%',
-                    transform: 'translate(-100%, -50%)',
-                  }}
-                  aria-label="Previous"
-                >
-                  <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
-                </button>
-              )}
-
-              {/* Next button - outside image, close to it on the right */}
-              {!exitTransform && (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    nextLightbox();
-                  }}
-                  disabled={isNextDisabled}
-                  className={`absolute rounded-full p-2 sm:p-3 text-white bg-white/20 z-20 pointer-events-auto ${
-                    isNextDisabled
-                      ? "opacity-40 cursor-default"
-                      : "hover:bg-white/30 transition-colors cursor-pointer"
-                  }`}
-                  style={{
-              left: `calc(50% + min(640px, calc(50vw - 16px - 40px - ${isLgOrAbove ? "16px" : "4px"})) + ${isLgOrAbove ? "16px" : "4px"})`,
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                  }}
-                  aria-label="Next"
-                >
-                  <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
-                </button>
+              {/* Prev/Next buttons - only when more than one item */}
+              {!exitTransform && normalizedItems.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      prevLightbox();
+                    }}
+                    disabled={isPrevDisabled}
+                    className={`absolute rounded-full p-2 sm:p-3 text-white bg-white/20 z-20 pointer-events-auto ${
+                      isPrevDisabled
+                        ? "opacity-40 cursor-default"
+                        : "hover:bg-white/30 transition-colors cursor-pointer"
+                    }`}
+                    style={{
+                      left: `calc(50% - min(640px, calc(50vw - 16px - 40px - ${isLgOrAbove ? "16px" : "4px"})) - ${isLgOrAbove ? "16px" : "4px"})`,
+                      top: '50%',
+                      transform: 'translate(-100%, -50%)',
+                    }}
+                    aria-label="Previous"
+                  >
+                    <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      nextLightbox();
+                    }}
+                    disabled={isNextDisabled}
+                    className={`absolute rounded-full p-2 sm:p-3 text-white bg-white/20 z-20 pointer-events-auto ${
+                      isNextDisabled
+                        ? "opacity-40 cursor-default"
+                        : "hover:bg-white/30 transition-colors cursor-pointer"
+                    }`}
+                    style={{
+                      left: `calc(50% + min(640px, calc(50vw - 16px - 40px - ${isLgOrAbove ? "16px" : "4px"})) + ${isLgOrAbove ? "16px" : "4px"})`,
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                    }}
+                    aria-label="Next"
+                  >
+                    <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+                  </button>
+                </>
               )}
             </div>
           </div>

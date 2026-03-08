@@ -10,6 +10,12 @@ interface ProjectItemProps {
   dates: string;
   description: string;
   href: string;
+  /** Image position as CSS object-position (e.g. 'center center'). Default: 'left top' */
+  imageObjectPosition?: string;
+  /** Image size as percentage (e.g. '90'). Default: 88 with left/top 12.5 for framing. */
+  imageSizePercent?: number;
+  /** 'contain' = show full image (no crop); 'cover' = fill frame (may crop). Default: 'cover' */
+  imageObjectFit?: 'cover' | 'contain';
   initial?: { opacity: number; y: number };
   animate?: { opacity: number; y: number };
   transition?: { duration: number; ease: [number, number, number, number]; delay?: number };
@@ -21,10 +27,15 @@ export default function ProjectItem({
   dates,
   description,
   href,
+  imageObjectPosition = 'left top',
+  imageSizePercent,
+  imageObjectFit = 'cover',
   initial = { opacity: 0, y: 20 },
   animate = { opacity: 1, y: 0 },
   transition = { duration: 0.1, ease: [0.25, 0.1, 0.25, 1] },
 }: ProjectItemProps) {
+  const size = imageSizePercent != null ? imageSizePercent : 88;
+  const inset = imageSizePercent != null ? (100 - imageSizePercent) / 2 : 12.5;
   // Dark mode detection - only set after hydration to avoid SSR mismatch
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
@@ -74,13 +85,14 @@ export default function ProjectItem({
           <img
             src={imageUrl}
             alt={`${organization} project screenshot`}
-            className="absolute object-cover"
+            className="absolute"
             style={{
-              left: '12.5%',
-              top: '12.5%',
-              width: '88%',
-              height: '88%',
-              objectPosition: 'left top',
+              left: `${inset}%`,
+              top: `${inset}%`,
+              width: `${size}%`,
+              height: `${size}%`,
+              objectFit: imageObjectFit,
+              objectPosition: imageObjectPosition,
             }}
           />
           {/* Border layer on top */}
