@@ -3,6 +3,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --intro-trigger-decoration: rgb(212 212 216); /* stone-300 - underline color for intro/link preview triggers */
 }
 
 @theme inline {
@@ -16,6 +17,7 @@
   :root {
     --background: #18181b;
     --foreground: #ededed;
+    --intro-trigger-decoration: rgb(82 82 91); /* zinc-600 - underline color for intro/link preview triggers */
   }
 }
 
@@ -350,6 +352,22 @@ a[data-inline-youtube-trigger]:hover {
   /* stone-500 - same as intro-link hover */
 }
 
+/* Inline link preview trigger: same as .intro-link (underline, italic, decoration color) */
+a[data-inline-link-preview-trigger] {
+  text-decoration-line: underline !important;
+  text-decoration-style: solid !important;
+  text-decoration-skip-ink: auto !important;
+  text-decoration-color: rgb(212 212 216) !important;
+  /* stone-300 - same as intro-link */
+  text-underline-offset: 0.05rem !important;
+  font-style: italic !important;
+}
+
+a[data-inline-link-preview-trigger]:hover {
+  text-decoration-color: rgb(120 113 108) !important;
+  /* stone-500 - same as intro-link hover */
+}
+
 /* Intro link variant for lighter text paragraphs (stone-500/zinc-400) */
 .intro-link-light {
   color: rgb(120 113 108) !important;
@@ -401,6 +419,16 @@ a[data-inline-youtube-trigger]:hover {
   }
 
   a[data-inline-youtube-trigger]:hover {
+    text-decoration-color: rgb(161 161 170) !important;
+    /* zinc-400 - same as intro-link dark hover */
+  }
+
+  a[data-inline-link-preview-trigger] {
+    text-decoration-color: rgb(82 82 91) !important;
+    /* zinc-600 - same as intro-link dark */
+  }
+
+  a[data-inline-link-preview-trigger]:hover {
     text-decoration-color: rgb(161 161 170) !important;
     /* zinc-400 - same as intro-link dark hover */
   }

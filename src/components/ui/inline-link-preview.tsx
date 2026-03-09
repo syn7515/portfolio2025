@@ -3,38 +3,20 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { cn } from '@/lib/utils'
+import type { OgResponse } from '@/app/api/og/route'
 
 const CURSOR_OFFSET = 12
 const PREVIEW_WIDTH = 320
-const PREVIEW_HEIGHT = 180
+const PREVIEW_HEIGHT = 200
 const HOVER_DELAY_MS = 200
 
-interface InlineYoutubePreviewProps {
-  videoId: string
-  start?: number
+export interface InlineLinkPreviewProps {
+  href: string
   children: React.ReactNode
+  explanation?: string
+  imageUrl?: string
   className?: string
-}
-
-function buildEmbedUrl(videoId: string, start?: number): string {
-  const params = new URLSearchParams({
-    autoplay: '1',
-    mute: '1',
-    controls: '0', // hide video control bar
-    modestbranding: '1', // minimize YouTube logo
-    rel: '0', // related videos from same channel only
-    iv_load_policy: '3', // hide annotations
-    disablekb: '1', // disable keyboard controls in embed
-    fs: '0', // hide fullscreen button
-  })
-  if (start != null && start > 0) params.set('start', String(start))
-  return `https://www.youtube.com/embed/${videoId}?${params.toString()}`
-}
-
-function buildWatchUrl(videoId: string, start?: number): string {
-  const base = `https://www.youtube.com/watch?v=${videoId}`
-  if (start != null && start > 0) return `${base}&t=${start}`
-  return base
+  variant?: 'intro-link' | 'intro-link-light'
 }
 
 function clampPosition(
@@ -51,15 +33,34 @@ function clampPosition(
   }
 }
 
-export function InlineYoutubePreview({
-  videoId,
-  start,
+const cache = new Map<string, OgResponse>()
+
+async function fetchOg(url: string): Promise<OgResponse> {
+  const cached = cache.get(url)
+  if (cached) return cached
+  const encoded = encodeURIComponent(url)
+  const res = await fetch(`/api/og?url=${encoded}`)
+  const data = (await res.json()) as OgResponse
+  cache.set(url, data)
+  return data
+}
+
+export function InlineLinkPreview({
+  href,
   children,
+  explanation,
+  imageUrl: imageUrlProp,
   className,
-}: InlineYoutubePreviewProps) {
+  variant = 'intro-link',
+}: InlineLinkPreviewProps) {
   const [isHovered, setIsHovered] = useState(false)
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null)
+  const [ogData, setOgData] = useState<OgResponse | null>(null)
+  const [loading, setLoading] = useState(false)
   const hoverDelayRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const previewImageUrl = imageUrlProp ?? ogData?.image ?? null
+  const hasImage = Boolean(previewImageUrl)
 
   const applyTriggerStyles = useCallback((el: HTMLAnchorElement | null) => {
     if (!el) return
@@ -70,9 +71,6 @@ export function InlineYoutubePreview({
     el.style.setProperty('text-underline-offset', '0.05rem', 'important')
     el.style.setProperty('font-style', 'italic', 'important')
   }, [])
-
-  const watchUrl = buildWatchUrl(videoId, start)
-  const embedUrl = buildEmbedUrl(videoId, start)
 
   const handleMouseEnter = useCallback((e: React.MouseEvent) => {
     hoverDelayRef.current = setTimeout(() => {
@@ -90,7 +88,22 @@ export function InlineYoutubePreview({
     setPos(null)
   }, [])
 
-  // Update position when hovered (mouse might move while over trigger)
+  useEffect(() => {
+    if (!isHovered || imageUrlProp != null) return
+    let cancelled = false
+    setLoading(true)
+    fetchOg(href)
+      .then((data) => {
+        if (!cancelled) setOgData(data)
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [isHovered, href, imageUrlProp])
+
   useEffect(() => {
     if (!isHovered) return
     const onMove = (e: MouseEvent) => setPos({ x: e.clientX, y: e.clientY })
@@ -101,19 +114,19 @@ export function InlineYoutubePreview({
   const handleClick = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault()
-      window.open(watchUrl, '_blank', 'noopener,noreferrer')
+      window.open(href, '_blank', 'noopener,noreferrer')
     },
-    [watchUrl]
+    [href]
   )
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault()
-        window.open(watchUrl, '_blank', 'noopener,noreferrer')
+        window.open(href, '_blank', 'noopener,noreferrer')
       }
     },
-    [watchUrl]
+    [href]
   )
 
   const boxStyle = React.useMemo(() => {
@@ -127,34 +140,49 @@ export function InlineYoutubePreview({
     return { left, top, width: PREVIEW_WIDTH, height: PREVIEW_HEIGHT }
   }, [pos])
 
-  const previewBox =
-    isHovered && boxStyle && typeof document !== 'undefined' ? (
-      <div
-        className="fixed z-50 rounded-lg overflow-hidden bg-stone-900 dark:bg-zinc-900 shadow-lg pointer-events-none"
-        style={{
-          left: boxStyle.left,
-          top: boxStyle.top,
-          width: boxStyle.width,
-          height: boxStyle.height,
-        }}
-        aria-hidden
-      >
-        <iframe
-          src={embedUrl}
-          title="YouTube preview"
-          className="w-full h-full border-0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
+  const showCard = isHovered && boxStyle && hasImage && typeof document !== 'undefined'
+
+  const previewBox = showCard ? (
+    <div
+      className="fixed z-50 rounded-lg overflow-hidden bg-stone-900 dark:bg-zinc-900 shadow-lg pointer-events-none"
+      style={{
+        left: boxStyle!.left,
+        top: boxStyle!.top,
+        width: boxStyle!.width,
+        height: boxStyle!.height,
+      }}
+      aria-hidden
+    >
+      <div className="relative w-full h-full">
+        <img
+          src={previewImageUrl!}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
         />
+        {explanation && (
+          <>
+            <div
+              className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent"
+              aria-hidden
+            />
+            <p
+              className="absolute bottom-0 left-0 right-0 pt-3 px-3 pb-0 text-sm font-normal leading-snug"
+              style={{ color: 'rgb(231 229 228)' }}
+            >
+              {explanation}
+            </p>
+          </>
+        )}
       </div>
-    ) : null
+    </div>
+  ) : null
 
   return (
     <>
       <a
         ref={applyTriggerStyles}
-        data-inline-youtube-trigger
-        href={watchUrl}
+        data-inline-link-preview-trigger
+        href={href}
         target="_blank"
         rel="noopener noreferrer"
         onClick={handleClick}
@@ -164,10 +192,11 @@ export function InlineYoutubePreview({
         role="button"
         tabIndex={0}
         className={cn(
-          'intro-link inline-youtube-preview-trigger focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 dark:focus-visible:ring-zinc-500 focus-visible:ring-offset-1 rounded',
+          variant,
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 dark:focus-visible:ring-zinc-500 focus-visible:ring-offset-1 rounded',
           className
         )}
-        aria-label={`Play video: ${watchUrl}`}
+        aria-label={`Open link: ${href}`}
       >
         {children}
       </a>
@@ -176,4 +205,4 @@ export function InlineYoutubePreview({
   )
 }
 
-export default InlineYoutubePreview
+export default InlineLinkPreview
