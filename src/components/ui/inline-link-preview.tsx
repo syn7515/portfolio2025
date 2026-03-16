@@ -165,8 +165,20 @@ export function InlineLinkPreview({
               className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent"
               aria-hidden
             />
+            <div
+              className="absolute inset-x-0 bottom-0 h-1/2 backdrop-blur-sm [mask-image:linear-gradient(to_top,black_0%,transparent_85%)]"
+              aria-hidden
+            />
+            <div
+              className="absolute inset-x-0 bottom-0 h-[45%] backdrop-blur-md [mask-image:linear-gradient(to_top,black_0%,transparent_75%)]"
+              aria-hidden
+            />
+            <div
+              className="absolute inset-x-0 bottom-0 h-[30%] backdrop-blur-xl [mask-image:linear-gradient(to_top,black_0%,transparent_65%)]"
+              aria-hidden
+            />
             <p
-              className="absolute bottom-0 left-0 right-0 pt-3 px-3 pb-0 text-sm font-normal leading-snug"
+              className="absolute bottom-0 left-0 right-0 pt-3 px-3 pb-0 text-sm font-normal leading-tight"
               style={{ color: 'rgb(231 229 228)' }}
             >
               {explanation}

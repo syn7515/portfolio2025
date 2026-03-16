@@ -93,7 +93,10 @@ export default function BlogPostToc({ contentSelector = CONTENT_SELECTOR, classN
     lastClickTimeRef.current = Date.now()
     setActiveId(id)
     const el = document.getElementById(id)
-    el?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    if (el) {
+      const top = el.getBoundingClientRect().top + window.scrollY - 54
+      window.scrollTo({ top, behavior: 'smooth' })
+    }
   }
 
   if (items.length === 0) return null

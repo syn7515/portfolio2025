@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { Undo2 } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Undo2 } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { Divider } from '@/components/ui/divider'
@@ -134,18 +134,25 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                 {previousProject ? (
                   <Link 
                     href={`/${previousProject.slug}`}
-                    className="flex-1 group cursor-pointer hover:opacity-80 transition-opacity"
+                    className="flex-1 group cursor-pointer"
                     style={{ textDecoration: 'none' }}
                   >
                     <div 
                       className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic mb-1.5 opacity-80 font-sans"
 
                     >
-                      Previous
+                      <span className="relative inline-flex items-center">
+                        <ArrowLeft
+                          className="absolute left-0 size-3.5 text-current opacity-0 translate-x-2 motion-safe:transition-all motion-safe:duration-300 motion-safe:ease-out group-hover:opacity-100 group-hover:translate-x-0 group-focus-visible:opacity-100 group-focus-visible:translate-x-0 motion-reduce:opacity-100 motion-reduce:translate-x-0"
+                          aria-hidden
+                        />
+                        <span className="relative z-10 motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out group-hover:translate-x-4 group-focus-visible:translate-x-4 motion-reduce:translate-x-0">
+                          Previous
+                        </span>
+                      </span>
                     </div>
                     <p 
                       className="mt-0 not-italic project-nav-description"
-                      style={{ fontSize: '14px' }}
                     >
                       {preventWidow(previousProject.description)}
                     </p>
@@ -158,17 +165,24 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                 {nextProject ? (
                   <Link 
                     href={`/${nextProject.slug}`}
-                    className="flex-1 text-right group cursor-pointer hover:opacity-80 transition-opacity"
+                    className="flex-1 text-right group cursor-pointer"
                     style={{ textDecoration: 'none' }}
                   >
                     <div 
                       className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic mb-1.5 opacity-80 font-sans"
                     >
-                      Next
+                      <span className="relative inline-flex items-center justify-end">
+                        <ArrowRight
+                          className="absolute right-0 size-3.5 text-current opacity-0 -translate-x-2 motion-safe:transition-all motion-safe:duration-300 motion-safe:ease-out group-hover:opacity-100 group-hover:translate-x-0 group-focus-visible:opacity-100 group-focus-visible:translate-x-0 motion-reduce:opacity-100 motion-reduce:translate-x-0"
+                          aria-hidden
+                        />
+                        <span className="relative z-10 motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out group-hover:-translate-x-4 group-focus-visible:-translate-x-4 motion-reduce:translate-x-0">
+                          Next
+                        </span>
+                      </span>
                     </div>
                     <p 
                       className="mt-0 not-italic project-nav-description"
-                      style={{ fontSize: '14px' }}
                     >
                       {preventWidow(nextProject.description)}
                     </p>
