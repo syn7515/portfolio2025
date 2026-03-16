@@ -58,7 +58,7 @@ export default function Home() {
               {/* <Button 
                 variant="ghost" 
                 asChild
-                className="group shadow-[0_1px_2px_0_rgba(0,0,0,0.04)] bg-white dark:bg-[var(--background)] group-hover:bg-stone-100 dark:group-hover:bg-zinc-800 !font-[450] border border-stone-200/80 dark:border-zinc-700/80 [&>a]:bg-white [&>a]:dark:bg-[var(--background)] [&>a]:group-hover:bg-stone-100 [&>a]:dark:group-hover:bg-zinc-800 [&>a]:shadow-[0_1px_2px_0_rgba(0,0,0,0.04)] px-3.5 py-0 [&>a]:px-3.5 [&>a]:py-0 leading-none [&>a]:leading-none h-[32px] [&>a]:h-[32px] focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 [&>a]:focus-visible:ring-2 [&>a]:focus-visible:ring-blue-600 [&>a]:focus-visible:ring-offset-2"
+                className="group shadow-[0_1px_2px_0_rgba(0,0,0,0.04)] bg-white dark:bg-[var(--background)] group-hover:bg-stone-100 dark:group-hover:bg-zinc-800 !font-[420] border border-stone-200/80 dark:border-zinc-700/80 [&>a]:bg-white [&>a]:dark:bg-[var(--background)] [&>a]:group-hover:bg-stone-100 [&>a]:dark:group-hover:bg-zinc-800 [&>a]:shadow-[0_1px_2px_0_rgba(0,0,0,0.04)] px-3.5 py-0 [&>a]:px-3.5 [&>a]:py-0 leading-none [&>a]:leading-none h-[32px] [&>a]:h-[32px] focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 [&>a]:focus-visible:ring-2 [&>a]:focus-visible:ring-blue-600 [&>a]:focus-visible:ring-offset-2"
               >
                 <a 
                   href="/resume.pdf" 
@@ -72,7 +72,7 @@ export default function Home() {
             </div>
           </motion.div>
           <motion.p
-            className="!text-stone-800 dark:!text-inherit !font-[450] mt-10 !mb-5"
+            className="!text-stone-800 dark:!text-inherit !font-[420] mt-10 !mb-5"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.08 }}
@@ -80,7 +80,7 @@ export default function Home() {
             Product designer with engineering mindset, obsessed with <span className="italic">why</span> behind everything — from systems to pixels.
           </motion.p>
           <motion.p
-            className="!text-stone-800 dark:!text-inherit !font-[450] !mb-5"
+            className="!text-stone-800 dark:!text-inherit !font-[420] !mb-5"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.16 }}
@@ -88,7 +88,7 @@ export default function Home() {
             Currently a founding product designer at <InlineLinkPreview href="https://www.aniai.ai/" imageUrl='https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/aniai.webp' explanation="A robotics startup specialized in kitchen automation">Aniai</InlineLinkPreview>, designing robots and tools behind them.
           </motion.p>
           <motion.p
-            className="!text-stone-500 dark:!text-zinc-400 !font-[450] mb-0"
+            className="!text-stone-500 dark:!text-zinc-400 !font-[420] mb-0"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.24 }}

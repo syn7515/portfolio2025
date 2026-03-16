@@ -29,7 +29,6 @@
     font-size: 1.25rem;
     font-weight: 500;
     line-height: 1.875rem;
-    letter-spacing: 0.01em;
     margin-bottom: 5rem;
     margin-top: 0rem
 }
@@ -52,12 +51,9 @@
     /* stone-400 */
     font-size: 0.9375rem;
     /* 15pt */
-    font-weight: 450;
+    font-weight: 420;
     /* regular */
-    line-height: 155%;
-    /* 155% */
-    letter-spacing: 0.01em;
-    /* 0.8% */
+    line-height: 165%;
     margin-bottom: 0.2rem;
     margin-top: 1.5rem;
 }
@@ -67,12 +63,10 @@
     /* stone-700 */
     font-size: 0.9375rem;
     /* 15pt */
-    font-weight: 450;
+    font-weight: 420;
     /* regular */
-    line-height: 160%;
-    /* 155% */
-    letter-spacing: 0.00em;
-    /* 0.8% */
+    line-height: 168%;
+    /* 168% */
     margin-bottom: 1.5rem;
     /* mb-4 */
 }
@@ -172,7 +166,6 @@
     color: rgb(12 10 9) !important;
     /* stone-950 */
     font-weight: 560;
-    letter-spacing: 0.01em;
     opacity: 1;
 }
 

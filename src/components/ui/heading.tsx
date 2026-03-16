@@ -26,7 +26,7 @@ export function Heading({ title, year, tocLabel, className }: HeadingProps) {
     >
       {/* Title text */}
       <span 
-        className="text-[15px] font-[520] leading-[150%] tracking-[0.12px] font-sans text-stone-800 dark:text-zinc-200"
+        className="text-[15px] font-[520] leading-[160%] font-sans text-stone-800 dark:text-zinc-200"
         style={{ fontStyle: 'normal' }}
       >
         {title}
@@ -46,7 +46,7 @@ export function Heading({ title, year, tocLabel, className }: HeadingProps) {
             />
           </div>
           <span 
-            className="text-[15px] !font-[450] leading-[150%] tracking-[0.12px] font-sans text-stone-400 dark:text-zinc-500"
+            className="text-[15px] !font-[420] leading-[160%] font-sans text-stone-400 dark:text-zinc-500"
             style={{ fontStyle: 'normal' }}
           >
             {year}
