@@ -143,7 +143,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                     >
                       <span className="relative inline-flex items-center">
                         <ArrowLeft
-                          className="absolute left-0 size-3.5 text-current opacity-0 translate-x-2 motion-safe:transition-all motion-safe:duration-300 motion-safe:ease-out group-hover:opacity-100 group-hover:translate-x-0 group-focus-visible:opacity-100 group-focus-visible:translate-x-0 motion-reduce:opacity-100 motion-reduce:translate-x-0"
+                          className="absolute left-0 size-3.5 text-current opacity-0 motion-safe:transition-opacity motion-safe:duration-300 motion-safe:ease-out group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:opacity-100"
                           aria-hidden
                         />
                         <span className="relative z-10 motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out group-hover:translate-x-4 group-focus-visible:translate-x-4 motion-reduce:translate-x-0">
@@ -173,7 +173,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                     >
                       <span className="relative inline-flex items-center justify-end">
                         <ArrowRight
-                          className="absolute right-0 size-3.5 text-current opacity-0 -translate-x-2 motion-safe:transition-all motion-safe:duration-300 motion-safe:ease-out group-hover:opacity-100 group-hover:translate-x-0 group-focus-visible:opacity-100 group-focus-visible:translate-x-0 motion-reduce:opacity-100 motion-reduce:translate-x-0"
+                          className="absolute right-0 size-3.5 text-current opacity-0 motion-safe:transition-opacity motion-safe:duration-300 motion-safe:ease-out group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:opacity-100"
                           aria-hidden
                         />
                         <span className="relative z-10 motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out group-hover:-translate-x-4 group-focus-visible:-translate-x-4 motion-reduce:translate-x-0">
