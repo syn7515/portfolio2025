@@ -93,7 +93,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.24 }}
           >
-            Previously, reimagined public benefits at <InlineLinkPreview href="https://goinvo.com/" variant="intro-link-light" explanation="A Boston studio crafting healthcare software for 20+ years">Goinvo</InlineLinkPreview> and advanced healthcare accessibility at <InlineLinkPreview href="https://www.athenahealth.com/" variant="intro-link-light" imageUrl="https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/athenahealth.jpeg" explanation='A healthtech company serving 170K+ clinicians across the US'>AthenaHealth</InlineLinkPreview>.
+            Previously, reimagined public benefits at <InlineLinkPreview href="https://goinvo.com/" variant="intro-link-light" imageUrl='https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/goinvo.jpg' explanation="A Boston studio crafting healthcare software for 20+ years">Goinvo</InlineLinkPreview> and advanced healthcare accessibility at <InlineLinkPreview href="https://www.athenahealth.com/" variant="intro-link-light" imageUrl="https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/athenahealth.jpeg" explanation='A healthtech company serving 170K+ clinicians across the US'>AthenaHealth</InlineLinkPreview>.
           </motion.p>
         </div>
         

@@ -57,10 +57,43 @@ export function InlineLinkPreview({
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null)
   const [ogData, setOgData] = useState<OgResponse | null>(null)
   const [loading, setLoading] = useState(false)
+  const [badgeTextDark, setBadgeTextDark] = useState(true)
   const hoverDelayRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const imgRef = useRef<HTMLImageElement>(null)
 
   const previewImageUrl = imageUrlProp ?? ogData?.image ?? null
   const hasImage = Boolean(previewImageUrl)
+
+  const handleImageLoad = useCallback(() => {
+    const img = imgRef.current
+    if (!img) return
+    try {
+      const canvas = document.createElement('canvas')
+      canvas.width = PREVIEW_WIDTH
+      canvas.height = PREVIEW_HEIGHT
+      const ctx = canvas.getContext('2d')
+      if (!ctx) return
+      const imgAspect = img.naturalWidth / img.naturalHeight
+      const canvasAspect = PREVIEW_WIDTH / PREVIEW_HEIGHT
+      let sx = 0, sy = 0, sw = img.naturalWidth, sh = img.naturalHeight
+      if (imgAspect > canvasAspect) {
+        sw = img.naturalHeight * canvasAspect
+        sx = (img.naturalWidth - sw) / 2
+      } else {
+        sh = img.naturalWidth / canvasAspect
+        sy = (img.naturalHeight - sh) / 2
+      }
+      ctx.drawImage(img, sx, sy, sw, sh, 0, 0, PREVIEW_WIDTH, PREVIEW_HEIGHT)
+      const { data } = ctx.getImageData(8, 8, 80, 24)
+      let total = 0
+      for (let i = 0; i < data.length; i += 4) {
+        total += 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]
+      }
+      setBadgeTextDark(total / (data.length / 4) > 128)
+    } catch {
+      // CORS blocked — keep default
+    }
+  }, [])
 
   const applyTriggerStyles = useCallback((el: HTMLAnchorElement | null) => {
     if (!el) return
@@ -155,10 +188,18 @@ export function InlineLinkPreview({
     >
       <div className="relative w-full h-full">
         <img
+          ref={imgRef}
           src={previewImageUrl!}
           alt=""
+          crossOrigin="anonymous"
+          onLoad={handleImageLoad}
           className="absolute inset-0 w-full h-full object-cover"
         />
+        <span
+          className={`absolute top-2 left-2 z-10 rounded-full bg-white/25 backdrop-blur-sm px-2.5 py-1 text-xs leading-tight truncate max-w-[90%] ${badgeTextDark ? 'text-stone-700' : 'text-stone-200'}`}
+        >
+          {new URL(href).hostname}
+        </span>
         {explanation && (
           <>
             <div
