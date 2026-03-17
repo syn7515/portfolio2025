@@ -173,9 +173,8 @@ export default function LabelIndicatorCarousel({
     if (hasPositionedMedia) {
       // For positioned images, animate the container size
       const maxFinalWidth = Math.min(1280, viewportWidth - 32 - 80 - 8);
-      const maxFinalHeight = viewportHeight * 0.9;
       // Calculate dimensions to maintain 16:9 aspect ratio
-      const finalWidth = Math.min(maxFinalWidth, maxFinalHeight * 16 / 9);
+      const finalWidth = maxFinalWidth;
       const finalHeight = finalWidth * 9 / 16;
       
       return {
@@ -189,23 +188,13 @@ export default function LabelIndicatorCarousel({
     } else {
       // For full-cover images, use existing logic
     // Calculate scale factors
-    // Final size: max-w-7xl (1280px) or max-h-[90vh], whichever is smaller
+    // Final size: max-w-7xl (1280px)
     // Account for: 32px padding + 80px buttons (40px each) + 8px gaps (4px each side)
     const maxFinalWidth = Math.min(1280, viewportWidth - 32 - 80 - 8);
-    const maxFinalHeight = viewportHeight * 0.9;
-    
-    // Determine final rendered dimensions based on media aspect ratio and container constraints
-    // This simulates what object-contain will do
-    let finalRenderedWidth, finalRenderedHeight;
-    if (maxFinalWidth / maxFinalHeight > mediaAspectRatio) {
-      // Height is the limiting factor
-      finalRenderedHeight = maxFinalHeight;
-      finalRenderedWidth = finalRenderedHeight * mediaAspectRatio;
-    } else {
-      // Width is the limiting factor
-      finalRenderedWidth = maxFinalWidth;
-      finalRenderedHeight = finalRenderedWidth / mediaAspectRatio;
-    }
+
+    // Width is always the limiting factor (no height constraint)
+    const finalRenderedWidth = maxFinalWidth;
+    const finalRenderedHeight = finalRenderedWidth / mediaAspectRatio;
     
     // Calculate offset from viewport center (where the media will be centered)
     const offsetX = initialX - finalX;

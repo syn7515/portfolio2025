@@ -39,6 +39,7 @@ interface LightboxContentProps {
   exitTransform: TransformSnapshot | null;
   exitDuration: number;
   isDarkMode: boolean;
+  dimensions: { width: number; height: number };
 }
 
 function LightboxContent({
@@ -47,8 +48,8 @@ function LightboxContent({
   exitTransform,
   exitDuration,
   isDarkMode,
+  dimensions,
 }: LightboxContentProps) {
-  const dimensions = useLightboxDimensions();
   const hasPositionedImage = currentItem?.imageSizePercent != null && currentItem?.imageUrl;
   const hasPositionedVideo = currentItem?.imageSizePercent != null && currentItem?.videoUrl;
   const hasPositionedMedia = hasPositionedImage || hasPositionedVideo;
@@ -260,6 +261,7 @@ export function Lightbox({
   isDarkMode,
   isLgOrAbove
 }: LightboxProps) {
+  const dimensions = useLightboxDimensions();
   const isPrevDisabled = lightboxIndex === 0;
   const isNextDisabled = lightboxIndex >= normalizedItems.length - 1;
 
@@ -291,12 +293,13 @@ export function Lightbox({
             >
               {/* Relative container sizes to LightboxContent only; caption is out of flow to avoid wrapper height change during animation */}
               <div className="relative">
-                <LightboxContent 
+                <LightboxContent
                   currentItem={normalizedItems[lightboxIndex]}
                   initialTransform={initialTransform}
                   exitTransform={exitTransform}
                   exitDuration={exitDuration}
                   isDarkMode={isDarkMode}
+                  dimensions={dimensions}
                 />
                 {/* Caption - absolutely below media, same enter/exit timing */}
                 {(() => {
@@ -340,7 +343,7 @@ export function Lightbox({
                         : "hover:bg-white/30 transition-colors cursor-pointer"
                     }`}
                     style={{
-                      left: `calc(50% - min(640px, calc(50vw - 16px - 40px - ${isLgOrAbove ? "16px" : "4px"})) - ${isLgOrAbove ? "16px" : "4px"})`,
+                      left: `calc(50% - ${dimensions.width / 2}px - ${isLgOrAbove ? 16 : 4}px)`,
                       top: '50%',
                       transform: 'translate(-100%, -50%)',
                     }}
@@ -361,7 +364,7 @@ export function Lightbox({
                         : "hover:bg-white/30 transition-colors cursor-pointer"
                     }`}
                     style={{
-                      left: `calc(50% + min(640px, calc(50vw - 16px - 40px - ${isLgOrAbove ? "16px" : "4px"})) + ${isLgOrAbove ? "16px" : "4px"})`,
+                      left: `calc(50% + ${dimensions.width / 2}px + ${isLgOrAbove ? 16 : 4}px)`,
                       top: '50%',
                       transform: 'translateY(-50%)',
                     }}

@@ -223,13 +223,7 @@ export function useLightboxDimensions() {
 
     const handleResize = () => {
       const viewportWidth = window.innerWidth;
-      const viewportHeight = window.innerHeight;
-      const maxContainerWidth = Math.min(1280, viewportWidth - 32 - 80 - 8);
-      const maxContainerHeight = viewportHeight * 0.9;
-      const containerWidth = Math.min(
-        maxContainerWidth,
-        (maxContainerHeight * 16) / 9
-      );
+      const containerWidth = Math.min(1280, viewportWidth - 32 - 80 - 8);
       const containerHeight = (containerWidth * 9) / 16;
 
       setDimensions({ width: containerWidth, height: containerHeight });
