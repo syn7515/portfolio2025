@@ -104,7 +104,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           <Button variant="ghostNoBg" size="sm" asChild className="cursor-pointer w-fit inline-flex text-sm font-normal !text-stone-400 dark:text-zinc-400 hover:opacity-90 h-auto py-0 px-0">
             <Link href="/" className="flex items-center gap-2" aria-label="Back to home">
               <Undo2 className="size-4 flex-shrink-0" />
-              Back
+              Home
             </Link>
           </Button>
           <BlogPostToc />
