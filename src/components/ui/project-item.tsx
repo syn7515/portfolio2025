@@ -16,7 +16,7 @@ interface ProjectItemProps {
   imageSizePercent?: number;
   /** 'contain' = show full image (no crop); 'cover' = fill frame (may crop). Default: 'cover' */
   imageObjectFit?: 'cover' | 'contain';
-  initial?: { opacity: number; y: number };
+  initial?: { opacity: number; y: number } | false;
   animate?: { opacity: number; y: number };
   transition?: { duration: number; ease: [number, number, number, number]; delay?: number };
 }
@@ -30,7 +30,7 @@ export default function ProjectItem({
   imageObjectPosition = 'left top',
   imageSizePercent,
   imageObjectFit = 'cover',
-  initial = { opacity: 0, y: 20 },
+  initial,
   animate = { opacity: 1, y: 0 },
   transition = { duration: 0.1, ease: [0.25, 0.1, 0.25, 1] },
 }: ProjectItemProps) {
