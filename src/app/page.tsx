@@ -21,9 +21,9 @@ export default function Home() {
 
     <div className="font-sans grid grid-rows-[80px_1fr_20px] items-center justify-items-center min-h-screen pb-0 gap-1">
       <main className="w-full flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <div className="max-w-[512px] mx-auto px-4" style={{ paddingTop: 'clamp(40px, 10vh, 100px)' }}>
+        <div className="intro-container max-w-[512px] mx-auto px-4" style={{ paddingTop: 'clamp(40px, 10vh, 100px)' }}>
           <motion.div
-            className="flex justify-between items-center w-full"
+            className="intro-text flex justify-between items-center w-full"
             initial={shouldAnimate ? { opacity: 0, y: 20 } : false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
@@ -81,7 +81,7 @@ export default function Home() {
             </div>
           </motion.div>
           <motion.p
-            className="!text-stone-800 dark:!text-inherit !font-[420] mt-10 !mb-5"
+            className="intro-text !text-stone-800 dark:!text-inherit !font-[420] mt-10 !mb-5"
             initial={shouldAnimate ? { opacity: 0, y: 20 } : false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.08 }}
@@ -94,7 +94,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.16 }}
           >
-            Currently a founding product designer at <InlineLinkPreview href="https://www.aniai.ai/" imageUrl='https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/aniai.webp' explanation="A robotics startup specialized in kitchen automation">Aniai</InlineLinkPreview>, designing robots and tools behind them.
+            <span className="intro-text">Currently a founding product designer at </span><InlineLinkPreview href="https://www.aniai.ai/" imageUrl='https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/aniai.webp' explanation="A robotics startup specialized in kitchen automation">Aniai</InlineLinkPreview><span className="intro-text">, designing robots and tools behind them.</span>
           </motion.p>
           <motion.p
             className="!text-stone-500 dark:!text-zinc-400 !font-[420] mb-0"
@@ -102,7 +102,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.24 }}
           >
-            Previously, reimagined public benefits at <InlineLinkPreview href="https://goinvo.com/" variant="intro-link-light" imageUrl='https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/goinvo.jpg' explanation="A Boston studio crafting healthcare software for 20+ years">Goinvo</InlineLinkPreview> and advanced healthcare accessibility at <InlineLinkPreview href="https://www.athenahealth.com/" variant="intro-link-light" imageUrl="https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/athenahealth.jpeg" explanation='A healthtech company serving 170K+ clinicians across the US'>AthenaHealth</InlineLinkPreview>.
+            <span className="intro-text">Previously, reimagined public benefits at </span><InlineLinkPreview href="https://goinvo.com/" variant="intro-link-light" imageUrl='https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/goinvo.jpg' explanation="A Boston studio crafting healthcare software for 20+ years">Goinvo</InlineLinkPreview><span className="intro-text"> and advanced healthcare accessibility at </span><InlineLinkPreview href="https://www.athenahealth.com/" variant="intro-link-light" imageUrl="https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/athenahealth.jpeg" explanation='A healthtech company serving 170K+ clinicians across the US'>AthenaHealth</InlineLinkPreview><span className="intro-text">.</span>
           </motion.p>
         </div>
 

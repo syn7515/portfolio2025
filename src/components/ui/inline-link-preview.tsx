@@ -177,7 +177,7 @@ export function InlineLinkPreview({
 
   const previewBox = showCard ? (
     <div
-      className="fixed z-50 rounded-lg overflow-hidden bg-stone-900 dark:bg-zinc-900 shadow-lg pointer-events-none"
+      className="fixed z-50 overflow-hidden bg-stone-900 dark:bg-zinc-900 shadow-lg pointer-events-none"
       style={{
         left: boxStyle!.left,
         top: boxStyle!.top,
@@ -219,7 +219,7 @@ export function InlineLinkPreview({
               aria-hidden
             />
             <p
-              className="absolute bottom-0 left-0 right-0 pt-3 px-3 pb-0 text-sm font-normal leading-tight"
+              className="absolute bottom-0 left-0 right-0 pt-3 px-3 pb-0 text-xs font-normal leading-[1.15]"
               style={{ color: 'rgb(231 229 228)' }}
             >
               {explanation}

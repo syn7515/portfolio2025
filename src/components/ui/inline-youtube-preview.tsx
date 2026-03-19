@@ -130,7 +130,7 @@ export function InlineYoutubePreview({
   const previewBox =
     isHovered && boxStyle && typeof document !== 'undefined' ? (
       <div
-        className="fixed z-50 rounded-lg overflow-hidden bg-stone-900 dark:bg-zinc-900 shadow-lg pointer-events-none"
+        className="fixed z-50 overflow-hidden bg-stone-900 dark:bg-zinc-900 shadow-lg pointer-events-none"
         style={{
           left: boxStyle.left,
           top: boxStyle.top,

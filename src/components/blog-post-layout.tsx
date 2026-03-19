@@ -97,11 +97,11 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
     <TooltipProvider>
       {/* Fixed side nav: back + TOC; visible only on lg+ */}
       <aside
-        className="hidden lg:block fixed left-6 top-[7.5rem] z-50 pl-8"
+        className="hidden min-[1400px]:block fixed left-6 top-[7.5rem] z-50 pl-8"
         aria-label="Post navigation"
       >
         <div className="flex flex-col gap-6">
-          <Button variant="ghostNoBg" size="sm" asChild className="cursor-pointer w-fit inline-flex text-sm font-normal !text-stone-400 dark:text-zinc-400 hover:opacity-90 h-auto py-0 px-0">
+          <Button variant="ghostNoBg" size="sm" asChild className="cursor-pointer w-fit inline-flex text-sm font-normal !text-stone-400 dark:text-zinc-400 hover:opacity-90 h-auto py-0 px-0 !rounded-none">
             <Link href="/" className="flex items-center gap-2" aria-label="Back to home">
               <Undo2 className="size-4 flex-shrink-0" />
               Home
