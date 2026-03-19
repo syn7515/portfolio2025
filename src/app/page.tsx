@@ -26,7 +26,7 @@ export default function Home() {
             className="intro-text flex justify-between items-center w-full"
             initial={shouldAnimate ? { opacity: 0, y: 20 } : false}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.1, ease: [0.32, 0.72, 0, 1] }}
+            transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
           >
             <motion.p
               className="!text-stone-800 dark:!text-zinc-200 !mb-0 md:!mb-0 !font-medium !dark:!text-zinc-100"
@@ -84,7 +84,7 @@ export default function Home() {
             className="intro-text !text-stone-800 dark:!text-inherit !font-[420] mt-10 !mb-5"
             initial={shouldAnimate ? { opacity: 0, y: 20 } : false}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.1, ease: [0.32, 0.72, 0, 1], delay: 0.08 }}
+            transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.08 }}
           >
             Product designer with engineering mindset, obsessed with <span className="italic">why</span> behind everything — from systems to pixels.
           </motion.p>
@@ -92,7 +92,7 @@ export default function Home() {
             className="!text-stone-800 dark:!text-inherit !font-[420] !mb-5"
             initial={shouldAnimate ? { opacity: 0, y: 20 } : false}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.1, ease: [0.32, 0.72, 0, 1], delay: 0.16 }}
+            transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.16 }}
           >
             <span className="intro-text">Currently a founding product designer at </span><InlineLinkPreview href="https://www.aniai.ai/" imageUrl='https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/aniai.webp' explanation="A robotics startup specialized in kitchen automation">Aniai</InlineLinkPreview><span className="intro-text">, designing robots and tools behind them.</span>
           </motion.p>
@@ -100,7 +100,7 @@ export default function Home() {
             className="!text-stone-500 dark:!text-zinc-400 !font-[420] mb-0"
             initial={shouldAnimate ? { opacity: 0, y: 20 } : false}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.1, ease: [0.32, 0.72, 0, 1], delay: 0.24 }}
+            transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.24 }}
           >
             <span className="intro-text">Previously, reimagined public benefits at </span><InlineLinkPreview href="https://goinvo.com/" variant="intro-link-light" imageUrl='https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/goinvo.jpg' explanation="A Boston studio crafting healthcare software for 20+ years">Goinvo</InlineLinkPreview><span className="intro-text"> and advanced healthcare accessibility at </span><InlineLinkPreview href="https://www.athenahealth.com/" variant="intro-link-light" imageUrl="https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/athenahealth.jpeg" explanation='A healthtech company serving 170K+ clinicians across the US'>AthenaHealth</InlineLinkPreview><span className="intro-text">.</span>
           </motion.p>
@@ -116,7 +116,7 @@ export default function Home() {
               href="/aniai"
               initial={shouldAnimate ? { opacity: 0, y: 20 } : false}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.1, ease: [0.32, 0.72, 0, 1], delay: 0.4 }}
+              transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.4 }}
             />
             <ProjectItem
               imageUrl="https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/alphagrill-main.png"
@@ -129,7 +129,7 @@ export default function Home() {
               imageObjectFit="contain"
               initial={shouldAnimate ? { opacity: 0, y: 20 } : false}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.1, ease: [0.32, 0.72, 0, 1], delay: 0.44 }}
+              transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.44 }}
             />
             <ProjectItem
               imageUrl="https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/athenahealth-main.png"
@@ -139,7 +139,7 @@ export default function Home() {
               href="/athenahealth"
               initial={shouldAnimate ? { opacity: 0, y: 20 } : false}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.1, ease: [0.32, 0.72, 0, 1], delay: 0.48 }}
+              transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.48 }}
             />
           </div>
         </div>
@@ -148,7 +148,7 @@ export default function Home() {
           className="max-w-[480px] mx-auto px-4 mt-24 mb-0 text-center"
           initial={shouldAnimate ? { opacity: 0, y: 20 } : false}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.1, ease: [0.32, 0.72, 0, 1], delay: 0.56 }}
+          transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.56 }}
         >
           <div
             className="text-[14px] text-stone-400 dark:text-zinc-500 font-normal font-sans"
