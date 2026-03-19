@@ -272,10 +272,10 @@ export function Lightbox({
           {/* Background overlay with opacity */}
           <motion.div 
             initial={{ opacity: 0 }}
-            animate={{ opacity: 0.8 }}
+            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4, ease: [0.77, 0, 0.175, 1] }}
-            className="fixed inset-0 z-50 bg-black cursor-zoom-out" 
+            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-[1.5px] cursor-zoom-out"
             onClick={closeLightbox}
           />
           
