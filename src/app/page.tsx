@@ -69,7 +69,7 @@ export default function Home() {
               href="https://x.com/spark7515"
               target="_blank"
               rel="noopener noreferrer"
-              className="!text-stone-500 dark:!text-zinc-400 !no-underline !not-italic"
+              className="!text-stone-500 dark:!text-zinc-400 hover:!text-stone-700 dark:hover:!text-zinc-300 !no-underline !not-italic"
               style={{ fontSize: '14px' }}
             >
               Twitter
@@ -78,7 +78,7 @@ export default function Home() {
               href="https://www.linkedin.com/in/sooyeonp/"
               target="_blank"
               rel="noopener noreferrer"
-              className="!text-stone-500 dark:!text-zinc-400 !no-underline !not-italic"
+              className="!text-stone-500 dark:!text-zinc-400 hover:!text-stone-700 dark:hover:!text-zinc-300 !no-underline !not-italic"
               style={{ fontSize: '14px' }}
             >
               LinkedIn
