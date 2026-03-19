@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
+import { AnimatePresence, motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import type { OgResponse } from '@/app/api/og/route'
 
@@ -106,6 +107,14 @@ export function InlineLinkPreview({
   }, [])
 
   const handleMouseEnter = useCallback((e: React.MouseEvent) => {
+    const triggerEl = e.currentTarget as HTMLElement
+    const blogContent = triggerEl.closest('[data-blog-content]')
+    if (blogContent) {
+      const activeChild = Array.from(blogContent.children).find(child => child.contains(triggerEl))
+      Array.from(blogContent.children).forEach(child => {
+        if (child !== activeChild) child.setAttribute('data-dim', '')
+      })
+    }
     hoverDelayRef.current = setTimeout(() => {
       setIsHovered(true)
       setPos({ x: e.clientX, y: e.clientY })
@@ -119,6 +128,9 @@ export function InlineLinkPreview({
     }
     setIsHovered(false)
     setPos(null)
+    document.querySelectorAll('[data-blog-content] > [data-dim]').forEach(el => {
+      el.removeAttribute('data-dim')
+    })
   }, [])
 
   useEffect(() => {
@@ -173,62 +185,7 @@ export function InlineLinkPreview({
     return { left, top, width: PREVIEW_WIDTH, height: PREVIEW_HEIGHT }
   }, [pos])
 
-  const showCard = isHovered && boxStyle && hasImage && typeof document !== 'undefined'
-
-  const previewBox = showCard ? (
-    <div
-      className="fixed z-50 overflow-hidden bg-stone-900 dark:bg-zinc-900 shadow-lg pointer-events-none"
-      style={{
-        left: boxStyle!.left,
-        top: boxStyle!.top,
-        width: boxStyle!.width,
-        height: boxStyle!.height,
-      }}
-      aria-hidden
-    >
-      <div className="relative w-full h-full">
-        <img
-          ref={imgRef}
-          src={previewImageUrl!}
-          alt=""
-          crossOrigin="anonymous"
-          onLoad={handleImageLoad}
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-        <span
-          className={`absolute top-2 left-2 z-10 rounded-full bg-white/25 backdrop-blur-sm px-2.5 py-1 text-xs leading-tight truncate max-w-[90%] ${badgeTextDark ? 'text-stone-700' : 'text-stone-200'}`}
-        >
-          {new URL(href).hostname}
-        </span>
-        {explanation && (
-          <>
-            <div
-              className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent"
-              aria-hidden
-            />
-            <div
-              className="absolute inset-x-0 bottom-0 h-1/2 backdrop-blur-sm [mask-image:linear-gradient(to_top,black_0%,transparent_85%)]"
-              aria-hidden
-            />
-            <div
-              className="absolute inset-x-0 bottom-0 h-[45%] backdrop-blur-md [mask-image:linear-gradient(to_top,black_0%,transparent_75%)]"
-              aria-hidden
-            />
-            <div
-              className="absolute inset-x-0 bottom-0 h-[30%] backdrop-blur-xl [mask-image:linear-gradient(to_top,black_0%,transparent_65%)]"
-              aria-hidden
-            />
-            <p
-              className="absolute bottom-0 left-0 right-0 pt-3 px-3 pb-0 text-xs font-normal leading-[1.15]"
-              style={{ color: 'rgb(231 229 228)' }}
-            >
-              {explanation}
-            </p>
-          </>
-        )}
-      </div>
-    </div>
-  ) : null
+  const showCard = isHovered && boxStyle && hasImage
 
   return (
     <>
@@ -253,7 +210,71 @@ export function InlineLinkPreview({
       >
         {children}
       </a>
-      {previewBox && createPortal(previewBox, document.body)}
+      {typeof document !== 'undefined' && createPortal(
+        <AnimatePresence>
+          {showCard && (
+            <motion.div
+              key="preview"
+              className="fixed z-50 overflow-hidden bg-stone-900 dark:bg-zinc-900 shadow-lg pointer-events-none"
+              style={{
+                left: boxStyle!.left,
+                top: boxStyle!.top,
+                width: boxStyle!.width,
+                height: boxStyle!.height,
+                transformOrigin: 'top left',
+              }}
+              initial={{ opacity: 0.5, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.98, transition: { duration: 0 } }}
+              transition={{ duration: 0.18, ease: [0.32, 0.72, 0, 1] }}
+              aria-hidden
+            >
+              <div className="relative w-full h-full">
+                <img
+                  ref={imgRef}
+                  src={previewImageUrl!}
+                  alt=""
+                  crossOrigin="anonymous"
+                  onLoad={handleImageLoad}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                <span
+                  className={`absolute top-2 left-2 z-10 rounded-full bg-white/25 backdrop-blur-sm px-2.5 py-1 text-xs leading-tight truncate max-w-[90%] ${badgeTextDark ? 'text-stone-700' : 'text-stone-200'}`}
+                >
+                  {new URL(href).hostname}
+                </span>
+                {explanation && (
+                  <>
+                    <div
+                      className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent"
+                      aria-hidden
+                    />
+                    <div
+                      className="absolute inset-x-0 bottom-0 h-1/2 backdrop-blur-sm [mask-image:linear-gradient(to_top,black_0%,transparent_85%)]"
+                      aria-hidden
+                    />
+                    <div
+                      className="absolute inset-x-0 bottom-0 h-[45%] backdrop-blur-md [mask-image:linear-gradient(to_top,black_0%,transparent_75%)]"
+                      aria-hidden
+                    />
+                    <div
+                      className="absolute inset-x-0 bottom-0 h-[30%] backdrop-blur-xl [mask-image:linear-gradient(to_top,black_0%,transparent_65%)]"
+                      aria-hidden
+                    />
+                    <p
+                      className="absolute bottom-0 left-0 right-0 pt-3 px-3 pb-0 text-xs font-normal leading-[1.15]"
+                      style={{ color: 'rgb(231 229 228)' }}
+                    >
+                      {explanation}
+                    </p>
+                  </>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </>
   )
 }

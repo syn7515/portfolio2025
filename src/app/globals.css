@@ -653,11 +653,23 @@ a.inline-flex.items-center {
 }
 
 /* Dim other intro texts when hovering an inline link preview */
+.intro-text,
+[data-inline-link-preview-trigger] {
+  transition: opacity 180ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
 .intro-container:has([data-inline-link-preview-trigger]:hover) .intro-text {
   opacity: 0.4 !important;
-  transition: opacity 150ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 .intro-container:has([data-inline-link-preview-trigger]:hover) [data-inline-link-preview-trigger]:not(:hover) {
   opacity: 0.4 !important;
-  transition: opacity 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dim blog post content when hovering an inline preview trigger */
+[data-blog-content] > * {
+  transition: opacity 180ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+[data-blog-content] > [data-dim] {
+  opacity: 0.4 !important;
 }

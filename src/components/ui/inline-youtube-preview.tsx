@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
+import { AnimatePresence, motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
 const CURSOR_OFFSET = 12
@@ -75,6 +76,14 @@ export function InlineYoutubePreview({
   const embedUrl = buildEmbedUrl(videoId, start)
 
   const handleMouseEnter = useCallback((e: React.MouseEvent) => {
+    const triggerEl = e.currentTarget as HTMLElement
+    const blogContent = triggerEl.closest('[data-blog-content]')
+    if (blogContent) {
+      const activeChild = Array.from(blogContent.children).find(child => child.contains(triggerEl))
+      Array.from(blogContent.children).forEach(child => {
+        if (child !== activeChild) child.setAttribute('data-dim', '')
+      })
+    }
     hoverDelayRef.current = setTimeout(() => {
       setIsHovered(true)
       setPos({ x: e.clientX, y: e.clientY })
@@ -88,6 +97,9 @@ export function InlineYoutubePreview({
     }
     setIsHovered(false)
     setPos(null)
+    document.querySelectorAll('[data-blog-content] > [data-dim]').forEach(el => {
+      el.removeAttribute('data-dim')
+    })
   }, [])
 
   // Update position when hovered (mouse might move while over trigger)
@@ -127,27 +139,7 @@ export function InlineYoutubePreview({
     return { left, top, width: PREVIEW_WIDTH, height: PREVIEW_HEIGHT }
   }, [pos])
 
-  const previewBox =
-    isHovered && boxStyle && typeof document !== 'undefined' ? (
-      <div
-        className="fixed z-50 overflow-hidden bg-stone-900 dark:bg-zinc-900 shadow-lg pointer-events-none"
-        style={{
-          left: boxStyle.left,
-          top: boxStyle.top,
-          width: boxStyle.width,
-          height: boxStyle.height,
-        }}
-        aria-hidden
-      >
-        <iframe
-          src={embedUrl}
-          title="YouTube preview"
-          className="w-full h-full border-0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        />
-      </div>
-    ) : null
+  const showCard = isHovered && boxStyle
 
   return (
     <>
@@ -171,7 +163,37 @@ export function InlineYoutubePreview({
       >
         {children}
       </a>
-      {previewBox && createPortal(previewBox, document.body)}
+      {typeof document !== 'undefined' && createPortal(
+        <AnimatePresence>
+          {showCard && (
+            <motion.div
+              key="preview"
+              className="fixed z-50 overflow-hidden bg-stone-900 dark:bg-zinc-900 shadow-lg pointer-events-none"
+              style={{
+                left: boxStyle!.left,
+                top: boxStyle!.top,
+                width: boxStyle!.width,
+                height: boxStyle!.height,
+                transformOrigin: 'top left',
+              }}
+              initial={{ opacity: 0.5, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.98, transition: { duration: 0 } }}
+              transition={{ duration: 0.18, ease: [0.32, 0.72, 0, 1] }}
+              aria-hidden
+            >
+              <iframe
+                src={embedUrl}
+                title="YouTube preview"
+                className="w-full h-full border-0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </>
   )
 }
