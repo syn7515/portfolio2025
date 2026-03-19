@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
+import { AnimatePresence, motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import type { OgResponse } from '@/app/api/og/route'
 
@@ -176,14 +177,20 @@ export function InlineLinkPreview({
   const showCard = isHovered && boxStyle && hasImage && typeof document !== 'undefined'
 
   const previewBox = showCard ? (
-    <div
+    <motion.div
+      key="preview"
       className="fixed z-50 overflow-hidden bg-stone-900 dark:bg-zinc-900 shadow-lg pointer-events-none"
       style={{
         left: boxStyle!.left,
         top: boxStyle!.top,
         width: boxStyle!.width,
         height: boxStyle!.height,
+        transformOrigin: 'top left',
       }}
+      initial={{ opacity: 0, scale: 0.96 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.98, transition: { duration: 0.1 } }}
+      transition={{ duration: 0.18, ease: [0.32, 0.72, 0, 1] }}
       aria-hidden
     >
       <div className="relative w-full h-full">
@@ -227,7 +234,7 @@ export function InlineLinkPreview({
           </>
         )}
       </div>
-    </div>
+    </motion.div>
   ) : null
 
   return (
@@ -253,7 +260,10 @@ export function InlineLinkPreview({
       >
         {children}
       </a>
-      {previewBox && createPortal(previewBox, document.body)}
+      {typeof document !== 'undefined' && createPortal(
+        <AnimatePresence>{previewBox}</AnimatePresence>,
+        document.body
+      )}
     </>
   )
 }

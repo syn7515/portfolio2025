@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
+import { AnimatePresence, motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
 const CURSOR_OFFSET = 12
@@ -129,14 +130,20 @@ export function InlineYoutubePreview({
 
   const previewBox =
     isHovered && boxStyle && typeof document !== 'undefined' ? (
-      <div
+      <motion.div
+        key="preview"
         className="fixed z-50 overflow-hidden bg-stone-900 dark:bg-zinc-900 shadow-lg pointer-events-none"
         style={{
           left: boxStyle.left,
           top: boxStyle.top,
           width: boxStyle.width,
           height: boxStyle.height,
+          transformOrigin: 'top left',
         }}
+        initial={{ opacity: 0, scale: 0.96 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.98, transition: { duration: 0.1 } }}
+        transition={{ duration: 0.18, ease: [0.32, 0.72, 0, 1] }}
         aria-hidden
       >
         <iframe
@@ -146,7 +153,7 @@ export function InlineYoutubePreview({
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
         />
-      </div>
+      </motion.div>
     ) : null
 
   return (
@@ -171,7 +178,10 @@ export function InlineYoutubePreview({
       >
         {children}
       </a>
-      {previewBox && createPortal(previewBox, document.body)}
+      {typeof document !== 'undefined' && createPortal(
+        <AnimatePresence>{previewBox}</AnimatePresence>,
+        document.body
+      )}
     </>
   )
 }
