@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import type { OgResponse } from '@/app/api/og/route'
 
-const CURSOR_OFFSET = 12
+const BELOW_GAP = 12
 const PREVIEW_WIDTH = 320
 const PREVIEW_HEIGHT = 200
 const HOVER_DELAY_MS = 200
@@ -55,11 +55,12 @@ export function InlineLinkPreview({
   variant = 'intro-link',
 }: InlineLinkPreviewProps) {
   const [isHovered, setIsHovered] = useState(false)
-  const [pos, setPos] = useState<{ x: number; y: number } | null>(null)
+  const [anchorRect, setAnchorRect] = useState<DOMRect | null>(null)
   const [ogData, setOgData] = useState<OgResponse | null>(null)
   const [loading, setLoading] = useState(false)
   const [badgeTextDark, setBadgeTextDark] = useState(true)
   const hoverDelayRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const anchorRef = useRef<HTMLAnchorElement>(null)
   const imgRef = useRef<HTMLImageElement>(null)
 
   const previewImageUrl = imageUrlProp ?? ogData?.image ?? null
@@ -106,10 +107,15 @@ export function InlineLinkPreview({
     el.style.setProperty('font-style', 'italic', 'important')
   }, [])
 
-  const handleMouseEnter = useCallback((e: React.MouseEvent) => {
+  const setAnchorRef = useCallback((el: HTMLAnchorElement | null) => {
+    anchorRef.current = el
+    applyTriggerStyles(el)
+  }, [applyTriggerStyles])
+
+  const handleMouseEnter = useCallback(() => {
     hoverDelayRef.current = setTimeout(() => {
       setIsHovered(true)
-      setPos({ x: e.clientX, y: e.clientY })
+      setAnchorRect(anchorRef.current?.getBoundingClientRect() ?? null)
     }, HOVER_DELAY_MS)
   }, [])
 
@@ -119,7 +125,7 @@ export function InlineLinkPreview({
       hoverDelayRef.current = null
     }
     setIsHovered(false)
-    setPos(null)
+    setAnchorRect(null)
   }, [])
 
   useEffect(() => {
@@ -137,13 +143,6 @@ export function InlineLinkPreview({
       cancelled = true
     }
   }, [isHovered, href, imageUrlProp])
-
-  useEffect(() => {
-    if (!isHovered) return
-    const onMove = (e: MouseEvent) => setPos({ x: e.clientX, y: e.clientY })
-    window.addEventListener('mousemove', onMove)
-    return () => window.removeEventListener('mousemove', onMove)
-  }, [isHovered])
 
   const handleClick = useCallback(
     (e: React.MouseEvent) => {
@@ -164,15 +163,12 @@ export function InlineLinkPreview({
   )
 
   const boxStyle = React.useMemo(() => {
-    if (!pos) return undefined
-    const { left, top } = clampPosition(
-      pos.x + CURSOR_OFFSET,
-      pos.y + CURSOR_OFFSET,
-      PREVIEW_WIDTH,
-      PREVIEW_HEIGHT
-    )
-    return { left, top, width: PREVIEW_WIDTH, height: PREVIEW_HEIGHT }
-  }, [pos])
+    if (!anchorRect) return undefined
+    const left = anchorRect.left + anchorRect.width / 2 - PREVIEW_WIDTH / 2
+    const top = anchorRect.bottom + BELOW_GAP
+    const { left: clampedLeft, top: clampedTop } = clampPosition(left, top, PREVIEW_WIDTH, PREVIEW_HEIGHT)
+    return { left: clampedLeft, top: clampedTop, width: PREVIEW_WIDTH, height: PREVIEW_HEIGHT }
+  }, [anchorRect])
 
   const showCard = isHovered && boxStyle && hasImage && typeof document !== 'undefined'
 
@@ -185,7 +181,7 @@ export function InlineLinkPreview({
         top: boxStyle!.top,
         width: boxStyle!.width,
         height: boxStyle!.height,
-        transformOrigin: 'top left',
+        transformOrigin: 'top center',
       }}
       initial={{ opacity: 0, scale: 0.96 }}
       animate={{ opacity: 1, scale: 1 }}
@@ -240,7 +236,7 @@ export function InlineLinkPreview({
   return (
     <>
       <a
-        ref={applyTriggerStyles}
+        ref={setAnchorRef}
         data-inline-link-preview-trigger
         href={href}
         target="_blank"
