@@ -46,7 +46,8 @@ export function CarouselCard({
   captionStyle,
   transition
 }: CarouselCardProps) {
-  const { label, caption, imageUrl, videoUrl, alt, imageSizePercent, imagePosition, videoAutoplay, videoLoop, videoMuted, videoControls, cardVariant, backgroundLines } = item;
+  const { label, caption, imageUrl, videoUrl, alt, imageSizePercent, imagePosition, videoAutoplay, videoLoop, videoMuted, videoControls, cardVariant, backgroundLines, fetchPriority } = item;
+  const videoPreload = fetchPriority === 'high' ? 'auto' : 'metadata';
   const hasPositionedImage = imageSizePercent != null && imageUrl;
   const hasPositionedVideo = imageSizePercent != null && videoUrl;
   const hasVideo = !!videoUrl;
@@ -115,6 +116,7 @@ export function CarouselCard({
                       muted={videoMuted}
                       controls={videoControls}
                       playsInline
+                      preload={videoPreload}
                       style={{
                         height: `${imageSizePercent}%`,
                         width: "auto",
@@ -130,6 +132,7 @@ export function CarouselCard({
                       muted={videoMuted}
                       controls={videoControls}
                       playsInline
+                      preload={videoPreload}
                     />
                   )
                 )}
@@ -138,14 +141,15 @@ export function CarouselCard({
               <>
                 {hasVideo ? (
                   hasPositionedVideo ? (
-                  <video 
-                    src={videoUrl} 
+                  <video
+                    src={videoUrl}
                     className="absolute object-contain"
                     autoPlay={videoAutoplay}
                     loop={videoLoop}
                     muted={videoMuted}
                     controls={videoControls}
                     playsInline
+                    preload={videoPreload}
                     style={{
                       height: `${imageSizePercent}%`,
                       width: 'auto',
@@ -153,22 +157,24 @@ export function CarouselCard({
                     }}
                   />
                 ) : (
-                  <video 
-                    src={videoUrl} 
+                  <video
+                    src={videoUrl}
                     className="w-full h-full object-cover"
                     autoPlay={videoAutoplay}
                     loop={videoLoop}
                     muted={videoMuted}
                     controls={videoControls}
                     playsInline
+                    preload={videoPreload}
                   />
                 )
               ) : imageUrl ? (
                 hasPositionedImage ? (
-                  <img 
-                    src={imageUrl} 
+                  <img
+                    src={imageUrl}
                     alt={alt ?? label}
                     className="absolute object-contain"
+                    fetchPriority={fetchPriority}
                     style={{
                       height: `${imageSizePercent}%`,
                       width: 'auto',
@@ -176,10 +182,11 @@ export function CarouselCard({
                     }}
                   />
                 ) : (
-                  <img 
-                    src={imageUrl} 
+                  <img
+                    src={imageUrl}
                     alt={alt ?? label}
                     className="w-full h-full object-cover"
+                    fetchPriority={fetchPriority}
                   />
                 )
               ) : (

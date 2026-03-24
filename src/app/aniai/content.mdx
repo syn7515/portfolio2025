@@ -26,13 +26,14 @@ Testing requires firmware configured for specific test conditions. Creating this
       </div>
     )}
     items={[
-      { 
-        label: "Edit", 
+      {
+        label: "Edit",
         caption: "Fine-tuning robot behavior by editing key firmware parameters  <sup>1</sup>",
         imageUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/generator-4.png",
         videoUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/generator-demo.mov",
         imageSizePercent: 93,
-        imagePosition: { top: 8, left: 'center' }
+        imagePosition: { top: 8, left: 'center' },
+        fetchPriority: 'high'
       },
       { 
         label: "Create", 

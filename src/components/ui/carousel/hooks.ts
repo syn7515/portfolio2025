@@ -24,6 +24,7 @@ export type CarouselItem = {
   videoControls: boolean;
   cardVariant?: "default" | "with-background-lines";
   backgroundLines?: string;
+  fetchPriority?: 'high' | 'low' | 'auto';
 };
 
 type Normalizable =
@@ -44,6 +45,7 @@ const DEFAULT_ITEM: CarouselItem = {
   videoControls: false,
   cardVariant: "default",
   backgroundLines: undefined,
+  fetchPriority: 'auto',
 };
 
 export function normalizeItem(item: Normalizable): CarouselItem {
@@ -97,6 +99,10 @@ export function normalizeItem(item: Normalizable): CarouselItem {
             : "default",
         backgroundLines:
           typeof item.backgroundLines === "string" ? item.backgroundLines : undefined,
+        fetchPriority:
+          item.fetchPriority === 'high' || item.fetchPriority === 'low' || item.fetchPriority === 'auto'
+            ? item.fetchPriority
+            : 'auto',
       };
     }
 
