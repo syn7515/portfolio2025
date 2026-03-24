@@ -19,9 +19,10 @@ export default function Home() {
 
 
     <div className="font-sans grid grid-rows-[80px_1fr_20px] items-center justify-items-center min-h-screen pb-0 gap-1">
-      <main className="w-full flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
+      <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-4 focus:left-4 focus:px-4 focus:py-2 focus:bg-white focus:text-stone-800 focus:rounded focus:shadow">Skip to content</a>
+      <main id="main" className="w-full flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
         <div className="intro-container max-w-[512px] mx-auto px-4" style={{ paddingTop: 'clamp(40px, 10vh, 100px)' }}>
-          <motion.p
+          <motion.h1
             className="intro-text !text-stone-800 dark:!text-zinc-200 !mb-0 md:!mb-0 !font-medium !dark:!text-zinc-100"
             initial={shouldAnimate ? { opacity: 0, y: 20 } : false}
             animate={{ opacity: 1, y: 0 }}
@@ -34,7 +35,7 @@ export default function Home() {
             }}
           >
             Sue Park
-          </motion.p>
+          </motion.h1>
           <motion.p
             className="intro-text !text-stone-800 dark:!text-inherit !font-[420] mt-10 !mb-5"
             initial={shouldAnimate ? { opacity: 0, y: 20 } : false}
@@ -90,16 +91,19 @@ export default function Home() {
           <div className="grid gap-12 md:gap-20 lg:gap-28">
             <ProjectItem
               imageUrl="https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/aniai-main.png"
+              alt="Aniai internal tools dashboard"
               organization="Aniai"
               dates="2024-2025"
               description="Building the Tools Behind Smarter Robots"
               href="/aniai"
+              fetchPriority="high"
               initial={shouldAnimate ? { opacity: 0, y: 20 } : false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.4 }}
             />
             <ProjectItem
               imageUrl="https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/alphagrill-main.png"
+              alt="AlphaGrill robot interface for kitchen collaboration"
               organization="Aniai"
               dates="2025-2026"
               description="Robot Interface for Collaboration in Kitchen"
@@ -107,16 +111,19 @@ export default function Home() {
               imageObjectPosition="center center"
               imageSizePercent={85}
               imageObjectFit="contain"
+              loading="lazy"
               initial={shouldAnimate ? { opacity: 0, y: 20 } : false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.44 }}
             />
             <ProjectItem
               imageUrl="https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/athenahealth-main.png"
+              alt="AthenaHealth bill payment prompt interface"
               organization="AthenaHealth"
               dates="2023"
               description="Encouraging Prompt Bill Payment"
               href="/athenahealth"
+              loading="lazy"
               initial={shouldAnimate ? { opacity: 0, y: 20 } : false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.48 }}

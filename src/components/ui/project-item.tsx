@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 
 interface ProjectItemProps {
   imageUrl: string;
+  alt: string;
   organization: string;
   dates: string;
   description: string;
@@ -16,6 +17,8 @@ interface ProjectItemProps {
   imageSizePercent?: number;
   /** 'contain' = show full image (no crop); 'cover' = fill frame (may crop). Default: 'cover' */
   imageObjectFit?: 'cover' | 'contain';
+  loading?: 'lazy' | 'eager';
+  fetchPriority?: 'high' | 'low' | 'auto';
   initial?: { opacity: number; y: number } | false;
   animate?: { opacity: number; y: number };
   transition?: { duration: number; ease: [number, number, number, number]; delay?: number };
@@ -23,6 +26,7 @@ interface ProjectItemProps {
 
 export default function ProjectItem({
   imageUrl,
+  alt,
   organization,
   dates,
   description,
@@ -30,6 +34,8 @@ export default function ProjectItem({
   imageObjectPosition = 'left top',
   imageSizePercent,
   imageObjectFit = 'cover',
+  loading = 'eager',
+  fetchPriority = 'auto',
   initial,
   animate = { opacity: 1, y: 0 },
   transition = { duration: 0.1, ease: [0.25, 0.1, 0.25, 1] },
@@ -84,8 +90,10 @@ export default function ProjectItem({
         <div className="relative w-full aspect-video bg-stone-200/50 dark:bg-zinc-800/70 dark:group-hover:bg-zinc-800 group-hover:bg-stone-200 transition-colors duration-300 ease-out overflow-hidden">
           <img
             src={imageUrl}
-            alt={`${organization} project screenshot`}
+            alt={alt}
             className="absolute"
+            loading={loading}
+            fetchPriority={fetchPriority}
             style={{
               left: `${inset}%`,
               top: `${inset}%`,
@@ -109,9 +117,9 @@ export default function ProjectItem({
           <div className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic font-sans !font-[420]">
             {organization} · <span>{dates}</span>
           </div>
-          <p className="mt-0.5 not-italic !text-stone-800 dark:!text-zinc-200 !font-[420]">
+          <h2 className="!text-base !font-[420] !mt-0.5 !mb-0 not-italic !text-stone-800 dark:!text-zinc-200 leading-normal">
             {description}
-          </p>
+          </h2>
         </div>
       </Link>
     </motion.div>

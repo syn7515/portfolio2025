@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Geist, Geist_Mono, Libre_Caslon_Text } from "next/font/google";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/react";
@@ -25,6 +25,13 @@ const libreCaslonText = Libre_Caslon_Text({
   subsets: ["latin"],
   variable: "--font-libre-caslon",
 });
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#18181b' },
+  ],
+};
 
 export const metadata: Metadata = {
   title: "Sue Park",
@@ -65,6 +72,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <link rel="preconnect" href="https://f5uskgwhyu2fi170.public.blob.vercel-storage.com" />
       {/* Google tag (gtag.js) */}
       <Script
         src="https://www.googletagmanager.com/gtag/js?id=G-BBV28P3EE7"

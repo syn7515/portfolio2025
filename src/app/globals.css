@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  color-scheme: light dark;
   --background: #ffffff;
   --foreground: #171717;
   --intro-trigger-decoration: rgb(212 212 216); /* stone-300 - underline color for intro/link preview triggers */
