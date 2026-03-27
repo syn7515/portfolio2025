@@ -31,6 +31,7 @@ export const viewport: Viewport = {
     { media: '(prefers-color-scheme: light)', color: '#ffffff' },
     { media: '(prefers-color-scheme: dark)', color: '#18181b' },
   ],
+  colorScheme: 'light dark',
 };
 
 export const metadata: Metadata = {
@@ -107,6 +108,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       <body
         className={`${inter.variable} ${geistSans.variable} ${geistMono.variable} ${libreCaslonText.variable} antialiased`}
       >
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){function setTC(){var d=window.matchMedia('(prefers-color-scheme: dark)').matches;var m=document.querySelector('meta[name="theme-color"][data-d]');if(!m){m=document.createElement('meta');m.name='theme-color';m.setAttribute('data-d','');document.head.appendChild(m);}m.content=d?'#18181b':'#ffffff';}setTC();window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',setTC);})();`,
+          }}
+        />
         {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe

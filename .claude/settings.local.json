@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(grep -r \"color-scheme\\\\|darkMode\\\\|dark:\\\\|prefers-color-scheme\" /Users/sooyeon/Documents/GitHub/portfolio2025 --include=*.tsx --include=*.ts --include=*.css --include=*.json --include=*.js)"
     ]
   }
 }
