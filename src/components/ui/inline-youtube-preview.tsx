@@ -133,12 +133,11 @@ export function InlineYoutubePreview({
           top: boxStyle.top,
           width: boxStyle.width,
           height: boxStyle.height,
-          transformOrigin: 'top center',
         }}
-        initial={{ opacity: 0, scale: 0.96 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.98, transition: { duration: 0.1 } }}
-        transition={{ duration: 0.18, ease: [0.32, 0.72, 0, 1] }}
+        initial={{ opacity: 0, y: -8, filter: "blur(2px)" }}
+        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+        exit={{ opacity: 0, y: -4, filter: "blur(2px)" }}
+        transition={{ type: "spring", duration: 0.2, bounce: 0 }}
         aria-hidden
       >
         <iframe

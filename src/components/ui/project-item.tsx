@@ -19,8 +19,8 @@ interface ProjectItemProps {
   imageObjectFit?: 'cover' | 'contain';
   loading?: 'lazy' | 'eager';
   fetchPriority?: 'high' | 'low' | 'auto';
-  initial?: { opacity: number; y: number } | false;
-  animate?: { opacity: number; y: number };
+  initial?: { opacity: number; y: number; filter?: string } | false;
+  animate?: { opacity: number; y: number; filter?: string };
   transition?: { duration: number; ease: [number, number, number, number]; delay?: number };
 }
 

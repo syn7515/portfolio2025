@@ -7,9 +7,6 @@ import { cn } from '@/lib/utils'
 import type { OgResponse } from '@/app/api/og/route'
 
 const BELOW_GAP = 12
-const SKIP_ANIMATION_MS = 1200
-
-let lastPreviewClosedAt = 0
 const PREVIEW_WIDTH = 320
 const PREVIEW_HEIGHT = 200
 const HOVER_DELAY_MS = 200
@@ -58,7 +55,6 @@ export function InlineLinkPreview({
   variant = 'intro-link',
 }: InlineLinkPreviewProps) {
   const [isHovered, setIsHovered] = useState(false)
-  const [skipAnimation, setSkipAnimation] = useState(false)
   const [anchorRect, setAnchorRect] = useState<DOMRect | null>(null)
   const [ogData, setOgData] = useState<OgResponse | null>(null)
   const [loading, setLoading] = useState(false)
@@ -118,7 +114,6 @@ export function InlineLinkPreview({
 
   const handleMouseEnter = useCallback(() => {
     hoverDelayRef.current = setTimeout(() => {
-      setSkipAnimation(Date.now() - lastPreviewClosedAt < SKIP_ANIMATION_MS)
       setIsHovered(true)
       setAnchorRect(anchorRef.current?.getBoundingClientRect() ?? null)
     }, HOVER_DELAY_MS)
@@ -129,7 +124,6 @@ export function InlineLinkPreview({
       clearTimeout(hoverDelayRef.current)
       hoverDelayRef.current = null
     }
-    lastPreviewClosedAt = Date.now()
     setIsHovered(false)
     setAnchorRect(null)
   }, [])
@@ -187,12 +181,11 @@ export function InlineLinkPreview({
         top: boxStyle!.top,
         width: boxStyle!.width,
         height: boxStyle!.height,
-        transformOrigin: 'top center',
       }}
-      initial={skipAnimation ? false : { opacity: 0, scale: 0.96 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.98, transition: { duration: 0.1 } }}
-      transition={skipAnimation ? { duration: 0 } : { duration: 0.18, ease: [0.32, 0.72, 0, 1] }}
+      initial={{ opacity: 0, y: -8, filter: "blur(2px)" }}
+      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      exit={{ opacity: 0, y: -4, filter: "blur(2px)" }}
+      transition={{ type: "spring", duration: 0.2, bounce: 0 }}
       aria-hidden
     >
       <div className="relative w-full h-full">
