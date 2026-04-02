@@ -97,10 +97,24 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
     <TooltipProvider>
       {/* Fixed side nav: back + TOC; visible only on lg+ */}
       <aside
-        className="hidden min-[1400px]:block fixed left-6 top-[7.5rem] z-50 pl-8"
+        className="hidden min-[1400px]:block fixed left-0 top-0 bottom-0 z-50 pointer-events-none"
         aria-label="Post navigation"
       >
-        <div className="flex flex-col gap-6">
+        {/* Background layer at 10% opacity */}
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(to right, var(--gradient-bg) 25%, var(--gradient-transparent))',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            maskImage: 'linear-gradient(to right, #000 50%, transparent)',
+            WebkitMaskImage: 'linear-gradient(to right, #000 50%, transparent)',
+            opacity: 0.1,
+          }}
+        />
+        <div className="relative flex flex-col gap-6 pt-[7.5rem] pl-14 pointer-events-auto">
           <Button variant="ghostNoBg" size="sm" asChild className="cursor-pointer w-fit inline-flex text-sm font-normal !text-stone-400 dark:text-zinc-400 hover:opacity-90 h-auto py-0 px-0 !rounded-none">
             <Link href="/" className="flex items-center gap-2" aria-label="Back to home">
               <Undo2 className="size-4 flex-shrink-0" />
@@ -143,7 +157,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                     >
                       <span className="relative inline-flex items-center">
                         <ArrowLeft
-                          className="absolute left-0 size-3.5 text-current opacity-0 motion-safe:transition-opacity motion-safe:duration-300 motion-safe:ease-out group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:opacity-100"
+                          className="absolute left-0 size-3.5 text-current opacity-0 blur-[1px] motion-safe:transition-[opacity,filter] motion-safe:duration-300 motion-safe:ease-out group-hover:opacity-100 group-hover:blur-none group-focus-visible:opacity-100 group-focus-visible:blur-none motion-reduce:opacity-100 motion-reduce:blur-none"
                           aria-hidden
                         />
                         <span className="relative z-10 motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out group-hover:translate-x-4 group-focus-visible:translate-x-4 motion-reduce:translate-x-0">
@@ -173,7 +187,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                     >
                       <span className="relative inline-flex items-center justify-end">
                         <ArrowRight
-                          className="absolute right-0 size-3.5 text-current opacity-0 motion-safe:transition-opacity motion-safe:duration-300 motion-safe:ease-out group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:opacity-100"
+                          className="absolute right-0 size-3.5 text-current opacity-0 blur-[1px] motion-safe:transition-[opacity,filter] motion-safe:duration-300 motion-safe:ease-out group-hover:opacity-100 group-hover:blur-none group-focus-visible:opacity-100 group-focus-visible:blur-none motion-reduce:opacity-100 motion-reduce:blur-none"
                           aria-hidden
                         />
                         <span className="relative z-10 motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out group-hover:-translate-x-4 group-focus-visible:-translate-x-4 motion-reduce:translate-x-0">

@@ -3,7 +3,8 @@
     "allow": [
       "Bash(git reset:*)",
       "Bash(grep -r \"color-scheme\\\\|darkMode\\\\|dark:\\\\|prefers-color-scheme\" /Users/sooyeon/Documents/GitHub/portfolio2025 --include=*.tsx --include=*.ts --include=*.css --include=*.json --include=*.js)",
-      "Bash(xargs -I{} sh -c 'echo \"=== {} ===\"; git show {}:package.json 2>/dev/null | grep framer')"
+      "Bash(xargs -I{} sh -c 'echo \"=== {} ===\"; git show {}:package.json 2>/dev/null | grep framer')",
+      "WebFetch(domain:www.csim.me)"
     ]
   }
 }

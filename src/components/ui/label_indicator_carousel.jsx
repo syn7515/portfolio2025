@@ -311,6 +311,7 @@ export default function LabelIndicatorCarousel({
     body.style.top = `-${scrollY}px`;
     body.style.width = '100%';
     body.style.overflow = 'hidden';
+    document.documentElement.setAttribute('data-lightbox-open', '');
     
     // Step 5: Open lightbox with pre-calculated transform
     setInitialTransform(transform);
@@ -348,6 +349,7 @@ export default function LabelIndicatorCarousel({
           body.style.top = '';
           body.style.width = '';
           body.style.overflow = '';
+          document.documentElement.removeAttribute('data-lightbox-open');
           window.scrollTo(0, savedScrollY);
         }, animationDuration);
       };

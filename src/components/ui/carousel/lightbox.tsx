@@ -309,11 +309,11 @@ export function Lightbox({
                   return (
                     <motion.div
                       className="absolute left-0 right-0 top-full mt-4 text-center font-sans text-xs !text-white sm:text-sm"
-                      initial={{ opacity: 0, scale: 0.9 }}
+                      initial={{ opacity: 0, filter: 'blur(2px)' }}
                       animate={
                         exitTransform
-                          ? { opacity: 0, scale: 0.95 }
-                          : { opacity: 1, scale: 1 }
+                          ? { opacity: 0, filter: 'blur(2px)' }
+                          : { opacity: 1, filter: 'blur(0px)' }
                       }
                       transition={{
                         duration: exitTransform ? exitDuration : 0.4,
