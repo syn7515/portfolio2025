@@ -175,7 +175,7 @@ export function InlineLinkPreview({
   const previewBox = showCard ? (
     <motion.div
       key="preview"
-      className="fixed z-50 overflow-hidden bg-stone-900 dark:bg-zinc-900 shadow-lg pointer-events-none"
+      className="fixed z-50 overflow-hidden bg-stone-900 dark:bg-zinc-900 pointer-events-none shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1),_0_4px_6px_-2px_rgba(0,0,0,0.05),_0_0_0_1px_rgba(0,0,0,0.06)] dark:shadow-[0_10px_15px_-3px_rgba(0,0,0,0.3),_0_4px_6px_-2px_rgba(0,0,0,0.2),_0_0_0_1px_rgba(255,255,255,0.06)]"
       style={{
         left: boxStyle!.left,
         top: boxStyle!.top,
