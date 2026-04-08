@@ -57,7 +57,6 @@ export function InlineLinkPreview({
   const [isHovered, setIsHovered] = useState(false)
   const [anchorRect, setAnchorRect] = useState<DOMRect | null>(null)
   const [ogData, setOgData] = useState<OgResponse | null>(null)
-  const [loading, setLoading] = useState(false)
   const [badgeTextDark, setBadgeTextDark] = useState(true)
   const hoverDelayRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const anchorRef = useRef<HTMLAnchorElement>(null)
@@ -128,21 +127,22 @@ export function InlineLinkPreview({
     setAnchorRect(null)
   }, [])
 
+  // Eagerly fetch OG data on mount so the image is ready before hover
   useEffect(() => {
-    if (!isHovered || imageUrlProp != null) return
+    if (imageUrlProp != null) return
     let cancelled = false
-    setLoading(true)
-    fetchOg(href)
-      .then((data) => {
-        if (!cancelled) setOgData(data)
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [isHovered, href, imageUrlProp])
+    fetchOg(href).then((data) => {
+      if (!cancelled) setOgData(data)
+    })
+    return () => { cancelled = true }
+  }, [href, imageUrlProp])
+
+  // Preload the image into the browser cache as soon as the URL is known
+  useEffect(() => {
+    if (!previewImageUrl) return
+    const img = new window.Image()
+    img.src = previewImageUrl
+  }, [previewImageUrl])
 
   const handleClick = useCallback(
     (e: React.MouseEvent) => {
