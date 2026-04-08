@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import ProjectItem from '@/components/ui/project-item';
 import InlineLinkPreview from '@/components/ui/inline-link-preview';
@@ -10,10 +10,16 @@ let hasVisitedHome = false;
 
 export default function Home() {
   const shouldAnimate = !hasVisitedHome;
+  const [animationReady, setAnimationReady] = useState(false);
 
   useEffect(() => {
     hasVisitedHome = true;
+    setAnimationReady(true);
   }, []);
+
+  const animateVisible = { opacity: 1, y: 0, filter: "blur(0px)" };
+  const animateHidden = { opacity: 0, y: 20, filter: "blur(1.5px)" };
+  const getAnimate = () => (!shouldAnimate || animationReady ? animateVisible : animateHidden);
 
   return (
 
@@ -25,7 +31,7 @@ export default function Home() {
           <motion.h1
             className="intro-text !text-stone-800 dark:!text-zinc-200 !mb-0 md:!mb-0 !font-medium !dark:!text-zinc-100"
             initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
-            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            animate={getAnimate()}
             transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
             style={{
               fontFamily: 'var(--font-libre-caslon), serif',
@@ -39,7 +45,7 @@ export default function Home() {
           <motion.p
             className="intro-text !text-stone-800 dark:!text-inherit !font-[420] mt-10 !mb-5"
             initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
-            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            animate={getAnimate()}
             transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.08 }}
           >
             Product designer with engineering mindset, obsessed with <span className="italic">why</span> behind everything — from systems to pixels.
@@ -47,7 +53,7 @@ export default function Home() {
           <motion.p
             className="!text-stone-800 dark:!text-inherit !font-[420] !mb-5"
             initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
-            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            animate={getAnimate()}
             transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.16 }}
           >
             <span className="intro-text">Currently a founding product designer at </span><InlineLinkPreview href="https://www.aniai.ai/" imageUrl='https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/aniai.webp' explanation="A robotics startup specialized in kitchen automation">Aniai</InlineLinkPreview><span className="intro-text">, designing robots and tools behind them.</span>
@@ -55,7 +61,7 @@ export default function Home() {
           <motion.p
             className="!text-stone-500 dark:!text-zinc-400 !font-[420] mb-0"
             initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
-            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            animate={getAnimate()}
             transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.24 }}
           >
             <span className="intro-text">Previously, reimagined public benefits at </span><InlineLinkPreview href="https://goinvo.com/" variant="intro-link-light" imageUrl='https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/goinvo.jpg' explanation="A Boston design studio crafting healthcare software for 20+ years">Goinvo</InlineLinkPreview><span className="intro-text"> and advanced healthcare accessibility at </span><InlineLinkPreview href="https://www.athenahealth.com/" variant="intro-link-light" imageUrl="https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/athenahealth.jpeg" explanation='A healthtech company serving 170K+ clinicians across the US'>AthenaHealth</InlineLinkPreview><span className="intro-text">.</span>
@@ -63,7 +69,7 @@ export default function Home() {
           <motion.div
             className="intro-text flex gap-4 mt-6"
             initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
-            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            animate={getAnimate()}
             transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.32 }}
           >
             <a
@@ -98,7 +104,7 @@ export default function Home() {
               href="/aniai"
               fetchPriority="high"
               initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              animate={getAnimate()}
               transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.4 }}
             />
             <ProjectItem
@@ -113,7 +119,7 @@ export default function Home() {
               imageObjectFit="contain"
               loading="lazy"
               initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              animate={getAnimate()}
               transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.44 }}
             />
             <ProjectItem
@@ -125,7 +131,7 @@ export default function Home() {
               href="/athenahealth"
               loading="lazy"
               initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              animate={getAnimate()}
               transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.48 }}
             />
           </div>
@@ -134,7 +140,7 @@ export default function Home() {
         <motion.div
           className="max-w-[480px] mx-auto px-4 mt-24 mb-0 text-center"
           initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          animate={getAnimate()}
           transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.56 }}
         >
           <div

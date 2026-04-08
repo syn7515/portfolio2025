@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useCallback, useRef } from 'react'
+import React, { useState, useCallback, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
@@ -9,6 +9,7 @@ const BELOW_GAP = 12
 const PREVIEW_WIDTH = 320
 const PREVIEW_HEIGHT = 180
 const HOVER_DELAY_MS = 200
+const MIN_SHIMMER_MS = 800
 
 interface InlineYoutubePreviewProps {
   videoId: string
@@ -17,20 +18,6 @@ interface InlineYoutubePreviewProps {
   className?: string
 }
 
-function buildEmbedUrl(videoId: string, start?: number): string {
-  const params = new URLSearchParams({
-    autoplay: '1',
-    mute: '1',
-    controls: '0', // hide video control bar
-    modestbranding: '1', // minimize YouTube logo
-    rel: '0', // related videos from same channel only
-    iv_load_policy: '3', // hide annotations
-    disablekb: '1', // disable keyboard controls in embed
-    fs: '0', // hide fullscreen button
-  })
-  if (start != null && start > 0) params.set('start', String(start))
-  return `https://www.youtube.com/embed/${videoId}?${params.toString()}`
-}
 
 function buildWatchUrl(videoId: string, start?: number): string {
   const base = `https://www.youtube.com/watch?v=${videoId}`
@@ -52,6 +39,21 @@ function clampPosition(
   }
 }
 
+function buildEmbedUrl(videoId: string, start?: number): string {
+  const params = new URLSearchParams({
+    autoplay: '1',
+    mute: '1',
+    controls: '0',
+    modestbranding: '1',
+    rel: '0',
+    iv_load_policy: '3',
+    disablekb: '1',
+    fs: '0',
+  })
+  if (start != null && start > 0) params.set('start', String(start))
+  return `https://www.youtube.com/embed/${videoId}?${params.toString()}`
+}
+
 export function InlineYoutubePreview({
   videoId,
   start,
@@ -59,9 +61,11 @@ export function InlineYoutubePreview({
   className,
 }: InlineYoutubePreviewProps) {
   const [isHovered, setIsHovered] = useState(false)
+  const [iframeReady, setIframeReady] = useState(false)
   const [anchorRect, setAnchorRect] = useState<DOMRect | null>(null)
   const hoverDelayRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const anchorRef = useRef<HTMLAnchorElement>(null)
+  const hoverStartRef = useRef<number>(0)
 
   const applyTriggerStyles = useCallback((el: HTMLAnchorElement | null) => {
     if (!el) return
@@ -81,8 +85,10 @@ export function InlineYoutubePreview({
   const watchUrl = buildWatchUrl(videoId, start)
   const embedUrl = buildEmbedUrl(videoId, start)
 
+
   const handleMouseEnter = useCallback(() => {
     hoverDelayRef.current = setTimeout(() => {
+      hoverStartRef.current = Date.now()
       setIsHovered(true)
       setAnchorRect(anchorRef.current?.getBoundingClientRect() ?? null)
     }, HOVER_DELAY_MS)
@@ -94,6 +100,7 @@ export function InlineYoutubePreview({
       hoverDelayRef.current = null
     }
     setIsHovered(false)
+    setIframeReady(false)
     setAnchorRect(null)
   }, [])
 
@@ -140,12 +147,24 @@ export function InlineYoutubePreview({
         transition={{ type: "spring", duration: 0.2, bounce: 0 }}
         aria-hidden
       >
+        {/* Shimmer skeleton shown while iframe loads */}
+        {!iframeReady && (
+          <div className="absolute inset-0 bg-stone-800 dark:bg-zinc-800 overflow-hidden">
+            <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.4s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+          </div>
+        )}
         <iframe
           src={embedUrl}
           title="YouTube preview"
-          className="w-full h-full border-0"
+          className="absolute inset-0 w-full h-full border-0 transition-opacity duration-300"
+          style={{ opacity: iframeReady ? 1 : 0 }}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
+          onLoad={() => {
+            const elapsed = Date.now() - hoverStartRef.current
+            const remaining = Math.max(0, MIN_SHIMMER_MS - elapsed)
+            setTimeout(() => setIframeReady(true), remaining)
+          }}
         />
       </motion.div>
     ) : null

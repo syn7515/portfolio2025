@@ -1,6 +1,6 @@
 "use client"
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight, Undo2 } from 'lucide-react'
 import { motion } from 'framer-motion'
@@ -90,8 +90,12 @@ function preventWidow(text: string): React.ReactNode {
 }
 
 export default function BlogPostLayout({ children, slug, title, subtitle }: BlogPostLayoutProps) {
-  // Get project navigation
   const { previousProject, nextProject } = getProjectNavigation(slug)
+  const [animationReady, setAnimationReady] = useState(false)
+
+  useEffect(() => {
+    setAnimationReady(true)
+  }, [])
 
   return (
     <TooltipProvider>
@@ -128,7 +132,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
       <div className="w-full overflow-x-clip px-4 pt-12 sm:pt-20 lg:pt-[7.5rem]">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          animate={animationReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
         >
           {/* Header: title, subtitle, like/copy */}
