@@ -3,6 +3,7 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
+import { ExternalLink } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { OgResponse } from '@/app/api/og/route'
 
@@ -198,9 +199,9 @@ export function InlineLinkPreview({
           className="absolute inset-0 w-full h-full object-cover"
         />
         <span
-          className={`absolute top-2 left-2 z-10 rounded-full bg-white/25 backdrop-blur-sm px-2.5 py-1 text-xs leading-tight truncate max-w-[90%] ${badgeTextDark ? 'text-stone-700' : 'text-stone-200'}`}
+          className={`absolute top-2 right-2 z-10 rounded-full bg-white/25 backdrop-blur-sm p-2.5 ${badgeTextDark ? 'text-stone-700' : 'text-stone-200'}`}
         >
-          {new URL(href).hostname}
+          <ExternalLink size={14} strokeWidth={2} />
         </span>
         {explanation && (
           <>
