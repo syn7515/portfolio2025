@@ -2,6 +2,7 @@
 "use client"
 
 import type { CSSProperties, ReactNode } from "react";
+import { useState, useEffect } from "react";
 import { motion, type Transition } from "framer-motion";
 import { calculateImagePosition, type CarouselItem } from "./hooks";
 import { GrillLines } from "./grill-lines";
@@ -48,6 +49,15 @@ export function CarouselCard({
 }: CarouselCardProps) {
   const { label, caption, imageUrl, videoUrl, alt, imageSizePercent, imagePosition, videoAutoplay, videoLoop, videoMuted, videoControls, cardVariant, backgroundLines, fetchPriority } = item;
   const videoPreload = fetchPriority === 'high' ? 'auto' : 'metadata';
+  const hasMedia = !!(imageUrl || videoUrl);
+  const [isMediaLoading, setIsMediaLoading] = useState(hasMedia);
+
+  useEffect(() => {
+    if (imageUrl || videoUrl) {
+      setIsMediaLoading(true);
+    }
+  }, [imageUrl, videoUrl]);
+
   const hasPositionedImage = imageSizePercent != null && imageUrl;
   const hasPositionedVideo = imageSizePercent != null && videoUrl;
   const hasVideo = !!videoUrl;
@@ -117,6 +127,7 @@ export function CarouselCard({
                       controls={videoControls}
                       playsInline
                       preload={videoPreload}
+                      onCanPlay={() => setIsMediaLoading(false)}
                       style={{
                         height: `${imageSizePercent}%`,
                         width: "auto",
@@ -133,6 +144,7 @@ export function CarouselCard({
                       controls={videoControls}
                       playsInline
                       preload={videoPreload}
+                      onCanPlay={() => setIsMediaLoading(false)}
                     />
                   )
                 )}
@@ -150,6 +162,7 @@ export function CarouselCard({
                     controls={videoControls}
                     playsInline
                     preload={videoPreload}
+                    onCanPlay={() => setIsMediaLoading(false)}
                     style={{
                       height: `${imageSizePercent}%`,
                       width: 'auto',
@@ -166,6 +179,7 @@ export function CarouselCard({
                     controls={videoControls}
                     playsInline
                     preload={videoPreload}
+                    onCanPlay={() => setIsMediaLoading(false)}
                   />
                 )
               ) : imageUrl ? (
@@ -175,6 +189,7 @@ export function CarouselCard({
                     alt={alt ?? label}
                     className="absolute object-contain"
                     fetchPriority={fetchPriority}
+                    onLoad={() => setIsMediaLoading(false)}
                     style={{
                       height: `${imageSizePercent}%`,
                       width: 'auto',
@@ -187,6 +202,7 @@ export function CarouselCard({
                     alt={alt ?? label}
                     className="w-full h-full object-cover"
                     fetchPriority={fetchPriority}
+                    onLoad={() => setIsMediaLoading(false)}
                   />
                 )
               ) : (
@@ -198,6 +214,13 @@ export function CarouselCard({
             )}
           </div>
         )}
+        {/* Loading spinner */}
+        {isMediaLoading && hasMedia && !renderCard && (
+          <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+            <div className="w-6 h-6 rounded-full border-2 border-stone-300 dark:border-zinc-600 border-t-stone-500 dark:border-t-zinc-400 animate-spin" />
+          </div>
+        )}
+
         {/* Border layer on top */}
         {(imageUrl || videoUrl) && (
           <div
