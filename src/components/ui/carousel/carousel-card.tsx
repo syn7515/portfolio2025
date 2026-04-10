@@ -189,6 +189,7 @@ export function CarouselCard({
                     alt={alt ?? label}
                     className="absolute object-contain"
                     fetchPriority={fetchPriority}
+                    ref={(el) => { if (el?.complete) setIsMediaLoading(false); }}
                     onLoad={() => setIsMediaLoading(false)}
                     style={{
                       height: `${imageSizePercent}%`,
@@ -202,6 +203,7 @@ export function CarouselCard({
                     alt={alt ?? label}
                     className="w-full h-full object-cover"
                     fetchPriority={fetchPriority}
+                    ref={(el) => { if (el?.complete) setIsMediaLoading(false); }}
                     onLoad={() => setIsMediaLoading(false)}
                   />
                 )
