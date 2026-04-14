@@ -89,7 +89,7 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: 'Inter var', var(--font-inter), var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  font-feature-settings: "ss01", "ss07", "cv08", "cv06", "zero";
+  font-feature-settings: "ss01", "ss07", "cv08", "cv06";
 }
 
 /* Global Typography Styles */

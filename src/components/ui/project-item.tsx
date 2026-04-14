@@ -108,6 +108,9 @@ export default function ProjectItem({
             className="absolute inset-0 pointer-events-none"
             style={{
               border: isHydrated && !isDarkMode ? '1px solid rgba(0, 0, 0, 0.02)' : 'none',
+              boxShadow: isHydrated && !isDarkMode
+                ? '0px 0px 0px 1px rgba(0, 0, 0, 0.10), 0px 1px 2px -1px rgba(0, 0, 0, 0.10), 0px 2px 4px 0px rgba(0, 0, 0, 0.07)'
+                : 'none',
               boxSizing: 'border-box',
               zIndex: 10
             }}
@@ -117,7 +120,7 @@ export default function ProjectItem({
           <div className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic font-sans !font-[420] lg:px-2">
             <span className="flex gap-2 items-center">{organization}<span className="text-stone-400 dark:text-zinc-600">·</span><span>{dates}</span></span>
           </div>
-          <h2 className="!text-base !font-[420] !mt-0.5 !mb-0 not-italic !text-stone-800 dark:!text-zinc-200 leading-normal">
+          <h2 className="!text-[15px] !font-[420] !mt-0.5 !mb-0 not-italic !text-stone-800 dark:!text-zinc-200 leading-normal">
             {description}
           </h2>
         </div>
