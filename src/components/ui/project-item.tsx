@@ -115,7 +115,7 @@ export default function ProjectItem({
         </div>
         <div className="mt-4 lg:order-1 lg:mt-0 lg:mb-4 font-sans not-italic lg:grid lg:grid-cols-[268px_500px] lg:items-baseline">
           <div className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic font-sans !font-[420] lg:px-2">
-            {organization} · <span>{dates}</span>
+            <span className="flex gap-2 items-center">{organization}<span className="text-stone-400 dark:text-zinc-600">·</span><span>{dates}</span></span>
           </div>
           <h2 className="!text-base !font-[420] !mt-0.5 !mb-0 not-italic !text-stone-800 dark:!text-zinc-200 leading-normal">
             {description}
