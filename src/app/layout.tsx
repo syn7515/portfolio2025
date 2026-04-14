@@ -1,13 +1,23 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Geist, Geist_Mono, Libre_Caslon_Text } from "next/font/google";
+import { Geist, Geist_Mono, Libre_Caslon_Text } from "next/font/google";
+import localFont from "next/font/local";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
-const inter = Inter({
+const inter = localFont({
+  src: [
+    {
+      path: "../../public/fonts/InterVariable.woff2",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/InterVariable-Italic.woff2",
+      style: "italic",
+    },
+  ],
   variable: "--font-inter",
-  subsets: ["latin"],
 });
 
 const geistSans = Geist({

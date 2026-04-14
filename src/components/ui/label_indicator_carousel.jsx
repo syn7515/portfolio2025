@@ -51,51 +51,33 @@ export default function LabelIndicatorCarousel({
   const index = isControlled ? currentIndex : uncontrolledIndex;
 
   // Viewport detection for mobile mode (< 640px) - vertical layout
-  const [isMobile, setIsMobile] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return window.innerWidth < 640;
-  });
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 640);
-    };
-    if (typeof window !== 'undefined') {
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
-    }
+    setIsMobile(window.innerWidth < 640);
+    const handleResize = () => setIsMobile(window.innerWidth < 640);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   // Viewport detection for disabling lightbox on sm and below
-  const [isSmOrBelow, setIsSmOrBelow] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return window.innerWidth < 768; // md breakpoint
-  });
+  const [isSmOrBelow, setIsSmOrBelow] = useState(false);
 
   useEffect(() => {
-    const handleResize = () => {
-      setIsSmOrBelow(window.innerWidth < 768);
-    };
-    if (typeof window !== 'undefined') {
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
-    }
+    setIsSmOrBelow(window.innerWidth < 768);
+    const handleResize = () => setIsSmOrBelow(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   // Viewport detection for lg+ (1024px+)
-  const [isLgOrAbove, setIsLgOrAbove] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return window.innerWidth >= 1024; // lg breakpoint
-  });
+  const [isLgOrAbove, setIsLgOrAbove] = useState(false);
 
   useEffect(() => {
-    const handleResize = () => {
-      setIsLgOrAbove(window.innerWidth >= 1024);
-    };
-    if (typeof window !== 'undefined') {
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
-    }
+    setIsLgOrAbove(window.innerWidth >= 1024);
+    const handleResize = () => setIsLgOrAbove(window.innerWidth >= 1024);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   // Dark mode detection - only set after hydration to avoid SSR mismatch

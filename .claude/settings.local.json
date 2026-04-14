@@ -6,7 +6,13 @@
       "Bash(xargs -I{} sh -c 'echo \"=== {} ===\"; git show {}:package.json 2>/dev/null | grep framer')",
       "WebFetch(domain:www.csim.me)",
       "WebFetch(domain:simplicity-23.toss.im)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(curl -L \"https://github.com/rsms/inter/releases/download/v4.1/Inter-4.1.zip\" -o /tmp/inter.zip)",
+      "Bash(unzip -o /tmp/inter.zip -d /tmp/inter-extracted/)",
+      "Read(//private/tmp/inter-extracted/**)",
+      "Read(//private/tmp/inter-extracted/web/**)",
+      "Bash(cp /tmp/inter-extracted/web/InterVariable.woff2 /Users/sooyeon/Documents/GitHub/portfolio2025/public/fonts/InterVariable.woff2)",
+      "Bash(cp /tmp/inter-extracted/web/InterVariable-Italic.woff2 /Users/sooyeon/Documents/GitHub/portfolio2025/public/fonts/InterVariable-Italic.woff2)"
     ]
   }
 }
