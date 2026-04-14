@@ -79,15 +79,15 @@ export default function ProjectItem({
       animate={animate}
       transition={transition}
     >
-      <Link 
-        href={href} 
-        className="block group font-sans cursor-pointer"
+      <Link
+        href={href}
+        className="flex flex-col group font-sans cursor-pointer"
         style={{ 
           textDecoration: 'none',
           color: 'inherit'
         }}
       >
-        <div className="relative w-full aspect-video bg-stone-200/50 dark:bg-zinc-800/70 dark:group-hover:bg-zinc-800 group-hover:bg-stone-200 transition-colors duration-300 ease-out overflow-hidden">
+        <div className="relative w-full aspect-video bg-stone-200/50 dark:bg-zinc-800/70 dark:group-hover:bg-zinc-800 group-hover:bg-stone-200 transition-colors duration-300 ease-out overflow-hidden lg:order-2">
           <img
             src={imageUrl}
             alt={alt}
@@ -113,7 +113,7 @@ export default function ProjectItem({
             }}
           />
         </div>
-        <div className="mt-4 font-sans not-italic">
+        <div className="mt-4 lg:order-1 lg:mt-0 lg:mb-4 font-sans not-italic lg:grid lg:grid-cols-[268px_500px] lg:items-baseline">
           <div className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic font-sans !font-[420]">
             {organization} · <span>{dates}</span>
           </div>
