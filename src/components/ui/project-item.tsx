@@ -87,7 +87,7 @@ export default function ProjectItem({
           color: 'inherit'
         }}
       >
-        <div className="relative w-full aspect-video bg-stone-200/50 dark:bg-zinc-800/70 dark:group-hover:bg-zinc-800 group-hover:bg-stone-200 transition-colors duration-300 ease-out overflow-hidden lg:order-2">
+        <div className="relative w-full aspect-video bg-stone-200/50 dark:bg-zinc-800/70 dark:group-hover:bg-zinc-800 group-hover:bg-stone-200 transition-colors duration-300 ease-out overflow-hidden lg:rounded-xl lg:order-2">
           <img
             src={imageUrl}
             alt={alt}
@@ -114,7 +114,7 @@ export default function ProjectItem({
           />
         </div>
         <div className="mt-4 lg:order-1 lg:mt-0 lg:mb-4 font-sans not-italic lg:grid lg:grid-cols-[268px_500px] lg:items-baseline">
-          <div className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic font-sans !font-[420]">
+          <div className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic font-sans !font-[420] lg:px-2">
             {organization} · <span>{dates}</span>
           </div>
           <h2 className="!text-base !font-[420] !mt-0.5 !mb-0 not-italic !text-stone-800 dark:!text-zinc-200 leading-normal">
