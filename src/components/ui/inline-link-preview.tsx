@@ -113,6 +113,7 @@ export function InlineLinkPreview({
   }, [applyTriggerStyles])
 
   const handleMouseEnter = useCallback(() => {
+    anchorRef.current?.style.setProperty('text-decoration-color', 'var(--intro-trigger-decoration-hover)', 'important')
     hoverDelayRef.current = setTimeout(() => {
       setIsHovered(true)
       setAnchorRect(anchorRef.current?.getBoundingClientRect() ?? null)
@@ -120,6 +121,7 @@ export function InlineLinkPreview({
   }, [])
 
   const handleMouseLeave = useCallback(() => {
+    anchorRef.current?.style.setProperty('text-decoration-color', 'var(--intro-trigger-decoration)', 'important')
     if (hoverDelayRef.current) {
       clearTimeout(hoverDelayRef.current)
       hoverDelayRef.current = null

@@ -87,6 +87,7 @@ export function InlineYoutubePreview({
 
 
   const handleMouseEnter = useCallback(() => {
+    anchorRef.current?.style.setProperty('text-decoration-color', 'var(--intro-trigger-decoration-hover)', 'important')
     hoverDelayRef.current = setTimeout(() => {
       hoverStartRef.current = Date.now()
       setIsHovered(true)
@@ -95,6 +96,7 @@ export function InlineYoutubePreview({
   }, [])
 
   const handleMouseLeave = useCallback(() => {
+    anchorRef.current?.style.setProperty('text-decoration-color', 'var(--intro-trigger-decoration)', 'important')
     if (hoverDelayRef.current) {
       clearTimeout(hoverDelayRef.current)
       hoverDelayRef.current = null

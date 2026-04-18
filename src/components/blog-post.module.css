@@ -83,8 +83,8 @@
     text-decoration-line: underline;
     text-decoration-style: solid;
     text-decoration-skip-ink: auto;
-    text-decoration-color: rgb(212 212 216);
-    /* stone-300 */
+    text-decoration-color: rgb(228 228 231);
+    /* zinc-200 */
     text-decoration-thickness: 5%;
     /* 0.75px */
     text-underline-offset: 0.05rem;
@@ -95,8 +95,8 @@
 .mdxContent a:hover {
     color: rgb(28 25 23) !important;
     /* stone-900 - darker on hover */
-    text-decoration-color: rgb(120 113 108) !important;
-    /* stone-500 - darker underline on hover */
+    text-decoration-color: rgb(168 162 158) !important;
+    /* stone-400 - lighter underline on hover */
 }
 
 /* Inline YouTube preview trigger: force underline + italic (wins over preflight and .mdxContent a) */
@@ -104,7 +104,7 @@
     text-decoration-line: underline !important;
     text-decoration-style: solid !important;
     text-decoration-skip-ink: auto !important;
-    text-decoration-color: rgb(212 212 216) !important;
+    text-decoration-color: rgb(228 228 231) !important;
     text-decoration-thickness: 5% !important;
     text-underline-offset: 0.05rem !important;
     text-underline-position: from-font !important;
@@ -113,7 +113,7 @@
 
 .mdxContent a.inline-youtube-preview-trigger:hover {
     color: rgb(28 25 23) !important;
-    text-decoration-color: rgb(120 113 108) !important;
+    text-decoration-color: rgb(168 162 158) !important;
 }
 
 .mdxContent ul {
@@ -242,15 +242,15 @@
         /* zinc-300 - matches p text color */
         opacity: 0.9;
         /* matches p opacity */
-        text-decoration-color: rgb(82 82 91);
-        /* zinc-600 */
+        text-decoration-color: rgb(63 63 70);
+        /* zinc-700 */
     }
 
     .mdxContent a:hover {
         color: rgb(244 244 245) !important;
         /* zinc-100 - lighter text color on hover */
-        text-decoration-color: rgb(161 161 170) !important;
-        /* zinc-400 - lighter underline on hover */
+        text-decoration-color: rgb(113 113 122) !important;
+        /* zinc-500 - lighter underline on hover */
         opacity: 1;
         /* full opacity on hover */
     }
@@ -258,12 +258,12 @@
     .mdxContent a.inline-youtube-preview-trigger {
         color: rgb(212 212 216) !important;
         opacity: 0.9;
-        text-decoration-color: rgb(82 82 91) !important;
+        text-decoration-color: rgb(63 63 70) !important;
     }
 
     .mdxContent a.inline-youtube-preview-trigger:hover {
         color: rgb(244 244 245) !important;
-        text-decoration-color: rgb(161 161 170) !important;
+        text-decoration-color: rgb(113 113 122) !important;
         opacity: 1;
     }
 

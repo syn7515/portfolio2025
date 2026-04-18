@@ -4,9 +4,14 @@
   color-scheme: light dark;
   --background: #ffffff;
   --foreground: #171717;
-  --intro-trigger-decoration: rgb(212 212 216); /* stone-300 - underline color for intro/link preview triggers */
-  --scrollbar-thumb: rgb(168 162 158 / 0.6); /* stone-400 */
-  --scrollbar-thumb-hover: rgb(120 113 108 / 0.8); /* stone-500 */
+  --intro-trigger-decoration: rgb(228 228 231);
+  /* zinc-200 - underline color for intro/link preview triggers */
+  --intro-trigger-decoration-hover: rgb(168 162 158);
+  /* stone-400 - underline color on hover */
+  --scrollbar-thumb: rgb(168 162 158 / 0.6);
+  /* stone-400 */
+  --scrollbar-thumb-hover: rgb(120 113 108 / 0.8);
+  /* stone-500 */
   --gradient-bg: #ffffff;
   --gradient-transparent: transparent;
 }
@@ -22,10 +27,16 @@
   :root {
     --background: #18181b;
     --foreground: #ededed;
-    --intro-trigger-decoration: rgb(82 82 91); /* zinc-600 - underline color for intro/link preview triggers */
-    --scrollbar-thumb: rgb(82 82 91 / 0.6); /* zinc-600 */
-    --scrollbar-thumb-hover: rgb(113 113 122 / 0.8); /* zinc-500 */
-    --gradient-bg: rgb(24 24 27 / 0.7); /* zinc-900 at 70% — semi-transparent so backdrop blur shows through */
+    --intro-trigger-decoration: rgb(63 63 70);
+    /* zinc-700 - underline color for intro/link preview triggers */
+    --intro-trigger-decoration-hover: rgb(113 113 122);
+    /* zinc-500 - underline color on hover */
+    --scrollbar-thumb: rgb(82 82 91 / 0.6);
+    /* zinc-600 */
+    --scrollbar-thumb-hover: rgb(113 113 122 / 0.8);
+    /* zinc-500 */
+    --gradient-bg: rgb(24 24 27 / 0.7);
+    /* zinc-900 at 70% — semi-transparent so backdrop blur shows through */
     --gradient-transparent: rgb(24 24 27 / 0);
   }
 }
@@ -68,6 +79,7 @@ html:hover::-webkit-scrollbar-thumb:hover {
 }
 
 @supports (scrollbar-width: thin) {
+
   html:active,
   html:focus-within,
   html:hover {
@@ -76,12 +88,14 @@ html:hover::-webkit-scrollbar-thumb:hover {
 }
 
 ::selection {
-  background-color: rgb(231 229 228); /* stone-200 */
+  background-color: rgb(231 229 228);
+  /* stone-200 */
 }
 
 @media (prefers-color-scheme: dark) {
   ::selection {
-    background-color: rgb(39 39 42); /* zinc-800 */
+    background-color: rgb(39 39 42);
+    /* zinc-800 */
   }
 }
 
@@ -89,7 +103,7 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: 'Inter var', var(--font-inter), var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  font-feature-settings: "ss01", "ss07", "cv08", "cv06";
+  font-feature-settings: "ss01", "ss07", "cv01", "cv08";
 }
 
 /* Global Typography Styles */
@@ -377,7 +391,7 @@ pre code {
   text-decoration-line: underline !important;
   text-decoration-style: solid !important;
   text-decoration-skip-ink: auto !important;
-  text-decoration-color: rgb(212 212 216) !important;
+  text-decoration-color: rgb(228 228 231) !important;
   /* stone-300 */
   text-decoration-thickness: 5% !important;
   text-underline-offset: 0.05rem !important;
@@ -391,8 +405,8 @@ pre code {
 .intro-link:hover {
   color: rgb(28 25 23) !important;
   /* stone-900 - even darker on hover */
-  text-decoration-color: rgb(120 113 108) !important;
-  /* stone-500 - darker underline on hover */
+  text-decoration-color: rgb(168 162 158) !important;
+  /* stone-400 - lighter underline on hover */
 }
 
 /* Inline YouTube preview trigger: same as .intro-link (underline, italic, decoration color) */
@@ -400,15 +414,15 @@ a[data-inline-youtube-trigger] {
   text-decoration-line: underline !important;
   text-decoration-style: solid !important;
   text-decoration-skip-ink: auto !important;
-  text-decoration-color: rgb(212 212 216) !important;
+  text-decoration-color: rgb(228 228 231) !important;
   /* stone-300 - same as intro-link */
   text-underline-offset: 0.05rem !important;
   font-style: italic !important;
 }
 
 a[data-inline-youtube-trigger]:hover {
-  text-decoration-color: rgb(120 113 108) !important;
-  /* stone-500 - same as intro-link hover */
+  text-decoration-color: rgb(168 162 158) !important;
+  /* stone-400 - same as intro-link hover */
 }
 
 /* Inline link preview trigger: same as .intro-link (underline, italic, decoration color) */
@@ -416,15 +430,15 @@ a[data-inline-link-preview-trigger] {
   text-decoration-line: underline !important;
   text-decoration-style: solid !important;
   text-decoration-skip-ink: auto !important;
-  text-decoration-color: rgb(212 212 216) !important;
+  text-decoration-color: rgb(228 228 231) !important;
   /* stone-300 - same as intro-link */
   text-underline-offset: 0.05rem !important;
   font-style: italic !important;
 }
 
 a[data-inline-link-preview-trigger]:hover {
-  text-decoration-color: rgb(120 113 108) !important;
-  /* stone-500 - same as intro-link hover */
+  text-decoration-color: rgb(168 162 158) !important;
+  /* stone-400 - same as intro-link hover */
 }
 
 /* Intro link variant for lighter text paragraphs (stone-500/zinc-400) */
@@ -435,7 +449,7 @@ a[data-inline-link-preview-trigger]:hover {
   text-decoration-line: underline;
   text-decoration-style: solid;
   text-decoration-skip-ink: auto;
-  text-decoration-color: rgb(212 212 216);
+  text-decoration-color: rgb(228 228 231);
   /* stone-300 */
   text-decoration-thickness: 5%;
   text-underline-offset: 0.05rem;
@@ -449,8 +463,8 @@ a[data-inline-link-preview-trigger]:hover {
 .intro-link-light:hover {
   color: rgb(68 64 60) !important;
   /* stone-700 - darker on hover */
-  text-decoration-color: rgb(120 113 108) !important;
-  /* stone-500 - darker underline on hover */
+  text-decoration-color: rgb(168 162 158) !important;
+  /* stone-400 - lighter underline on hover */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -459,37 +473,37 @@ a[data-inline-link-preview-trigger]:hover {
     /* zinc-300 - matches p text color */
     opacity: 0.9;
     /* matches p opacity */
-    text-decoration-color: rgb(82 82 91);
-    /* zinc-600 */
+    text-decoration-color: rgb(63 63 70);
+    /* zinc-700 */
   }
 
   .intro-link:hover {
     color: rgb(244 244 245) !important;
     /* zinc-100 - lighter on hover */
-    text-decoration-color: rgb(161 161 170) !important;
-    /* zinc-400 - lighter underline on hover */
+    text-decoration-color: rgb(113 113 122) !important;
+    /* zinc-500 - lighter underline on hover */
     opacity: 1;
     /* full opacity on hover */
   }
 
   a[data-inline-youtube-trigger] {
-    text-decoration-color: rgb(82 82 91) !important;
-    /* zinc-600 - same as intro-link dark */
+    text-decoration-color: rgb(63 63 70) !important;
+    /* zinc-700 - same as intro-link dark */
   }
 
   a[data-inline-youtube-trigger]:hover {
-    text-decoration-color: rgb(161 161 170) !important;
-    /* zinc-400 - same as intro-link dark hover */
+    text-decoration-color: rgb(113 113 122) !important;
+    /* zinc-500 - same as intro-link dark hover */
   }
 
   a[data-inline-link-preview-trigger] {
-    text-decoration-color: rgb(82 82 91) !important;
-    /* zinc-600 - same as intro-link dark */
+    text-decoration-color: rgb(63 63 70) !important;
+    /* zinc-700 - same as intro-link dark */
   }
 
   a[data-inline-link-preview-trigger]:hover {
-    text-decoration-color: rgb(161 161 170) !important;
-    /* zinc-400 - same as intro-link dark hover */
+    text-decoration-color: rgb(113 113 122) !important;
+    /* zinc-500 - same as intro-link dark hover */
   }
 
   /* Intro link variant for lighter text paragraphs (stone-500/zinc-400) */
@@ -497,17 +511,26 @@ a[data-inline-link-preview-trigger]:hover {
     color: rgb(161 161 170) !important;
     /* zinc-400 - matches lighter paragraph text color */
     opacity: 0.9;
-    text-decoration-color: rgb(82 82 91);
-    /* zinc-600 */
+    text-decoration-color: rgb(63 63 70);
+    /* zinc-700 */
   }
 
   .intro-link-light:hover {
     color: rgb(212 212 216) !important;
     /* zinc-300 - lighter on hover */
-    text-decoration-color: rgb(161 161 170) !important;
-    /* zinc-400 - lighter underline on hover */
+    text-decoration-color: rgb(113 113 122) !important;
+    /* zinc-500 - lighter underline on hover */
     opacity: 1;
   }
+}
+
+sup {
+  font-feature-settings: "sups";
+  vertical-align: baseline;
+  font-size: inherit;
+  position: relative;
+  top: -0.1rem;
+  left: 0;
 }
 
 /* Social icon styles */
@@ -718,6 +741,7 @@ a.inline-flex.items-center {
   opacity: 0.4 !important;
   transition: opacity 150ms cubic-bezier(0.4, 0, 0.2, 1);
 }
+
 .intro-container:has([data-inline-link-preview-trigger]:hover) [data-inline-link-preview-trigger]:not(:hover) {
   opacity: 0.4 !important;
   transition: opacity 150ms cubic-bezier(0.4, 0, 0.2, 1);

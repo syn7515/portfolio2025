@@ -1,7 +1,6 @@
 "use client"
 
 import React from 'react'
-import { Divider } from '@/components/ui/divider'
 
 interface BlogPostHeaderProps {
   slug?: string
@@ -11,17 +10,12 @@ interface BlogPostHeaderProps {
 
 export default function BlogPostHeader({ title, subtitle }: BlogPostHeaderProps) {
   return (
-    <header className="max-w-[560px] mx-auto mb-[100px] text-center">
+    <header className="max-w-[560px] mx-auto mb-[100px] text-left">
       {/* Subtitle / metadata - small, light grey */}
       {subtitle && (
-        <>
-          <p className="text-sm font-normal text-stone-400 dark:!text-zinc-400 !mb-1">
-            {subtitle}
-          </p>
-          <div className="my-4 flex justify-center">
-            <Divider orientation="horizontal" color="stone" variant="default" className="!w-3 shrink-0 my-0" />
-          </div>
-        </>
+        <p className="text-sm font-normal !text-stone-500 dark:!text-zinc-500 !mb-3">
+          {subtitle}
+        </p>
       )}
       {/* Title - typography per design spec */}
       <h1

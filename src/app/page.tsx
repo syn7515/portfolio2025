@@ -100,13 +100,13 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="max-w-[800px] mx-auto w-full px-4 mt-24 lg:mt-48">
+        <div className="max-w-[800px] mx-auto w-full px-4 mt-12 lg:mt-24">
           <div className="grid gap-12 md:gap-20 lg:gap-28">
             <ProjectItem
               imageUrl="https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/aniai-main.png"
               alt="Aniai internal tools dashboard"
               organization="Aniai"
-              dates="2024-2025"
+              dates="2024 - 2025"
               description="Building the Tools Behind Smarter Robots"
               href="/aniai"
               fetchPriority="high"
@@ -118,7 +118,7 @@ export default function Home() {
               imageUrl="https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/alphagrill-main.png"
               alt="AlphaGrill robot interface for kitchen collaboration"
               organization="Aniai"
-              dates="2025-2026"
+              dates="2025 - 2026"
               description="Robot Interface for Collaboration in Kitchen"
               href="/alphagrill"
               imageObjectPosition="center center"
