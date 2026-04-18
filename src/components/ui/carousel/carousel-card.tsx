@@ -242,7 +242,7 @@ export function CarouselCard({
           renderCaption({ index, label, caption, active: index === currentIndex })
         ) : (
           <div
-            className={`text-center text-stone-500 dark:text-zinc-400 text-xs sm:text-sm mt-2 sm:mt-3 md:mt-4 font-sans`}
+            className={`carousel-caption text-center text-xs sm:text-sm mt-2 sm:mt-3 md:mt-4 font-sans`}
             style={{ width: "100%", ...(captionStyle || {}) }}
           >
             {caption}

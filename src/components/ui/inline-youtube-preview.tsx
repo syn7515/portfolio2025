@@ -75,6 +75,7 @@ export function InlineYoutubePreview({
     el.style.setProperty('text-decoration-thickness', '5%', 'important')
     el.style.setProperty('text-underline-offset', '0.05rem', 'important')
     el.style.setProperty('font-style', 'italic', 'important')
+    el.style.setProperty('opacity', '0.65', 'important')
   }, [])
 
   const setAnchorRef = useCallback((el: HTMLAnchorElement | null) => {
@@ -88,6 +89,7 @@ export function InlineYoutubePreview({
 
   const handleMouseEnter = useCallback(() => {
     anchorRef.current?.style.setProperty('text-decoration-color', 'var(--intro-trigger-decoration-hover)', 'important')
+    anchorRef.current?.style.setProperty('opacity', '0.9', 'important')
     hoverDelayRef.current = setTimeout(() => {
       hoverStartRef.current = Date.now()
       setIsHovered(true)
@@ -97,6 +99,7 @@ export function InlineYoutubePreview({
 
   const handleMouseLeave = useCallback(() => {
     anchorRef.current?.style.setProperty('text-decoration-color', 'var(--intro-trigger-decoration)', 'important')
+    anchorRef.current?.style.setProperty('opacity', '0.65', 'important')
     if (hoverDelayRef.current) {
       clearTimeout(hoverDelayRef.current)
       hoverDelayRef.current = null

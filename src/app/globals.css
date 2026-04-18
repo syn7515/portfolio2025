@@ -14,6 +14,7 @@
   /* stone-500 */
   --gradient-bg: #ffffff;
   --gradient-transparent: transparent;
+  --toc-text-shadow: none;
 }
 
 @theme inline {
@@ -38,6 +39,7 @@
     --gradient-bg: rgb(24 24 27 / 0.7);
     /* zinc-900 at 70% — semi-transparent so backdrop blur shows through */
     --gradient-transparent: rgb(24 24 27 / 0);
+    --toc-text-shadow: 0 0 16px color-mix(in srgb, var(--background) 40%, transparent), 0 0 32px color-mix(in srgb, var(--background) 20%, transparent);
   }
 }
 
@@ -531,6 +533,19 @@ sup {
   position: relative;
   top: -0.1rem;
   left: 0;
+}
+
+/* Carousel caption — must win over .mdxContent div !important */
+.carousel-caption {
+  color: rgb(120 113 108) !important;
+  /* stone-500 */
+}
+
+@media (prefers-color-scheme: dark) {
+  .carousel-caption {
+    color: rgb(161 161 170) !important;
+    /* zinc-400 */
+  }
 }
 
 /* Social icon styles */

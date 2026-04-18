@@ -441,7 +441,7 @@ export default function LabelIndicatorCarousel({
             style={{ columnGap: effGap }}
             animate={{ x: xOffset }}
             transition={transition}
-            {...(enableDrag
+            {...(enableDrag && normalized.length > 1
               ? {
                   drag: "x",
                   dragConstraints: { left: -100000, right: 100000 },

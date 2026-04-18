@@ -76,6 +76,11 @@
     /* stone-700 */
 }
 
+.mdxContent :global(.carousel-caption) {
+    color: rgb(120 113 108) !important;
+    /* stone-500 */
+}
+
 .mdxContent a {
     color: rgb(68 64 60) !important;
     /* text-blue-600 */
@@ -213,6 +218,11 @@
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
 
+    .mdxContent :global(.carousel-caption) {
+        color: rgb(161 161 170) !important;
+        /* zinc-400 */
+    }
+
     .mdxContent h1,
     .mdxContent h2,
     .mdxContent h3,
@@ -221,8 +231,8 @@
     .mdxContent ul,
     .mdxContent ol,
     .mdxContent blockquote {
-        color: rgb(212 212 216) !important;
-        /* zinc-300 */
+        color: rgb(161 161 170) !important;
+        /* zinc-400 */
     }
 
     .mdxContent p {

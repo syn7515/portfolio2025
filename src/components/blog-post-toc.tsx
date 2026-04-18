@@ -114,6 +114,7 @@ export default function BlogPostToc({ contentSelector = CONTENT_SELECTOR, classN
               ? 'text-stone-800 dark:text-zinc-100'
               : 'text-stone-400 dark:text-zinc-400'
           )}
+          style={{ textShadow: 'var(--toc-text-shadow)' }}
         >
           {text}
         </button>
