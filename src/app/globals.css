@@ -90,14 +90,14 @@ html:hover::-webkit-scrollbar-thumb:hover {
 }
 
 ::selection {
-  background-color: rgb(231 229 228);
-  /* stone-200 */
+  background-color: rgb(249 115 22 / 80%);
+  /* orange-500 / 80% */
 }
 
 @media (prefers-color-scheme: dark) {
   ::selection {
-    background-color: rgb(39 39 42);
-    /* zinc-800 */
+    background-color: rgb(101 163 13);
+    /* lime-600 */
   }
 }
 
