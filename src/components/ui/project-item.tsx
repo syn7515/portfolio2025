@@ -107,9 +107,11 @@ export default function ProjectItem({
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
-              border: isHydrated && !isDarkMode ? '1px solid rgba(0, 0, 0, 0.02)' : 'none',
-              boxShadow: isHydrated && !isDarkMode
-                ? '0px 0px 0px 1px rgba(0, 0, 0, 0.10), 0px 1px 2px -1px rgba(0, 0, 0, 0.10), 0px 2px 4px 0px rgba(0, 0, 0, 0.07)'
+              border: isHydrated && !isDarkMode ? '1px solid rgba(0, 0, 0, 0.02)' : 'none',  // dark mode border is handled via inset box-shadow
+              boxShadow: isHydrated
+                ? isDarkMode
+                  ? 'inset 0 1px 0 0 rgba(255,255,255,0.02), inset 0 0 0 1px rgba(255,255,255,0.02), 0 1px 1px -0.5px rgba(0,0,0,0.18)'
+                  : '0px 0px 0px 1px rgba(0,0,0,0.10), 0px 1px 1px -0.5px rgba(0,0,0,0.10), 0px 3px 3px -1.5px rgba(0,0,0,0.10)'
                 : 'none',
               boxSizing: 'border-box',
               zIndex: 10

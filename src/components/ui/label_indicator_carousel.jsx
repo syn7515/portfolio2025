@@ -100,6 +100,7 @@ export default function LabelIndicatorCarousel({
   const [exitTransform, setExitTransform] = useState(null);
   const [exitDuration, setExitDuration] = useState(0.4);
   const [pendingLightboxIndex, setPendingLightboxIndex] = useState(null); // For delayed transform calculation
+  const [hiddenCardIndex, setHiddenCardIndex] = useState(null); // Card hidden while lightbox is open
   const cardRefs = useRef({});
   const scrollbarGutterRef = useRef(0); // Store scrollbar gutter for exit animation
   
@@ -218,7 +219,7 @@ export default function LabelIndicatorCarousel({
   // Lightbox callbacks (defined after setIndex)
   const openLightbox = useCallback((i) => {
     if (!effectiveLightboxEnabled) return;
-    
+
     // FIX 2: Set pending index to trigger scroll lock, then calculate transform after layout stabilizes
     setLightboxIndex(i);
     setIndex(i);
@@ -228,13 +229,15 @@ export default function LabelIndicatorCarousel({
   const prevLightbox = useCallback(() => {
     const newIndex = Math.max(0, lightboxIndex - 1);
     setLightboxIndex(newIndex);
+    setHiddenCardIndex(newIndex);
     // Sync carousel index with lightbox index
     setIndex(newIndex);
   }, [lightboxIndex, setIndex]);
-  
+
   const nextLightbox = useCallback(() => {
     const newIndex = Math.min(normalized.length - 1, lightboxIndex + 1);
     setLightboxIndex(newIndex);
+    setHiddenCardIndex(newIndex);
     // Sync carousel index with lightbox index
     setIndex(newIndex);
   }, [lightboxIndex, normalized.length, setIndex]);
@@ -259,11 +262,12 @@ export default function LabelIndicatorCarousel({
     } else {
       setLightboxOpen(false);
     }
-    // Reset transform after animation completes
+    // Reset transform after animation completes and reveal the card again
     setTimeout(() => {
       setInitialTransform(null);
       setExitTransform(null);
       setExitDuration(0.4);
+      setHiddenCardIndex(null);
     }, 400);
   }, [lightboxIndex, calculateCardTransform]);
 
@@ -295,7 +299,8 @@ export default function LabelIndicatorCarousel({
     body.style.overflow = 'hidden';
     document.documentElement.setAttribute('data-lightbox-open', '');
     
-    // Step 5: Open lightbox with pre-calculated transform
+    // Step 5: Open lightbox with pre-calculated transform, and hide source card — all in one render
+    setHiddenCardIndex(pendingLightboxIndex);
     setInitialTransform(transform);
     setLightboxOpen(true);
     setPendingLightboxIndex(null);
@@ -428,6 +433,7 @@ export default function LabelIndicatorCarousel({
                     renderCaption={renderCaption}
                     captionStyle={captionStyle}
                     transition={transition}
+                    hiddenCardIndex={hiddenCardIndex}
                   />
                 </div>
               </div>
@@ -485,7 +491,8 @@ export default function LabelIndicatorCarousel({
                 renderCard={renderCard}
                 renderCaption={renderCaption}
                 captionStyle={captionStyle}
-                  transition={transition}
+                transition={transition}
+                hiddenCardIndex={hiddenCardIndex}
               />
             ))}
           </motion.div>

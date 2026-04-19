@@ -28,6 +28,7 @@ interface CarouselCardProps {
   }) => ReactNode;
   captionStyle?: CSSProperties;
   transition?: Transition;
+  hiddenCardIndex?: number | null;
 }
 
 export function CarouselCard({
@@ -45,7 +46,8 @@ export function CarouselCard({
   renderCard,
   renderCaption,
   captionStyle,
-  transition
+  transition,
+  hiddenCardIndex
 }: CarouselCardProps) {
   const { label, caption, imageUrl, videoUrl, alt, imageSizePercent, imagePosition, videoAutoplay, videoLoop, videoMuted, videoControls, cardVariant, backgroundLines, fetchPriority } = item;
   const videoPreload = fetchPriority === 'high' ? 'auto' : 'metadata';
@@ -69,8 +71,13 @@ export function CarouselCard({
       : `bg-stone-200/50 dark:bg-zinc-800/70 ${index === currentIndex ? "hover:bg-stone-200 dark:hover:bg-zinc-800" : ""}`;
   const canOpenLightboxFromCard = effectiveLightboxEnabled && openLightboxOnCardClick && (imageUrl || videoUrl);
   
+  const isHiddenByLightbox = hiddenCardIndex === index;
+
   return (
-    <div className="flex flex-col items-center" style={{ width: effWidth }}>
+    <div
+      className={`flex flex-col items-center${isHiddenByLightbox ? " opacity-0 pointer-events-none" : ""}`}
+      style={{ width: effWidth }}
+    >
       <motion.div
         ref={cardRef}
         initial={false}
@@ -228,7 +235,12 @@ export function CarouselCard({
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
-              border: isHydrated && !isDarkMode ? '1px solid rgba(0, 0, 0, 0.02)' : 'none',
+              border: isHydrated && !isDarkMode ? '1px solid rgba(0, 0, 0, 0.02)' : 'none', // dark mode border is handled via inset box-shadow
+              boxShadow: isHydrated
+                ? isDarkMode
+                  ? 'inset 0 1px 0 0 rgba(255,255,255,0.02), inset 0 0 0 1px rgba(255,255,255,0.02), 0 1px 1px -0.5px rgba(0,0,0,0.18)'
+                  : '0px 0px 0px 1px rgba(0,0,0,0.10), 0px 1px 1px -0.5px rgba(0,0,0,0.10), 0px 3px 3px -1.5px rgba(0,0,0,0.10)'
+                : 'none',
               boxSizing: 'border-box',
               zIndex: 10
             }}

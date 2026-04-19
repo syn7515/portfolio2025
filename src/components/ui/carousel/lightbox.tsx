@@ -291,7 +291,7 @@ export function Lightbox({
               style={{ overflow: 'visible' }}
               onClick={closeLightbox}
             >
-              {/* Relative container sizes to LightboxContent only; caption is out of flow to avoid wrapper height change during animation */}
+              {/* Relative container sizes to LightboxContent only */}
               <div className="relative">
                 <LightboxContent
                   currentItem={normalizedItems[lightboxIndex]}
@@ -301,31 +301,33 @@ export function Lightbox({
                   isDarkMode={isDarkMode}
                   dimensions={dimensions}
                 />
-                {/* Caption - absolutely below media, same enter/exit timing */}
-                {(() => {
-                  const caption = normalizedItems[lightboxIndex]?.caption?.trim();
-                  const hasHtml = caption?.includes("<");
-                  if (!caption) return null;
-                  return (
-                    <motion.div
-                      className="absolute left-0 right-0 top-full mt-4 text-center font-sans text-xs !text-white sm:text-sm"
-                      initial={{ opacity: 0, filter: 'blur(2px)' }}
-                      animate={
-                        exitTransform
-                          ? { opacity: 0, filter: 'blur(2px)' }
-                          : { opacity: 1, filter: 'blur(0px)' }
-                      }
-                      transition={{
-                        duration: exitTransform ? exitDuration : 0.4,
-                        ease: [0.77, 0, 0.175, 1],
-                      }}
-                      {...(hasHtml
-                        ? { dangerouslySetInnerHTML: { __html: caption } }
-                        : { children: caption })}
-                    />
-                  );
-                })()}
               </div>
+
+              {/* Caption - fixed relative to viewport so it doesn't move during the open/close animation */}
+              {(() => {
+                const caption = normalizedItems[lightboxIndex]?.caption?.trim();
+                const hasHtml = caption?.includes("<");
+                if (!caption) return null;
+                return (
+                  <motion.div
+                    className="fixed left-0 right-0 text-center font-sans text-xs !text-white sm:text-sm pointer-events-none"
+                    style={{ top: `calc(50% + ${dimensions.height / 2}px + 1rem)` }}
+                    initial={{ opacity: 0, filter: 'blur(2px)' }}
+                    animate={
+                      exitTransform
+                        ? { opacity: 0, filter: 'blur(2px)' }
+                        : { opacity: 1, filter: 'blur(0px)' }
+                    }
+                    transition={{
+                      duration: exitTransform ? exitDuration : 0.4,
+                      ease: [0.77, 0, 0.175, 1],
+                    }}
+                    {...(hasHtml
+                      ? { dangerouslySetInnerHTML: { __html: caption } }
+                      : { children: caption })}
+                  />
+                );
+              })()}
 
               {/* Prev/Next buttons - only when more than one item */}
               {!exitTransform && normalizedItems.length > 1 && (
