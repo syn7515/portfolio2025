@@ -27,7 +27,7 @@ export default function Home() {
     <div className="font-sans grid grid-rows-[80px_1fr_20px] items-center justify-items-center min-h-screen pb-0 gap-1">
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-4 focus:left-4 focus:px-4 focus:py-2 focus:bg-white focus:text-stone-800 focus:rounded focus:shadow">Skip to content</a>
       <main id="main" className="w-full flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <div className="intro-container max-w-[512px] lg:max-w-[800px] mx-auto px-4 lg:grid lg:grid-cols-[268px_500px] lg:items-baseline" style={{ paddingTop: 'clamp(40px, 10vh, 100px)' }}>
+        <div className="intro-container max-w-[592px] mx-auto px-4" style={{ paddingTop: 'clamp(40px, 10vh, 100px)' }}>
           {/* Left column: name */}
           <div>
             <motion.h1
@@ -48,7 +48,7 @@ export default function Home() {
           {/* Right column: bio + social links */}
           <div>
             <motion.p
-              className="intro-text !text-stone-800 dark:!text-inherit !font-[420] mt-10 lg:mt-0 !mb-5"
+              className="intro-text !text-stone-800 dark:!text-inherit !font-[420] mt-4 md:mt-10 lg:mt-12 !mb-5"
               initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
               animate={getAnimate()}
               transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.08 }}
