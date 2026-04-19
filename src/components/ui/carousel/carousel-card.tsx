@@ -102,10 +102,13 @@ export function CarouselCard({
           }
         }}
         className={`group relative ${backgroundClass} transition-all duration-150 ${canOpenLightboxFromCard && index === currentIndex ? 'cursor-zoom-in' : 'cursor-pointer'} focus-visible:ring-2 focus-visible:ring-stone-400 overflow-hidden ${index !== currentIndex ? 'hover:opacity-70' : ''}`}
-        style={{ 
-          width: "100%", 
+        style={{
+          width: "100%",
           aspectRatio: '16/9',
-          boxSizing: 'border-box'
+          boxSizing: 'border-box',
+          borderRadius: '4px',
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ['cornerShape' as any]: 'squircle',
         }}
         transition={transition}
         whileTap={{ scale: 0.98 }}
@@ -242,6 +245,9 @@ export function CarouselCard({
                   : '0px 0px 0px 1px rgba(0,0,0,0.10), 0px 1px 1px -0.5px rgba(0,0,0,0.10), 0px 3px 3px -1.5px rgba(0,0,0,0.10)'
                 : 'none',
               boxSizing: 'border-box',
+              borderRadius: '4px',
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              ['cornerShape' as any]: 'squircle',
               zIndex: 10
             }}
           />

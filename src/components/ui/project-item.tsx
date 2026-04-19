@@ -87,7 +87,7 @@ export default function ProjectItem({
           color: 'inherit'
         }}
       >
-        <div className="relative w-full aspect-video bg-stone-200/50 dark:bg-zinc-800/70 dark:group-hover:bg-zinc-800 group-hover:bg-stone-200 transition-colors duration-300 ease-out overflow-hidden">
+        <div className="relative w-full aspect-video bg-stone-200/50 dark:bg-zinc-800/70 dark:group-hover:bg-zinc-800 group-hover:bg-stone-200 transition-colors duration-300 ease-out overflow-hidden" style={{ borderRadius: '4px', ['cornerShape' as string]: 'squircle' }}>
           <img
             src={imageUrl}
             alt={alt}
@@ -114,6 +114,8 @@ export default function ProjectItem({
                   : '0px 0px 0px 1px rgba(0,0,0,0.10), 0px 1px 1px -0.5px rgba(0,0,0,0.10), 0px 3px 3px -1.5px rgba(0,0,0,0.10)'
                 : 'none',
               boxSizing: 'border-box',
+              borderRadius: '4px',
+              ['cornerShape' as string]: 'squircle',
               zIndex: 10
             }}
           />
