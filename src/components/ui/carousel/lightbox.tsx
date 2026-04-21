@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client"
 
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
@@ -264,6 +265,45 @@ export function Lightbox({
   const dimensions = useLightboxDimensions();
   const isPrevDisabled = lightboxIndex === 0;
   const isNextDisabled = lightboxIndex >= normalizedItems.length - 1;
+  const [cursorStyle, setCursorStyle] = useState<string>('default');
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const vpCenterX = window.innerWidth / 2;
+    const vpCenterY = window.innerHeight / 2;
+    const dx = Math.abs(e.clientX - vpCenterX);
+    const dy = Math.abs(e.clientY - vpCenterY);
+
+    if (dx <= dimensions.width / 2 && dy <= dimensions.height / 2) {
+      if (e.clientX < vpCenterX && !isPrevDisabled) {
+        setCursorStyle('w-resize');
+      } else if (e.clientX >= vpCenterX && !isNextDisabled) {
+        setCursorStyle('e-resize');
+      } else {
+        setCursorStyle('default');
+      }
+    } else {
+      setCursorStyle('zoom-out');
+    }
+  };
+
+  const handleMouseLeave = () => setCursorStyle('zoom-out');
+
+  const handleClick = (e: React.MouseEvent) => {
+    const vpCenterX = window.innerWidth / 2;
+    const vpCenterY = window.innerHeight / 2;
+    const dx = Math.abs(e.clientX - vpCenterX);
+    const dy = Math.abs(e.clientY - vpCenterY);
+
+    if (dx <= dimensions.width / 2 && dy <= dimensions.height / 2) {
+      if (e.clientX < vpCenterX) {
+        if (!isPrevDisabled) prevLightbox();
+      } else {
+        if (!isNextDisabled) nextLightbox();
+      }
+    } else {
+      closeLightbox();
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -286,10 +326,12 @@ export function Lightbox({
             aria-modal="true"
           >
             {/* Image container - positioned absolutely to allow animation without clipping */}
-            <div 
-              className="absolute inset-0 pointer-events-auto flex items-center justify-center cursor-zoom-out"
-              style={{ overflow: 'visible' }}
-              onClick={closeLightbox}
+            <div
+              className="absolute inset-0 pointer-events-auto flex items-center justify-center"
+              style={{ overflow: 'visible', cursor: cursorStyle }}
+              onClick={handleClick}
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
             >
               {/* Relative container sizes to LightboxContent only */}
               <div className="relative">
