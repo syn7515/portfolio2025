@@ -100,9 +100,9 @@ export function InlineLinkPreview({
   const applyTriggerStyles = useCallback((el: HTMLAnchorElement | null) => {
     if (!el) return
     el.style.setProperty('text-decoration-line', 'underline', 'important')
-    el.style.setProperty('text-decoration-style', 'solid', 'important')
+    el.style.setProperty('text-decoration-style', 'dotted', 'important')
     el.style.setProperty('text-decoration-color', 'var(--intro-trigger-decoration)', 'important')
-    el.style.setProperty('text-decoration-thickness', '5%', 'important')
+    el.style.setProperty('text-decoration-thickness', '10%', 'important')
     el.style.setProperty('text-underline-offset', '0.05rem', 'important')
     el.style.setProperty('font-style', 'italic', 'important')
     el.style.setProperty('opacity', '0.65', 'important')

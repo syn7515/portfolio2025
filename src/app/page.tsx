@@ -78,7 +78,7 @@ export default function Home() {
               transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.32 }}
             >
               <a
-                href="https://x.com/spark7515"
+                href="https://x.com/sue_park__"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="!text-stone-500 dark:!text-zinc-400 hover:!text-stone-700 dark:hover:!text-zinc-300 !no-underline !not-italic"

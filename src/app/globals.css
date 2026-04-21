@@ -4,10 +4,10 @@
   color-scheme: light dark;
   --background: #ffffff;
   --foreground: #171717;
-  --intro-trigger-decoration: rgb(228 228 231);
-  /* zinc-200 - underline color for intro/link preview triggers */
-  --intro-trigger-decoration-hover: rgb(168 162 158);
-  /* stone-400 - underline color on hover */
+  --intro-trigger-decoration: rgb(168 162 158);
+  /* stone-300 - underline color for intro/link preview triggers */
+  --intro-trigger-decoration-hover: rgb(249 115 22);
+  /* stone-500 - underline color on hover */
   --scrollbar-thumb: rgb(168 162 158 / 0.6);
   /* stone-400 */
   --scrollbar-thumb-hover: rgb(120 113 108 / 0.8);
@@ -28,10 +28,10 @@
   :root {
     --background: #18181b;
     --foreground: #ededed;
-    --intro-trigger-decoration: rgb(63 63 70);
-    /* zinc-700 - underline color for intro/link preview triggers */
-    --intro-trigger-decoration-hover: rgb(113 113 122);
-    /* zinc-500 - underline color on hover */
+    --intro-trigger-decoration: rgb(113 113 122);
+    /* zinc-500 - underline color for intro/link preview triggers */
+    --intro-trigger-decoration-hover: rgb(163 230 53);
+    /* zinc-400 - underline color on hover */
     --scrollbar-thumb: rgb(82 82 91 / 0.6);
     /* zinc-600 */
     --scrollbar-thumb-hover: rgb(113 113 122 / 0.8);
@@ -391,11 +391,11 @@ pre code {
   /* stone-700 */
   cursor: pointer !important;
   text-decoration-line: underline !important;
-  text-decoration-style: solid !important;
+  text-decoration-style: dotted !important;
   text-decoration-skip-ink: auto !important;
-  text-decoration-color: rgb(228 228 231) !important;
+  text-decoration-color: rgb(168 162 158) !important;
   /* stone-300 */
-  text-decoration-thickness: 5% !important;
+  text-decoration-thickness: 10% !important;
   text-underline-offset: 0.05rem !important;
   text-underline-position: from-font !important;
   transition-property: color, background-color, border-color, fill, stroke;
@@ -407,40 +407,40 @@ pre code {
 .intro-link:hover {
   color: rgb(28 25 23) !important;
   /* stone-900 - even darker on hover */
-  text-decoration-color: rgb(168 162 158) !important;
-  /* stone-400 - lighter underline on hover */
+  text-decoration-color: rgb(249 115 22) !important;
+  /* stone-500 - darker underline on hover */
 }
 
 /* Inline YouTube preview trigger: same as .intro-link (underline, italic, decoration color) */
 a[data-inline-youtube-trigger] {
   text-decoration-line: underline !important;
-  text-decoration-style: solid !important;
+  text-decoration-style: dotted !important;
   text-decoration-skip-ink: auto !important;
-  text-decoration-color: rgb(228 228 231) !important;
+  text-decoration-color: rgb(168 162 158) !important;
   /* stone-300 - same as intro-link */
   text-underline-offset: 0.05rem !important;
   font-style: italic !important;
 }
 
 a[data-inline-youtube-trigger]:hover {
-  text-decoration-color: rgb(168 162 158) !important;
-  /* stone-400 - same as intro-link hover */
+  text-decoration-color: rgb(249 115 22) !important;
+  /* stone-500 - same as intro-link hover */
 }
 
 /* Inline link preview trigger: same as .intro-link (underline, italic, decoration color) */
 a[data-inline-link-preview-trigger] {
   text-decoration-line: underline !important;
-  text-decoration-style: solid !important;
+  text-decoration-style: dotted !important;
   text-decoration-skip-ink: auto !important;
-  text-decoration-color: rgb(228 228 231) !important;
+  text-decoration-color: rgb(168 162 158) !important;
   /* stone-300 - same as intro-link */
   text-underline-offset: 0.05rem !important;
   font-style: italic !important;
 }
 
 a[data-inline-link-preview-trigger]:hover {
-  text-decoration-color: rgb(168 162 158) !important;
-  /* stone-400 - same as intro-link hover */
+  text-decoration-color: rgb(249 115 22) !important;
+  /* stone-500 - same as intro-link hover */
 }
 
 /* Intro link variant for lighter text paragraphs (stone-500/zinc-400) */
@@ -449,11 +449,11 @@ a[data-inline-link-preview-trigger]:hover {
   /* stone-500 */
   cursor: pointer !important;
   text-decoration-line: underline;
-  text-decoration-style: solid;
+  text-decoration-style: dotted;
   text-decoration-skip-ink: auto;
-  text-decoration-color: rgb(228 228 231);
+  text-decoration-color: rgb(168 162 158);
   /* stone-300 */
-  text-decoration-thickness: 5%;
+  text-decoration-thickness: 10%;
   text-underline-offset: 0.05rem;
   text-underline-position: from-font;
   transition-property: color, background-color, border-color, fill, stroke;
@@ -465,8 +465,8 @@ a[data-inline-link-preview-trigger]:hover {
 .intro-link-light:hover {
   color: rgb(68 64 60) !important;
   /* stone-700 - darker on hover */
-  text-decoration-color: rgb(168 162 158) !important;
-  /* stone-400 - lighter underline on hover */
+  text-decoration-color: rgb(249 115 22) !important;
+  /* stone-500 - darker underline on hover */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -475,37 +475,37 @@ a[data-inline-link-preview-trigger]:hover {
     /* zinc-300 - matches p text color */
     opacity: 0.9;
     /* matches p opacity */
-    text-decoration-color: rgb(63 63 70);
-    /* zinc-700 */
+    text-decoration-color: rgb(113 113 122);
+    /* zinc-500 */
   }
 
   .intro-link:hover {
     color: rgb(244 244 245) !important;
     /* zinc-100 - lighter on hover */
-    text-decoration-color: rgb(113 113 122) !important;
-    /* zinc-500 - lighter underline on hover */
+    text-decoration-color: rgb(163 230 53) !important;
+    /* zinc-400 - lighter underline on hover */
     opacity: 1;
     /* full opacity on hover */
   }
 
   a[data-inline-youtube-trigger] {
-    text-decoration-color: rgb(63 63 70) !important;
-    /* zinc-700 - same as intro-link dark */
+    text-decoration-color: rgb(113 113 122) !important;
+    /* zinc-500 - same as intro-link dark */
   }
 
   a[data-inline-youtube-trigger]:hover {
-    text-decoration-color: rgb(113 113 122) !important;
-    /* zinc-500 - same as intro-link dark hover */
+    text-decoration-color: rgb(163 230 53) !important;
+    /* zinc-400 - same as intro-link dark hover */
   }
 
   a[data-inline-link-preview-trigger] {
-    text-decoration-color: rgb(63 63 70) !important;
-    /* zinc-700 - same as intro-link dark */
+    text-decoration-color: rgb(113 113 122) !important;
+    /* zinc-500 - same as intro-link dark */
   }
 
   a[data-inline-link-preview-trigger]:hover {
-    text-decoration-color: rgb(113 113 122) !important;
-    /* zinc-500 - same as intro-link dark hover */
+    text-decoration-color: rgb(163 230 53) !important;
+    /* zinc-400 - same as intro-link dark hover */
   }
 
   /* Intro link variant for lighter text paragraphs (stone-500/zinc-400) */
@@ -513,15 +513,15 @@ a[data-inline-link-preview-trigger]:hover {
     color: rgb(161 161 170) !important;
     /* zinc-400 - matches lighter paragraph text color */
     opacity: 0.9;
-    text-decoration-color: rgb(63 63 70);
-    /* zinc-700 */
+    text-decoration-color: rgb(113 113 122);
+    /* zinc-500 */
   }
 
   .intro-link-light:hover {
     color: rgb(212 212 216) !important;
     /* zinc-300 - lighter on hover */
-    text-decoration-color: rgb(113 113 122) !important;
-    /* zinc-500 - lighter underline on hover */
+    text-decoration-color: rgb(163 230 53) !important;
+    /* zinc-400 - lighter underline on hover */
     opacity: 1;
   }
 }
@@ -550,7 +550,7 @@ sup {
 
 /* Social icon styles */
 .social-icon {
-  color: rgb(214 211 209) !important;
+  color: rgb(168 162 158) !important;
   /* stone-300 - lighter */
   opacity: 0.9;
   transition-duration: 0ms;
