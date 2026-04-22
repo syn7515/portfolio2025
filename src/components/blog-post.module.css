@@ -98,9 +98,9 @@
 }
 
 .mdxContent a:hover {
-    color: rgb(28 25 23) !important;
+    color: rgb(234 88 12) !important;
     /* stone-900 - darker on hover */
-    text-decoration-color: rgb(249 115 22) !important;
+    text-decoration-color: rgb(234 88 12) !important;
     /* stone-500 - darker underline on hover */
 }
 
@@ -117,8 +117,8 @@
 }
 
 .mdxContent a.inline-youtube-preview-trigger:hover {
-    color: rgb(28 25 23) !important;
-    text-decoration-color: rgb(249 115 22) !important;
+    color: rgb(234 88 12) !important;
+    text-decoration-color: rgb(234 88 12) !important;
 }
 
 .mdxContent ul {
@@ -257,7 +257,7 @@
     }
 
     .mdxContent a:hover {
-        color: rgb(244 244 245) !important;
+        color: rgb(163 230 53) !important;
         /* zinc-100 - lighter text color on hover */
         text-decoration-color: rgb(163 230 53) !important;
         /* zinc-400 - lighter underline on hover */
@@ -272,7 +272,7 @@
     }
 
     .mdxContent a.inline-youtube-preview-trigger:hover {
-        color: rgb(244 244 245) !important;
+        color: rgb(163 230 53) !important;
         text-decoration-color: rgb(163 230 53) !important;
         opacity: 1;
     }
@@ -310,7 +310,7 @@
 
 @media (prefers-color-scheme: dark) {
     .project-nav-description {
-        color: rgb(244 244 245) !important;
+        color: rgb(163 230 53) !important;
         /* zinc-100 for dark mode */
     }
 }

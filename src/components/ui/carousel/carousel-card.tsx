@@ -101,7 +101,11 @@ export function CarouselCard({
             }
           }
         }}
-        className={`group relative ${backgroundClass} transition-all duration-150 ${canOpenLightboxFromCard && index === currentIndex ? 'cursor-zoom-in' : 'cursor-pointer'} focus-visible:ring-2 focus-visible:ring-stone-400 overflow-hidden ${index !== currentIndex ? 'hover:opacity-70' : ''}`}
+        className={`group relative ${backgroundClass} transition-all duration-150 ${
+          index === currentIndex
+            ? canOpenLightboxFromCard ? 'cursor-zoom-in' : 'cursor-default'
+            : index < currentIndex ? 'cursor-[w-resize]' : 'cursor-[e-resize]'
+        } focus-visible:ring-2 focus-visible:ring-stone-400 overflow-hidden ${index !== currentIndex ? 'hover:opacity-70' : ''}`}
         style={{
           width: "100%",
           aspectRatio: '16/9',

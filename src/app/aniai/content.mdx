@@ -19,7 +19,7 @@ Testing requires firmware configured for specific test conditions. Creating this
   <LabelIndicatorCarousel
     showIndicators={false}
     renderCaption={({ caption }) => (
-      <div className="text-center text-stone-600 dark:text-stone-300 text-xs sm:text-sm mt-2 sm:mt-3 md:mt-5 font-sans">
+      <div className="carousel-caption text-center text-xs sm:text-sm mt-2 sm:mt-3 md:mt-5 font-sans">
         {caption && (
           <span dangerouslySetInnerHTML={{ __html: caption }} />
         )}
@@ -72,7 +72,7 @@ Managing updates at the level of individual robots did not scale. Updates were i
   <LabelIndicatorCarousel
     showIndicators={false}
     renderCaption={({ caption }) => (
-      <div className="text-center text-stone-600 dark:text-stone-300 text-xs sm:text-sm mt-2 sm:mt-3 md:mt-5 font-sans">
+      <div className="carousel-caption text-center text-xs sm:text-sm mt-2 sm:mt-3 md:mt-5 font-sans">
         {caption && (
           <span dangerouslySetInnerHTML={{ __html: caption }} />
         )}
