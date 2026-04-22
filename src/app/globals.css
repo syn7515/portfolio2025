@@ -90,14 +90,18 @@ html:hover::-webkit-scrollbar-thumb:hover {
 }
 
 ::selection {
-  background-color: rgb(249 115 22 / 80%);
-  /* orange-500 / 80% */
+  background-color: rgb(234 88 12) !important;
+  /* orange-600 */
+  color: #ffffff !important;
+  opacity: 1 !important;
 }
 
 @media (prefers-color-scheme: dark) {
   ::selection {
-    background-color: rgb(101 163 13);
-    /* lime-600 */
+    background-color: rgb(132 204 22) !important;
+    /* lime-500 */
+    color: #ffffff !important;
+    opacity: 1 !important;
   }
 }
 
