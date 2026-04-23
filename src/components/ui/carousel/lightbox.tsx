@@ -62,7 +62,7 @@ function LightboxContent({
     // Positioned image or video mode with background layers
     return (
       <motion.div 
-        className="relative pointer-events-auto overflow-hidden"
+        className="relative pointer-events-auto overflow-hidden rounded-[4px]"
         initial={initialTransform ? {
           x: initialTransform.x,
           y: initialTransform.y,
@@ -197,7 +197,7 @@ function LightboxContent({
     // Full-cover image or video mode
     return (
       <motion.div 
-        className="relative pointer-events-auto overflow-hidden"
+        className="relative pointer-events-auto overflow-hidden rounded-[4px]"
         initial={initialTransform ? {
           x: initialTransform.x,
           y: initialTransform.y,
@@ -254,7 +254,7 @@ function LightboxContent({
             style={{
               opacity: 1,
               display: 'block',
-              transformOrigin: 'center center'
+              transformOrigin: 'center center',
             }}
           />
         )}

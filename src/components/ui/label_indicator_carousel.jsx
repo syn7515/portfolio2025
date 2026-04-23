@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { CarouselCard } from "./carousel/carousel-card";
 import { CarouselIndicators } from "./carousel/carousel-indicators";
 import { Lightbox } from "./carousel/lightbox";
@@ -260,12 +261,11 @@ export default function LabelIndicatorCarousel({
       if (scrollbarGutter > 0) {
         transform.x = transform.x + scrollbarGutter / 2;
       }
-      setExitTransform(transform);
-      setExitDuration(0.4); // Fixed duration since no sliding
-      // Use requestAnimationFrame to ensure state is updated before exit animation
-      requestAnimationFrame(() => {
-        setLightboxOpen(false);
+      flushSync(() => {
+        setExitTransform(transform);
+        setExitDuration(0.4);
       });
+      setLightboxOpen(false);
     } else {
       setLightboxOpen(false);
     }
