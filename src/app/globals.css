@@ -92,7 +92,8 @@ html:hover::-webkit-scrollbar-thumb:hover {
 ::selection {
   background-color: rgb(234 88 12) !important;
   /* orange-600 */
-  color: #ffffff !important;
+  color: rgb(250 250 249) !important;
+  /* stone-50 */
   opacity: 1 !important;
 }
 
@@ -100,7 +101,8 @@ html:hover::-webkit-scrollbar-thumb:hover {
   ::selection {
     background-color: rgb(132 204 22) !important;
     /* lime-500 */
-    color: #ffffff !important;
+    color: rgb(250 250 250) !important;
+    /* zinc-50 */
     opacity: 1 !important;
   }
 }

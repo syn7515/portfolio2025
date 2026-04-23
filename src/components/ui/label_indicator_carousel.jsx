@@ -242,6 +242,13 @@ export default function LabelIndicatorCarousel({
     setIndex(newIndex);
   }, [lightboxIndex, normalized.length, setIndex]);
 
+  const handleLightboxExitComplete = useCallback(() => {
+    setInitialTransform(null);
+    setExitTransform(null);
+    setExitDuration(0.4);
+    setHiddenCardIndex(null);
+  }, []);
+
   const closeLightbox = useCallback(() => {
     // Since carousel index is synced with lightbox index, no sliding needed
     // Just animate back to the current card position
@@ -262,13 +269,6 @@ export default function LabelIndicatorCarousel({
     } else {
       setLightboxOpen(false);
     }
-    // Reset transform after animation completes and reveal the card again
-    setTimeout(() => {
-      setInitialTransform(null);
-      setExitTransform(null);
-      setExitDuration(0.4);
-      setHiddenCardIndex(null);
-    }, 400);
   }, [lightboxIndex, calculateCardTransform]);
 
   // FIX 2: Measure BEFORE scroll lock, then apply scroll lock and open lightbox
@@ -524,6 +524,7 @@ export default function LabelIndicatorCarousel({
         exitDuration={exitDuration}
         isDarkMode={isDarkMode}
         isLgOrAbove={isLgOrAbove}
+        onExitComplete={handleLightboxExitComplete}
       />
     </div>
   );

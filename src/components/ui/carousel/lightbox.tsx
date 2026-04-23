@@ -32,6 +32,7 @@ interface LightboxProps {
   exitDuration: number;
   isDarkMode: boolean;
   isLgOrAbove: boolean;
+  onExitComplete?: () => void;
 }
 
 interface LightboxContentProps {
@@ -95,7 +96,7 @@ function LightboxContent({
         {withBackgroundLines ? (
           <>
             {/* Theme background */}
-            <div 
+            <div
               className="absolute inset-0 bg-stone-100 dark:bg-zinc-800"
               aria-hidden
             />
@@ -116,8 +117,8 @@ function LightboxContent({
                 controls={currentItem.videoControls ?? false}
                 playsInline
                 aria-label={currentItem.alt || currentItem.label || "Lightbox video"}
-                style={{ 
-                  opacity: 1, 
+                style={{
+                  opacity: 1,
                   display: 'block',
                   transformOrigin: 'center center',
                   height: `${currentItem.imageSizePercent}%`,
@@ -130,14 +131,14 @@ function LightboxContent({
         ) : (
           <>
             {/* Base layer: page background */}
-            <div 
+            <div
               className="absolute inset-0"
               style={{
                 backgroundColor: isDarkMode ? '#18181b' : '#ffffff'
               }}
             />
             {/* Top layer: project-item background */}
-            <div 
+            <div
               className="absolute inset-0 bg-stone-200/60 dark:bg-zinc-700/80"
             />
             {/* Image or Video */}
@@ -151,8 +152,8 @@ function LightboxContent({
                 controls={currentItem.videoControls ?? false}
                 playsInline
                 aria-label={currentItem.alt || currentItem.label || "Lightbox video"}
-                style={{ 
-                  opacity: 1, 
+                style={{
+                  opacity: 1,
                   display: 'block',
                   transformOrigin: 'center center',
                   height: `${currentItem.imageSizePercent}%`,
@@ -165,8 +166,8 @@ function LightboxContent({
                 src={currentItem.imageUrl ?? "/placeholder.svg"}
                 alt={currentItem.alt || currentItem.label || "Lightbox image"}
                 className="absolute object-contain"
-                style={{ 
-                  opacity: 1, 
+                style={{
+                  opacity: 1,
                   display: 'block',
                   transformOrigin: 'center center',
                   height: `${currentItem.imageSizePercent}%`,
@@ -177,6 +178,19 @@ function LightboxContent({
             )}
           </>
         )}
+        {/* Border overlay */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            border: !isDarkMode ? '1px solid rgba(0, 0, 0, 0.02)' : 'none',
+            boxShadow: isDarkMode
+              ? 'inset 0 1px 0 0 rgba(255,255,255,0.02), inset 0 0 0 1px rgba(255,255,255,0.02), 0 1px 1px -0.5px rgba(0,0,0,0.18)'
+              : '0px 0px 0px 1px rgba(0,0,0,0.10), 0px 1px 1px -0.5px rgba(0,0,0,0.10), 0px 3px 3px -1.5px rgba(0,0,0,0.10)',
+            boxSizing: 'border-box',
+            borderRadius: '4px',
+            zIndex: 10,
+          }}
+        />
       </motion.div>
     );
   } else {
@@ -226,8 +240,8 @@ function LightboxContent({
             muted={currentItem.videoMuted ?? true}
             controls={currentItem.videoControls ?? false}
             playsInline
-            style={{ 
-              opacity: 1, 
+            style={{
+              opacity: 1,
               display: 'block',
               transformOrigin: 'center center'
             }}
@@ -237,13 +251,26 @@ function LightboxContent({
             src={currentItem?.imageUrl ?? "/placeholder.svg"}
             alt={currentItem?.alt || currentItem?.label || "Lightbox image"}
             className="object-contain w-full h-full"
-            style={{ 
-              opacity: 1, 
+            style={{
+              opacity: 1,
               display: 'block',
               transformOrigin: 'center center'
             }}
           />
         )}
+        {/* Border overlay */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            border: !isDarkMode ? '1px solid rgba(0, 0, 0, 0.02)' : 'none',
+            boxShadow: isDarkMode
+              ? 'inset 0 1px 0 0 rgba(255,255,255,0.02), inset 0 0 0 1px rgba(255,255,255,0.02), 0 1px 1px -0.5px rgba(0,0,0,0.18)'
+              : '0px 0px 0px 1px rgba(0,0,0,0.10), 0px 1px 1px -0.5px rgba(0,0,0,0.10), 0px 3px 3px -1.5px rgba(0,0,0,0.10)',
+            boxSizing: 'border-box',
+            borderRadius: '4px',
+            zIndex: 10,
+          }}
+        />
       </motion.div>
     );
   }
@@ -260,7 +287,8 @@ export function Lightbox({
   exitTransform,
   exitDuration,
   isDarkMode,
-  isLgOrAbove
+  isLgOrAbove,
+  onExitComplete,
 }: LightboxProps) {
   const dimensions = useLightboxDimensions();
   const isPrevDisabled = lightboxIndex === 0;
@@ -306,16 +334,16 @@ export function Lightbox({
   };
 
   return (
-    <AnimatePresence>
+    <AnimatePresence onExitComplete={onExitComplete}>
       {isOpen && (
         <>
           {/* Background overlay with opacity */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4, ease: [0.77, 0, 0.175, 1] }}
-            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-[1.5px] cursor-zoom-out"
+            className={`fixed inset-0 z-50 backdrop-blur-[1.5px] cursor-zoom-out ${isDarkMode ? 'bg-black/70' : 'bg-white/85'}`}
             onClick={closeLightbox}
           />
           
@@ -352,7 +380,7 @@ export function Lightbox({
                 if (!caption) return null;
                 return (
                   <motion.div
-                    className="fixed left-0 right-0 text-center font-sans text-xs !text-white sm:text-sm pointer-events-none [&_sup]:!text-white"
+                    className={`fixed left-0 right-0 text-center font-sans text-xs sm:text-sm pointer-events-none ${isDarkMode ? '!text-white [&_sup]:!text-white' : '!text-stone-600 [&_sup]:!text-stone-600'}`}
                     style={{ top: `calc(50% + ${dimensions.height / 2}px + 1rem)` }}
                     initial={{ opacity: 0, filter: 'blur(2px)' }}
                     animate={
@@ -381,10 +409,10 @@ export function Lightbox({
                       prevLightbox();
                     }}
                     disabled={isPrevDisabled}
-                    className={`absolute rounded-full p-2 sm:p-3 text-white bg-white/20 z-20 pointer-events-auto ${
+                    className={`absolute rounded-full p-2 sm:p-3 z-20 pointer-events-auto ${isDarkMode ? 'text-white bg-white/20' : 'text-stone-700 bg-black/8'} ${
                       isPrevDisabled
                         ? "opacity-40 cursor-default"
-                        : "hover:bg-white/30 transition-colors cursor-pointer"
+                        : `${isDarkMode ? 'hover:bg-white/30' : 'hover:bg-black/15'} transition-colors cursor-pointer`
                     }`}
                     style={{
                       left: `calc(50% - ${dimensions.width / 2}px - ${isLgOrAbove ? 16 : 4}px)`,
@@ -402,10 +430,10 @@ export function Lightbox({
                       nextLightbox();
                     }}
                     disabled={isNextDisabled}
-                    className={`absolute rounded-full p-2 sm:p-3 text-white bg-white/20 z-20 pointer-events-auto ${
+                    className={`absolute rounded-full p-2 sm:p-3 z-20 pointer-events-auto ${isDarkMode ? 'text-white bg-white/20' : 'text-stone-700 bg-black/8'} ${
                       isNextDisabled
                         ? "opacity-40 cursor-default"
-                        : "hover:bg-white/30 transition-colors cursor-pointer"
+                        : `${isDarkMode ? 'hover:bg-white/30' : 'hover:bg-black/15'} transition-colors cursor-pointer`
                     }`}
                     style={{
                       left: `calc(50% + ${dimensions.width / 2}px + ${isLgOrAbove ? 16 : 4}px)`,
