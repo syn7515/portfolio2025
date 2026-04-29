@@ -6,7 +6,6 @@ import { ArrowLeft, ArrowRight, Undo2 } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { Divider } from '@/components/ui/divider'
-import { Button } from '@/components/ui/button'
 import styles from './blog-post.module.css'
 import BlogPostHeader from '@/components/blog-post-header'
 import BlogPostToc from '@/components/blog-post-toc'
@@ -119,12 +118,10 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           }}
         />
         <div className="relative flex flex-col gap-6 pt-[7.5rem] pl-14 pointer-events-auto">
-          <Button variant="ghostNoBg" size="sm" asChild className="cursor-pointer w-fit inline-flex text-sm font-normal !text-stone-400 dark:text-zinc-400 hover:opacity-90 h-auto py-0 px-0 !rounded-none">
-            <Link href="/" className="flex items-center gap-2" aria-label="Back to home">
-              <Undo2 className="size-4 flex-shrink-0" />
-              Home
-            </Link>
-          </Button>
+          <Link href="/" className="flex items-center gap-2 w-fit text-sm font-normal !not-italic !no-underline !text-stone-400 dark:!text-zinc-400 hover:!text-orange-600 dark:hover:!text-lime-400 transition-colors duration-300 ease-out" aria-label="Back to home">
+            <Undo2 className="size-4 flex-shrink-0" />
+            Home
+          </Link>
           <BlogPostToc />
         </div>
       </aside>
