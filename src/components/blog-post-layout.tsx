@@ -1,8 +1,9 @@
 "use client"
 
 import React, { useEffect, useState } from 'react'
+import { cn } from '@/lib/utils'
 import Link from 'next/link'
-import { ArrowLeft, ArrowRight, Undo2 } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ArrowUp, Undo2 } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { Divider } from '@/components/ui/divider'
@@ -91,9 +92,25 @@ function preventWidow(text: string): React.ReactNode {
 export default function BlogPostLayout({ children, slug, title, subtitle }: BlogPostLayoutProps) {
   const { previousProject, nextProject } = getProjectNavigation(slug)
   const [animationReady, setAnimationReady] = useState(false)
+  const [showBackToTop, setShowBackToTop] = useState(false)
+  const [viewportTall, setViewportTall] = useState(false)
 
   useEffect(() => {
     setAnimationReady(true)
+  }, [])
+
+  useEffect(() => {
+    const update = () => {
+      setShowBackToTop(window.scrollY > 300)
+      setViewportTall(window.innerHeight > 700)
+    }
+    update()
+    window.addEventListener('scroll', update, { passive: true })
+    window.addEventListener('resize', update, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', update)
+      window.removeEventListener('resize', update)
+    }
   }, [])
 
   return (
@@ -124,6 +141,20 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           </Link>
           <BlogPostToc />
         </div>
+        <button
+          type="button"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className={cn(
+            'absolute bottom-20 left-14 flex items-center gap-2 w-fit text-sm font-normal text-stone-400 dark:text-zinc-400 hover:text-orange-600 dark:hover:text-lime-400 transition-[color,opacity,filter] duration-300 ease-out cursor-pointer pointer-events-auto',
+            showBackToTop && viewportTall
+              ? 'opacity-100 blur-none'
+              : 'opacity-0 blur-[4px] pointer-events-none'
+          )}
+          aria-label="Back to top"
+        >
+          <ArrowUp className="size-4 flex-shrink-0" />
+          Back to top
+        </button>
       </aside>
 
       <div className="w-full overflow-x-clip px-4 pt-12 sm:pt-20 lg:pt-[7.5rem]">
