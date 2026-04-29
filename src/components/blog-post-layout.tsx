@@ -145,7 +145,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           type="button"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           className={cn(
-            'absolute bottom-20 left-14 flex items-center gap-2 w-fit text-sm font-normal text-stone-400 dark:text-zinc-400 hover:text-orange-600 dark:hover:text-lime-400 transition-[color,opacity,filter] duration-300 ease-out cursor-pointer pointer-events-auto',
+            'absolute bottom-20 left-14 flex items-center gap-2 w-fit whitespace-nowrap text-sm font-normal text-stone-400 dark:text-zinc-400 hover:text-orange-600 dark:hover:text-lime-400 transition-[color,opacity,filter] duration-300 ease-out cursor-pointer pointer-events-auto',
             showBackToTop && viewportTall
               ? 'opacity-100 blur-none'
               : 'opacity-0 blur-[4px] pointer-events-none'
