@@ -81,7 +81,7 @@ export default function Home() {
                 href="https://x.com/sue_park__"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="!text-stone-500 dark:!text-zinc-400 hover:!text-orange-600 dark:hover:!text-lime-400 !no-underline !not-italic"
+                className="!text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-lime-200 !no-underline !not-italic"
                 style={{ fontSize: '14px' }}
               >
                 Twitter
@@ -91,7 +91,7 @@ export default function Home() {
                 href="https://www.linkedin.com/in/sooyeonp/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="!text-stone-500 dark:!text-zinc-400 hover:!text-orange-600 dark:hover:!text-lime-400 !no-underline !not-italic"
+                className="!text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-lime-200 !no-underline !not-italic"
                 style={{ fontSize: '14px' }}
               >
                 LinkedIn
