@@ -10,7 +10,7 @@ interface BlogPostHeaderProps {
 
 export default function BlogPostHeader({ title, subtitle }: BlogPostHeaderProps) {
   return (
-    <header className="max-w-[560px] mx-auto mb-[100px] text-left">
+    <header className="max-w-[560px] mx-auto mb-12 sm:mb-16 lg:mb-[100px] text-left">
       {/* Subtitle / metadata - small, light grey */}
       {subtitle && (
         <p className="text-sm font-normal !text-stone-500 dark:!text-zinc-500 !mb-3">

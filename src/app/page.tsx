@@ -27,7 +27,7 @@ export default function Home() {
     <div className="font-sans grid grid-rows-[80px_1fr_20px] items-center justify-items-center min-h-screen pb-0 gap-1">
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-4 focus:left-4 focus:px-4 focus:py-2 focus:bg-white focus:text-stone-800 focus:rounded focus:shadow">Skip to content</a>
       <main id="main" className="w-full flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <div className="intro-container max-w-[592px] mx-auto px-4" style={{ paddingTop: 'clamp(40px, 10vh, 100px)' }}>
+        <div className="intro-container max-w-[592px] mx-auto px-4 pt-0 sm:pt-16 lg:pt-24">
           {/* Left column: name */}
           <div>
             <motion.h1
