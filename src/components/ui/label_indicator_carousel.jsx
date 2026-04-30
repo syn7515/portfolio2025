@@ -426,6 +426,7 @@ export default function LabelIndicatorCarousel({
                     isHydrated={isHydrated}
                     isDarkMode={isDarkMode}
                     effectiveLightboxEnabled={false} // No lightbox in mobile
+                    disableCursor={true}
                     openLightboxOnCardClick={openLightboxOnCardClick}
                     openLightbox={openLightbox}
                     setIndex={setIndex}

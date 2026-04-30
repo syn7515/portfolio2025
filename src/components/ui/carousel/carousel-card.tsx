@@ -29,6 +29,7 @@ interface CarouselCardProps {
   captionStyle?: CSSProperties;
   transition?: Transition;
   hiddenCardIndex?: number | null;
+  disableCursor?: boolean;
 }
 
 export function CarouselCard({
@@ -47,7 +48,8 @@ export function CarouselCard({
   renderCaption,
   captionStyle,
   transition,
-  hiddenCardIndex
+  hiddenCardIndex,
+  disableCursor = false
 }: CarouselCardProps) {
   const { label, caption, imageUrl, videoUrl, alt, imageSizePercent, imagePosition, videoAutoplay, videoLoop, videoMuted, videoControls, cardVariant, backgroundLines, fetchPriority } = item;
   const videoPreload = fetchPriority === 'high' ? 'auto' : 'metadata';
@@ -102,10 +104,11 @@ export function CarouselCard({
           }
         }}
         className={`group relative ${backgroundClass} transition-all duration-150 ${
-          index === currentIndex
+          disableCursor ? 'cursor-default'
+            : index === currentIndex
             ? canOpenLightboxFromCard ? 'cursor-zoom-in' : 'cursor-default'
             : index < currentIndex ? 'cursor-[w-resize]' : 'cursor-[e-resize]'
-        } focus-visible:ring-2 focus-visible:ring-stone-400 overflow-hidden ${index !== currentIndex ? 'hover:opacity-70' : ''}`}
+        } focus-visible:ring-2 focus-visible:ring-stone-400 overflow-hidden ${!disableCursor && index !== currentIndex ? 'hover:opacity-70' : ''}`}
         style={{
           width: "100%",
           aspectRatio: '16/9',
