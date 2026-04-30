@@ -157,7 +157,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
         </button>
       </aside>
 
-      <div className="w-full overflow-x-clip px-4 pt-12 sm:pt-20 lg:pt-[7.5rem]">
+      <div className="w-full overflow-x-clip px-4 pt-20 sm:pt-20 lg:pt-[7.5rem]">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={animationReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}

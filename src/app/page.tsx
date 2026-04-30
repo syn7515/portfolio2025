@@ -48,7 +48,7 @@ export default function Home() {
           {/* Right column: bio + social links */}
           <div>
             <motion.p
-              className="intro-text !text-stone-800 dark:!text-inherit !font-[420] mt-4 md:mt-10 lg:mt-12 !mb-5"
+              className="intro-text !text-stone-800 dark:!text-inherit !font-[420] mt-8 md:mt-10 lg:mt-12 !mb-5"
               initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
               animate={getAnimate()}
               transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.08 }}
