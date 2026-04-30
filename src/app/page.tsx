@@ -100,7 +100,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="max-w-[800px] mx-auto w-full px-4 mt-12 lg:mt-24">
+        <div className="max-w-[800px] mx-auto w-full px-4 mt-12 sm:mt-20 lg:mt-24">
           <div className="grid gap-12 md:gap-20 lg:gap-28">
             <ProjectItem
               imageUrl="https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/aniai-main.png"
