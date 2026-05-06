@@ -184,7 +184,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                     style={{ textDecoration: 'none' }}
                   >
                     <div 
-                      className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic mb-1.5 opacity-80 font-sans transition-colors duration-150 group-hover:text-orange-600 dark:group-hover:text-lime-400 group-hover:opacity-100"
+                      className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic mb-1.5 opacity-80 font-sans transition-colors duration-150 group-hover:text-orange-700 dark:group-hover:text-lime-200 group-hover:opacity-100"
                     >
                       <span className="relative inline-flex items-center">
                         <ArrowLeft
@@ -214,7 +214,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                     style={{ textDecoration: 'none' }}
                   >
                     <div 
-                      className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic mb-1.5 opacity-80 font-sans transition-colors duration-150 group-hover:text-orange-600 dark:group-hover:text-lime-400 group-hover:opacity-100"
+                      className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic mb-1.5 opacity-80 font-sans transition-colors duration-150 group-hover:text-orange-700 dark:group-hover:text-lime-200 group-hover:opacity-100"
                     >
                       <span className="relative inline-flex items-center justify-end">
                         <ArrowRight
