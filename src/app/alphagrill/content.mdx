@@ -15,18 +15,8 @@ For 3–4 years, the team shipped without a product or design owner. As the comp
 
 <Heading title="Designing the grill workflow" year="2025 - 2026" tocLabel="Grill workflow" />
 
-Commercial kitchens move fast and AlphaGrill automates one task: grilling patties. The bot cooks and unloads patties in a few minutes, letting one line cook manage the grill line alongside other tasks. The redesign needed to support cooks managing multiple tasks in parallel.
+Commercial kitchens move fast and AlphaGrill automates one task: grilling patties. The bot cooks and unloads patties in a few minutes, letting one line cook manage the grill line alongside other tasks. The redesign had to hold up when chefs are busiest.
 
-The robot runs through many internal states. Interviews and observation showed that for chefs, these collapse into two phases: setup and cooking. The interface mirrors this model.
-
-<Table
-  columns={['Phase', 'What chefs need', 'Interface response']}
-  rows={[
-    ['Setup', '"What do I need to start cooking?"', 'Simple controls to start'],
-    ['Cooking', '"When will this batch finish?"', 'Clear progress display'],
-  ]}
-  highlightColumn={0}
-/>
 
 <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] my-20">
   <LabelIndicatorCarousel
@@ -59,13 +49,12 @@ Two decisions anchored the redesign:
 
 <Heading title="Designing safe cleaning controls" year="2026" tocLabel="Cleaning controls" />
 
-Kitchen robots require regular cleaning. Oil mist and food debris quickly build up inside the grill. If not cleaned properly, the robot may cook unevenly or stop during operation. Cleaning must be simple and safe for chefs.
+Kitchen robots need regular cleaning, but the original AlphaGrill wasn't designed for it — some surfaces were unreachable, others unsafe. Incomplete cleaning led to burnt-on buildup and component damage, a major source of repair costs and reliability loss.
 
-Effective cleaning requires moving the grill into specific positions. Different areas become accessible only when the grill is repositioned.
+> "We all clean the kitchen together at closing time." — Site visit interview
 
-Through observation and testing of the cleaning process, three positions emerged as the most effective: cleaning the inner wall, the griddle surface, and the underside of the grill. These positions form the foundation of the cleaning workflow.
+The reframe: cleaning already happens at closing. The opportunity wasn't to enforce it, but to fold it into that existing routine.
 
-The interface centers on repositioning the grill. Employees choose the area they are cleaning, and the robot moves to the correct position.
 
 <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] my-20">
   <LabelIndicatorCarousel
@@ -82,8 +71,13 @@ The interface centers on repositioning the grill. Employees choose the area they
   />
 </div>
 
-Safety was a key concern. Moving grill parts can cause burns or injuries if triggered accidentally. To prevent this, the interface requires a second confirmation before the robot moves.
+Three findings from research shaped the newly added cleaning mode:
+- Low-visibility surfaces were the ones being easily skipped.
+- Kitchen staff were pouring water on hot griddles, causing deformation.
+- Moving grill parts could cause burns or injuries if triggered accidentally.
 
-The slider provides the sense of physical control, while the confirmation step prevents unintended actions.
+**Cleaning mode runs in parallel with closing tasks.** Entering the mode starts a cooldown, so staff can keep working while the robot prepares — and gating cleaning behind the cooldown steers them away from pouring water on a still-hot grill.
+
+**Staff choose a cleaning position to reach hidden surfaces.** Three areas need the most careful cleaning — inner wall, griddle surface, and underside. Surfacing them in the UI prompts extra attention, and the robot moves into the selected position so staff don't shift hot, heavy parts by hand.
 
 </div>

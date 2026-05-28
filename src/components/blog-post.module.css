@@ -131,6 +131,14 @@
     list-style-type: disc;
 }
 
+.mdxContent p + ul {
+    margin-top: -0.75rem;
+}
+
+.mdxContent ul + p {
+    margin-top: 2.5rem;
+}
+
 .mdxContent ol {
     color: rgb(68 64 60) !important;
     /* stone-700 */
@@ -143,7 +151,16 @@
 
 .mdxContent li {
     margin-bottom: 0.5rem;
-    /* mb-2 */
+    font-size: 0.9375rem;
+    font-weight: 420;
+    line-height: 140%;
+    color: rgb(68 64 60) !important;
+    opacity: 0.85;
+}
+
+.mdxContent li::marker {
+    color: rgb(168 162 158);
+    /* stone-400 */
 }
 
 .mdxContent blockquote {
@@ -151,8 +168,8 @@
     /* stone-700 */
     border-left-width: 4px;
     /* border-l-4 */
-    border-color: rgb(59 130 246);
-    /* border-blue-500 */
+    border-color: rgb(234 88 12);
+    /* orange-600 */
     padding-left: 1rem;
     /* pl-4 */
     font-style: italic;
@@ -170,7 +187,7 @@
 .mdxContent strong {
     color: rgb(12 10 9) !important;
     /* stone-950 */
-    font-weight: 560;
+    font-weight: 520;
     opacity: 1;
 }
 
@@ -233,6 +250,19 @@
     .mdxContent blockquote {
         color: rgb(161 161 170) !important;
         /* zinc-400 */
+        border-color: rgb(163 230 53);
+        /* lime-400 */
+    }
+
+    .mdxContent li {
+        color: rgb(212 212 216) !important;
+        /* zinc-300 */
+        opacity: 0.7;
+    }
+
+    .mdxContent li::marker {
+        color: rgb(113 113 122);
+        /* zinc-500 */
     }
 
     .mdxContent p {
