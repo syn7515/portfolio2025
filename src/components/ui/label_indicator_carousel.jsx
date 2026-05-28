@@ -44,12 +44,15 @@ export default function LabelIndicatorCarousel({
   openLightboxOnCardClick = true,
   // Indicator options
   showIndicators = true,
+  // Sup navigation: maps supId (number) → cardIndex
+  supCardMap,
 } = {}) {
   const sourceItems = items ?? FALLBACK_ITEMS;
   const normalized = useMemo(() => sourceItems.map(normalizeItem), [sourceItems]);
   const isControlled = typeof currentIndex === "number";
   const [uncontrolledIndex, setUncontrolledIndex] = useState(defaultIndex);
   const index = isControlled ? currentIndex : uncontrolledIndex;
+  const wrapperRef = useRef(null);
 
   // Viewport detection for mobile mode (< 640px) - vertical layout
   const [isMobile, setIsMobile] = useState(false);
@@ -216,6 +219,20 @@ export default function LabelIndicatorCarousel({
     },
     [isControlled, normalized.length, onChange]
   );
+
+  // Sup footnote navigation
+  useEffect(() => {
+    if (!supCardMap) return
+    const handler = (e) => {
+      const cardIndex = supCardMap[e.detail.supId]
+      if (cardIndex !== undefined) {
+        setIndex(cardIndex)
+        wrapperRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      }
+    }
+    window.addEventListener('sup-navigate', handler)
+    return () => window.removeEventListener('sup-navigate', handler)
+  }, [supCardMap, setIndex])
 
   // Lightbox callbacks (defined after setIndex)
   const openLightbox = useCallback((i) => {
@@ -404,6 +421,7 @@ export default function LabelIndicatorCarousel({
 
   return (
     <div
+      ref={wrapperRef}
       className={`relative flex h-auto py-0 sm:py-2 md:py-3 w-full flex-col items-center justify-center ${className}`}
       aria-label={ariaLabel}
       onKeyDown={onKeyDown}

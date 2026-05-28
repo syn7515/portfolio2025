@@ -3,6 +3,7 @@ import Divider from '@/components/ui/divider'
 import Heading from '@/components/ui/heading'
 import { Table } from '@/components/ui/table'
 import InlineYoutubePreview from '@/components/ui/inline-youtube-preview'
+import SupRef from '@/components/ui/sup-ref'
 
 <div className="max-w-[560px] mx-auto">
 
@@ -21,6 +22,7 @@ Commercial kitchens move fast and AlphaGrill automates one task: grilling pattie
 <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] my-20">
   <LabelIndicatorCarousel
     showIndicators={false}
+    supCardMap={{ 1: 0, 2: 1 }}
     items={[
       {
         label: "GRILL",
@@ -42,9 +44,9 @@ Commercial kitchens move fast and AlphaGrill automates one task: grilling pattie
 
 Two decisions anchored the redesign:
 
-**Showing readiness, not temperature<sup>1</sup>** Chefs didn't want to know the current temperature — they wanted to know when the robot would be ready. I replaced numeric readings with a circular gauge showing degrees remaining, matching the question they were actually asking.
+**Showing readiness, not temperature<SupRef id={1} />** Chefs didn't want to know the current temperature — they wanted to know when the robot would be ready. I replaced numeric readings with a circular gauge showing degrees remaining, matching the question they were actually asking.
 
-**Tapping instead of swiping<sup>2</sup>** Swipe-based recipe selection failed often with oily gloved hands. Tap won on two counts: reliability (it needs only position, where swipe needs position + direction) and reach (frequent actions belong in the lower screen region).
+**Tapping instead of swiping<SupRef id={2} />** Swipe-based recipe selection failed often with oily gloved hands. Tap won on two counts: reliability (it needs only position, where swipe needs position + direction) and reach (frequent actions belong in the lower screen region).
 
 
 <Heading title="Designing safe cleaning controls" year="2026" tocLabel="Cleaning controls" />

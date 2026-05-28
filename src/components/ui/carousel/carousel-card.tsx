@@ -7,6 +7,35 @@ import { motion, type Transition } from "framer-motion";
 import { calculateImagePosition, type CarouselItem } from "./hooks";
 import { GrillLines } from "./grill-lines";
 
+function CaptionSupBadge({ supId }: { supId: string }) {
+  return (
+    <span
+      id={`sup-caption-${supId}`}
+      onClick={(e) => {
+        e.stopPropagation()
+        document.getElementById(`sup-body-${supId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }}
+      className="inline-flex items-center justify-center rounded-full w-[13px] h-[13px] text-[10px] leading-none font-medium text-white cursor-pointer select-none relative -top-[5px] ml-[2px] transition-colors duration-150 bg-stone-300 hover:bg-orange-700 dark:bg-zinc-600 dark:hover:bg-lime-200 dark:hover:text-zinc-900"
+    >
+      {supId}
+    </span>
+  )
+}
+
+function renderCaptionWithBadges(caption: string): ReactNode {
+  const parts = caption.split(/(<sup>\d+<\/sup>)/g)
+  if (parts.length === 1) return <span dangerouslySetInnerHTML={{ __html: caption }} />
+  return (
+    <>
+      {parts.map((part, i) => {
+        const match = part.match(/^<sup>(\d+)<\/sup>$/)
+        if (match) return <CaptionSupBadge key={i} supId={match[1]} />
+        return part ? <span key={i} dangerouslySetInnerHTML={{ __html: part }} /> : null
+      })}
+    </>
+  )
+}
+
 interface CarouselCardProps {
   item: CarouselItem;
   index: number;
@@ -269,8 +298,9 @@ export function CarouselCard({
           <div
             className={`carousel-caption text-center text-xs sm:text-sm mt-2 sm:mt-3 md:mt-4 font-sans`}
             style={{ width: "100%", ...(captionStyle || {}) }}
-            dangerouslySetInnerHTML={{ __html: caption }}
-          />
+          >
+            {renderCaptionWithBadges(caption)}
+          </div>
         )
       ) : null}
     </div>

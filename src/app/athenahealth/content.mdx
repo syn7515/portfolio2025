@@ -1,5 +1,6 @@
 import LabelIndicatorCarousel from '@/components/ui/label_indicator_carousel'
 import Divider from '@/components/ui/divider'
+import SupRef from '@/components/ui/sup-ref'
 
 <div className="max-w-[560px] mx-auto">
 
@@ -16,13 +17,7 @@ I focused on improving how the system guides payer actions at critical decision 
 <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] my-20">
   <LabelIndicatorCarousel
     showIndicators={false}
-    renderCaption={({ caption }) => (
-      <div className="text-center text-stone-600 dark:text-stone-300 text-xs sm:text-sm mt-2 sm:mt-3 md:mt-5 font-sans">
-        {caption && (
-          <span dangerouslySetInnerHTML={{ __html: caption }} />
-        )}
-      </div>
-    )}
+    supCardMap={{ 1: 0, 2: 1 }}
     items={[
       { 
         label: "", 
@@ -38,7 +33,7 @@ I focused on improving how the system guides payer actions at critical decision 
   />
 </div>
 
-This includes <sup>1</sup> highlighting invoice urgency to help users quickly identify pending or overdue bills, and <sup>2</sup> introducing messenger for payment adjudication communication.
+This includes <SupRef id={1} /> highlighting invoice urgency to help users quickly identify pending or overdue bills, and <SupRef id={2} /> introducing messenger for payment adjudication communication.
 
 3 months wasn’t enough to ship and see the full impact of my work in such a complex, compliance-heavy domain like healthcare. However, after the portal launched in 2024 alongside other new features, AthenaHealth saw a **30%** reduction in client payment cycles.
 
