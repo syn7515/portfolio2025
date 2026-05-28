@@ -269,9 +269,8 @@ export function CarouselCard({
           <div
             className={`carousel-caption text-center text-xs sm:text-sm mt-2 sm:mt-3 md:mt-4 font-sans`}
             style={{ width: "100%", ...(captionStyle || {}) }}
-          >
-            {caption}
-          </div>
+            dangerouslySetInnerHTML={{ __html: caption }}
+          />
         )
       ) : null}
     </div>

@@ -8,26 +8,22 @@ import InlineYoutubePreview from '@/components/ui/inline-youtube-preview'
 
 <span className="block">
   <InlineYoutubePreview videoId="xqcpR1u-OcA" start={8}>AlphaGrill</InlineYoutubePreview>
-  {' '}is an automatic grilling robot for Quick Service Restaurants (QSRs) like McDonald's.
+  {' '}is an grilling robot for commercial kitchens like McDonald's.
 </span>
 
-For 3–4 years, the team shipped feature updates without a product or design owner. Design debt grew and it began affecting the business metrics.
-
-As the company prepared the next version of this grill bot, I proposed and led a redesign of robot interaction. I worked closely with the industrial designer and engineers through implementation.
+For 3–4 years, the team shipped without a product or design owner. As the company prepared the next version, I proposed and led a redesign of robot interaction, working with the industrial designer and engineers through implementation.
 
 <Heading title="Designing the grill workflow" year="2025 - 2026" tocLabel="Grill workflow" />
 
-QSR kitchens move fast and AlphaGrill automates one task: grilling patties. The grill bot cooks and unloads patties automatically in few minutes.
+Commercial kitchens move fast and AlphaGrill automates one task: grilling patties. The bot cooks and unloads patties in a few minutes, letting one line cook manage the grill line alongside other tasks. The redesign needed to support cooks managing multiple tasks in parallel.
 
-This efficiency lets one line cook manage grill line alongside other tasks. The redesign must support cooks managing multiple tasks.
-
-The robot runs through many internal states. For chefs, these collapse into two phases: cooking setup and cooking cycle. The interface mirrors this model.
+The robot runs through many internal states. Interviews and observation showed that for chefs, these collapse into two phases: setup and cooking. The interface mirrors this model.
 
 <Table
   columns={['Phase', 'What chefs need', 'Interface response']}
   rows={[
-    ['Cooking setup', '"What do I need to start cooking?"', 'Simple controls to start'],
-    ['Cooking cycle', '"When will this batch finish?"', 'Clear progress display'],
+    ['Setup', '"What do I need to start cooking?"', 'Simple controls to start'],
+    ['Cooking', '"When will this batch finish?"', 'Clear progress display'],
   ]}
   highlightColumn={0}
 />
@@ -38,22 +34,28 @@ The robot runs through many internal states. For chefs, these collapse into two 
     items={[
       {
         label: "GRILL",
-        caption: "Grill workflow status and countdown",
+        caption: "The gauge shows degrees remaining until ready, rather than the current temperature<sup>1</sup>",
         videoUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/grill-1.mov",
         imageSizePercent: 85,
         imagePosition: { top: "center", left: "center" },
-        cardVariant: "with-background-lines",
-        backgroundLines: "grill",
+      },
+      {
+        label: "GRILL",
+        caption: "Recipe selection uses taps instead of swipes, reducing failed inputs with gloved hands<sup>2</sup>",
+        videoUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/grill-2.mov",
+        imageSizePercent: 85,
+        imagePosition: { top: "center", left: "center" },
       },
     ]}
   />
 </div>
 
-During cooking setup, chefs need to start cooking with minimal interaction. The layout keeps the key controls visible so chefs can begin cooking in a few taps.
+Two decisions anchored the redesign:
 
-During the cooking cycle, the focus shifts to monitoring progress. The display becomes a status board, showing remaining time and grill status from a distance.
+**Showing readiness, not temperature<sup>1</sup>** Chefs didn't want to know the current temperature — they wanted to know when the robot would be ready. I replaced numeric readings with a circular gauge showing degrees remaining, matching the question they were actually asking.
 
-Color also guides the workflow. The background gradient follows the color of the next action button, so chefs always know what to press next.
+**Tapping instead of swiping<sup>2</sup>** Swipe-based recipe selection failed often with oily gloved hands. I evaluated swipe vs. tap against two constraints: *reliability* (tap needs position only; swipe needs position + direction) and *reach* (frequent actions belong in the lower screen region).
+
 
 <Heading title="Designing safe cleaning controls" year="2026" tocLabel="Cleaning controls" />
 
@@ -75,8 +77,6 @@ The interface centers on repositioning the grill. Employees choose the area they
         videoUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/clean-1.mov",
         imageSizePercent: 85,
         imagePosition: { top: "center", left: "center" },
-        cardVariant: "with-background-lines",
-        backgroundLines: "grill",
       },
     ]}
   />
