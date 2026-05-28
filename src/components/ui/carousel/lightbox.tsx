@@ -380,7 +380,7 @@ export function Lightbox({
                 if (!caption) return null;
                 return (
                   <motion.div
-                    className={`fixed left-0 right-0 text-center font-sans text-xs sm:text-sm pointer-events-none ${isDarkMode ? '!text-white [&_sup]:!text-white' : '!text-stone-600 [&_sup]:!text-stone-600'}`}
+                    className={`fixed left-0 right-0 text-center font-sans text-xs sm:text-sm pointer-events-none [&_sup]:inline-flex [&_sup]:items-center [&_sup]:justify-center [&_sup]:rounded-full [&_sup]:w-[13px] [&_sup]:h-[13px] [&_sup]:text-[10px] [&_sup]:leading-none [&_sup]:font-medium [&_sup]:!text-white [&_sup]:select-none [&_sup]:[vertical-align:3px] [&_sup]:ml-[2px] ${isDarkMode ? '!text-white [&_sup]:bg-zinc-600' : '!text-stone-600 [&_sup]:bg-stone-300'}`}
                     style={{ top: `calc(50% + ${dimensions.height / 2}px + 1rem)` }}
                     initial={{ opacity: 0, filter: 'blur(2px)' }}
                     animate={
