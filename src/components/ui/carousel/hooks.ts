@@ -104,6 +104,7 @@ export function normalizeItem(item: Normalizable): CarouselItem {
           item.fetchPriority === 'high' || item.fetchPriority === 'low' || item.fetchPriority === 'auto'
             ? item.fetchPriority
             : 'auto',
+        withInsetShadow: item.withInsetShadow === true ? true : undefined,
       };
     }
 
