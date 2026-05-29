@@ -25,6 +25,7 @@ export type CarouselItem = {
   cardVariant?: "default" | "with-background-lines";
   backgroundLines?: string;
   fetchPriority?: 'high' | 'low' | 'auto';
+  withInsetShadow?: boolean;
 };
 
 type Normalizable =

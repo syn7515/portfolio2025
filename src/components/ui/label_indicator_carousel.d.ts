@@ -7,12 +7,13 @@ export type ImagePosition = {
   right?: number;
 };
 
-export type CarouselItem = string | { 
-  label: string; 
-  caption?: string; 
+export type CarouselItem = string | {
+  label: string;
+  caption?: string;
   imageUrl?: string;
   imageSizePercent?: number;
   imagePosition?: ImagePosition;
+  withInsetShadow?: boolean;
 };
 
 export interface LabelIndicatorCarouselProps {

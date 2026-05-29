@@ -80,7 +80,7 @@ export function CarouselCard({
   hiddenCardIndex,
   disableCursor = false
 }: CarouselCardProps) {
-  const { label, caption, imageUrl, videoUrl, alt, imageSizePercent, imagePosition, videoAutoplay, videoLoop, videoMuted, videoControls, cardVariant, backgroundLines, fetchPriority } = item;
+  const { label, caption, imageUrl, videoUrl, alt, imageSizePercent, imagePosition, videoAutoplay, videoLoop, videoMuted, videoControls, cardVariant, backgroundLines, fetchPriority, withInsetShadow } = item;
   const videoPreload = fetchPriority === 'high' ? 'auto' : 'metadata';
   const hasMedia = !!(imageUrl || videoUrl);
   const [isMediaLoading, setIsMediaLoading] = useState(hasMedia);
@@ -277,7 +277,9 @@ export function CarouselCard({
               border: isHydrated && !isDarkMode ? '1px solid rgba(0, 0, 0, 0.02)' : 'none', // dark mode border is handled via inset box-shadow
               boxShadow: isHydrated
                 ? isDarkMode
-                  ? 'inset 0 1px 0 0 rgba(255,255,255,0.02), inset 0 0 0 1px rgba(255,255,255,0.02), 0 1px 1px -0.5px rgba(0,0,0,0.18)'
+                  ? withInsetShadow
+                    ? 'inset 0 1px 0 0 rgba(255,255,255,0.10), inset 0 0 0 1px rgba(255,255,255,0.08), 0 1px 1px -0.5px rgba(0,0,0,0.18)'
+                    : 'inset 0 1px 0 0 rgba(255,255,255,0.02), inset 0 0 0 1px rgba(255,255,255,0.02), 0 1px 1px -0.5px rgba(0,0,0,0.18)'
                   : '0px 0px 0px 1px rgba(0,0,0,0.10), 0px 1px 1px -0.5px rgba(0,0,0,0.10), 0px 3px 3px -1.5px rgba(0,0,0,0.10)'
                 : 'none',
               boxSizing: 'border-box',

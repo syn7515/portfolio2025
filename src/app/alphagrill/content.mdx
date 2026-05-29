@@ -14,7 +14,7 @@ import SupRef from '@/components/ui/sup-ref'
 
 For 3–4 years, the team shipped without a product or design owner. As the company prepared the next version, I proposed and led a redesign of robot interaction, working with the industrial designer and engineers through implementation.
 
-<Heading title="Designing the grill workflow" year="2025 - 2026" tocLabel="Grill workflow" />
+<Heading title="Cooking around the chef's question" year="2025 - 2026" tocLabel="Cooking" />
 
 Commercial kitchens move fast and AlphaGrill automates one task: grilling patties. The bot cooks and unloads patties in a few minutes, letting one line cook manage the grill line alongside other tasks. The redesign had to hold up when chefs are busiest.
 
@@ -56,7 +56,7 @@ Two decisions anchored the redesign:
   className="mt-4 mb-20"
 />
 
-<Heading title="Designing safe cleaning controls" year="2026" tocLabel="Cleaning controls" />
+<Heading title="Cleaning around the closing routine" year="2026" tocLabel="Cleaning" />
 
 Kitchen robots need regular cleaning, but the original AlphaGrill wasn't designed for it — some surfaces were unreachable, others unsafe. Incomplete cleaning led to burnt-on buildup and component damage, a major source of repair costs and reliability loss.
 
@@ -64,10 +64,15 @@ Kitchen robots need regular cleaning, but the original AlphaGrill wasn't designe
 
 The reframe: cleaning already happens at closing. The opportunity wasn't to enforce it, but to fold it into that existing routine.
 
+Three findings from research shaped the newly added cleaning mode:
+- Low-visibility surfaces were the ones being easily skipped.
+- Kitchen staff were pouring water on hot griddles, causing deformation.
+- Staff were reluctant to handle the hot grill parts, leading them to skip cleaning.
 
 <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] my-20">
   <LabelIndicatorCarousel
     showIndicators={false}
+    supCardMap={{ 3: 0, 4: 1 }}
     items={[
       {
         label: "GRILL",
@@ -75,18 +80,28 @@ The reframe: cleaning already happens at closing. The opportunity wasn't to enfo
         videoUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/clean-1.mov",
         imageSizePercent: 85,
         imagePosition: { top: "center", left: "center" },
+        withInsetShadow: true,
+      },
+      {
+        label: "GRILL",
+        caption: "Selecting a cleaning area repositions the grill so staff can reach hidden surfaces<sup>4</sup>",
+        videoUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/clean-2.mov",
+        imageSizePercent: 85,
+        imagePosition: { top: "center", left: "center" },
+        withInsetShadow: true,
       },
     ]}
   />
 </div>
 
-Three findings from research shaped the newly added cleaning mode:
-- Low-visibility surfaces were the ones being easily skipped.
-- Kitchen staff were pouring water on hot griddles, causing deformation.
-- Staff were reluctant to handle the hot grill parts, leading them to skip cleaning.
-
 **Cleaning mode runs in parallel with closing tasks<SupRef id={3} />** Entering the mode starts a cooldown, so staff can keep working while the robot prepares — and gating cleaning behind the cooldown steers them away from pouring water on a still-hot grill.
 
-**Staff choose a cleaning position to reach hidden surfaces.** Three areas need the most careful cleaning — inner wall, griddle surface, and underside. Surfacing them in the UI prompts extra attention, and the robot moves into the selected position so staff don't shift hot, heavy parts by hand.
+**Staff choose a cleaning position to reach hidden surfaces<SupRef id={4} />** Three areas need the most careful cleaning — inner wall, griddle surface, and underside. Surfacing them in the UI prompts extra attention, and the robot moves into the selected position so staff don't shift hot, heavy parts by hand.
+
+<Heading title="Impact"/>
+
+Pre-launch, validation came through internal dogfooding and demos with three major burger franchise partners. Staff followed the new flows without external guidance, and unprompted feedback specifically named the cleaning flow as intuitive and the readiness display as useful for managing parallel tasks.
+
+As of May 2026, AlphaGrill is in pre-sale and contract discussions with three major franchise partners are underway.
 
 </div>
