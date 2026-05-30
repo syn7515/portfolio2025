@@ -430,7 +430,7 @@ export default function LabelIndicatorCarousel({
       tabIndex={0}
       style={{ outline: "none" }}
     >
-      <div className="flex flex-col items-center justify-center w-full">
+      <div className="relative z-[50] flex flex-col items-center justify-center w-full">
         {isMobile ? (
           // Vertical layout for mobile (< 640px)
           <div className="flex flex-col items-center w-full" style={{ rowGap: Math.max(effGap * 3, 24), width: '100%' }}>

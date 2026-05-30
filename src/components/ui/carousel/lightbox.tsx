@@ -344,14 +344,14 @@ export function Lightbox({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4, ease: [0.77, 0, 0.175, 1] }}
-            className={`fixed inset-0 z-50 backdrop-blur-[1.5px] cursor-zoom-out ${isDarkMode ? 'bg-black/70' : 'bg-white/85'}`}
+            className={`fixed inset-0 z-[70] backdrop-blur-[1.5px] cursor-zoom-out ${isDarkMode ? 'bg-black/70' : 'bg-white/85'}`}
             onClick={closeLightbox}
           />
 
           {/* Lightbox content container */}
           <motion.div
             key="lightbox-dialog"
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
+            className="fixed inset-0 z-[70] flex items-center justify-center p-4 pointer-events-none"
             role="dialog"
             aria-modal="true"
             initial={false}

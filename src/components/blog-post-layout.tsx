@@ -107,11 +107,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
       setViewportTall(window.innerHeight > 700)
       if (headerRef.current) {
         const headerScrolledOut = headerRef.current.getBoundingClientRect().bottom <= 0
-        const carouselInTopZone = Array.from(document.querySelectorAll('[data-carousel]')).some(el => {
-          const r = el.getBoundingClientRect()
-          return r.top < 80 && r.bottom > 0
-        })
-        setShowTopBlur(headerScrolledOut && !carouselInTopZone)
+        setShowTopBlur(headerScrolledOut)
       }
     }
     update()
@@ -138,7 +134,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
 
       {/* Fixed side nav: back + TOC; visible only on lg+ */}
       <aside
-        className="hidden min-[1400px]:block fixed left-0 top-0 bottom-0 z-50 pointer-events-none"
+        className="hidden min-[1400px]:block fixed left-0 top-0 bottom-0 z-60 pointer-events-none"
         aria-label="Post navigation"
       >
         {/* Background layer at 10% opacity */}
