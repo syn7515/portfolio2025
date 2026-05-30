@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight, ArrowUp, Undo2 } from 'lucide-react'
@@ -94,6 +94,8 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
   const [animationReady, setAnimationReady] = useState(false)
   const [showBackToTop, setShowBackToTop] = useState(false)
   const [viewportTall, setViewportTall] = useState(false)
+  const [showTopBlur, setShowTopBlur] = useState(false)
+  const headerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     setAnimationReady(true)
@@ -103,6 +105,9 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
     const update = () => {
       setShowBackToTop(window.scrollY > 300)
       setViewportTall(window.innerHeight > 700)
+      if (headerRef.current) {
+        setShowTopBlur(headerRef.current.getBoundingClientRect().bottom <= 0)
+      }
     }
     update()
     window.addEventListener('scroll', update, { passive: true })
@@ -115,6 +120,20 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
 
   return (
     <TooltipProvider>
+      {/* Top-edge blur overlay: only active once title/subtitle has scrolled out of view */}
+      <div
+        aria-hidden
+        className="fixed top-0 left-0 right-0 z-40 pointer-events-none transition-opacity duration-300"
+        style={{
+          height: '60px',
+          opacity: showTopBlur ? 1 : 0,
+          backdropFilter: 'blur(1px)',
+          WebkitBackdropFilter: 'blur(1px)',
+          maskImage: 'linear-gradient(to bottom, black 0%, black 15%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 15%, transparent 100%)',
+        }}
+      />
+
       {/* Fixed side nav: back + TOC; visible only on lg+ */}
       <aside
         className="hidden min-[1400px]:block fixed left-0 top-0 bottom-0 z-50 pointer-events-none"
@@ -164,7 +183,9 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
         >
           {/* Header: title, subtitle, like/copy */}
-          <BlogPostHeader slug={slug} title={title} subtitle={subtitle} />
+          <div ref={headerRef}>
+            <BlogPostHeader slug={slug} title={title} subtitle={subtitle} />
+          </div>
 
           {/* Content with overflow-x-hidden */}
           <div className={styles.mdxContent} data-blog-content>

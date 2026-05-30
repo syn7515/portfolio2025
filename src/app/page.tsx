@@ -61,7 +61,7 @@ export default function Home() {
               animate={getAnimate()}
               transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.16 }}
             >
-              <span className="intro-text">Currently a founding product designer at </span><InlineLinkPreview href="https://www.aniai.ai/" imageUrl='https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/aniai.webp' explanation="A robotics startup specialized in kitchen automation">Aniai</InlineLinkPreview><span className="intro-text">, designing robots and tools behind them.</span>
+              <span className="intro-text">Currently leading design at </span><InlineLinkPreview href="https://www.aniai.ai/" imageUrl='https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/aniai.webp' explanation="A robotics startup specialized in kitchen automation">Aniai</InlineLinkPreview><span className="intro-text">, designing robots and tools behind them.</span>
             </motion.p>
             <motion.p
               className="!text-stone-500 dark:!text-zinc-400 !font-[420] mb-0"
