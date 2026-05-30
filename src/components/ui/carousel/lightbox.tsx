@@ -339,6 +339,7 @@ export function Lightbox({
         <>
           {/* Background overlay with opacity */}
           <motion.div
+            key="lightbox-backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -346,12 +347,15 @@ export function Lightbox({
             className={`fixed inset-0 z-50 backdrop-blur-[1.5px] cursor-zoom-out ${isDarkMode ? 'bg-black/70' : 'bg-white/85'}`}
             onClick={closeLightbox}
           />
-          
+
           {/* Lightbox content container */}
-          <div 
+          <motion.div
+            key="lightbox-dialog"
             className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
-            role="dialog" 
+            role="dialog"
             aria-modal="true"
+            initial={false}
+            exit={{}}
           >
             {/* Image container - positioned absolutely to allow animation without clipping */}
             <div
@@ -447,7 +451,7 @@ export function Lightbox({
                 </>
               )}
             </div>
-          </div>
+          </motion.div>
         </>
       )}
     </AnimatePresence>

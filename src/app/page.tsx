@@ -115,7 +115,7 @@ export default function Home() {
               transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.4 }}
             />
             <ProjectItem
-              imageUrl="https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/alphagrill-main.png"
+              imageUrl="https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/alphagrill.png"
               alt="AlphaGrill robot interface for kitchen collaboration"
               organization="Aniai"
               dates="2025 - 2026"

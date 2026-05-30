@@ -45,6 +45,7 @@ export default function ProjectItem({
   // Dark mode detection - only set after hydration to avoid SSR mismatch
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
+  const [isMediaLoading, setIsMediaLoading] = useState(true);
 
   useEffect(() => {
     setIsHydrated(true);
@@ -94,6 +95,8 @@ export default function ProjectItem({
             className="absolute"
             loading={loading}
             fetchPriority={fetchPriority}
+            ref={(el) => { if (el?.complete) setIsMediaLoading(false); }}
+            onLoad={() => setIsMediaLoading(false)}
             style={{
               left: `${inset}%`,
               top: `${inset}%`,
@@ -103,6 +106,12 @@ export default function ProjectItem({
               objectPosition: imageObjectPosition,
             }}
           />
+          {/* Loading spinner */}
+          {isMediaLoading && (
+            <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+              <div className="w-6 h-6 rounded-full border-2 border-stone-300 dark:border-zinc-600 border-t-stone-500 dark:border-t-zinc-400 animate-spin" />
+            </div>
+          )}
           {/* Border layer on top */}
           <div
             className="absolute inset-0 pointer-events-none"
