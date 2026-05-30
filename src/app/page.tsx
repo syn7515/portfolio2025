@@ -118,7 +118,7 @@ export default function Home() {
               imageUrl="https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/alphagrill.png"
               alt="AlphaGrill robot interface for kitchen collaboration"
               organization="Aniai"
-              dates="2025 - 2026"
+              dates="Ongoing"
               description="Robot Interface for Collaboration in Kitchen"
               href="/alphagrill"
               imageObjectPosition="center center"
