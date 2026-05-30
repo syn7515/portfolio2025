@@ -106,7 +106,12 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
       setShowBackToTop(window.scrollY > 300)
       setViewportTall(window.innerHeight > 700)
       if (headerRef.current) {
-        setShowTopBlur(headerRef.current.getBoundingClientRect().bottom <= 0)
+        const headerScrolledOut = headerRef.current.getBoundingClientRect().bottom <= 0
+        const carouselInTopZone = Array.from(document.querySelectorAll('[data-carousel]')).some(el => {
+          const r = el.getBoundingClientRect()
+          return r.top < 80 && r.bottom > 0
+        })
+        setShowTopBlur(headerScrolledOut && !carouselInTopZone)
       }
     }
     update()
@@ -125,12 +130,9 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
         aria-hidden
         className="fixed top-0 left-0 right-0 z-40 pointer-events-none transition-opacity duration-300"
         style={{
-          height: '60px',
+          height: '80px',
           opacity: showTopBlur ? 1 : 0,
-          backdropFilter: 'blur(1px)',
-          WebkitBackdropFilter: 'blur(1px)',
-          maskImage: 'linear-gradient(to bottom, black 0%, black 15%, transparent 100%)',
-          WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 15%, transparent 100%)',
+          background: 'linear-gradient(to bottom, var(--top-fade-from) 0%, transparent 100%)',
         }}
       />
 

@@ -423,6 +423,7 @@ export default function LabelIndicatorCarousel({
     <div
       ref={wrapperRef}
       className={`relative flex h-auto py-0 sm:py-2 md:py-3 w-full flex-col items-center justify-center ${className}`}
+      data-carousel
       aria-label={ariaLabel}
       onKeyDown={onKeyDown}
       onWheel={onWheel}
