@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight, ArrowUp, Undo2 } from 'lucide-react'
@@ -94,8 +94,6 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
   const [animationReady, setAnimationReady] = useState(false)
   const [showBackToTop, setShowBackToTop] = useState(false)
   const [viewportTall, setViewportTall] = useState(false)
-  const [showTopBlur, setShowTopBlur] = useState(false)
-  const headerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     setAnimationReady(true)
@@ -105,10 +103,6 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
     const update = () => {
       setShowBackToTop(window.scrollY > 300)
       setViewportTall(window.innerHeight > 700)
-      if (headerRef.current) {
-        const headerScrolledOut = headerRef.current.getBoundingClientRect().bottom <= 0
-        setShowTopBlur(headerScrolledOut)
-      }
     }
     update()
     window.addEventListener('scroll', update, { passive: true })
@@ -121,13 +115,12 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
 
   return (
     <TooltipProvider>
-      {/* Top-edge blur overlay: only active once title/subtitle has scrolled out of view */}
+      {/* Top-edge fade overlay */}
       <div
         aria-hidden
-        className="fixed top-0 left-0 right-0 z-40 pointer-events-none transition-opacity duration-300"
+        className="fixed top-0 left-0 right-0 z-40 pointer-events-none"
         style={{
           height: '80px',
-          opacity: showTopBlur ? 1 : 0,
           background: 'linear-gradient(to bottom, var(--top-fade-from) 0%, transparent 100%)',
         }}
       />
@@ -181,9 +174,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
         >
           {/* Header: title, subtitle, like/copy */}
-          <div ref={headerRef}>
-            <BlogPostHeader slug={slug} title={title} subtitle={subtitle} />
-          </div>
+          <BlogPostHeader slug={slug} title={title} subtitle={subtitle} />
 
           {/* Content with overflow-x-hidden */}
           <div className={styles.mdxContent} data-blog-content>
