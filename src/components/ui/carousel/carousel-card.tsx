@@ -45,6 +45,7 @@ function CaptionSupBadge({ supId }: { supId: string }) {
         document.getElementById(`sup-body-${supId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
         window.dispatchEvent(new CustomEvent('sup-highlight', { detail: { supId } }))
       }}
+      style={supId === '1' ? { paddingRight: '1px' } : undefined}
       className={`inline-flex items-center justify-center rounded-full w-[13px] h-[13px] text-[10px] leading-none font-medium text-white cursor-pointer select-none relative -top-[5px] ml-[2px] transition-colors duration-300 ease-out ${
         isHighlighted
           ? 'bg-orange-700 dark:bg-lime-200 dark:text-zinc-900'
