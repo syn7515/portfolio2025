@@ -16,7 +16,7 @@
   --gradient-bg: #ffffff;
   --gradient-transparent: transparent;
   --toc-text-shadow: none;
-  --top-fade-from: var(--background);
+  --top-fade-from: color-mix(in srgb, var(--background) 80%, transparent);
 }
 
 @theme inline {
@@ -42,7 +42,7 @@
     /* zinc-900 at 70% — semi-transparent so backdrop blur shows through */
     --gradient-transparent: rgb(24 24 27 / 0);
     --toc-text-shadow: 0 0 16px color-mix(in srgb, var(--background) 40%, transparent), 0 0 32px color-mix(in srgb, var(--background) 20%, transparent);
-    --top-fade-from: var(--background);
+    --top-fade-from: color-mix(in srgb, var(--background) 80%, transparent);
   }
 }
 
