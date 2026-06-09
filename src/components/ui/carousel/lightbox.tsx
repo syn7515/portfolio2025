@@ -10,6 +10,7 @@ import {
   type CarouselItem,
 } from "./hooks";
 import { GrillLines } from "./grill-lines";
+import { renderCaptionWithBadges } from "@/components/ui/sup-caption-badge";
 
 export type TransformSnapshot = {
   x: number;
@@ -380,11 +381,10 @@ export function Lightbox({
               {/* Caption - fixed relative to viewport so it doesn't move during the open/close animation */}
               {(() => {
                 const caption = normalizedItems[lightboxIndex]?.caption?.trim();
-                const hasHtml = caption?.includes("<");
                 if (!caption) return null;
                 return (
                   <motion.div
-                    className={`fixed left-0 right-0 text-center font-sans text-xs sm:text-sm pointer-events-none [&_sup]:inline-flex [&_sup]:items-center [&_sup]:justify-center [&_sup]:rounded-full [&_sup]:w-[13px] [&_sup]:h-[13px] [&_sup]:text-[10px] [&_sup]:leading-none [&_sup]:font-medium [&_sup]:!text-white [&_sup]:select-none [&_sup]:[vertical-align:3px] [&_sup]:ml-[2px] ${isDarkMode ? '!text-white [&_sup]:bg-zinc-600' : '!text-stone-600 [&_sup]:bg-stone-300'}`}
+                    className={`fixed left-0 right-0 text-center font-sans text-xs sm:text-sm pointer-events-none ${isDarkMode ? '!text-white' : '!text-stone-600'}`}
                     style={{ top: `calc(50% + ${dimensions.height / 2}px + 1rem)` }}
                     initial={{ opacity: 0, filter: 'blur(2px)' }}
                     animate={
@@ -396,10 +396,9 @@ export function Lightbox({
                       duration: exitTransform ? exitDuration : 0.4,
                       ease: [0.77, 0, 0.175, 1],
                     }}
-                    {...(hasHtml
-                      ? { dangerouslySetInnerHTML: { __html: caption } }
-                      : { children: caption })}
-                  />
+                  >
+                    {renderCaptionWithBadges(caption)}
+                  </motion.div>
                 );
               })()}
 

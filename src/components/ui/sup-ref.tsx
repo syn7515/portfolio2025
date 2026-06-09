@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from 'react'
+import { SUP_BADGE_BASE_CLASS, SUP_BADGE_DEFAULT_CLASS, SUP_BADGE_HIGHLIGHTED_CLASS } from '@/components/ui/sup-badge'
 
 interface SupRefProps {
   id: number
@@ -46,10 +47,8 @@ export default function SupRef({ id }: SupRefProps) {
       id={`sup-body-${id}`}
       onClick={handleClick}
       style={id === 1 || id === 4 ? { paddingRight: '1px' } : undefined}
-      className={`inline-flex items-center justify-center rounded-full w-[13px] h-[13px] text-[10px] leading-none font-medium text-white cursor-pointer select-none relative -top-[5px] ml-[2px] ${
-        isHighlighted
-          ? 'bg-orange-700 dark:bg-lime-200 dark:text-zinc-900'
-          : 'bg-stone-300 hover:bg-orange-700 dark:bg-zinc-600 dark:hover:bg-lime-200 dark:hover:text-zinc-900'
+      className={`${SUP_BADGE_BASE_CLASS} ${
+        isHighlighted ? SUP_BADGE_HIGHLIGHTED_CLASS : SUP_BADGE_DEFAULT_CLASS
       }`}
     >
       {id}

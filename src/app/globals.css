@@ -534,13 +534,21 @@ a[data-inline-link-preview-trigger]:hover {
   }
 }
 
-sup {
+/* Prose footnote markers only — circular badges use span.sup-badge, not <sup> */
+sup:not(.sup-badge) {
   font-feature-settings: "sups";
   vertical-align: baseline;
   font-size: inherit;
   position: relative;
   top: -0.1rem;
   left: 0;
+}
+
+.sup-badge {
+  font-feature-settings: normal;
+  vertical-align: baseline;
+  font-size: 10px;
+  line-height: 1;
 }
 
 /* Carousel caption — must win over .mdxContent div !important */

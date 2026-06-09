@@ -2,75 +2,12 @@
 "use client"
 
 import type { CSSProperties, ReactNode } from "react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { motion, type Transition } from "framer-motion";
 import { calculateImagePosition, type CarouselItem } from "./hooks";
 import { GrillLines } from "./grill-lines";
 import { CARD_LIGHT_SHADOW } from "@/components/ui/card-shadow";
-
-function CaptionSupBadge({ supId }: { supId: string }) {
-  const [isHighlighted, setIsHighlighted] = useState(false)
-  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([])
-
-  useEffect(() => {
-    const clearTimers = () => {
-      timersRef.current.forEach(clearTimeout)
-      timersRef.current = []
-    }
-
-    const handler = (e: CustomEvent<{ supId: string | number }>) => {
-      if (String(e.detail.supId) === supId) {
-        clearTimers()
-        // Wait for carousel navigation to complete, then blink
-        const t1 = setTimeout(() => {
-          setIsHighlighted(true)
-          const t2 = setTimeout(() => setIsHighlighted(false), 600)
-          timersRef.current.push(t2)
-        }, 800)
-        timersRef.current.push(t1)
-      }
-    }
-
-    window.addEventListener('sup-caption-highlight', handler as EventListener)
-    return () => {
-      window.removeEventListener('sup-caption-highlight', handler as EventListener)
-      clearTimers()
-    }
-  }, [supId])
-
-  return (
-    <span
-      id={`sup-caption-${supId}`}
-      onClick={(e) => {
-        e.stopPropagation()
-        document.getElementById(`sup-body-${supId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        window.dispatchEvent(new CustomEvent('sup-highlight', { detail: { supId } }))
-      }}
-      style={supId === '1' ? { paddingRight: '1px' } : undefined}
-      className={`inline-flex items-center justify-center rounded-full w-[13px] h-[13px] text-[10px] leading-none font-medium text-white cursor-pointer select-none relative -top-[5px] ml-[2px] transition-colors duration-300 ease-out ${
-        isHighlighted
-          ? 'bg-orange-700 dark:bg-lime-200 dark:text-zinc-900'
-          : 'bg-stone-300 hover:bg-orange-700 dark:bg-zinc-600 dark:hover:bg-lime-200 dark:hover:text-zinc-900'
-      }`}
-    >
-      {supId}
-    </span>
-  )
-}
-
-function renderCaptionWithBadges(caption: string): ReactNode {
-  const parts = caption.split(/(<sup>\d+<\/sup>)/g)
-  if (parts.length === 1) return <span dangerouslySetInnerHTML={{ __html: caption }} />
-  return (
-    <>
-      {parts.map((part, i) => {
-        const match = part.match(/^<sup>(\d+)<\/sup>$/)
-        if (match) return <CaptionSupBadge key={i} supId={match[1]} />
-        return part ? <span key={i} dangerouslySetInnerHTML={{ __html: part }} /> : null
-      })}
-    </>
-  )
-}
+import { renderCaptionWithBadges } from "@/components/ui/sup-caption-badge";
 
 interface CarouselCardProps {
   item: CarouselItem;

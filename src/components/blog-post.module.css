@@ -179,7 +179,7 @@
     /* my-4 */
 }
 
-.mdxContent sup {
+.mdxContent sup:not(.sup-badge) {
     color: rgb(120 113 108) !important;
     /* stone-500 - lighter text color */
 }
@@ -307,7 +307,7 @@
         opacity: 1;
     }
 
-    .mdxContent sup {
+    .mdxContent sup:not(.sup-badge) {
         color: rgb(161 161 170) !important;
         /* zinc-400 - lighter text color for dark mode */
     }
