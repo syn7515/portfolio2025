@@ -135,8 +135,8 @@ export function CarouselCard({
   const withBackgroundLines = cardVariant === "with-background-lines";
   const backgroundClass =
     hasPositionedMedia || withBackgroundLines
-      ? `bg-stone-200/50 dark:bg-zinc-800/70 ${index === currentIndex ? "hover:bg-stone-200 dark:hover:bg-zinc-800" : ""}`
-      : `bg-stone-200/50 dark:bg-zinc-800/70 ${index === currentIndex ? "hover:bg-stone-200 dark:hover:bg-zinc-800" : ""}`;
+      ? `bg-stone-200/20 dark:bg-zinc-800/70 ${index === currentIndex ? "hover:bg-stone-200/60 dark:hover:bg-zinc-800" : ""}`
+      : `bg-stone-200/20 dark:bg-zinc-800/70 ${index === currentIndex ? "hover:bg-stone-200/60 dark:hover:bg-zinc-800" : ""}`;
   const canOpenLightboxFromCard = effectiveLightboxEnabled && openLightboxOnCardClick && (imageUrl || videoUrl);
   
   const isHiddenByLightbox = hiddenCardIndex === index;

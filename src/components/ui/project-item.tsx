@@ -92,7 +92,7 @@ export default function ProjectItem({
           color: 'inherit'
         }}
       >
-        <div className="relative w-full aspect-video bg-stone-200/50 dark:bg-zinc-800/70 dark:group-hover:bg-zinc-800 group-hover:bg-stone-200 transition-colors duration-300 ease-out" style={{ borderRadius: '4px', ['cornerShape' as string]: 'squircle' }}>
+        <div className="relative w-full aspect-video bg-stone-200/20 dark:bg-zinc-800/70 dark:group-hover:bg-zinc-800 group-hover:bg-stone-200/60 transition-colors duration-300 ease-out" style={{ borderRadius: '4px', ['cornerShape' as string]: 'squircle' }}>
           <div
             className="absolute inset-0 overflow-hidden"
             style={{ borderRadius: '4px', ['cornerShape' as string]: 'squircle' }}
