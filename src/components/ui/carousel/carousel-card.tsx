@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, type Transition } from "framer-motion";
 import { calculateImagePosition, type CarouselItem } from "./hooks";
 import { GrillLines } from "./grill-lines";
+import { CARD_LIGHT_SHADOW } from "@/components/ui/card-shadow";
 
 function CaptionSupBadge({ supId }: { supId: string }) {
   const [isHighlighted, setIsHighlighted] = useState(false)
@@ -119,6 +120,7 @@ export function CarouselCard({
   const videoPreload = fetchPriority === 'high' ? 'auto' : 'metadata';
   const hasMedia = !!(imageUrl || videoUrl);
   const [isMediaLoading, setIsMediaLoading] = useState(hasMedia);
+  const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
     if (imageUrl || videoUrl) {
@@ -167,12 +169,14 @@ export function CarouselCard({
             }
           }
         }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
         className={`group relative ${backgroundClass} transition-all duration-150 ${
           disableCursor ? 'cursor-default'
             : index === currentIndex
             ? canOpenLightboxFromCard ? 'cursor-zoom-in' : 'cursor-default'
             : index < currentIndex ? 'cursor-[w-resize]' : 'cursor-[e-resize]'
-        } focus-visible:ring-2 focus-visible:ring-stone-400 overflow-hidden ${!disableCursor && index !== currentIndex ? 'hover:opacity-70' : ''}`}
+        } focus-visible:ring-2 focus-visible:ring-stone-400 ${!disableCursor && index !== currentIndex ? 'hover:opacity-70' : ''}`}
         style={{
           width: "100%",
           aspectRatio: '16/9',
@@ -314,12 +318,12 @@ export function CarouselCard({
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
-              border: isHydrated && !isDarkMode ? '1px solid rgba(0, 0, 0, 0.02)' : 'none', // dark mode border is handled via inset box-shadow
               boxShadow: isHydrated
                 ? isDarkMode
                   ? 'inset 0 1px 0 0 rgba(255,255,255,0.02), inset 0 0 0 1px rgba(255,255,255,0.02), 0 1px 1px -0.5px rgba(0,0,0,0.18)'
-                  : '0px 0px 0px 1px rgba(0,0,0,0.10), 0px 1px 1px -0.5px rgba(0,0,0,0.10), 0px 3px 3px -1.5px rgba(0,0,0,0.10)'
+                  : isHovered ? CARD_LIGHT_SHADOW.hover : CARD_LIGHT_SHADOW.default
                 : 'none',
+              transition: `box-shadow ${isHovered ? '150ms' : '0ms'} ease-out`,
               boxSizing: 'border-box',
               borderRadius: '4px',
               // eslint-disable-next-line @typescript-eslint/no-explicit-any

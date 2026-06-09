@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
+import { CARD_LIGHT_SHADOW } from '@/components/ui/card-shadow';
 
 interface ProjectItemProps {
   imageUrl: string;
@@ -46,6 +47,7 @@ export default function ProjectItem({
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
   const [isMediaLoading, setIsMediaLoading] = useState(true);
+  const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
     setIsHydrated(true);
@@ -83,45 +85,52 @@ export default function ProjectItem({
       <Link
         href={href}
         className="flex flex-col group font-sans cursor-pointer"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
         style={{ 
           textDecoration: 'none',
           color: 'inherit'
         }}
       >
-        <div className="relative w-full aspect-video bg-stone-200/50 dark:bg-zinc-800/70 dark:group-hover:bg-zinc-800 group-hover:bg-stone-200 transition-colors duration-300 ease-out overflow-hidden" style={{ borderRadius: '4px', ['cornerShape' as string]: 'squircle' }}>
-          <img
-            src={imageUrl}
-            alt={alt}
-            className="absolute"
-            loading={loading}
-            fetchPriority={fetchPriority}
-            ref={(el) => { if (el?.complete) setIsMediaLoading(false); }}
-            onLoad={() => setIsMediaLoading(false)}
-            style={{
-              left: `${inset}%`,
-              top: `${inset}%`,
-              width: `${size}%`,
-              height: `${size}%`,
-              objectFit: imageObjectFit,
-              objectPosition: imageObjectPosition,
-            }}
-          />
-          {/* Loading spinner */}
-          {isMediaLoading && (
-            <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
-              <div className="w-6 h-6 rounded-full border-2 border-stone-300 dark:border-zinc-600 border-t-stone-500 dark:border-t-zinc-400 animate-spin" />
-            </div>
-          )}
+        <div className="relative w-full aspect-video bg-stone-200/50 dark:bg-zinc-800/70 dark:group-hover:bg-zinc-800 group-hover:bg-stone-200 transition-colors duration-300 ease-out" style={{ borderRadius: '4px', ['cornerShape' as string]: 'squircle' }}>
+          <div
+            className="absolute inset-0 overflow-hidden"
+            style={{ borderRadius: '4px', ['cornerShape' as string]: 'squircle' }}
+          >
+            <img
+              src={imageUrl}
+              alt={alt}
+              className="absolute"
+              loading={loading}
+              fetchPriority={fetchPriority}
+              ref={(el) => { if (el?.complete) setIsMediaLoading(false); }}
+              onLoad={() => setIsMediaLoading(false)}
+              style={{
+                left: `${inset}%`,
+                top: `${inset}%`,
+                width: `${size}%`,
+                height: `${size}%`,
+                objectFit: imageObjectFit,
+                objectPosition: imageObjectPosition,
+              }}
+            />
+            {/* Loading spinner */}
+            {isMediaLoading && (
+              <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+                <div className="w-6 h-6 rounded-full border-2 border-stone-300 dark:border-zinc-600 border-t-stone-500 dark:border-t-zinc-400 animate-spin" />
+              </div>
+            )}
+          </div>
           {/* Border layer on top */}
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
-              border: isHydrated && !isDarkMode ? '1px solid rgba(0, 0, 0, 0.02)' : 'none',  // dark mode border is handled via inset box-shadow
               boxShadow: isHydrated
                 ? isDarkMode
                   ? 'inset 0 1px 0 0 rgba(255,255,255,0.02), inset 0 0 0 1px rgba(255,255,255,0.02), 0 1px 1px -0.5px rgba(0,0,0,0.18)'
-                  : '0px 0px 0px 1px rgba(0,0,0,0.10), 0px 1px 1px -0.5px rgba(0,0,0,0.10), 0px 3px 3px -1.5px rgba(0,0,0,0.10)'
+                  : isHovered ? CARD_LIGHT_SHADOW.hover : CARD_LIGHT_SHADOW.default
                 : 'none',
+              transition: `box-shadow ${isHovered ? '150ms' : '0ms'} ease-out`,
               boxSizing: 'border-box',
               borderRadius: '4px',
               ['cornerShape' as string]: 'squircle',
