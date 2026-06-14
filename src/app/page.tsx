@@ -71,8 +71,15 @@ export default function Home() {
             >
               <span className="intro-text">Previously, reimagined public benefits at </span><InlineLinkPreview href="https://goinvo.com/" variant="intro-link-light" imageUrl='https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/goinvo.jpg' explanation="A Boston design studio crafting healthcare software for 20+ years">Goinvo</InlineLinkPreview><span className="intro-text"> and advanced healthcare accessibility at </span><InlineLinkPreview href="https://www.athenahealth.com/" variant="intro-link-light" imageUrl="https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/athenahealth.jpeg" explanation='A healthtech company serving 170K+ clinicians across the US'>AthenaHealth</InlineLinkPreview><span className="intro-text">.</span>
             </motion.p>
+            <div className="mt-8 w-fit pr-4 flex flex-col gap-6">
             <motion.div
-              className="intro-text flex gap-2 mt-8"
+              className="h-px w-full bg-gradient-to-r from-stone-300 dark:from-zinc-600 to-transparent"
+              initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
+              animate={getAnimate()}
+              transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.30 }}
+            />
+            <motion.div
+              className="intro-text flex gap-2 w-fit"
               initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
               animate={getAnimate()}
               transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.32 }}
@@ -97,6 +104,7 @@ export default function Home() {
                 LinkedIn
               </a>
             </motion.div>
+            </div>
           </div>
         </div>
 
