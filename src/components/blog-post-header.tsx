@@ -1,6 +1,5 @@
 "use client"
 
-import React from 'react'
 
 interface BlogPostHeaderProps {
   slug?: string
@@ -19,12 +18,14 @@ export default function BlogPostHeader({ title, subtitle }: BlogPostHeaderProps)
       )}
       {/* Title - typography per design spec */}
       <h1
-        className="!mt-0 text-stone-800 dark:text-zinc-200 !font-medium !mb-0 !dark:text-zinc-100 whitespace-pre-line"
+        className="!mt-0 !text-stone-700 dark:!text-zinc-200 !mb-0 whitespace-pre-line"
         style={{
-          fontFamily: 'var(--font-libre-caslon), serif',
-          fontSize: '32px',
-          lineHeight: '150%',
+          fontFamily: 'var(--font-crimson-pro), serif',
+          fontSize: '40px',
+          lineHeight: '120%',
           letterSpacing: '-0.03em',
+          fontWeight: 360,
+          textWrap: 'balance',
         }}
       >
         {title}

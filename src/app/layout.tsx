@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Libre_Caslon_Text } from "next/font/google";
+import { Geist, Geist_Mono, Libre_Caslon_Text, Crimson_Pro } from "next/font/google";
 import localFont from "next/font/local";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/react";
@@ -34,6 +34,11 @@ const libreCaslonText = Libre_Caslon_Text({
   weight: "400",
   subsets: ["latin"],
   variable: "--font-libre-caslon",
+});
+
+const crimsonPro = Crimson_Pro({
+  subsets: ["latin"],
+  variable: "--font-crimson-pro",
 });
 
 export const viewport: Viewport = {
@@ -116,7 +121,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       />
       {/* End Google Tag Manager */}
       <body
-        className={`${inter.variable} ${geistSans.variable} ${geistMono.variable} ${libreCaslonText.variable} antialiased`}
+        className={`${inter.variable} ${geistSans.variable} ${geistMono.variable} ${libreCaslonText.variable} ${crimsonPro.variable} antialiased`}
       >
         <script
           dangerouslySetInnerHTML={{

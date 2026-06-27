@@ -138,11 +138,11 @@ export default function ProjectItem({
             }}
           />
         </div>
-        <div className="mt-4 font-sans not-italic">
+        <div className="mt-5 font-sans not-italic">
           <div className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic font-sans !font-[420]">
             <span className="flex gap-1.5 items-center">{organization}<span className="text-stone-400 dark:text-zinc-600">·</span><span>{dates}</span></span>
           </div>
-          <h2 className="!text-[15px] !font-[420] !mt-0.5 !mb-0 not-italic !text-stone-800 dark:!text-zinc-200 leading-normal">
+          <h2 className="!mt-0.5 !mb-0 not-italic !text-stone-700 dark:!text-zinc-200" style={{ fontFamily: 'var(--font-crimson-pro), serif', fontSize: '22px', fontWeight: 450, lineHeight: '130%', letterSpacing: '-0.02em' }}>
             {description}
           </h2>
         </div>

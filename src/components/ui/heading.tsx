@@ -26,8 +26,8 @@ export function Heading({ title, year, tocLabel, className }: HeadingProps) {
     >
       {/* Title text */}
       <span
-        className="text-[15px] font-[520] leading-[160%] font-sans text-stone-800 dark:text-zinc-200"
-        style={{ fontStyle: 'normal' }}
+        className="text-stone-800 dark:text-zinc-200"
+        style={{ fontFamily: 'var(--font-crimson-pro), serif', fontSize: '19px', fontWeight: 450, lineHeight: '160%', letterSpacing: '-0.02em', fontStyle: 'normal' }}
       >
         {title}
       </span>

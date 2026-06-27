@@ -208,6 +208,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                     </div>
                     <p
                       className="mt-0 not-italic project-nav-description transition-colors duration-150 group-hover:!text-orange-700 dark:group-hover:!text-lime-200"
+                      style={{ fontFamily: 'var(--font-crimson-pro), serif', fontSize: '19px', fontWeight: 450, lineHeight: '130%', letterSpacing: '-0.02em', textWrap: 'balance' }}
                     >
                       {preventWidow(previousProject.description)}
                     </p>
@@ -238,6 +239,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                     </div>
                     <p
                       className="mt-0 not-italic project-nav-description transition-colors duration-150 group-hover:!text-orange-700 dark:group-hover:!text-lime-200"
+                      style={{ fontFamily: 'var(--font-crimson-pro), serif', fontSize: '19px', fontWeight: 450, lineHeight: '130%', letterSpacing: '-0.02em', textWrap: 'balance' }}
                     >
                       {preventWidow(nextProject.description)}
                     </p>

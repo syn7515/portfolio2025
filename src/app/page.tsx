@@ -31,15 +31,17 @@ export default function Home() {
           {/* Left column: name */}
           <div>
             <motion.h1
-              className="intro-text !text-stone-800 dark:!text-zinc-200 !mb-0 md:!mb-0 !font-medium !dark:!text-zinc-100"
+              className="intro-text !text-stone-700 dark:!text-zinc-200 !mb-0 md:!mb-0"
               initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
               animate={getAnimate()}
               transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
               style={{
-                fontFamily: 'var(--font-libre-caslon), serif',
-                fontSize: '32px',
-                lineHeight: '150%',
+                fontFamily: 'var(--font-crimson-pro), serif',
+                fontSize: '40px',
+                lineHeight: '120%',
                 letterSpacing: '-0.03em',
+                fontWeight: 360,
+                textWrap: 'balance',
               }}
             >
               Sue Park
@@ -48,7 +50,7 @@ export default function Home() {
           {/* Right column: bio + social links */}
           <div>
             <motion.p
-              className="intro-text !text-stone-800 dark:!text-inherit !font-[480] mt-8 md:mt-10 lg:mt-12 !mb-5"
+              className="intro-text !text-stone-500 dark:!text-inherit !font-[480] mt-8 md:mt-10 lg:mt-12 !mb-5"
               initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
               animate={getAnimate()}
               transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.08 }}
@@ -56,7 +58,7 @@ export default function Home() {
               Product designer with engineering mindset, obsessed with <span className="italic">why</span> behind everything — from systems to pixels.
             </motion.p>
             <motion.p
-              className="!text-stone-800 dark:!text-inherit !font-[480] !mb-5"
+              className="!text-stone-500 dark:!text-inherit !font-[480] !mb-5"
               initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
               animate={getAnimate()}
               transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.16 }}
