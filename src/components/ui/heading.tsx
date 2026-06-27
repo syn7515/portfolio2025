@@ -46,7 +46,7 @@ export function Heading({ title, year, tocLabel, className }: HeadingProps) {
             />
           </div>
           <span
-            className="text-[15px] !font-[420] leading-[160%] font-sans text-stone-400 dark:text-zinc-500"
+            className="text-[15px] !font-[460] leading-[160%] font-sans text-stone-400 dark:text-zinc-500"
             style={{ fontStyle: 'normal' }}
           >
             {year}

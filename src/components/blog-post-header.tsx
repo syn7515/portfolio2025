@@ -13,7 +13,7 @@ export default function BlogPostHeader({ title, subtitle }: BlogPostHeaderProps)
     <header className="max-w-[560px] mx-auto mb-16 xs:mb-16 sm:mb-20 lg:mb-[100px] text-left">
       {/* Subtitle / metadata - small, light grey */}
       {subtitle && (
-        <p className="text-sm font-normal !text-stone-500 dark:!text-zinc-500 !mb-3">
+        <p className="text-sm !text-stone-500 dark:!text-zinc-500 !mb-3" style={{ fontWeight: 460 }}>
           {subtitle}
         </p>
       )}

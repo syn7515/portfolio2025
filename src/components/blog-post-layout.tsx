@@ -145,7 +145,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           }}
         />
         <div className="relative flex flex-col gap-6 pt-[7.5rem] pl-14 pointer-events-auto">
-          <Link href="/" className="flex items-center gap-2 w-fit text-sm font-normal !not-italic !no-underline !text-stone-400 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-lime-200 transition-colors duration-300 ease-out" aria-label="Back to home">
+          <Link href="/" className="flex items-center gap-2 w-fit text-sm font-[460] !not-italic !no-underline !text-stone-400 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-lime-200 transition-colors duration-300 ease-out" aria-label="Back to home">
             <Undo2 className="size-4 flex-shrink-0" />
             Home
           </Link>
@@ -155,7 +155,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           type="button"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           className={cn(
-            'absolute bottom-20 left-14 flex items-center gap-2 w-fit whitespace-nowrap text-sm font-normal text-stone-400 dark:text-zinc-400 hover:text-orange-700 dark:hover:text-lime-200 transition-[color,opacity,filter] duration-300 ease-out cursor-pointer pointer-events-auto',
+            'absolute bottom-20 left-14 flex items-center gap-2 w-fit whitespace-nowrap text-sm font-[460] text-stone-400 dark:text-zinc-400 hover:text-orange-700 dark:hover:text-lime-200 transition-[color,opacity,filter] duration-300 ease-out cursor-pointer pointer-events-auto',
             showBackToTop && viewportTall
               ? 'opacity-100 blur-none'
               : 'opacity-0 blur-[4px] pointer-events-none'
@@ -194,7 +194,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                     style={{ textDecoration: 'none' }}
                   >
                     <div 
-                      className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic mb-1.5 opacity-80 font-sans transition-colors duration-150 group-hover:text-orange-700 dark:group-hover:text-lime-200 group-hover:opacity-100"
+                      className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic mb-1.5 opacity-80 font-sans"
                     >
                       <span className="relative inline-flex items-center">
                         <ArrowLeft
@@ -206,8 +206,8 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                         </span>
                       </span>
                     </div>
-                    <p 
-                      className="mt-0 not-italic project-nav-description"
+                    <p
+                      className="mt-0 not-italic project-nav-description transition-colors duration-150 group-hover:!text-orange-700 dark:group-hover:!text-lime-200"
                     >
                       {preventWidow(previousProject.description)}
                     </p>
@@ -224,7 +224,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                     style={{ textDecoration: 'none' }}
                   >
                     <div 
-                      className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic mb-1.5 opacity-80 font-sans transition-colors duration-150 group-hover:text-orange-700 dark:group-hover:text-lime-200 group-hover:opacity-100"
+                      className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic mb-1.5 opacity-80 font-sans"
                     >
                       <span className="relative inline-flex items-center justify-end">
                         <ArrowRight
@@ -236,8 +236,8 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                         </span>
                       </span>
                     </div>
-                    <p 
-                      className="mt-0 not-italic project-nav-description"
+                    <p
+                      className="mt-0 not-italic project-nav-description transition-colors duration-150 group-hover:!text-orange-700 dark:group-hover:!text-lime-200"
                     >
                       {preventWidow(nextProject.description)}
                     </p>
