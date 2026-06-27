@@ -102,19 +102,25 @@ export default function BlogPostToc({ contentSelector = CONTENT_SELECTOR, classN
   if (items.length === 0) return null
 
   return (
-    <nav aria-label="Table of contents" className={cn('flex flex-col gap-2', className)}>
+    <nav aria-label="Table of contents" className={cn('flex flex-col gap-1', className)}>
       {items.map(({ id, text }) => (
         <button
           key={id}
           type="button"
           onClick={() => handleClick(id)}
           className={cn(
-            'cursor-pointer text-left text-sm font-[460] transition-all duration-200 ease-out hover:translate-x-[12px]',
+            'cursor-pointer text-left transition-all duration-200 ease-out hover:translate-x-[12px]',
             activeId === id
               ? 'text-stone-800 dark:text-zinc-100'
               : 'text-stone-400 dark:text-zinc-400'
           )}
-          style={{ textShadow: 'var(--toc-text-shadow)' }}
+          style={{
+            fontFamily: 'var(--font-crimson-pro), serif',
+            fontSize: '18px',
+            fontWeight: 450,
+            letterSpacing: '-0.02em',
+            textShadow: 'var(--toc-text-shadow)',
+          }}
         >
           {text}
         </button>
