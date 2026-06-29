@@ -127,7 +127,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
 
       {/* Fixed side nav: back + TOC; visible only on lg+ */}
       <aside
-        className="hidden min-[1400px]:block fixed left-0 top-0 bottom-0 z-60 pointer-events-none"
+        className="hidden min-[1500px]:block fixed left-0 top-0 bottom-0 z-60 pointer-events-none"
         aria-label="Post navigation"
       >
         {/* Background layer at 10% opacity */}
@@ -144,7 +144,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
             opacity: 0.1,
           }}
         />
-        <div className="relative flex flex-col gap-6 pt-[7.5rem] pl-14 pointer-events-auto">
+        <div className="relative flex flex-col gap-6 pt-[240px] pl-14 pointer-events-auto">
           <Link href="/" className="flex items-center gap-2 w-fit text-sm font-[460] !not-italic !no-underline !text-stone-400 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-lime-200 transition-colors duration-300 ease-out" aria-label="Back to home">
             <Undo2 className="size-4 flex-shrink-0" />
             Home
@@ -155,7 +155,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           type="button"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           className={cn(
-            'absolute bottom-20 left-14 flex items-center gap-2 w-fit whitespace-nowrap text-sm font-[460] text-stone-400 dark:text-zinc-400 hover:text-orange-700 dark:hover:text-lime-200 transition-[color,opacity,filter] duration-300 ease-out cursor-pointer pointer-events-auto',
+            'absolute bottom-20 min-[1500px]:bottom-[120px] left-14 flex items-center gap-2 w-fit whitespace-nowrap text-sm font-[460] text-stone-400 dark:text-zinc-400 hover:text-orange-700 dark:hover:text-lime-200 transition-[color,opacity,filter] duration-300 ease-out cursor-pointer pointer-events-auto',
             showBackToTop && viewportTall
               ? 'opacity-100 blur-none'
               : 'opacity-0 blur-[4px] pointer-events-none'
@@ -167,25 +167,36 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
         </button>
       </aside>
 
-      <div className="w-full overflow-x-clip px-4 pt-20 xs:pt-20 sm:pt-24 lg:pt-[7.5rem]">
+      <div className="w-full overflow-x-clip">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={animationReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
         >
-          {/* Header: title, subtitle, like/copy */}
-          <BlogPostHeader slug={slug} title={title} subtitle={subtitle} />
+          {/* Paper: wraps header + content, floats after sidebar at ≥1500px */}
+          <div
+            className="min-[1500px]:ml-[300px] min-[1500px]:mt-[100px] overflow-x-clip"
+            style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)' }}
+          >
+            <div className="pt-20 xs:pt-20 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] min-[1500px]:pt-[8.75rem] pb-12 min-[1500px]:pb-[148px]">
+              <div className="px-4 min-[1500px]:px-0 min-[1500px]:ml-[calc(50vw_-_580px)] min-[1500px]:w-[560px]">
+                {/* Header: title, subtitle */}
+                <BlogPostHeader slug={slug} title={title} subtitle={subtitle} />
 
-          {/* Content with overflow-x-hidden */}
-          <div className={styles.mdxContent} data-blog-content>
-            {children}
+                {/* Content */}
+                <div className={cn(styles.mdxContent, 'max-w-[560px] mx-auto')} data-blog-content>
+                  {children}
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Project Navigation Footer */}
+          {/* Project Navigation Footer — outside paper */}
           {(previousProject || nextProject) && (
-            <div className="max-w-[560px] mx-auto mt-28 mb-8 sm:mb-16 overflow-x-hidden">
-              <Divider variant="default" color="stone" spacing="md" />
-              <div className="flex justify-between items-start mt-4 gap-8">
+            <div className="min-[1500px]:ml-[300px]">
+              <div className="max-w-[560px] mx-auto mt-16 mb-8 min-[640px]:mb-16 min-[1500px]:mb-[120px] overflow-x-hidden min-[1500px]:max-w-none min-[1500px]:mx-0 min-[1500px]:ml-[calc(50vw_-_580px)] min-[1500px]:w-[560px]">
+                <Divider variant="default" color="stone" spacing="md" className="min-[1500px]:hidden" />
+                <div className="flex justify-between items-start mt-4 gap-8">
                 {/* Previous Project */}
                 {previousProject ? (
                   <Link 
@@ -247,6 +258,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                 ) : (
                   <div className="flex-1" />
                 )}
+                </div>
               </div>
             </div>
           )}

@@ -17,6 +17,10 @@
   --gradient-transparent: transparent;
   --toc-text-shadow: none;
   --top-fade-from: color-mix(in srgb, var(--background) 80%, transparent);
+  --paper-inset-shadow: rgba(120, 113, 108, 0.4); /* stone-500 */
+  --paper-drop-shadow: rgba(0, 0, 0, 0.12);
+  --paper-bg: #ffffff;
+  --paper-box-shadow: none;
 }
 
 @theme inline {
@@ -28,7 +32,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #18181b;
+    --background: #18181b; /* zinc-900 */
     --foreground: #ededed;
     --intro-trigger-decoration: rgb(113 113 122);
     /* zinc-500 - underline color for intro/link preview triggers */
@@ -43,6 +47,15 @@
     --gradient-transparent: rgb(24 24 27 / 0);
     --toc-text-shadow: 0 0 16px color-mix(in srgb, var(--background) 40%, transparent), 0 0 32px color-mix(in srgb, var(--background) 20%, transparent);
     --top-fade-from: color-mix(in srgb, var(--background) 80%, transparent);
+    --paper-inset-shadow: rgba(63, 63, 70, 0.6); /* zinc-700 */
+    --paper-drop-shadow: rgba(0, 0, 0, 0.4);
+    --paper-bg: #18181b; /* zinc-900 */
+  }
+}
+
+@media (min-width: 1500px) {
+  :root {
+    --paper-box-shadow: inset 0 0 0 0.5px var(--paper-inset-shadow), 0 30px 60px 0 var(--paper-drop-shadow);
   }
 }
 
