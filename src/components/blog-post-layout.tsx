@@ -155,7 +155,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           type="button"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           className={cn(
-            'absolute bottom-20 min-[1500px]:bottom-[120px] left-14 flex items-center gap-2 w-fit whitespace-nowrap text-sm font-[460] text-stone-400 dark:text-zinc-400 hover:text-orange-700 dark:hover:text-lime-200 transition-[color,opacity,filter] duration-300 ease-out cursor-pointer pointer-events-auto',
+            'absolute bottom-20 min-[1500px]:bottom-[120px] mb-[120px] left-14 flex items-center gap-2 w-fit whitespace-nowrap text-sm font-[460] text-stone-400 dark:text-zinc-400 hover:text-orange-700 dark:hover:text-lime-200 transition-[color,opacity,filter] duration-300 ease-out cursor-pointer pointer-events-auto',
             showBackToTop && viewportTall
               ? 'opacity-100 blur-none'
               : 'opacity-0 blur-[4px] pointer-events-none'
@@ -173,12 +173,12 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           animate={animationReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
         >
-          {/* Paper: wraps header + content, floats after sidebar at ≥1500px */}
+          {/* Paper: wraps header + content + footer, floats after sidebar at ≥1500px */}
           <div
-            className="min-[1500px]:ml-[300px] min-[1500px]:mt-[100px] overflow-x-clip"
+            className="min-[1500px]:ml-[300px] min-[1500px]:mt-[100px] mb-8 min-[640px]:mb-16 min-[1500px]:mb-[120px] overflow-x-clip"
             style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)' }}
           >
-            <div className="pt-20 xs:pt-20 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] min-[1500px]:pt-[8.75rem] pb-12 min-[1500px]:pb-[148px]">
+            <div className="pt-20 xs:pt-20 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] min-[1500px]:pt-[8.75rem]">
               <div className="px-4 min-[1500px]:px-0 min-[1500px]:ml-[calc(50vw_-_580px)] min-[1500px]:w-[560px]">
                 {/* Header: title, subtitle */}
                 <BlogPostHeader slug={slug} title={title} subtitle={subtitle} />
@@ -187,81 +187,77 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                 <div className={cn(styles.mdxContent, 'max-w-[560px] mx-auto')} data-blog-content>
                   {children}
                 </div>
+
+                {/* Project Navigation Footer — inside paper */}
+                {(previousProject || nextProject) ? (
+                  <div className="max-w-[560px] mx-auto min-[1500px]:max-w-none mt-16 pb-12 min-[640px]:pb-16 min-[1500px]:pb-[120px] overflow-x-hidden">
+                    <Divider variant="default" color="stone" spacing="md" />
+                    <div className="flex justify-between items-start mt-4 gap-8">
+                      {/* Previous Project */}
+                      {previousProject ? (
+                        <Link
+                          href={`/${previousProject.slug}`}
+                          className="flex-1 group cursor-pointer"
+                          style={{ textDecoration: 'none' }}
+                        >
+                          <div className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic mb-1.5 opacity-80 font-sans">
+                            <span className="relative inline-flex items-center">
+                              <ArrowLeft
+                                className="absolute left-0 size-3.5 text-current opacity-0 blur-[1px] motion-safe:transition-[opacity,filter] motion-safe:duration-300 motion-safe:ease-out group-hover:opacity-100 group-hover:blur-none group-focus-visible:opacity-100 group-focus-visible:blur-none motion-reduce:opacity-100 motion-reduce:blur-none"
+                                aria-hidden
+                              />
+                              <span className="relative z-10 motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out group-hover:translate-x-4 group-focus-visible:translate-x-4 motion-reduce:translate-x-0">
+                                Previous
+                              </span>
+                            </span>
+                          </div>
+                          <p
+                            className="mt-0 not-italic project-nav-description transition-colors duration-150 group-hover:!text-orange-700 dark:group-hover:!text-lime-200"
+                            style={{ fontFamily: 'var(--font-crimson-pro), serif', fontSize: '19px', fontWeight: 450, lineHeight: '130%', letterSpacing: '-0.02em', textWrap: 'balance' }}
+                          >
+                            {preventWidow(previousProject.description)}
+                          </p>
+                        </Link>
+                      ) : (
+                        <div className="flex-1" />
+                      )}
+
+                      {/* Next Project */}
+                      {nextProject ? (
+                        <Link
+                          href={`/${nextProject.slug}`}
+                          className="flex-1 text-right group cursor-pointer"
+                          style={{ textDecoration: 'none' }}
+                        >
+                          <div className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic mb-1.5 opacity-80 font-sans">
+                            <span className="relative inline-flex items-center justify-end">
+                              <ArrowRight
+                                className="absolute right-0 size-3.5 text-current opacity-0 blur-[1px] motion-safe:transition-[opacity,filter] motion-safe:duration-300 motion-safe:ease-out group-hover:opacity-100 group-hover:blur-none group-focus-visible:opacity-100 group-focus-visible:blur-none motion-reduce:opacity-100 motion-reduce:blur-none"
+                                aria-hidden
+                              />
+                              <span className="relative z-10 motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out group-hover:-translate-x-4 group-focus-visible:-translate-x-4 motion-reduce:translate-x-0">
+                                Next
+                              </span>
+                            </span>
+                          </div>
+                          <p
+                            className="mt-0 not-italic project-nav-description transition-colors duration-150 group-hover:!text-orange-700 dark:group-hover:!text-lime-200"
+                            style={{ fontFamily: 'var(--font-crimson-pro), serif', fontSize: '19px', fontWeight: 450, lineHeight: '130%', letterSpacing: '-0.02em', textWrap: 'balance' }}
+                          >
+                            {preventWidow(nextProject.description)}
+                          </p>
+                        </Link>
+                      ) : (
+                        <div className="flex-1" />
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="pb-12 min-[1500px]:pb-[148px]" aria-hidden />
+                )}
               </div>
             </div>
           </div>
-
-          {/* Project Navigation Footer — outside paper */}
-          {(previousProject || nextProject) && (
-            <div className="min-[1500px]:ml-[300px]">
-              <div className="max-w-[560px] mx-auto mt-16 mb-8 min-[640px]:mb-16 min-[1500px]:mb-[120px] overflow-x-hidden min-[1500px]:max-w-none min-[1500px]:mx-0 min-[1500px]:ml-[calc(50vw_-_580px)] min-[1500px]:w-[560px]">
-                <Divider variant="default" color="stone" spacing="md" className="min-[1500px]:hidden" />
-                <div className="flex justify-between items-start mt-4 gap-8">
-                {/* Previous Project */}
-                {previousProject ? (
-                  <Link 
-                    href={`/${previousProject.slug}`}
-                    className="flex-1 group cursor-pointer"
-                    style={{ textDecoration: 'none' }}
-                  >
-                    <div 
-                      className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic mb-1.5 opacity-80 font-sans"
-                    >
-                      <span className="relative inline-flex items-center">
-                        <ArrowLeft
-                          className="absolute left-0 size-3.5 text-current opacity-0 blur-[1px] motion-safe:transition-[opacity,filter] motion-safe:duration-300 motion-safe:ease-out group-hover:opacity-100 group-hover:blur-none group-focus-visible:opacity-100 group-focus-visible:blur-none motion-reduce:opacity-100 motion-reduce:blur-none"
-                          aria-hidden
-                        />
-                        <span className="relative z-10 motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out group-hover:translate-x-4 group-focus-visible:translate-x-4 motion-reduce:translate-x-0">
-                          Previous
-                        </span>
-                      </span>
-                    </div>
-                    <p
-                      className="mt-0 not-italic project-nav-description transition-colors duration-150 group-hover:!text-orange-700 dark:group-hover:!text-lime-200"
-                      style={{ fontFamily: 'var(--font-crimson-pro), serif', fontSize: '19px', fontWeight: 450, lineHeight: '130%', letterSpacing: '-0.02em', textWrap: 'balance' }}
-                    >
-                      {preventWidow(previousProject.description)}
-                    </p>
-                  </Link>
-                ) : (
-                  <div className="flex-1" />
-                )}
-
-                {/* Next Project */}
-                {nextProject ? (
-                  <Link 
-                    href={`/${nextProject.slug}`}
-                    className="flex-1 text-right group cursor-pointer"
-                    style={{ textDecoration: 'none' }}
-                  >
-                    <div 
-                      className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic mb-1.5 opacity-80 font-sans"
-                    >
-                      <span className="relative inline-flex items-center justify-end">
-                        <ArrowRight
-                          className="absolute right-0 size-3.5 text-current opacity-0 blur-[1px] motion-safe:transition-[opacity,filter] motion-safe:duration-300 motion-safe:ease-out group-hover:opacity-100 group-hover:blur-none group-focus-visible:opacity-100 group-focus-visible:blur-none motion-reduce:opacity-100 motion-reduce:blur-none"
-                          aria-hidden
-                        />
-                        <span className="relative z-10 motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out group-hover:-translate-x-4 group-focus-visible:-translate-x-4 motion-reduce:translate-x-0">
-                          Next
-                        </span>
-                      </span>
-                    </div>
-                    <p
-                      className="mt-0 not-italic project-nav-description transition-colors duration-150 group-hover:!text-orange-700 dark:group-hover:!text-lime-200"
-                      style={{ fontFamily: 'var(--font-crimson-pro), serif', fontSize: '19px', fontWeight: 450, lineHeight: '130%', letterSpacing: '-0.02em', textWrap: 'balance' }}
-                    >
-                      {preventWidow(nextProject.description)}
-                    </p>
-                  </Link>
-                ) : (
-                  <div className="flex-1" />
-                )}
-                </div>
-              </div>
-            </div>
-          )}
         </motion.div>
       </div>
     </TooltipProvider>
