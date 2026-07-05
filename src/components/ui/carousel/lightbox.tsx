@@ -10,6 +10,7 @@ import {
   type CarouselItem,
 } from "./hooks";
 import { GrillLines } from "./grill-lines";
+import { CARD_LIGHT_SHADOW } from "@/components/ui/card-shadow";
 import { renderCaptionWithBadges } from "@/components/ui/sup-caption-badge";
 
 export type TransformSnapshot = {
@@ -62,8 +63,8 @@ function LightboxContent({
   if (hasPositionedMedia) {
     // Positioned image or video mode with background layers
     return (
-      <motion.div 
-        className="relative pointer-events-auto overflow-hidden rounded-[4px]"
+      <motion.div
+        className="relative pointer-events-auto rounded-[4px]"
         initial={initialTransform ? {
           x: initialTransform.x,
           y: initialTransform.y,
@@ -86,107 +87,104 @@ function LightboxContent({
           duration: exitTransform ? exitDuration : 0.4,
           ease: [0.77, 0, 0.175, 1]
         }}
-        style={{ 
+        style={{
           aspectRatio: '16/9',
           boxSizing: 'border-box',
-          // Use inline styles for responsive updates if not animating
           width: !initialTransform && !exitTransform ? dimensions.width : undefined,
           height: !initialTransform && !exitTransform ? dimensions.height : undefined,
         }}
       >
-        {withBackgroundLines ? (
-          <>
-            {/* Theme background */}
-            <div
-              className="absolute inset-0 bg-stone-100 dark:bg-zinc-800"
-              aria-hidden
-            />
-            {/* Theme-responsive line art */}
-            {currentItem?.backgroundLines === "grill" && (
-              <div className="absolute inset-0 pointer-events-none z-0 text-stone-300 dark:text-zinc-700" aria-hidden>
-                <GrillLines className="w-full h-full" />
-              </div>
-            )}
-            {/* Video on top */}
-            {hasPositionedVideo && (
-              <video
-                src={currentItem.videoUrl ?? undefined}
-                className="absolute object-contain z-[1]"
-                autoPlay={currentItem.videoAutoplay ?? true}
-                loop={currentItem.videoLoop ?? true}
-                muted={currentItem.videoMuted ?? true}
-                controls={currentItem.videoControls ?? false}
-                playsInline
-                aria-label={currentItem.alt || currentItem.label || "Lightbox video"}
-                style={{
-                  opacity: 1,
-                  display: 'block',
-                  transformOrigin: 'center center',
-                  height: `${currentItem.imageSizePercent}%`,
-                  width: 'auto',
-                  ...calculateImagePosition(currentItem.imagePosition)
-                }}
+        {/* overflow-hidden scoped to inner div so border overlay shadow is not clipped */}
+        <div className="absolute inset-0 overflow-hidden rounded-[4px]">
+          {withBackgroundLines ? (
+            <>
+              <div className="absolute inset-0 bg-stone-100 dark:bg-zinc-800" aria-hidden />
+              {currentItem?.backgroundLines === "grill" && (
+                <div className="absolute inset-0 pointer-events-none z-0 text-stone-300 dark:text-zinc-700" aria-hidden>
+                  <GrillLines className="w-full h-full" />
+                </div>
+              )}
+              {hasPositionedVideo && (
+                <video
+                  src={currentItem.videoUrl ?? undefined}
+                  className="absolute object-contain z-[1]"
+                  autoPlay={currentItem.videoAutoplay ?? true}
+                  loop={currentItem.videoLoop ?? true}
+                  muted={currentItem.videoMuted ?? true}
+                  controls={currentItem.videoControls ?? false}
+                  playsInline
+                  aria-label={currentItem.alt || currentItem.label || "Lightbox video"}
+                  style={{
+                    opacity: 1,
+                    display: 'block',
+                    transformOrigin: 'center center',
+                    height: `${currentItem.imageSizePercent}%`,
+                    width: 'auto',
+                    ...calculateImagePosition(currentItem.imagePosition)
+                  }}
+                />
+              )}
+            </>
+          ) : (
+            <>
+              <div
+                className="absolute inset-0"
+                style={{ backgroundColor: isDarkMode ? '#232326' : '#fafafa' }}
               />
-            )}
-          </>
-        ) : (
-          <>
-            {/* Base layer: page background */}
-            <div
-              className="absolute inset-0"
-              style={{
-                backgroundColor: isDarkMode ? '#18181b' : '#ffffff'
-              }}
-            />
-            {/* Top layer: project-item background */}
-            <div
-              className="absolute inset-0 bg-stone-200/60 dark:bg-zinc-700/80"
-            />
-            {/* Image or Video */}
-            {hasPositionedVideo ? (
-              <video
-                src={currentItem.videoUrl ?? undefined}
-                className="absolute object-contain"
-                autoPlay={currentItem.videoAutoplay ?? true}
-                loop={currentItem.videoLoop ?? true}
-                muted={currentItem.videoMuted ?? true}
-                controls={currentItem.videoControls ?? false}
-                playsInline
-                aria-label={currentItem.alt || currentItem.label || "Lightbox video"}
-                style={{
-                  opacity: 1,
-                  display: 'block',
-                  transformOrigin: 'center center',
-                  height: `${currentItem.imageSizePercent}%`,
-                  width: 'auto',
-                  ...calculateImagePosition(currentItem.imagePosition)
-                }}
-              />
-            ) : (
-              <img
-                src={currentItem.imageUrl ?? "/placeholder.svg"}
-                alt={currentItem.alt || currentItem.label || "Lightbox image"}
-                className="absolute object-contain"
-                style={{
-                  opacity: 1,
-                  display: 'block',
-                  transformOrigin: 'center center',
-                  height: `${currentItem.imageSizePercent}%`,
-                  width: 'auto',
-                  ...calculateImagePosition(currentItem.imagePosition)
-                }}
-              />
-            )}
-          </>
-        )}
-        {/* Border overlay */}
+              {hasPositionedVideo ? (
+                <video
+                  src={currentItem.videoUrl ?? undefined}
+                  className="absolute object-contain"
+                  autoPlay={currentItem.videoAutoplay ?? true}
+                  loop={currentItem.videoLoop ?? true}
+                  muted={currentItem.videoMuted ?? true}
+                  controls={currentItem.videoControls ?? false}
+                  playsInline
+                  aria-label={currentItem.alt || currentItem.label || "Lightbox video"}
+                  style={{
+                    opacity: 1,
+                    display: 'block',
+                    transformOrigin: 'center center',
+                    height: `${currentItem.imageSizePercent}%`,
+                    width: 'auto',
+                    ...calculateImagePosition(currentItem.imagePosition),
+                    ...(currentItem.withInsetShadow ? {
+                      boxShadow: isDarkMode
+                        ? 'inset 0 1px 0 0 rgba(255,255,255,0.12), inset 0 0 0 1px rgba(255,255,255,0.10), 0px 0px 0px 1px rgba(0,0,0,0.22), 0px 4px 8px rgba(0,0,0,0.30)'
+                        : '0px 0px 0px 1px rgba(0,0,0,0.12), 0px 2px 3px -0.5px rgba(0,0,0,0.12), 0px 6px 6px -2px rgba(0,0,0,0.10)'
+                    } : {})
+                  }}
+                />
+              ) : (
+                <img
+                  src={currentItem.imageUrl ?? "/placeholder.svg"}
+                  alt={currentItem.alt || currentItem.label || "Lightbox image"}
+                  className="absolute object-contain"
+                  style={{
+                    opacity: 1,
+                    display: 'block',
+                    transformOrigin: 'center center',
+                    height: `${currentItem.imageSizePercent}%`,
+                    width: 'auto',
+                    ...calculateImagePosition(currentItem.imagePosition),
+                    ...(currentItem.withInsetShadow ? {
+                      boxShadow: isDarkMode
+                        ? 'inset 0 1px 0 0 rgba(255,255,255,0.12), inset 0 0 0 1px rgba(255,255,255,0.10), 0px 0px 0px 1px rgba(0,0,0,0.22), 0px 4px 8px rgba(0,0,0,0.30)'
+                        : '0px 0px 0px 1px rgba(0,0,0,0.12), 0px 2px 3px -0.5px rgba(0,0,0,0.12), 0px 6px 6px -2px rgba(0,0,0,0.10)'
+                    } : {})
+                  }}
+                />
+              )}
+            </>
+          )}
+        </div>
+        {/* Border overlay outside overflow-hidden so shadow is not clipped */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            border: !isDarkMode ? '1px solid rgba(0, 0, 0, 0.02)' : 'none',
             boxShadow: isDarkMode
-              ? 'inset 0 1px 0 0 rgba(255,255,255,0.02), inset 0 0 0 1px rgba(255,255,255,0.02), 0 1px 1px -0.5px rgba(0,0,0,0.18)'
-              : '0px 0px 0px 1px rgba(0,0,0,0.10), 0px 1px 1px -0.5px rgba(0,0,0,0.10), 0px 3px 3px -1.5px rgba(0,0,0,0.10)',
+              ? 'inset 0 1px 0 0 rgba(255,255,255,0.03), inset 0 0 0 1px rgba(255,255,255,0.03), 0px 4px 12px rgba(0,0,0,0.4)'
+              : '0px 0px 1px 0px rgba(0,0,0,0.4), 0px 4px 8px 0px rgba(0,0,0,0.08)',
             boxSizing: 'border-box',
             borderRadius: '4px',
             zIndex: 10,
@@ -197,8 +195,8 @@ function LightboxContent({
   } else {
     // Full-cover image or video mode
     return (
-      <motion.div 
-        className="relative pointer-events-auto overflow-hidden rounded-[4px]"
+      <motion.div
+        className="relative pointer-events-auto rounded-[4px]"
         initial={initialTransform ? {
           x: initialTransform.x,
           y: initialTransform.y,
@@ -221,52 +219,45 @@ function LightboxContent({
           duration: exitTransform ? exitDuration : 0.4,
           ease: [0.77, 0, 0.175, 1]
         }}
-        style={{ 
+        style={{
           aspectRatio: '16/9',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           boxSizing: 'border-box',
-          // Use inline styles for responsive updates if not animating
           width: !initialTransform && !exitTransform ? dimensions.width : undefined,
           height: !initialTransform && !exitTransform ? dimensions.height : undefined,
         }}
       >
-        {hasVideo ? (
-          <video
-            src={currentItem.videoUrl ?? undefined}
-            className="object-contain w-full h-full"
-            autoPlay={currentItem.videoAutoplay ?? true}
-            loop={currentItem.videoLoop ?? true}
-            muted={currentItem.videoMuted ?? true}
-            controls={currentItem.videoControls ?? false}
-            playsInline
-            style={{
-              opacity: 1,
-              display: 'block',
-              transformOrigin: 'center center'
-            }}
-          />
-        ) : (
-          <img
-            src={currentItem?.imageUrl ?? "/placeholder.svg"}
-            alt={currentItem?.alt || currentItem?.label || "Lightbox image"}
-            className="object-contain w-full h-full"
-            style={{
-              opacity: 1,
-              display: 'block',
-              transformOrigin: 'center center',
-            }}
-          />
-        )}
-        {/* Border overlay */}
+        {/* overflow-hidden scoped to inner div so border overlay shadow is not clipped */}
+        <div className="absolute inset-0 overflow-hidden rounded-[4px]">
+          {hasVideo ? (
+            <video
+              src={currentItem.videoUrl ?? undefined}
+              className="object-contain w-full h-full"
+              autoPlay={currentItem.videoAutoplay ?? true}
+              loop={currentItem.videoLoop ?? true}
+              muted={currentItem.videoMuted ?? true}
+              controls={currentItem.videoControls ?? false}
+              playsInline
+              style={{ opacity: 1, display: 'block', transformOrigin: 'center center' }}
+            />
+          ) : (
+            <img
+              src={currentItem?.imageUrl ?? "/placeholder.svg"}
+              alt={currentItem?.alt || currentItem?.label || "Lightbox image"}
+              className="object-contain w-full h-full"
+              style={{ opacity: 1, display: 'block', transformOrigin: 'center center' }}
+            />
+          )}
+        </div>
+        {/* Border overlay outside overflow-hidden so shadow is not clipped */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            border: !isDarkMode ? '1px solid rgba(0, 0, 0, 0.02)' : 'none',
             boxShadow: isDarkMode
-              ? 'inset 0 1px 0 0 rgba(255,255,255,0.02), inset 0 0 0 1px rgba(255,255,255,0.02), 0 1px 1px -0.5px rgba(0,0,0,0.18)'
-              : '0px 0px 0px 1px rgba(0,0,0,0.10), 0px 1px 1px -0.5px rgba(0,0,0,0.10), 0px 3px 3px -1.5px rgba(0,0,0,0.10)',
+              ? 'inset 0 1px 0 0 rgba(255,255,255,0.03), inset 0 0 0 1px rgba(255,255,255,0.03), 0px 4px 12px rgba(0,0,0,0.4)'
+              : '0px 0px 1px 0px rgba(0,0,0,0.4), 0px 4px 8px 0px rgba(0,0,0,0.08)',
             boxSizing: 'border-box',
             borderRadius: '4px',
             zIndex: 10,
@@ -295,6 +286,8 @@ export function Lightbox({
   const isPrevDisabled = lightboxIndex === 0;
   const isNextDisabled = lightboxIndex >= normalizedItems.length - 1;
   const [cursorStyle, setCursorStyle] = useState<string>('default');
+  const [isPrevHovered, setIsPrevHovered] = useState(false);
+  const [isNextHovered, setIsNextHovered] = useState(false);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     const vpCenterX = window.innerWidth / 2;
@@ -407,45 +400,49 @@ export function Lightbox({
                 <>
                   <button
                     type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      prevLightbox();
-                    }}
+                    onClick={(e) => { e.stopPropagation(); prevLightbox(); }}
+                    onMouseEnter={() => setIsPrevHovered(true)}
+                    onMouseLeave={() => setIsPrevHovered(false)}
                     disabled={isPrevDisabled}
-                    className={`absolute rounded-full p-2 sm:p-3 z-20 pointer-events-auto ${isDarkMode ? 'text-white bg-white/20' : 'text-stone-700 bg-black/8'} ${
-                      isPrevDisabled
-                        ? "opacity-40 cursor-default"
-                        : `${isDarkMode ? 'hover:bg-white/30' : 'hover:bg-black/15'} transition-colors cursor-pointer`
-                    }`}
+                    className={`absolute rounded-full p-2 sm:p-3 z-20 pointer-events-auto ${isDarkMode ? 'text-white' : 'text-stone-700'} ${isPrevDisabled ? 'opacity-40 cursor-default' : 'cursor-pointer'}`}
                     style={{
                       left: `calc(50% - ${dimensions.width / 2}px - ${isLgOrAbove ? 16 : 4}px)`,
                       top: '50%',
                       transform: 'translate(-100%, -50%)',
+                      backgroundColor: isDarkMode
+                        ? isPrevHovered && !isPrevDisabled ? '#202023' : '#18181b'
+                        : isPrevHovered && !isPrevDisabled ? '#f4f4f4' : '#ffffff',
+                      boxShadow: isDarkMode
+                        ? 'inset 0 1px 0 0 rgba(255,255,255,0.03), inset 0 0 0 1px rgba(255,255,255,0.03), 0px 2px 8px rgba(0,0,0,0.35)'
+                        : '0px 0px 1px 0px rgba(0,0,0,0.3), 0px 2px 8px 0px rgba(0,0,0,0.08)',
+                      transition: 'background-color 150ms ease-out',
                     }}
                     aria-label="Previous"
                   >
-                    <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+                    <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" style={{ transform: 'translateX(-1.5px)' }} />
                   </button>
                   <button
                     type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      nextLightbox();
-                    }}
+                    onClick={(e) => { e.stopPropagation(); nextLightbox(); }}
+                    onMouseEnter={() => setIsNextHovered(true)}
+                    onMouseLeave={() => setIsNextHovered(false)}
                     disabled={isNextDisabled}
-                    className={`absolute rounded-full p-2 sm:p-3 z-20 pointer-events-auto ${isDarkMode ? 'text-white bg-white/20' : 'text-stone-700 bg-black/8'} ${
-                      isNextDisabled
-                        ? "opacity-40 cursor-default"
-                        : `${isDarkMode ? 'hover:bg-white/30' : 'hover:bg-black/15'} transition-colors cursor-pointer`
-                    }`}
+                    className={`absolute rounded-full p-2 sm:p-3 z-20 pointer-events-auto ${isDarkMode ? 'text-white' : 'text-stone-700'} ${isNextDisabled ? 'opacity-40 cursor-default' : 'cursor-pointer'}`}
                     style={{
                       left: `calc(50% + ${dimensions.width / 2}px + ${isLgOrAbove ? 16 : 4}px)`,
                       top: '50%',
                       transform: 'translateY(-50%)',
+                      backgroundColor: isDarkMode
+                        ? isNextHovered && !isNextDisabled ? '#202023' : '#18181b'
+                        : isNextHovered && !isNextDisabled ? '#f4f4f4' : '#ffffff',
+                      boxShadow: isDarkMode
+                        ? 'inset 0 1px 0 0 rgba(255,255,255,0.03), inset 0 0 0 1px rgba(255,255,255,0.03), 0px 2px 8px rgba(0,0,0,0.35)'
+                        : '0px 0px 1px 0px rgba(0,0,0,0.3), 0px 2px 8px 0px rgba(0,0,0,0.08)',
+                      transition: 'background-color 150ms ease-out',
                     }}
                     aria-label="Next"
                   >
-                    <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+                    <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" style={{ transform: 'translateX(1.5px)' }} />
                   </button>
                 </>
               )}
