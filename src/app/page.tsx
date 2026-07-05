@@ -75,7 +75,7 @@ export default function Home() {
             </motion.p>
             <div className="mt-8 w-fit pr-4 flex flex-col gap-6">
             <motion.div
-              className="h-px w-full bg-gradient-to-r from-stone-300 dark:from-zinc-600 to-transparent"
+              className="h-px w-4 bg-stone-400/50 dark:bg-zinc-600/50"
               initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
               animate={getAnimate()}
               transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.30 }}
