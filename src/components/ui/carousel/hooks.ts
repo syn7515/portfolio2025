@@ -210,11 +210,11 @@ export function useResponsiveSizing(
         setSize({ cardWidth: 840, cardHeight: 473, gap: 36 });
       } else if (w < 1500) {
         const t = (w - 1280) / 220; // 0 at 1280px → 1 at 1500px
-        const cardWidth = Math.round(720 + t * 120); // clamp 720px → 840px
+        const cardWidth = Math.round(720 + t * 240); // clamp 720px → 960px
         const cardHeight = Math.round(cardWidth * 9 / 16);
         setSize({ cardWidth, cardHeight, gap: 40 });
       } else {
-        setSize({ cardWidth: 840, cardHeight: 473, gap: 36 });
+        setSize({ cardWidth: 960, cardHeight: 540, gap: 40 });
       }
     };
 
