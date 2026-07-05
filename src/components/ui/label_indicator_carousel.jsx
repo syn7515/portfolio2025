@@ -84,6 +84,16 @@ export default function LabelIndicatorCarousel({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Viewport detection for paper layout vertical mode (1280–1499px)
+  const [isPaperViewport, setIsPaperViewport] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsPaperViewport(window.innerWidth >= 1280 && window.innerWidth < 1500);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
   // Dark mode detection - only set after hydration to avoid SSR mismatch
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
@@ -395,7 +405,7 @@ export default function LabelIndicatorCarousel({
     // Disable keyboard navigation when lightbox is open
     if (isLightboxOpen) return;
     // Disable keyboard navigation in mobile/vertical mode
-    if (isMobile) return;
+    if (isMobile || isPaperViewport) return;
     if (e.key === "ArrowRight") {
       e.preventDefault();
       setIndex(Math.min(index + 1, normalized.length - 1));
@@ -413,7 +423,7 @@ export default function LabelIndicatorCarousel({
 
   const onWheel = (e) => {
     // Disable wheel navigation in mobile/vertical mode
-    if (isMobile || !wheelToNavigate) return;
+    if (isMobile || isPaperViewport || !wheelToNavigate) return;
     const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : 0;
     if (delta > 20) setIndex(index + 1);
     else if (delta < -20) setIndex(index - 1);
@@ -457,6 +467,35 @@ export default function LabelIndicatorCarousel({
                   />
                 </div>
               </div>
+            ))}
+          </div>
+        ) : isPaperViewport ? (
+          // Vertical layout for paper viewport (1280–1499px) — cards bigger, lightbox enabled
+          <div className="flex flex-col items-center w-full" style={{ rowGap: effGap }}>
+            {normalized.map((item, i) => (
+              <CarouselCard
+                key={i}
+                item={item}
+                index={i}
+                currentIndex={index}
+                effWidth={effWidth}
+                isHydrated={isHydrated}
+                isDarkMode={isDarkMode}
+                effectiveLightboxEnabled={effectiveLightboxEnabled}
+                openLightboxOnCardClick={openLightboxOnCardClick}
+                openLightbox={openLightbox}
+                setIndex={setIndex}
+                cardRef={(el) => {
+                  if (effectiveLightboxEnabled && (item.imageUrl || item.videoUrl)) {
+                    cardRefs.current[i] = el;
+                  }
+                }}
+                renderCard={renderCard}
+                renderCaption={renderCaption}
+                captionStyle={captionStyle}
+                transition={transition}
+                hiddenCardIndex={hiddenCardIndex}
+              />
             ))}
           </div>
         ) : (
@@ -519,7 +558,7 @@ export default function LabelIndicatorCarousel({
         )}
 
         {/* Indicators - hidden in mobile/vertical mode */}
-        {showIndicators && !isMobile && (
+        {showIndicators && !isMobile && !isPaperViewport && (
           <CarouselIndicators
             normalized={normalized}
             index={index}

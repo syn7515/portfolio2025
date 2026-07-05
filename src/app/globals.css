@@ -21,6 +21,7 @@
   --paper-drop-shadow: rgba(0, 0, 0, 0.12);
   --paper-bg: #ffffff;
   --paper-box-shadow: none;
+  --sidebar-w: 0px;
 }
 
 @theme inline {
@@ -53,9 +54,10 @@
   }
 }
 
-@media (min-width: 1500px) {
+@media (min-width: 1280px) {
   :root {
     --paper-box-shadow: inset 0 0 0 0.5px var(--paper-inset-shadow), 0 30px 60px 0 var(--paper-drop-shadow);
+    --sidebar-w: clamp(240px, calc(27.273vw - 109.09px), 300px);
   }
 }
 

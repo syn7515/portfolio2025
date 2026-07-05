@@ -50,7 +50,7 @@ export default function Home() {
           {/* Right column: bio + social links */}
           <div>
             <motion.p
-              className="intro-text !text-stone-500 dark:!text-inherit !font-[480] mt-8 md:mt-10 lg:mt-12 !mb-5"
+              className="intro-text !text-stone-500 dark:!text-inherit !font-[460] mt-8 md:mt-10 lg:mt-12 !mb-5"
               initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
               animate={getAnimate()}
               transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.08 }}
@@ -58,7 +58,7 @@ export default function Home() {
               Product designer with engineering mindset, obsessed with <span className="italic">why</span> behind everything — from systems to pixels.
             </motion.p>
             <motion.p
-              className="!text-stone-500 dark:!text-inherit !font-[480] !mb-5"
+              className="!text-stone-500 dark:!text-inherit !font-[460] !mb-5"
               initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
               animate={getAnimate()}
               transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.16 }}
@@ -66,7 +66,7 @@ export default function Home() {
               <span className="intro-text">Currently leading design at </span><InlineLinkPreview href="https://www.aniai.ai/" imageUrl='https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/aniai.webp' explanation="A robotics startup specialized in kitchen automation">Aniai</InlineLinkPreview><span className="intro-text">, designing robots and tools behind them.</span>
             </motion.p>
             <motion.p
-              className="!text-stone-500 dark:!text-zinc-400 !font-[480] mb-0"
+              className="!text-stone-500 dark:!text-zinc-400 !font-[460] mb-0"
               initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
               animate={getAnimate()}
               transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.24 }}

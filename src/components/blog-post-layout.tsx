@@ -127,7 +127,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
 
       {/* Fixed side nav: back + TOC; visible only on lg+ */}
       <aside
-        className="hidden min-[1500px]:block fixed left-0 top-0 bottom-0 z-60 pointer-events-none"
+        className="hidden min-[1280px]:block fixed left-0 top-0 bottom-0 z-60 pointer-events-none"
         aria-label="Post navigation"
       >
         {/* Background layer at 10% opacity */}
@@ -155,7 +155,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           type="button"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           className={cn(
-            'absolute bottom-20 min-[1500px]:bottom-[120px] mb-[120px] left-14 flex items-center gap-2 w-fit whitespace-nowrap text-sm font-[460] text-stone-400 dark:text-zinc-400 hover:text-orange-700 dark:hover:text-lime-200 transition-[color,opacity,filter] duration-300 ease-out cursor-pointer pointer-events-auto',
+            'absolute bottom-20 min-[1280px]:bottom-[120px] mb-[120px] left-14 flex items-center gap-2 w-fit whitespace-nowrap text-sm font-[460] text-stone-400 dark:text-zinc-400 hover:text-orange-700 dark:hover:text-lime-200 transition-[color,opacity,filter] duration-300 ease-out cursor-pointer pointer-events-auto',
             showBackToTop && viewportTall
               ? 'opacity-100 blur-none'
               : 'opacity-0 blur-[4px] pointer-events-none'
@@ -175,11 +175,11 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
         >
           {/* Paper: wraps header + content + footer, floats after sidebar at ≥1500px */}
           <div
-            className="min-[1500px]:ml-[300px] min-[1500px]:mt-[100px] mb-8 min-[640px]:mb-16 min-[1500px]:mb-[120px] overflow-x-clip"
-            style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)' }}
+            className="min-[1280px]:mt-[100px] mb-8 min-[640px]:mb-16 min-[1280px]:mb-[120px] overflow-x-clip"
+            style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}
           >
-            <div className="pt-20 xs:pt-20 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] min-[1500px]:pt-[8.75rem]">
-              <div className="px-4 min-[1500px]:px-0 min-[1500px]:ml-[calc(50vw_-_580px)] min-[1500px]:w-[560px]">
+            <div className="pt-20 xs:pt-20 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] min-[1280px]:pt-[8.75rem]">
+              <div className="px-4 min-[1280px]:px-0 min-[1280px]:ml-[calc(50vw_-_520px)] min-[1280px]:w-[560px]">
                 {/* Header: title, subtitle */}
                 <BlogPostHeader slug={slug} title={title} subtitle={subtitle} />
 
@@ -190,9 +190,9 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
 
                 {/* Project Navigation Footer — inside paper */}
                 {(previousProject || nextProject) ? (
-                  <div className="max-w-[560px] mx-auto min-[1500px]:max-w-none mt-16 pb-12 min-[640px]:pb-16 min-[1500px]:pb-[120px] overflow-x-hidden">
+                  <div className="max-w-[560px] mx-auto min-[1280px]:max-w-none mt-16 min-[1280px]:mt-32 pb-12 min-[640px]:pb-16 min-[1280px]:pb-[120px] overflow-x-hidden">
                     <Divider variant="default" color="stone" spacing="md" />
-                    <div className="flex justify-between items-start mt-4 gap-8">
+                    <div className="flex justify-between items-start mt-4 min-[1280px]:mt-12 gap-8">
                       {/* Previous Project */}
                       {previousProject ? (
                         <Link
@@ -253,7 +253,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                     </div>
                   </div>
                 ) : (
-                  <div className="pb-12 min-[1500px]:pb-[148px]" aria-hidden />
+                  <div className="pb-12 min-[1280px]:pb-[148px]" aria-hidden />
                 )}
               </div>
             </div>
