@@ -228,6 +228,21 @@ export function useResponsiveSizing(
   return size;
 }
 
+// Prev/next buttons are 48px in diameter (p-3 padding + w-6 h-6 icon) once the
+// lightbox is enabled (>=768px viewport), and sit `buttonGap` away from the
+// media edge — 4px below the lg breakpoint, 16px at lg+ (see lightbox.tsx).
+// The reserved space must grow with that gap so the buttons keep breathing
+// room from the viewport edge instead of being pushed flush against it.
+const LIGHTBOX_OUTER_PADDING = 16;
+const LIGHTBOX_BUTTON_DIAMETER = 48;
+
+export function getLightboxMaxWidth(viewportWidth: number): number {
+  const isLgOrAbove = viewportWidth >= 1024;
+  const buttonGap = isLgOrAbove ? 16 : 4;
+  const reserved = (LIGHTBOX_OUTER_PADDING + buttonGap + LIGHTBOX_BUTTON_DIAMETER) * 2;
+  return Math.min(1280, viewportWidth - reserved);
+}
+
 export function useLightboxDimensions() {
   const [dimensions, setDimensions] = useState({ width: 1280, height: 720 });
 
@@ -236,7 +251,7 @@ export function useLightboxDimensions() {
 
     const handleResize = () => {
       const viewportWidth = window.innerWidth;
-      const containerWidth = Math.min(1280, viewportWidth - 32 - 80 - 8);
+      const containerWidth = getLightboxMaxWidth(viewportWidth);
       const containerHeight = (containerWidth * 9) / 16;
 
       setDimensions({ width: containerWidth, height: containerHeight });

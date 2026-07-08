@@ -6,7 +6,7 @@ import { flushSync } from "react-dom";
 import { CarouselCard } from "./carousel/carousel-card";
 import { CarouselIndicators } from "./carousel/carousel-indicators";
 import { Lightbox } from "./carousel/lightbox";
-import { normalizeItem, useResponsiveSizing, FALLBACK_ITEMS } from "./carousel/hooks";
+import { normalizeItem, useResponsiveSizing, getLightboxMaxWidth, FALLBACK_ITEMS } from "./carousel/hooks";
 
 // LabelIndicatorCarousel Component (Responsive)
 // - Responsive sizing defaults by viewport unless overridden by props
@@ -169,7 +169,7 @@ export default function LabelIndicatorCarousel({
     
     if (hasPositionedMedia) {
       // For positioned images, animate the container size
-      const maxFinalWidth = Math.min(1280, viewportWidth - 32 - 80 - 8);
+      const maxFinalWidth = getLightboxMaxWidth(viewportWidth);
       // Calculate dimensions to maintain 16:9 aspect ratio
       const finalWidth = maxFinalWidth;
       const finalHeight = finalWidth * 9 / 16;
@@ -185,9 +185,8 @@ export default function LabelIndicatorCarousel({
     } else {
       // For full-cover images, use existing logic
     // Calculate scale factors
-    // Final size: max-w-7xl (1280px)
-    // Account for: 32px padding + 80px buttons (40px each) + 8px gaps (4px each side)
-    const maxFinalWidth = Math.min(1280, viewportWidth - 32 - 80 - 8);
+    // Final size: max-w-7xl (1280px), reserving space for the prev/next buttons
+    const maxFinalWidth = getLightboxMaxWidth(viewportWidth);
 
     // Width is always the limiting factor (no height constraint)
     const finalRenderedWidth = maxFinalWidth;
