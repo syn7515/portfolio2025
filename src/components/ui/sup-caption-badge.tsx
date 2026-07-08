@@ -2,9 +2,9 @@
 
 import type { ReactNode } from "react"
 import { useState, useEffect, useRef } from "react"
-import { SUP_BADGE_BASE_CLASS, SUP_BADGE_DEFAULT_CLASS, SUP_BADGE_HIGHLIGHTED_CLASS } from "@/components/ui/sup-badge"
+import { SUP_BADGE_BASE_CLASS, SUP_BADGE_DEFAULT_CLASS, SUP_BADGE_CAROUSEL_CLASS, SUP_BADGE_HIGHLIGHTED_CLASS } from "@/components/ui/sup-badge"
 
-export function CaptionSupBadge({ supId }: { supId: string }) {
+export function CaptionSupBadge({ supId, muted = false }: { supId: string; muted?: boolean }) {
   const [isHighlighted, setIsHighlighted] = useState(false)
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([])
 
@@ -43,7 +43,7 @@ export function CaptionSupBadge({ supId }: { supId: string }) {
       }}
       style={supId === '1' ? { paddingRight: '1px' } : undefined}
       className={`${SUP_BADGE_BASE_CLASS} transition-colors duration-300 ease-out ${
-        isHighlighted ? SUP_BADGE_HIGHLIGHTED_CLASS : SUP_BADGE_DEFAULT_CLASS
+        isHighlighted ? SUP_BADGE_HIGHLIGHTED_CLASS : muted ? SUP_BADGE_CAROUSEL_CLASS : SUP_BADGE_DEFAULT_CLASS
       }`}
     >
       {supId}
@@ -51,14 +51,14 @@ export function CaptionSupBadge({ supId }: { supId: string }) {
   )
 }
 
-export function renderCaptionWithBadges(caption: string): ReactNode {
+export function renderCaptionWithBadges(caption: string, options?: { muted?: boolean }): ReactNode {
   const parts = caption.split(/(<sup>\d+<\/sup>)/g)
   if (parts.length === 1) return <span dangerouslySetInnerHTML={{ __html: caption }} />
   return (
     <>
       {parts.map((part, i) => {
         const match = part.match(/^<sup>(\d+)<\/sup>$/)
-        if (match) return <CaptionSupBadge key={i} supId={match[1]} />
+        if (match) return <CaptionSupBadge key={i} supId={match[1]} muted={options?.muted} />
         return part ? <span key={i} dangerouslySetInnerHTML={{ __html: part }} /> : null
       })}
     </>

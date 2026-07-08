@@ -129,7 +129,14 @@ export function CarouselCard({
         whileTap={{ scale: 0.98 }}
       >
         {renderCard ? renderCard(index, isActive, item) : (
-          <div className="w-full h-full relative overflow-hidden">
+          <div
+            className="w-full h-full relative overflow-hidden"
+            style={{
+              borderRadius: '4px',
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              ['cornerShape' as any]: 'squircle',
+            }}
+          >
             {withBackgroundLines ? (
               <>
                 {/* Transparent so card background (and hover) show through */}
@@ -283,7 +290,7 @@ export function CarouselCard({
             className={`carousel-caption text-center text-xs sm:text-sm mt-2 sm:mt-3 md:mt-4 font-sans`}
             style={{ width: "100%", ...(captionStyle || {}) }}
           >
-            {renderCaptionWithBadges(caption)}
+            {renderCaptionWithBadges(caption, { muted: true })}
           </div>
         )
       ) : null}
