@@ -32,6 +32,7 @@ interface CarouselCardProps {
   transition?: Transition;
   hiddenCardIndex?: number | null;
   disableCursor?: boolean;
+  forceActive?: boolean;
 }
 
 export function CarouselCard({
@@ -51,7 +52,8 @@ export function CarouselCard({
   captionStyle,
   transition,
   hiddenCardIndex,
-  disableCursor = false
+  disableCursor = false,
+  forceActive = false
 }: CarouselCardProps) {
   const { label, caption, imageUrl, videoUrl, alt, imageSizePercent, imagePosition, videoAutoplay, videoLoop, videoMuted, videoControls, cardVariant, backgroundLines, fetchPriority, withInsetShadow } = item;
   const videoPreload = fetchPriority === 'high' ? 'auto' : 'metadata';
@@ -70,12 +72,13 @@ export function CarouselCard({
   const hasVideo = !!videoUrl;
   const hasPositionedMedia = hasPositionedImage || hasPositionedVideo;
   const withBackgroundLines = cardVariant === "with-background-lines";
+  const isActive = forceActive || index === currentIndex;
   const backgroundClass =
     hasPositionedMedia || withBackgroundLines
-      ? `bg-stone-200/20 dark:bg-zinc-800/70 ${index === currentIndex ? "hover:bg-stone-200/60 dark:hover:bg-zinc-800" : ""}`
-      : `bg-stone-200/20 dark:bg-zinc-800/70 ${index === currentIndex ? "hover:bg-stone-200/60 dark:hover:bg-zinc-800" : ""}`;
+      ? `bg-stone-200/20 dark:bg-zinc-800/70 ${isActive ? "hover:bg-stone-200/60 dark:hover:bg-zinc-800" : ""}`
+      : `bg-stone-200/20 dark:bg-zinc-800/70 ${isActive ? "hover:bg-stone-200/60 dark:hover:bg-zinc-800" : ""}`;
   const canOpenLightboxFromCard = effectiveLightboxEnabled && openLightboxOnCardClick && (imageUrl || videoUrl);
-  
+
   const isHiddenByLightbox = hiddenCardIndex === index;
 
   return (
@@ -90,7 +93,7 @@ export function CarouselCard({
         tabIndex={0}
         aria-label={`Select card ${index + 1}${label ? `: ${label}` : ""}`}
         onClick={() => {
-          if (index === currentIndex) {
+          if (isActive) {
             if (openLightboxOnCardClick && effectiveLightboxEnabled) openLightbox(index);
           } else {
             setIndex(index);
@@ -99,7 +102,7 @@ export function CarouselCard({
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
-            if (index === currentIndex) {
+            if (isActive) {
               if (openLightboxOnCardClick && effectiveLightboxEnabled) openLightbox(index);
             } else {
               setIndex(index);
@@ -110,10 +113,10 @@ export function CarouselCard({
         onMouseLeave={() => setIsHovered(false)}
         className={`group relative ${backgroundClass} transition-all duration-150 ${
           disableCursor ? 'cursor-default'
-            : index === currentIndex
+            : isActive
             ? canOpenLightboxFromCard ? 'cursor-zoom-in' : 'cursor-default'
             : index < currentIndex ? 'cursor-[w-resize]' : 'cursor-[e-resize]'
-        } focus-visible:ring-2 focus-visible:ring-stone-400 ${!disableCursor && index !== currentIndex ? 'hover:opacity-70' : ''}`}
+        } focus-visible:ring-2 focus-visible:ring-stone-400 ${!disableCursor && !isActive ? 'hover:opacity-70' : ''}`}
         style={{
           width: "100%",
           aspectRatio: '16/9',
@@ -125,7 +128,7 @@ export function CarouselCard({
         transition={transition}
         whileTap={{ scale: 0.98 }}
       >
-        {renderCard ? renderCard(index, index === currentIndex, item) : (
+        {renderCard ? renderCard(index, isActive, item) : (
           <div className="w-full h-full relative overflow-hidden">
             {withBackgroundLines ? (
               <>
@@ -274,7 +277,7 @@ export function CarouselCard({
 
       {caption != null && caption !== "" ? (
         renderCaption ? (
-          renderCaption({ index, label, caption, active: index === currentIndex })
+          renderCaption({ index, label, caption, active: isActive })
         ) : (
           <div
             className={`carousel-caption text-center text-xs sm:text-sm mt-2 sm:mt-3 md:mt-4 font-sans`}

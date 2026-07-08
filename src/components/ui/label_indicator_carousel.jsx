@@ -485,6 +485,7 @@ export default function LabelIndicatorCarousel({
                 openLightboxOnCardClick={openLightboxOnCardClick}
                 openLightbox={openLightbox}
                 setIndex={setIndex}
+                forceActive={true}
                 cardRef={(el) => {
                   if (effectiveLightboxEnabled && (item.imageUrl || item.videoUrl)) {
                     cardRefs.current[i] = el;
