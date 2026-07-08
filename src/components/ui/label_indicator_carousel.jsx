@@ -470,7 +470,7 @@ export default function LabelIndicatorCarousel({
           </div>
         ) : isPaperViewport ? (
           // Vertical layout for paper viewport (1280–1499px) — cards bigger, lightbox enabled
-          <div className="flex flex-col items-center w-full" style={{ rowGap: effGap }}>
+          <div className="flex flex-col items-center w-full" style={{ rowGap: effGap * 2 }}>
             {normalized.map((item, i) => (
               <CarouselCard
                 key={i}
