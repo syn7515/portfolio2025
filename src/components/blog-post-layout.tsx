@@ -97,6 +97,20 @@ const PAPER_OFFSET_Y = -32
 const PAPER_INITIAL_ROTATE_DEG = 2
 const PAPER_BLUR_PX = 10
 
+// Hoisted to stable module-level references (rather than object literals recreated per render) so
+// that unrelated re-renders — e.g. the scroll/resize listeners below firing mid-animation — never
+// hand Framer Motion a new `animate`/`transition` object reference for the same target. Framer Motion
+// can treat a changed reference as a reason to re-evaluate the in-flight tween, which reads as the
+// entrance animation being randomly interrupted depending on whether a scroll/resize event happens
+// to land during the ~0.45s slide.
+const PAPER_OFFSCREEN = { x: PAPER_OFFSET_X, y: PAPER_OFFSET_Y, rotate: PAPER_INITIAL_ROTATE_DEG, filter: `blur(${PAPER_BLUR_PX}px)` }
+const PAPER_REST = { x: 0, y: 0, rotate: 0, filter: 'blur(0px)' }
+const PAPER_TRANSITION_FULL = { duration: PAPER_SLIDE_DURATION, ease: ENTRANCE_EASE }
+const PAPER_TRANSITION_REDUCED = { duration: 0 }
+const CONTENT_FADE_TRANSITION = { duration: 0.5, ease: ENTRANCE_EASE }
+const CONTENT_FADE_HIDDEN = { opacity: 0 }
+const CONTENT_FADE_VISIBLE = { opacity: 1 }
+
 export default function BlogPostLayout({ children, slug, title, subtitle }: BlogPostLayoutProps) {
   const { previousProject, nextProject } = getProjectNavigation(slug)
   const [animationReady, setAnimationReady] = useState(false)
@@ -131,11 +145,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
   // would cause a hydration mismatch. It only affects the transition below, which applies after
   // animationReady flips post-hydration. The animate target is the same either way now (no more
   // mid-flight keyframe), so only the transition timing needs to branch.
-  const paperOffscreen = { x: PAPER_OFFSET_X, y: PAPER_OFFSET_Y, rotate: PAPER_INITIAL_ROTATE_DEG, filter: `blur(${PAPER_BLUR_PX}px)` }
-  const paperRest = { x: 0, y: 0, rotate: 0, filter: 'blur(0px)' }
-  const paperTransition = shouldReduceMotion
-    ? { duration: 0 }
-    : { duration: PAPER_SLIDE_DURATION, ease: ENTRANCE_EASE }
+  const paperTransition = shouldReduceMotion ? PAPER_TRANSITION_REDUCED : PAPER_TRANSITION_FULL
 
   return (
     <TooltipProvider>
@@ -225,9 +235,9 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
         >
           <motion.div
             className="pt-20 xs:pt-20 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] min-[1280px]:pt-[8.75rem]"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: contentVisible ? 1 : 0 }}
-            transition={{ duration: 0.5, ease: ENTRANCE_EASE }}
+            initial={CONTENT_FADE_HIDDEN}
+            animate={contentVisible ? CONTENT_FADE_VISIBLE : CONTENT_FADE_HIDDEN}
+            transition={CONTENT_FADE_TRANSITION}
           >
             <div className="px-4 min-[1280px]:px-0 min-[1280px]:ml-[calc(50vw_-_520px)] min-[1280px]:w-[560px]">
                 {/* Header: title, subtitle */}
@@ -318,8 +328,8 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
             aria-hidden
             className="absolute inset-0 min-[1280px]:top-[100px] overflow-x-clip pointer-events-none"
             style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}
-            initial={paperOffscreen}
-            animate={animationReady ? paperRest : paperOffscreen}
+            initial={PAPER_OFFSCREEN}
+            animate={animationReady ? PAPER_REST : PAPER_OFFSCREEN}
             transition={paperTransition}
             onAnimationComplete={() => setContentVisible(true)}
           />
