@@ -200,8 +200,8 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
         >
           <motion.div
             className="pt-20 xs:pt-20 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] min-[1280px]:pt-[8.75rem]"
-            initial={{ opacity: 0, y: 20 }}
-            animate={animationReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 0 }}
+            animate={animationReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 0 }}
             transition={{ duration: 0.5, ease: ENTRANCE_EASE, delay: contentDelay }}
           >
             <div className="px-4 min-[1280px]:px-0 min-[1280px]:ml-[calc(50vw_-_520px)] min-[1280px]:w-[560px]">
