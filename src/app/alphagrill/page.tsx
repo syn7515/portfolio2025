@@ -8,7 +8,7 @@ export default function AlphaGrillPost() {
     <BlogPostLayout
       slug="alphagrill"
       title={"Robot Interface for\nCollaboration in Kitchen"}
-      subtitle="Aniai · Ongoing"
+      subtitle="Aniai · 2026 - Ongoing"
     >
       <MDXContent />
     </BlogPostLayout>

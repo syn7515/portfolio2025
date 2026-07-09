@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight, ArrowUp, Undo2 } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { Divider } from '@/components/ui/divider'
 import styles from './blog-post.module.css'
@@ -21,14 +21,14 @@ interface BlogPostLayoutProps {
 // Project navigation data
 const PROJECTS = [
   {
-    slug: 'aniai',
-    title: 'Aniai',
-    description: 'Building the Tools Behind Smarter Robots'
-  },
-  {
     slug: 'alphagrill',
     title: 'AlphaGrill',
     description: 'Robot Interface for Collaboration in Kitchen'
+  },
+  {
+    slug: 'aniai',
+    title: 'Aniai',
+    description: 'Building the Tools Behind Smarter Robots'
   },
   {
     slug: 'athenahealth',
@@ -89,6 +89,15 @@ function preventWidow(text: string): React.ReactNode {
   )
 }
 
+// Paper entrance animation: paper slides in from the top-right corner with a blur-in, then content fades in on top of it
+const ENTRANCE_EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1]
+const PAPER_SLIDE_DURATION = 0.45
+const PAPER_OFFSET_X = 40
+const PAPER_OFFSET_Y = -32
+const PAPER_INITIAL_ROTATE_DEG = 2
+const PAPER_BLUR_PX = 10
+const CONTENT_DELAY_RATIO = 0.6
+
 export default function BlogPostLayout({ children, slug, title, subtitle }: BlogPostLayoutProps) {
   const { previousProject, nextProject } = getProjectNavigation(slug)
   const [animationReady, setAnimationReady] = useState(false)
@@ -112,6 +121,19 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
       window.removeEventListener('resize', update)
     }
   }, [])
+
+  const shouldReduceMotion = useReducedMotion()
+  // Pre-mount state (server + first client paint) never branches on shouldReduceMotion: that hook
+  // resolves differently between server (always null) and client first-render, so using it here
+  // would cause a hydration mismatch. It only affects the transition below, which applies after
+  // animationReady flips post-hydration. The animate target is the same either way now (no more
+  // mid-flight keyframe), so only the transition timing needs to branch.
+  const paperOffscreen = { x: PAPER_OFFSET_X, y: PAPER_OFFSET_Y, rotate: PAPER_INITIAL_ROTATE_DEG, filter: `blur(${PAPER_BLUR_PX}px)` }
+  const paperRest = { x: 0, y: 0, rotate: 0, filter: 'blur(0px)' }
+  const paperTransition = shouldReduceMotion
+    ? { duration: 0 }
+    : { duration: PAPER_SLIDE_DURATION, ease: ENTRANCE_EASE }
+  const contentDelay = shouldReduceMotion ? 0 : PAPER_SLIDE_DURATION * CONTENT_DELAY_RATIO
 
   return (
     <TooltipProvider>
@@ -167,19 +189,22 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
         </button>
       </aside>
 
-      <div className="w-full overflow-x-clip">
+      <div className="w-full min-h-screen overflow-x-clip flex flex-col">
+        {/* Paper: slides in from the top-right corner with a blur-in, settling flat; wraps header + content + footer, floats after sidebar at ≥1500px */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={animationReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+          className="flex-1 min-[1280px]:mt-[100px] overflow-x-clip"
+          style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}
+          initial={paperOffscreen}
+          animate={animationReady ? paperRest : paperOffscreen}
+          transition={paperTransition}
         >
-          {/* Paper: wraps header + content + footer, floats after sidebar at ≥1500px */}
-          <div
-            className="min-[1280px]:mt-[100px] mb-8 min-[640px]:mb-16 min-[1280px]:mb-[120px] overflow-x-clip"
-            style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}
+          <motion.div
+            className="pt-20 xs:pt-20 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] min-[1280px]:pt-[8.75rem]"
+            initial={{ opacity: 0, y: 20 }}
+            animate={animationReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.5, ease: ENTRANCE_EASE, delay: contentDelay }}
           >
-            <div className="pt-20 xs:pt-20 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] min-[1280px]:pt-[8.75rem]">
-              <div className="px-4 min-[1280px]:px-0 min-[1280px]:ml-[calc(50vw_-_520px)] min-[1280px]:w-[560px]">
+            <div className="px-4 min-[1280px]:px-0 min-[1280px]:ml-[calc(50vw_-_520px)] min-[1280px]:w-[560px]">
                 {/* Header: title, subtitle */}
                 <BlogPostHeader slug={slug} title={title} subtitle={subtitle} />
 
@@ -256,8 +281,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                   <div className="pb-12 min-[1280px]:pb-[148px]" aria-hidden />
                 )}
               </div>
-            </div>
-          </div>
+          </motion.div>
         </motion.div>
       </div>
     </TooltipProvider>

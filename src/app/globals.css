@@ -466,6 +466,24 @@ a[data-inline-link-preview-trigger]:hover {
   text-decoration-color: rgb(194 65 12) !important;
 }
 
+/* Social nav links: same dotted underline as intro links, but not italic */
+a[data-social-link-trigger] {
+  text-decoration-line: underline !important;
+  text-decoration-style: dotted !important;
+  text-decoration-skip-ink: auto !important;
+  text-decoration-color: rgb(168 162 158) !important;
+  /* stone-300 - same as intro-link */
+  text-decoration-thickness: 10% !important;
+  text-underline-offset: 0.05rem !important;
+  text-underline-position: from-font !important;
+  font-style: normal !important;
+}
+
+a[data-social-link-trigger]:hover {
+  text-decoration-color: rgb(194 65 12) !important;
+  /* orange-700 */
+}
+
 /* Intro link variant for lighter text paragraphs (stone-500/zinc-400) */
 .intro-link-light {
   color: rgb(120 113 108) !important;
@@ -529,6 +547,16 @@ a[data-inline-link-preview-trigger]:hover {
     color: rgb(217 249 157) !important;
     /* lime-200 */
     text-decoration-color: rgb(217 249 157) !important;
+  }
+
+  a[data-social-link-trigger] {
+    text-decoration-color: rgb(113 113 122) !important;
+    /* zinc-500 - same as intro-link dark */
+  }
+
+  a[data-social-link-trigger]:hover {
+    text-decoration-color: rgb(217 249 157) !important;
+    /* lime-200 */
   }
 
   /* Intro link variant for lighter text paragraphs (stone-500/zinc-400) */
