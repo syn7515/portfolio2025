@@ -96,13 +96,16 @@ const PAPER_OFFSET_X = 40
 const PAPER_OFFSET_Y = -32
 const PAPER_INITIAL_ROTATE_DEG = 2
 const PAPER_BLUR_PX = 10
-const CONTENT_DELAY_RATIO = 0.6
 
 export default function BlogPostLayout({ children, slug, title, subtitle }: BlogPostLayoutProps) {
   const { previousProject, nextProject } = getProjectNavigation(slug)
   const [animationReady, setAnimationReady] = useState(false)
   const [showBackToTop, setShowBackToTop] = useState(false)
   const [viewportTall, setViewportTall] = useState(false)
+  // Flips once the decorative entrance overlay finishes landing; reveals the real (always-mounted,
+  // never-transformed) content underneath it. See the "Real paper" / "Decorative entrance overlay"
+  // comments below for why content and the slide animation live on separate elements.
+  const [contentVisible, setContentVisible] = useState(false)
 
   useEffect(() => {
     setAnimationReady(true)
@@ -133,7 +136,6 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
   const paperTransition = shouldReduceMotion
     ? { duration: 0 }
     : { duration: PAPER_SLIDE_DURATION, ease: ENTRANCE_EASE }
-  const contentDelay = shouldReduceMotion ? 0 : PAPER_SLIDE_DURATION * CONTENT_DELAY_RATIO
 
   return (
     <TooltipProvider>
@@ -189,20 +191,43 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
         </button>
       </aside>
 
-      <div className="w-full min-h-screen overflow-x-clip flex flex-col">
-        {/* Paper: slides in from the top-right corner with a blur-in, settling flat; wraps header + content + footer, floats after sidebar at ≥1500px */}
-        <motion.div
-          className="flex-1 min-[1280px]:mt-[100px] overflow-x-clip"
+      <div className="w-full min-h-screen overflow-x-clip flex flex-col relative">
+        {/* Dummy paper: static sheet already in place at the paper's rest position, sitting beneath
+            everything else so the entrance reads as a new paper landing on an existing stack rather
+            than materializing out of nothing. Once the real paper (same rect, same shadow) lands on
+            top of it, it's fully redundant — left at full opacity, its shadow would sit exactly
+            underneath the real paper's identical shadow and compound into a darker edge than either
+            shadow alone, so it fades out as soon as the real content is revealed. */}
+        <div
+          aria-hidden
+          className="absolute inset-0 min-[1280px]:top-[100px] transition-opacity duration-500 ease-out"
+          style={{
+            backgroundColor: 'var(--paper-bg)',
+            boxShadow: 'var(--paper-box-shadow)',
+            marginLeft: 'var(--sidebar-w)',
+            opacity: contentVisible ? 0 : 1,
+          }}
+        />
+
+        {/* Real paper: holds the actual header/content/footer, floats after sidebar at ≥1500px. This
+            element is never transformed — a transform/filter (even an identity one like
+            translate(0,0)) permanently creates a CSS stacking context, which would trap descendants
+            (e.g. the carousel's z-[50]) below page-level fixed overlays like the top-edge fade
+            regardless of their own z-index. So the slide-in visual lives on a separate, disposable
+            overlay below, and this element just stays hidden (via `visibility`, which does not create
+            a stacking context) until that overlay lands. */}
+        <div
+          className={cn(
+            'flex-1 min-[1280px]:mt-[100px] overflow-x-clip relative',
+            contentVisible ? 'visible' : 'invisible'
+          )}
           style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}
-          initial={paperOffscreen}
-          animate={animationReady ? paperRest : paperOffscreen}
-          transition={paperTransition}
         >
           <motion.div
             className="pt-20 xs:pt-20 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] min-[1280px]:pt-[8.75rem]"
-            initial={{ opacity: 0, y: 0 }}
-            animate={animationReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 0 }}
-            transition={{ duration: 0.5, ease: ENTRANCE_EASE, delay: contentDelay }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: contentVisible ? 1 : 0 }}
+            transition={{ duration: 0.5, ease: ENTRANCE_EASE }}
           >
             <div className="px-4 min-[1280px]:px-0 min-[1280px]:ml-[calc(50vw_-_520px)] min-[1280px]:w-[560px]">
                 {/* Header: title, subtitle */}
@@ -282,7 +307,23 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                 )}
               </div>
           </motion.div>
-        </motion.div>
+        </div>
+
+        {/* Decorative entrance overlay: plays the slide-in-from-top-right-corner-with-a-blur-in visual
+            on top of the (currently hidden) real paper above, then reveals it and removes itself once
+            settled. Has no real children, so it's safe for this to be a Framer Motion transform target
+            — nothing here needs to escape a stacking context. */}
+        {!contentVisible && (
+          <motion.div
+            aria-hidden
+            className="absolute inset-0 min-[1280px]:top-[100px] overflow-x-clip pointer-events-none"
+            style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}
+            initial={paperOffscreen}
+            animate={animationReady ? paperRest : paperOffscreen}
+            transition={paperTransition}
+            onAnimationComplete={() => setContentVisible(true)}
+          />
+        )}
       </div>
     </TooltipProvider>
   )

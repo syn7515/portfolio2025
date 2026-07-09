@@ -97,7 +97,7 @@ export default function Home() {
           {/* Right column: bio + social links */}
           <div>
             <motion.p
-              className="intro-text !text-stone-500 dark:!text-zinc-400 !font-[460] mt-8 md:mt-10 lg:mt-12 !mb-5"
+              className="intro-text !text-stone-500 dark:!text-zinc-400 !font-[460] mt-12 md:mt-14 lg:mt-16 !mb-5"
               initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
               animate={getAnimate()}
               transition={{ duration: 0.5, ease: ENTRANCE_EASE, delay: contentBaseDelay + 0.08 }}
@@ -120,47 +120,11 @@ export default function Home() {
             >
               <span className="intro-text">Previously, reimagined public benefits at </span><InlineLinkPreview href="https://goinvo.com/" variant="intro-link-light" imageUrl='https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/goinvo.jpg' explanation="A Boston design studio crafting healthcare software for 20+ years">Goinvo</InlineLinkPreview><span className="intro-text"> and advanced healthcare accessibility at </span><InlineLinkPreview href="https://www.athenahealth.com/" variant="intro-link-light" imageUrl="https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/athenahealth.jpeg" explanation='A healthtech company serving 170K+ clinicians across the US'>AthenaHealth</InlineLinkPreview><span className="intro-text">.</span>
             </motion.p>
-            <div className="mt-8 w-fit pr-4 flex flex-col gap-6">
-            <motion.div
-              className="h-px w-4 bg-stone-400/50 dark:bg-zinc-600/50"
-              initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
-              animate={getAnimate()}
-              transition={{ duration: 0.5, ease: ENTRANCE_EASE, delay: contentBaseDelay + 0.30 }}
-            />
-            <motion.div
-              className="intro-text flex gap-2 w-fit"
-              initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
-              animate={getAnimate()}
-              transition={{ duration: 0.5, ease: ENTRANCE_EASE, delay: contentBaseDelay + 0.32 }}
-            >
-              <a
-                href="https://x.com/sue_park__"
-                target="_blank"
-                rel="noopener noreferrer"
-                data-social-link-trigger
-                className="!text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-lime-200"
-                style={{ fontSize: '14px' }}
-              >
-                Twitter
-              </a>
-              <span className="!text-stone-400 dark:!text-zinc-600" style={{ fontSize: '14px' }}>·</span>
-              <a
-                href="https://www.linkedin.com/in/sooyeonp/"
-                target="_blank"
-                rel="noopener noreferrer"
-                data-social-link-trigger
-                className="!text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-lime-200"
-                style={{ fontSize: '14px' }}
-              >
-                LinkedIn
-              </a>
-            </motion.div>
-            </div>
           </div>
         </div>
 
-        <div className="max-w-[560px] mx-auto w-full mt-16 sm:mt-24 lg:mt-28">
-          <div className="flex flex-col gap-2 sm:gap-3 lg:gap-4">
+        <div className="max-w-[560px] mx-auto w-full mt-8 sm:mt-12 lg:mt-14">
+          <div className="flex flex-col gap-0 sm:gap-1 lg:gap-1">
             <ProjectListItem
               title="Robot Interface for Collaboration in Kitchen"
               dates="2026 - Ongoing"
@@ -186,6 +150,43 @@ export default function Home() {
               transition={{ duration: 0.5, ease: ENTRANCE_EASE, delay: contentBaseDelay + 0.48 }}
             />
           </div>
+        </div>
+
+        <div className="max-w-[560px] mx-auto w-full mt-8 sm:mt-12 lg:mt-14 flex flex-col gap-6">
+          <motion.div
+            className="h-px w-4 bg-stone-400/50 dark:bg-zinc-600/50"
+            initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
+            animate={getAnimate()}
+            transition={{ duration: 0.5, ease: ENTRANCE_EASE, delay: contentBaseDelay + 0.52 }}
+          />
+          <motion.div
+            className="intro-text flex gap-2 w-fit"
+            initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
+            animate={getAnimate()}
+            transition={{ duration: 0.5, ease: ENTRANCE_EASE, delay: contentBaseDelay + 0.54 }}
+          >
+            <a
+              href="https://x.com/sue_park__"
+              target="_blank"
+              rel="noopener noreferrer"
+              data-social-link-trigger
+              className="!text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-lime-200"
+              style={{ fontSize: '14px' }}
+            >
+              Twitter
+            </a>
+            <span className="!text-stone-400 dark:!text-zinc-600" style={{ fontSize: '14px' }}>·</span>
+            <a
+              href="https://www.linkedin.com/in/sooyeonp/"
+              target="_blank"
+              rel="noopener noreferrer"
+              data-social-link-trigger
+              className="!text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-lime-200"
+              style={{ fontSize: '14px' }}
+            >
+              LinkedIn
+            </a>
+          </motion.div>
         </div>
 
         <motion.div
