@@ -124,7 +124,7 @@ export default function Home() {
         </div>
 
         <div className="max-w-[560px] mx-auto w-full mt-8 sm:mt-12 lg:mt-14">
-          <div className="flex flex-col gap-0 sm:gap-1 lg:gap-1">
+          <div className="flex flex-col gap-3 sm:gap-1 lg:gap-1">
             <ProjectListItem
               title="Robot Interface for Collaboration in Kitchen"
               dates="2026 - Ongoing"

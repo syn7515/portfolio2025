@@ -28,7 +28,7 @@ export default function LabelIndicatorCarousel({
   gap,
   renderCard,
   renderCaption,
-  captionStyle,
+  captionStyle = { lineHeight: 1.6 },
   transition = defaultTransition,
   indicatorExpandedWidth,
   indicatorCollapsedSize,
