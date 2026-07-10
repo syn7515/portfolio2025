@@ -300,7 +300,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
             animate={contentVisible ? CONTENT_FADE_VISIBLE : CONTENT_FADE_HIDDEN}
             transition={instantReveal ? CONTENT_FADE_INSTANT : CONTENT_FADE_TRANSITION}
           >
-            <div className="px-6 min-[1280px]:px-0 min-[1280px]:ml-[calc(50vw_-_520px)] min-[1280px]:w-[560px]">
+            <div className="px-6 min-[1280px]:px-0 min-[1280px]:ml-[calc(50vw_-_280px_-_var(--sidebar-w))] min-[1280px]:w-[560px]">
                 {/* Header: title, subtitle */}
                 <BlogPostHeader slug={slug} title={title} subtitle={subtitle} />
 

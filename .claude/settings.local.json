@@ -8,7 +8,8 @@
       "Bash(vercel --prod)",
       "Bash(git -C /Users/suepark/Documents/Github_aniai/portfolio2025 add src/app/page.tsx src/components/blog-post-header.tsx src/components/ui/label_indicator_carousel.jsx)",
       "Bash(git -C /Users/suepark/Documents/Github_aniai/portfolio2025 commit -m ' *)",
-      "Bash(git -C /Users/suepark/Documents/Github_aniai/portfolio2025 push)"
+      "Bash(git -C /Users/suepark/Documents/Github_aniai/portfolio2025 push)",
+      "Bash(lsof -nP -iTCP -sTCP:LISTEN)"
     ]
   }
 }

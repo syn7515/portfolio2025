@@ -208,13 +208,18 @@ export function useResponsiveSizing(
         setSize({ cardWidth: width, cardHeight: height, gap: 16 });
       } else if (w < 1280) {
         setSize({ cardWidth: 840, cardHeight: 473, gap: 36 });
-      } else if (w < 1500) {
-        const t = (w - 1280) / 220; // 0 at 1280px → 1 at 1500px
-        const cardWidth = Math.round(720 + t * 240); // clamp 720px → 960px
+      } else {
+        const t = Math.min(1, (w - 1280) / 220); // 0 at 1280px → 1 at 1500px+
+        const idealWidth = Math.round(720 + t * 240); // 720px → 960px
+        // The paper surface is inset from the left by --sidebar-w (see globals.css:
+        // clamp(240px, 27.273vw - 109.09px, 300px)) while the card is centered on the
+        // viewport, so only (50vw - sidebar) of paper exists left of the card's center.
+        // Cap the width so the card stays on the paper with 16px breathing room per side.
+        const sidebarW = Math.min(300, Math.max(240, 0.27273 * w - 109.09));
+        const maxWidth = Math.floor((w / 2 - sidebarW) * 2) - 32;
+        const cardWidth = Math.min(idealWidth, maxWidth);
         const cardHeight = Math.round(cardWidth * 9 / 16);
         setSize({ cardWidth, cardHeight, gap: 40 });
-      } else {
-        setSize({ cardWidth: 960, cardHeight: 540, gap: 40 });
       }
     };
 
