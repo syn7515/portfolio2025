@@ -33,17 +33,10 @@ export interface LabelIndicatorCarouselProps {
   }) => React.ReactNode;
   captionStyle?: React.CSSProperties;
   transition?: { type: string; stiffness: number; damping: number };
-  indicatorExpandedWidth?: number;
-  indicatorCollapsedSize?: number;
-  indicatorHeight?: number;
-  withEdgeBlur?: boolean;
   ariaLabel?: string;
   className?: string;
-  enableDrag?: boolean;
-  swipeThreshold?: number;
-  velocityThreshold?: number;
-  wheelToNavigate?: boolean;
-  showIndicators?: boolean;
+  enableLightbox?: boolean;
+  openLightboxOnCardClick?: boolean;
   supCardMap?: Record<number, number>;
 }
 

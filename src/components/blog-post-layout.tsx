@@ -109,6 +109,42 @@ const PAPER_REST = { x: 0, y: 0, rotate: 0, filter: 'blur(0px)' }
 const PAPER_TRANSITION_FULL = { duration: PAPER_SLIDE_DURATION, ease: ENTRANCE_EASE }
 const PAPER_TRANSITION_REDUCED = { duration: 0 }
 const CONTENT_FADE_TRANSITION = { duration: 0.5, ease: ENTRANCE_EASE }
+
+// Slide-out (backwards navigation) uses its own easing and duration, independent of the entrance
+// above. ENTRANCE_EASE is a "decelerate" curve — its long flat tail is right for a sheet settling
+// into place, but reads as lingering when applied to a sheet that's simply leaving the screen.
+// Exiting elements don't need to visually land, so this is an "accelerate" curve instead (Material
+// Design's standard exit easing): it speeds up continuously with no decelerating tail — the abrupt
+// stop happens off-screen, out of view. Paired with a shorter duration than the entrance, since an
+// accelerating exit should read as quicker, not just differently shaped.
+const EXIT_EASE: [number, number, number, number] = [0.4, 0, 1, 1]
+const PAPER_EXIT_DURATION = 0.3
+const PAPER_TRANSITION_EXIT_FULL = { duration: PAPER_EXIT_DURATION, ease: EXIT_EASE }
+// Layers an opacity fade onto the shared PAPER_REST/PAPER_OFFSCREEN targets, exit-only. Without it
+// the departing sheet only shifts by a small (40, -32) offset and gains blur while staying fully
+// opaque — a flat-colored rect barely changes appearance under blur except at its edges, so almost
+// none of the destination content is visibly revealed until the sheet suddenly unmounts at the end,
+// reading as an abrupt pop rather than a fade. Fading opacity alongside the blur mirrors the
+// "dissolve" treatment already used for the mobile menu's middle bar (see blog-post-mobile-menu.tsx).
+const PAPER_EXIT_REST = { ...PAPER_REST, opacity: 1 }
+const PAPER_EXIT_OFFSCREEN = { ...PAPER_OFFSCREEN, opacity: 0 }
+// Opacity gets a head-start delay so the sheet stays fully solid while the slide/rotate/blur are
+// just getting going, rather than dissolving from the very first frame (which read as premature —
+// content peeking through before the sheet visually reads as "leaving"). The fade then compresses
+// into the remaining time so it still finishes exactly when the position/blur animation does, at
+// PAPER_EXIT_DURATION — this only reshapes opacity's pacing within the same overall exit length.
+const PAPER_EXIT_OPACITY_DELAY = 0.1
+const PAPER_TRANSITION_EXIT_OPACITY_FULL = {
+  duration: PAPER_EXIT_DURATION - PAPER_EXIT_OPACITY_DELAY,
+  ease: EXIT_EASE,
+  delay: PAPER_EXIT_OPACITY_DELAY,
+}
+// Per-property transition map for the departing sheet: x/y/rotate/filter use `default`, opacity
+// gets its own delayed pacing. Hoisted (rather than built inline in the render below) for the same
+// reason as PAPER_OFFSCREEN/PAPER_REST above — a fresh object reference on every render would give
+// Framer Motion a reason to reconsider the in-flight tween on an unrelated re-render.
+const PAPER_TRANSITION_EXIT_COMBINED = { default: PAPER_TRANSITION_EXIT_FULL, opacity: PAPER_TRANSITION_EXIT_OPACITY_FULL }
+const PAPER_TRANSITION_EXIT_COMBINED_REDUCED = { default: PAPER_TRANSITION_REDUCED, opacity: PAPER_TRANSITION_REDUCED }
 const CONTENT_FADE_INSTANT = { duration: 0 }
 const CONTENT_FADE_HIDDEN = { opacity: 0 }
 const CONTENT_FADE_VISIBLE = { opacity: 1 }
@@ -185,6 +221,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
   // animationReady flips post-hydration. The animate target is the same either way now (no more
   // mid-flight keyframe), so only the transition timing needs to branch.
   const paperTransition = shouldReduceMotion ? PAPER_TRANSITION_REDUCED : PAPER_TRANSITION_FULL
+  const exitTransition = shouldReduceMotion ? PAPER_TRANSITION_EXIT_COMBINED_REDUCED : PAPER_TRANSITION_EXIT_COMBINED
 
   return (
     <TooltipProvider>
@@ -390,9 +427,9 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
             aria-hidden
             className="absolute inset-0 min-[1280px]:top-[100px] overflow-x-clip pointer-events-none z-[55]"
             style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}
-            initial={PAPER_REST}
-            animate={PAPER_OFFSCREEN}
-            transition={paperTransition}
+            initial={PAPER_EXIT_REST}
+            animate={PAPER_EXIT_OFFSCREEN}
+            transition={exitTransition}
             onAnimationComplete={() => setExitDone(true)}
           />
         )}

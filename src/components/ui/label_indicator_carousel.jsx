@@ -1,15 +1,13 @@
 "use client"
 
-import { motion } from "framer-motion";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { CarouselCard } from "./carousel/carousel-card";
-import { CarouselIndicators } from "./carousel/carousel-indicators";
 import { Lightbox } from "./carousel/lightbox";
 import { normalizeItem, useResponsiveSizing, getLightboxMaxWidth, FALLBACK_ITEMS } from "./carousel/hooks";
 import { scrollBehavior } from "@/lib/utils";
 
-// LabelIndicatorCarousel Component (Responsive)
+// LabelIndicatorCarousel Component (always renders as a vertical stack)
 // - Responsive sizing defaults by viewport unless overridden by props
 // - Responsive text sizing for captions: text-xs sm:text-sm
 
@@ -31,20 +29,11 @@ export default function LabelIndicatorCarousel({
   renderCaption,
   captionStyle = { lineHeight: 1.6 },
   transition = defaultTransition,
-  indicatorExpandedWidth,
-  indicatorCollapsedSize,
-  indicatorHeight,
   ariaLabel = "Label indicator carousel",
   className = "h-auto w-full max-w-full overflow-hidden",
-  enableDrag = true,
-  swipeThreshold = 0.25,
-  velocityThreshold = 500,
-  wheelToNavigate = true,
   // Lightbox options
   enableLightbox = true,
   openLightboxOnCardClick = true,
-  // Indicator options
-  showIndicators = true,
   // Sup navigation: maps supId (number) → cardIndex
   supCardMap,
 } = {}) {
@@ -54,16 +43,6 @@ export default function LabelIndicatorCarousel({
   const [uncontrolledIndex, setUncontrolledIndex] = useState(defaultIndex);
   const index = isControlled ? currentIndex : uncontrolledIndex;
   const wrapperRef = useRef(null);
-
-  // Viewport detection for mobile mode (< 640px) - vertical layout
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    setIsMobile(window.innerWidth < 640);
-    const handleResize = () => setIsMobile(window.innerWidth < 640);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   // Viewport detection for disabling lightbox on sm and below
   const [isSmOrBelow, setIsSmOrBelow] = useState(false);
@@ -83,16 +62,6 @@ export default function LabelIndicatorCarousel({
     const handleResize = () => setIsLgOrAbove(window.innerWidth >= 1024);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  // Viewport detection for paper layout vertical mode (1280–1499px)
-  const [isPaperViewport, setIsPaperViewport] = useState(false);
-
-  useEffect(() => {
-    const check = () => setIsPaperViewport(window.innerWidth >= 1280 && window.innerWidth < 1500);
-    check();
-    window.addEventListener('resize', check);
-    return () => window.removeEventListener('resize', check);
   }, []);
 
   // Dark mode detection - only set after hydration to avoid SSR mismatch
@@ -119,8 +88,8 @@ export default function LabelIndicatorCarousel({
   const cardRefs = useRef({});
   const scrollbarGutterRef = useRef(0); // Store scrollbar gutter for exit animation
   
-  // Disable lightbox on mobile (< 640px) and sm and below
-  const effectiveLightboxEnabled = enableLightbox && !isMobile && !isSmOrBelow;
+  // Disable lightbox on sm and below
+  const effectiveLightboxEnabled = enableLightbox && !isSmOrBelow;
 
   const calculateCardTransform = useCallback((cardIndex) => {
     const cardElement = cardRefs.current[cardIndex];
@@ -212,12 +181,6 @@ export default function LabelIndicatorCarousel({
     cardWidth,
     cardHeight,
     gap
-  );
-
-  const span = effWidth + effGap;
-  const centerOffset = useMemo(
-    () => span * (normalized.length - 1) * 0.5,
-    [span, normalized.length]
   );
 
   const setIndex = useCallback(
@@ -396,180 +359,46 @@ export default function LabelIndicatorCarousel({
     }
   }, [isLightboxOpen, closeLightbox, prevLightbox, nextLightbox]);
 
-  const xOffset = useMemo(
-    () => -index * span + centerOffset,
-    [index, span, centerOffset]
-  );
-
-  const onKeyDown = (e) => {
-    // Disable keyboard navigation when lightbox is open
-    if (isLightboxOpen) return;
-    // Disable keyboard navigation in mobile/vertical mode
-    if (isMobile || isPaperViewport) return;
-    if (e.key === "ArrowRight") {
-      e.preventDefault();
-      setIndex(Math.min(index + 1, normalized.length - 1));
-    } else if (e.key === "ArrowLeft") {
-      e.preventDefault();
-      setIndex(Math.max(index - 1, 0));
-    } else if (e.key === "Home") {
-      e.preventDefault();
-      setIndex(0);
-    } else if (e.key === "End") {
-      e.preventDefault();
-      setIndex(normalized.length - 1);
-    }
-  };
-
-  const onWheel = (e) => {
-    // Disable wheel navigation in mobile/vertical mode
-    if (isMobile || isPaperViewport || !wheelToNavigate) return;
-    const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : 0;
-    if (delta > 20) setIndex(index + 1);
-    else if (delta < -20) setIndex(index - 1);
-  };
-
   return (
     <div
       ref={wrapperRef}
       className={`relative flex h-auto py-0 sm:py-2 md:py-3 w-full flex-col items-center justify-center ${className}`}
       data-carousel
       aria-label={ariaLabel}
-      onKeyDown={onKeyDown}
-      onWheel={onWheel}
-      tabIndex={0}
-      style={{ outline: "none" }}
     >
       <div className="relative z-[50] flex flex-col items-center justify-center w-full">
-        {isMobile ? (
-          // Vertical layout for mobile (< 640px)
-          <div className="flex flex-col items-center w-full" style={{ rowGap: Math.max(effGap * 3, 24), width: '100%' }}>
-            {normalized.map((item, i) => (
-              <div key={i} className="w-full flex flex-col items-center px-4">
-                <div style={{ width: '100%', maxWidth: effWidth }}>
-                  <CarouselCard
-                    item={item}
-                    index={i}
-                    currentIndex={index}
-                    effWidth={effWidth}
-                    isHydrated={isHydrated}
-                    isDarkMode={isDarkMode}
-                    effectiveLightboxEnabled={false} // No lightbox in mobile
-                    disableCursor={true}
-                    openLightboxOnCardClick={openLightboxOnCardClick}
-                    openLightbox={openLightbox}
-                    setIndex={setIndex}
-                    renderCard={renderCard}
-                    renderCaption={renderCaption}
-                    captionStyle={captionStyle}
-                    transition={transition}
-                    hiddenCardIndex={hiddenCardIndex}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : isPaperViewport ? (
-          // Vertical layout for paper viewport (1280–1499px) — cards bigger, lightbox enabled
-          <div className="flex flex-col items-center w-full" style={{ rowGap: effGap * 2 }}>
-            {normalized.map((item, i) => (
-              <CarouselCard
-                key={i}
-                item={item}
-                index={i}
-                currentIndex={index}
-                effWidth={effWidth}
-                isHydrated={isHydrated}
-                isDarkMode={isDarkMode}
-                effectiveLightboxEnabled={effectiveLightboxEnabled}
-                openLightboxOnCardClick={openLightboxOnCardClick}
-                openLightbox={openLightbox}
-                setIndex={setIndex}
-                forceActive={true}
-                cardRef={(el) => {
-                  if (effectiveLightboxEnabled && (item.imageUrl || item.videoUrl)) {
-                    cardRefs.current[i] = el;
-                  }
-                }}
-                renderCard={renderCard}
-                renderCaption={renderCaption}
-                captionStyle={captionStyle}
-                transition={transition}
-                hiddenCardIndex={hiddenCardIndex}
-              />
-            ))}
-          </div>
-        ) : (
-          // Horizontal carousel layout for >= 640px
-          <motion.div
-            initial={false}
-            className="flex justify-start"
-            style={{ columnGap: effGap }}
-            animate={{ x: xOffset }}
-            transition={transition}
-            {...(enableDrag && normalized.length > 1
-              ? {
-                  drag: "x",
-                  dragConstraints: { left: -100000, right: 100000 },
-                  dragElastic: 0.1,
-                  dragMomentum: false,
-                  onDragEnd: (_, info) => {
-                    const delta = info.offset.x;
-                    const vx = info.velocity.x;
-                    const passed = Math.abs(delta) > span * swipeThreshold;
-                    let next = index;
-                    if (delta < 0) {
-                      if (passed || vx < -velocityThreshold)
-                        next = Math.min(index + 1, normalized.length - 1);
-                    } else if (delta > 0) {
-                      if (passed || vx > velocityThreshold)
-                        next = Math.max(index - 1, 0);
-                    }
-                    setIndex(next);
-                  },
-                }
-              : {})}
-          >
-            {normalized.map((item, i) => (
-              <CarouselCard
-                key={i}
-                item={item}
-                index={i}
-                currentIndex={index}
-                effWidth={effWidth}
-                isHydrated={isHydrated}
-                isDarkMode={isDarkMode}
-                effectiveLightboxEnabled={effectiveLightboxEnabled}
-                openLightboxOnCardClick={openLightboxOnCardClick}
-                openLightbox={openLightbox}
-                setIndex={setIndex}
-                cardRef={(el) => {
-                  if (effectiveLightboxEnabled && (item.imageUrl || item.videoUrl)) {
+        {/* Always a vertical stack, at every viewport size */}
+        <div className="flex flex-col items-center w-full" style={{ rowGap: Math.max(effGap * 2, 24) }}>
+          {normalized.map((item, i) => (
+            <div key={i} className="w-full flex flex-col items-center px-4">
+              <div style={{ width: '100%', maxWidth: effWidth }}>
+                <CarouselCard
+                  item={item}
+                  index={i}
+                  currentIndex={index}
+                  effWidth={effWidth}
+                  isHydrated={isHydrated}
+                  isDarkMode={isDarkMode}
+                  effectiveLightboxEnabled={effectiveLightboxEnabled}
+                  openLightboxOnCardClick={openLightboxOnCardClick}
+                  openLightbox={openLightbox}
+                  setIndex={setIndex}
+                  forceActive={true}
+                  cardRef={(el) => {
+                    if (effectiveLightboxEnabled && (item.imageUrl || item.videoUrl)) {
                       cardRefs.current[i] = el;
                     }
                   }}
-                renderCard={renderCard}
-                renderCaption={renderCaption}
-                captionStyle={captionStyle}
-                transition={transition}
-                hiddenCardIndex={hiddenCardIndex}
-              />
-            ))}
-          </motion.div>
-        )}
-
-        {/* Indicators - hidden in mobile/vertical mode */}
-        {showIndicators && !isMobile && !isPaperViewport && (
-          <CarouselIndicators
-            normalized={normalized}
-            index={index}
-            setIndex={setIndex}
-            indicatorExpandedWidth={indicatorExpandedWidth}
-            indicatorCollapsedSize={indicatorCollapsedSize}
-            indicatorHeight={indicatorHeight}
-                    transition={transition}
-          />
-        )}
+                  renderCard={renderCard}
+                  renderCaption={renderCaption}
+                  captionStyle={captionStyle}
+                  transition={transition}
+                  hiddenCardIndex={hiddenCardIndex}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       <Lightbox

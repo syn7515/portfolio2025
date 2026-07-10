@@ -100,7 +100,7 @@ export default function Home() {
           {/* Left column: name */}
           <div>
             <motion.h1
-              className="intro-text !text-stone-700 dark:!text-zinc-200 !mb-0 md:!mb-0"
+              className="intro-text !mt-0 !text-stone-700 dark:!text-zinc-200 !mb-0 md:!mb-0"
               initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
               animate={getAnimate()}
               transition={contentTransition(0)}
