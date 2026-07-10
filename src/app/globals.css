@@ -484,6 +484,19 @@ a[data-social-link-trigger]:hover {
   /* orange-700 */
 }
 
+/* Mobile menu current-post link: same dotted underline as intro links, but not italic.
+   Decoration color comes from --intro-trigger-decoration so dark mode is covered. */
+a[data-mobile-menu-current] {
+  text-decoration-line: underline !important;
+  text-decoration-style: dotted !important;
+  text-decoration-skip-ink: auto !important;
+  text-decoration-color: var(--intro-trigger-decoration) !important;
+  text-decoration-thickness: 10% !important;
+  text-underline-offset: 0.05rem !important;
+  text-underline-position: from-font !important;
+  font-style: normal !important;
+}
+
 /* Intro link variant for lighter text paragraphs (stone-500/zinc-400) */
 .intro-link-light {
   color: rgb(120 113 108) !important;

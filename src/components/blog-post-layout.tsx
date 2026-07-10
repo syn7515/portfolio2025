@@ -10,6 +10,7 @@ import { Divider } from '@/components/ui/divider'
 import styles from './blog-post.module.css'
 import BlogPostHeader from '@/components/blog-post-header'
 import BlogPostToc from '@/components/blog-post-toc'
+import BlogPostMobileMenu from '@/components/blog-post-mobile-menu'
 
 interface BlogPostLayoutProps {
   children: React.ReactNode
@@ -19,7 +20,7 @@ interface BlogPostLayoutProps {
 }
 
 // Project navigation data
-const PROJECTS = [
+export const PROJECTS = [
   {
     slug: 'alphagrill',
     title: 'AlphaGrill',
@@ -158,6 +159,9 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           background: 'linear-gradient(to bottom, var(--top-fade-from) 0%, transparent 100%)',
         }}
       />
+
+      {/* Mobile menu: hamburger + blurred overlay; visible only below 1280px */}
+      <BlogPostMobileMenu slug={slug} />
 
       {/* Fixed side nav: back + TOC; visible only on lg+ */}
       <aside
