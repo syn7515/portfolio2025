@@ -134,8 +134,22 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
   // completing normally, so the content skips its fade and appears instantly (a fade would itself
   // be a frozen rAF animation in exactly the situations the fallback exists to recover from).
   const [instantReveal, setInstantReveal] = useState(false)
+  // Backwards navigation (footer "Previous"): instead of a new paper sliding in, the current top
+  // sheet slides OUT to the top-right, revealing this post's content already sitting on the paper
+  // underneath. Signaled across the route change via sessionStorage (set in the Previous link's
+  // onClick), and read only post-mount so SSR output never branches on client-only state.
+  const [exitEntrance, setExitEntrance] = useState(false)
+  const [exitDone, setExitDone] = useState(false)
 
   useEffect(() => {
+    if (sessionStorage.getItem('paper-direction') === 'back') {
+      sessionStorage.removeItem('paper-direction')
+      setExitEntrance(true)
+      // Content must be fully present beneath the departing sheet before it moves, so reuse the
+      // instant-reveal path: dummy paper fades, real paper turns visible, content opacity snaps to 1.
+      setInstantReveal(true)
+      setContentVisible(true)
+    }
     setAnimationReady(true)
   }, [])
 
@@ -287,6 +301,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                           href={`/${previousProject.slug}`}
                           className="flex-1 group cursor-pointer"
                           style={{ textDecoration: 'none' }}
+                          onClick={() => sessionStorage.setItem('paper-direction', 'back')}
                         >
                           <div className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic mb-1.5 opacity-80 font-sans">
                             <span className="relative inline-flex items-center">
@@ -351,7 +366,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
             on top of the (currently hidden) real paper above, then reveals it and removes itself once
             settled. Has no real children, so it's safe for this to be a Framer Motion transform target
             — nothing here needs to escape a stacking context. */}
-        {!contentVisible && (
+        {!contentVisible && !exitEntrance && (
           <motion.div
             aria-hidden
             className="absolute inset-0 min-[1280px]:top-[100px] overflow-x-clip pointer-events-none"
@@ -360,6 +375,25 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
             animate={animationReady ? PAPER_REST : PAPER_OFFSCREEN}
             transition={paperTransition}
             onAnimationComplete={() => setContentVisible(true)}
+          />
+        )}
+
+        {/* Departing-sheet overlay (backwards navigation): the inverse of the entrance above. The
+            content is already revealed underneath (instant-reveal in the mount effect), and this
+            sheet starts at the paper's rest position and slides out to the top-right. Needs an
+            explicit z-index: the content below is visible during the exit, and carousel children
+            use z-[50] at the root stacking level (the real paper deliberately isn't a stacking
+            context), so without one the carousel would paint above the departing sheet. z-[55]
+            stays below the sidebar (z-60). */}
+        {exitEntrance && !exitDone && (
+          <motion.div
+            aria-hidden
+            className="absolute inset-0 min-[1280px]:top-[100px] overflow-x-clip pointer-events-none z-[55]"
+            style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}
+            initial={PAPER_REST}
+            animate={PAPER_OFFSCREEN}
+            transition={paperTransition}
+            onAnimationComplete={() => setExitDone(true)}
           />
         )}
       </div>
