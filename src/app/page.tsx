@@ -4,6 +4,14 @@ import { useEffect, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import ProjectListItem from '@/components/ui/project-list-item';
 import InlineLinkPreview from '@/components/ui/inline-link-preview';
+import {
+  PAPER_EXIT_REST,
+  PAPER_EXIT_OFFSCREEN,
+  PAPER_EXIT_TRANSITION,
+  PAPER_EXIT_TRANSITION_REDUCED,
+  PAPER_BACK_NAV_FLAG,
+  PAPER_BACK_NAV_VALUE,
+} from '@/lib/paper-exit-transition';
 
 // Persists across client-side navigation (back button) but resets on full page load
 let hasVisitedHome = false;
@@ -28,11 +36,26 @@ const ENTRANCE_FALLBACK_MS = 2200;
 export default function Home() {
   const shouldAnimate = !hasVisitedHome;
   const [animationReady, setAnimationReady] = useState(false);
-  // Set only by the fallback timer below: collapses every entrance transition to an instant jump so
-  // content appears even when the rAF-driven animation never runs. See ENTRANCE_FALLBACK_MS.
+  // Set either by the fallback timer below, or immediately on a backwards-navigation exit (see
+  // exitEntrance): collapses every entrance transition to an instant jump so content appears fully
+  // settled rather than animating in — because either nothing is animating it in normally (the rAF
+  // fallback case) or the departing sheet below is what plays the actual visible motion instead.
   const [instantReveal, setInstantReveal] = useState(false);
+  // Backwards navigation (sidebar "Home" link on a blog post): instead of the normal staggered
+  // entrance, a sheet slides OUT to the top-right, revealing this page's content already sitting on
+  // the paper underneath — the reverse of a fresh paper landing. Signaled across the route change via
+  // sessionStorage (set in the departing link's onClick in blog-post-layout.tsx), and read only
+  // post-mount so SSR output never branches on client-only state. Shared with blog-post-layout.tsx's
+  // identical mechanism via src/lib/paper-exit-transition.ts.
+  const [exitEntrance, setExitEntrance] = useState(false);
+  const [exitDone, setExitDone] = useState(false);
 
   useEffect(() => {
+    if (sessionStorage.getItem(PAPER_BACK_NAV_FLAG) === PAPER_BACK_NAV_VALUE) {
+      sessionStorage.removeItem(PAPER_BACK_NAV_FLAG);
+      setExitEntrance(true);
+      setInstantReveal(true);
+    }
     hasVisitedHome = true;
     setAnimationReady(true);
   }, []);
@@ -58,6 +81,7 @@ export default function Home() {
   const paperTransition = (shouldReduceMotion || instantReveal)
     ? { duration: 0 }
     : { duration: PAPER_SLIDE_DURATION, ease: ENTRANCE_EASE };
+  const exitTransition = shouldReduceMotion ? PAPER_EXIT_TRANSITION_REDUCED : PAPER_EXIT_TRANSITION;
   // Existing per-element stagger delays below are all offset by this so the whole sequence starts
   // once the paper has slid in, instead of racing it.
   const contentBaseDelay = shouldReduceMotion ? 0 : PAPER_SLIDE_DURATION * CONTENT_DELAY_RATIO;
@@ -86,7 +110,7 @@ export default function Home() {
       />
 
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-4 focus:left-4 focus:px-4 focus:py-2 focus:bg-white focus:text-stone-800 focus:rounded focus:shadow">Skip to content</a>
-      <main id="main" className="w-full flex-1 flex flex-col">
+      <main id="main" className="w-full flex-1 flex flex-col relative">
         <motion.div
           className="w-full flex-1 flex flex-col min-[1280px]:mt-[100px] overflow-x-clip"
           style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}
@@ -227,6 +251,23 @@ export default function Home() {
         </div>
         </motion.div>
 
+        {/* Departing-sheet overlay (backwards navigation from a blog post's sidebar "Home" link):
+            the reverse of the entrance above. Content is already revealed underneath (instantReveal
+            snaps the paper and every staggered element straight to their settled state — see the
+            mount effect), and this sheet starts at the paper's rest position and slides out to the
+            top-right. z-[55] matches blog-post-layout.tsx's departing sheet for consistency, even
+            though this page has no z-[50] descendant of its own to clear. */}
+        {exitEntrance && !exitDone && (
+          <motion.div
+            aria-hidden
+            className="absolute inset-0 min-[1280px]:top-[100px] overflow-x-clip pointer-events-none z-[55]"
+            style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}
+            initial={PAPER_EXIT_REST}
+            animate={PAPER_EXIT_OFFSCREEN}
+            transition={exitTransition}
+            onAnimationComplete={() => setExitDone(true)}
+          />
+        )}
       </main>
 
     </div>

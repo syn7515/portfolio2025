@@ -11,6 +11,14 @@ import styles from './blog-post.module.css'
 import BlogPostHeader from '@/components/blog-post-header'
 import BlogPostToc from '@/components/blog-post-toc'
 import BlogPostMobileMenu from '@/components/blog-post-mobile-menu'
+import {
+  PAPER_EXIT_REST,
+  PAPER_EXIT_OFFSCREEN,
+  PAPER_EXIT_TRANSITION,
+  PAPER_EXIT_TRANSITION_REDUCED,
+  PAPER_BACK_NAV_FLAG,
+  PAPER_BACK_NAV_VALUE,
+} from '@/lib/paper-exit-transition'
 
 interface BlogPostLayoutProps {
   children: React.ReactNode
@@ -110,41 +118,9 @@ const PAPER_TRANSITION_FULL = { duration: PAPER_SLIDE_DURATION, ease: ENTRANCE_E
 const PAPER_TRANSITION_REDUCED = { duration: 0 }
 const CONTENT_FADE_TRANSITION = { duration: 0.5, ease: ENTRANCE_EASE }
 
-// Slide-out (backwards navigation) uses its own easing and duration, independent of the entrance
-// above. ENTRANCE_EASE is a "decelerate" curve — its long flat tail is right for a sheet settling
-// into place, but reads as lingering when applied to a sheet that's simply leaving the screen.
-// Exiting elements don't need to visually land, so this is an "accelerate" curve instead (Material
-// Design's standard exit easing): it speeds up continuously with no decelerating tail — the abrupt
-// stop happens off-screen, out of view. Paired with a shorter duration than the entrance, since an
-// accelerating exit should read as quicker, not just differently shaped.
-const EXIT_EASE: [number, number, number, number] = [0.4, 0, 1, 1]
-const PAPER_EXIT_DURATION = 0.3
-const PAPER_TRANSITION_EXIT_FULL = { duration: PAPER_EXIT_DURATION, ease: EXIT_EASE }
-// Layers an opacity fade onto the shared PAPER_REST/PAPER_OFFSCREEN targets, exit-only. Without it
-// the departing sheet only shifts by a small (40, -32) offset and gains blur while staying fully
-// opaque — a flat-colored rect barely changes appearance under blur except at its edges, so almost
-// none of the destination content is visibly revealed until the sheet suddenly unmounts at the end,
-// reading as an abrupt pop rather than a fade. Fading opacity alongside the blur mirrors the
-// "dissolve" treatment already used for the mobile menu's middle bar (see blog-post-mobile-menu.tsx).
-const PAPER_EXIT_REST = { ...PAPER_REST, opacity: 1 }
-const PAPER_EXIT_OFFSCREEN = { ...PAPER_OFFSCREEN, opacity: 0 }
-// Opacity gets a head-start delay so the sheet stays fully solid while the slide/rotate/blur are
-// just getting going, rather than dissolving from the very first frame (which read as premature —
-// content peeking through before the sheet visually reads as "leaving"). The fade then compresses
-// into the remaining time so it still finishes exactly when the position/blur animation does, at
-// PAPER_EXIT_DURATION — this only reshapes opacity's pacing within the same overall exit length.
-const PAPER_EXIT_OPACITY_DELAY = 0.1
-const PAPER_TRANSITION_EXIT_OPACITY_FULL = {
-  duration: PAPER_EXIT_DURATION - PAPER_EXIT_OPACITY_DELAY,
-  ease: EXIT_EASE,
-  delay: PAPER_EXIT_OPACITY_DELAY,
-}
-// Per-property transition map for the departing sheet: x/y/rotate/filter use `default`, opacity
-// gets its own delayed pacing. Hoisted (rather than built inline in the render below) for the same
-// reason as PAPER_OFFSCREEN/PAPER_REST above — a fresh object reference on every render would give
-// Framer Motion a reason to reconsider the in-flight tween on an unrelated re-render.
-const PAPER_TRANSITION_EXIT_COMBINED = { default: PAPER_TRANSITION_EXIT_FULL, opacity: PAPER_TRANSITION_EXIT_OPACITY_FULL }
-const PAPER_TRANSITION_EXIT_COMBINED_REDUCED = { default: PAPER_TRANSITION_REDUCED, opacity: PAPER_TRANSITION_REDUCED }
+// Slide-out (backwards navigation, footer Previous or sidebar Home) uses its own easing/duration/
+// opacity pacing, independent of the entrance above — see src/lib/paper-exit-transition.ts, which
+// is shared with app/page.tsx so both exits feel identical.
 const CONTENT_FADE_INSTANT = { duration: 0 }
 const CONTENT_FADE_HIDDEN = { opacity: 0 }
 const CONTENT_FADE_VISIBLE = { opacity: 1 }
@@ -170,16 +146,17 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
   // completing normally, so the content skips its fade and appears instantly (a fade would itself
   // be a frozen rAF animation in exactly the situations the fallback exists to recover from).
   const [instantReveal, setInstantReveal] = useState(false)
-  // Backwards navigation (footer "Previous"): instead of a new paper sliding in, the current top
-  // sheet slides OUT to the top-right, revealing this post's content already sitting on the paper
-  // underneath. Signaled across the route change via sessionStorage (set in the Previous link's
-  // onClick), and read only post-mount so SSR output never branches on client-only state.
+  // Backwards navigation (footer "Previous" or sidebar "Home"): instead of a new paper sliding in,
+  // the current top sheet slides OUT to the top-right, revealing this post's content already sitting
+  // on the paper underneath. Signaled across the route change via sessionStorage (set in the
+  // departing link's onClick), and read only post-mount so SSR output never branches on client-only
+  // state.
   const [exitEntrance, setExitEntrance] = useState(false)
   const [exitDone, setExitDone] = useState(false)
 
   useEffect(() => {
-    if (sessionStorage.getItem('paper-direction') === 'back') {
-      sessionStorage.removeItem('paper-direction')
+    if (sessionStorage.getItem(PAPER_BACK_NAV_FLAG) === PAPER_BACK_NAV_VALUE) {
+      sessionStorage.removeItem(PAPER_BACK_NAV_FLAG)
       setExitEntrance(true)
       // Content must be fully present beneath the departing sheet before it moves, so reuse the
       // instant-reveal path: dummy paper fades, real paper turns visible, content opacity snaps to 1.
@@ -221,7 +198,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
   // animationReady flips post-hydration. The animate target is the same either way now (no more
   // mid-flight keyframe), so only the transition timing needs to branch.
   const paperTransition = shouldReduceMotion ? PAPER_TRANSITION_REDUCED : PAPER_TRANSITION_FULL
-  const exitTransition = shouldReduceMotion ? PAPER_TRANSITION_EXIT_COMBINED_REDUCED : PAPER_TRANSITION_EXIT_COMBINED
+  const exitTransition = shouldReduceMotion ? PAPER_EXIT_TRANSITION_REDUCED : PAPER_EXIT_TRANSITION
 
   return (
     <TooltipProvider>
@@ -258,7 +235,12 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           }}
         />
         <div className="relative flex flex-col gap-6 pt-[240px] pl-14 pointer-events-auto">
-          <Link href="/" className="flex items-center gap-2 w-fit text-sm font-[460] !not-italic !no-underline !text-stone-400 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-lime-200 transition-colors duration-300 ease-out px-3 py-2 -mx-3 -my-2 rounded" aria-label="Back to home">
+          <Link
+            href="/"
+            className="flex items-center gap-2 w-fit text-sm font-[460] !not-italic !no-underline !text-stone-400 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-lime-200 transition-colors duration-300 ease-out px-3 py-2 -mx-3 -my-2 rounded"
+            aria-label="Back to home"
+            onClick={() => sessionStorage.setItem(PAPER_BACK_NAV_FLAG, PAPER_BACK_NAV_VALUE)}
+          >
             <Undo2 className="size-4 flex-shrink-0" />
             Home
           </Link>
@@ -338,7 +320,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                           href={`/${previousProject.slug}`}
                           className="flex-1 group cursor-pointer"
                           style={{ textDecoration: 'none' }}
-                          onClick={() => sessionStorage.setItem('paper-direction', 'back')}
+                          onClick={() => sessionStorage.setItem(PAPER_BACK_NAV_FLAG, PAPER_BACK_NAV_VALUE)}
                         >
                           <div className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic mb-1.5 opacity-80 font-sans">
                             <span className="relative inline-flex items-center">
