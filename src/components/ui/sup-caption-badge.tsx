@@ -3,6 +3,7 @@
 import type { ReactNode } from "react"
 import { useState, useEffect, useRef } from "react"
 import { SUP_BADGE_BASE_CLASS, SUP_BADGE_DEFAULT_CLASS, SUP_BADGE_CAROUSEL_CLASS, SUP_BADGE_HIGHLIGHTED_CLASS } from "@/components/ui/sup-badge"
+import { scrollBehavior } from "@/lib/utils"
 
 export function CaptionSupBadge({ supId, muted = false }: { supId: string; muted?: boolean }) {
   const [isHighlighted, setIsHighlighted] = useState(false)
@@ -38,7 +39,7 @@ export function CaptionSupBadge({ supId, muted = false }: { supId: string; muted
       id={`sup-caption-${supId}`}
       onClick={(e) => {
         e.stopPropagation()
-        document.getElementById(`sup-body-${supId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        document.getElementById(`sup-body-${supId}`)?.scrollIntoView({ behavior: scrollBehavior(), block: 'center' })
         window.dispatchEvent(new CustomEvent('sup-highlight', { detail: { supId } }))
       }}
       style={supId === '1' ? { paddingRight: '1px' } : undefined}

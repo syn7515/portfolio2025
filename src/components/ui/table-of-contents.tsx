@@ -1,7 +1,7 @@
 "use client"
 
 import React from 'react'
-import { cn } from '@/lib/utils'
+import { cn, scrollBehavior } from '@/lib/utils'
 
 interface Heading {
   id: string
@@ -370,7 +370,7 @@ export default function TableOfContents({ className, labels }: TableOfContentsPr
 
       window.scrollTo({
         top: offsetPosition,
-        behavior: 'smooth'
+        behavior: scrollBehavior()
       })
     } else {
       console.log('[TOC DEBUG] Element not found for id:', id)

@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { cn } from '@/lib/utils'
+import { cn, prefersReducedMotion } from '@/lib/utils'
 import { PROJECTS } from '@/components/blog-post-layout'
 
 interface BlogPostMobileMenuProps {
@@ -42,6 +42,11 @@ export default function BlogPostMobileMenu({ slug }: BlogPostMobileMenuProps) {
     // sidebar's back-to-home link in blog-post-layout.
     if (href === '/') return
     e.preventDefault()
+    // Reduced motion: skip the fade-to-paper entirely and navigate at once.
+    if (prefersReducedMotion()) {
+      router.push(href)
+      return
+    }
     setLeaving(true)
     leaveTimerRef.current = setTimeout(() => router.push(href), LEAVE_FADE_MS)
   }

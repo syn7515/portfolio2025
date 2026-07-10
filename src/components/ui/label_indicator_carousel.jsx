@@ -7,6 +7,7 @@ import { CarouselCard } from "./carousel/carousel-card";
 import { CarouselIndicators } from "./carousel/carousel-indicators";
 import { Lightbox } from "./carousel/lightbox";
 import { normalizeItem, useResponsiveSizing, getLightboxMaxWidth, FALLBACK_ITEMS } from "./carousel/hooks";
+import { scrollBehavior } from "@/lib/utils";
 
 // LabelIndicatorCarousel Component (Responsive)
 // - Responsive sizing defaults by viewport unless overridden by props
@@ -236,7 +237,7 @@ export default function LabelIndicatorCarousel({
       const cardIndex = supCardMap[e.detail.supId]
       if (cardIndex !== undefined) {
         setIndex(cardIndex)
-        wrapperRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+        wrapperRef.current?.scrollIntoView({ behavior: scrollBehavior(), block: 'nearest' })
       }
     }
     window.addEventListener('sup-navigate', handler)

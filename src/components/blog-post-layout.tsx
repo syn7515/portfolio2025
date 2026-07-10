@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useState } from 'react'
-import { cn } from '@/lib/utils'
+import { cn, scrollBehavior } from '@/lib/utils'
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight, ArrowUp, Undo2 } from 'lucide-react'
 import { motion, useReducedMotion } from 'framer-motion'
@@ -109,8 +109,17 @@ const PAPER_REST = { x: 0, y: 0, rotate: 0, filter: 'blur(0px)' }
 const PAPER_TRANSITION_FULL = { duration: PAPER_SLIDE_DURATION, ease: ENTRANCE_EASE }
 const PAPER_TRANSITION_REDUCED = { duration: 0 }
 const CONTENT_FADE_TRANSITION = { duration: 0.5, ease: ENTRANCE_EASE }
+const CONTENT_FADE_INSTANT = { duration: 0 }
 const CONTENT_FADE_HIDDEN = { opacity: 0 }
 const CONTENT_FADE_VISIBLE = { opacity: 1 }
+
+// Wall-clock floor for revealing content. The reveal is normally driven by the entrance overlay's
+// onAnimationComplete, which runs on Framer's requestAnimationFrame loop — and browsers throttle rAF
+// to a near-stop while a tab is backgrounded (also under some battery-saver / heavy-CPU conditions).
+// Without a floor, content gated behind that callback could stay hidden indefinitely. This timeout
+// guarantees the reveal fires regardless of animation progress; it's comfortably longer than the
+// ~0.45s entrance so it never cuts a normally-running animation short.
+const ENTRANCE_FALLBACK_MS = 1200
 
 export default function BlogPostLayout({ children, slug, title, subtitle }: BlogPostLayoutProps) {
   const { previousProject, nextProject } = getProjectNavigation(slug)
@@ -121,10 +130,25 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
   // never-transformed) content underneath it. See the "Real paper" / "Decorative entrance overlay"
   // comments below for why content and the slide animation live on separate elements.
   const [contentVisible, setContentVisible] = useState(false)
+  // Set only when the reveal is forced by the fallback timer below rather than the entrance
+  // completing normally, so the content skips its fade and appears instantly (a fade would itself
+  // be a frozen rAF animation in exactly the situations the fallback exists to recover from).
+  const [instantReveal, setInstantReveal] = useState(false)
 
   useEffect(() => {
     setAnimationReady(true)
   }, [])
+
+  // Fallback reveal — see ENTRANCE_FALLBACK_MS. Cleanup cancels the timer the instant the entrance
+  // completes normally (contentVisible flips true), so this only ever fires when that never happens.
+  useEffect(() => {
+    if (contentVisible) return
+    const timer = setTimeout(() => {
+      setInstantReveal(true)
+      setContentVisible(true)
+    }, ENTRANCE_FALLBACK_MS)
+    return () => clearTimeout(timer)
+  }, [contentVisible])
 
   useEffect(() => {
     const update = () => {
@@ -191,7 +215,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
         </div>
         <button
           type="button"
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          onClick={() => window.scrollTo({ top: 0, behavior: scrollBehavior() })}
           className={cn(
             'absolute bottom-20 min-[1280px]:bottom-[120px] mb-[120px] left-14 flex items-center gap-2 w-fit whitespace-nowrap text-sm font-[460] text-stone-400 dark:text-zinc-400 hover:text-orange-700 dark:hover:text-lime-200 transition-[color,opacity,filter] duration-300 ease-out cursor-pointer pointer-events-auto px-3 py-2 -mx-3 -my-2 rounded',
             showBackToTop && viewportTall
@@ -241,7 +265,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
             className="pt-20 xs:pt-20 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] min-[1280px]:pt-[8.75rem]"
             initial={CONTENT_FADE_HIDDEN}
             animate={contentVisible ? CONTENT_FADE_VISIBLE : CONTENT_FADE_HIDDEN}
-            transition={CONTENT_FADE_TRANSITION}
+            transition={instantReveal ? CONTENT_FADE_INSTANT : CONTENT_FADE_TRANSITION}
           >
             <div className="px-6 min-[1280px]:px-0 min-[1280px]:ml-[calc(50vw_-_520px)] min-[1280px]:w-[560px]">
                 {/* Header: title, subtitle */}
@@ -270,7 +294,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                                 className="absolute left-0 size-3.5 text-current opacity-0 blur-[1px] motion-safe:transition-[opacity,filter] motion-safe:duration-300 motion-safe:ease-out group-hover:opacity-100 group-hover:blur-none group-focus-visible:opacity-100 group-focus-visible:blur-none motion-reduce:opacity-100 motion-reduce:blur-none"
                                 aria-hidden
                               />
-                              <span className="relative z-10 motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out group-hover:translate-x-4 group-focus-visible:translate-x-4 motion-reduce:translate-x-0">
+                              <span className="relative z-10 motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out group-hover:translate-x-4 group-focus-visible:translate-x-4 motion-reduce:translate-x-4">
                                 Previous
                               </span>
                             </span>
@@ -299,7 +323,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                                 className="absolute right-0 size-3.5 text-current opacity-0 blur-[1px] motion-safe:transition-[opacity,filter] motion-safe:duration-300 motion-safe:ease-out group-hover:opacity-100 group-hover:blur-none group-focus-visible:opacity-100 group-focus-visible:blur-none motion-reduce:opacity-100 motion-reduce:blur-none"
                                 aria-hidden
                               />
-                              <span className="relative z-10 motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out group-hover:-translate-x-4 group-focus-visible:-translate-x-4 motion-reduce:translate-x-0">
+                              <span className="relative z-10 motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out group-hover:-translate-x-4 group-focus-visible:-translate-x-4 motion-reduce:-translate-x-4">
                                 Next
                               </span>
                             </span>

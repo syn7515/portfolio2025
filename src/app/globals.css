@@ -833,3 +833,22 @@ a.inline-flex.items-center {
   opacity: 0.4 !important;
   transition: opacity 150ms cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* Reduced motion: neutralize CSS animations and transitions site-wide.
+   Framer Motion is handled separately via <MotionProvider> (reducedMotion="user");
+   this block covers pure-CSS motion that JS can't reach — the keyframe animations
+   above (tooltip slide/zoom, arrow bounce, heart bounce) and every CSS transition,
+   plus JS-triggered scrolling. Durations collapse to ~0 rather than `none` so that
+   end states still apply and transitionend/animationend listeners still fire. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+}

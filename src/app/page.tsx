@@ -17,14 +17,31 @@ const PAPER_INITIAL_ROTATE_DEG = 2;
 const PAPER_BLUR_PX = 10;
 const CONTENT_DELAY_RATIO = 0.6;
 
+// Wall-clock floor for revealing content. The entrance is driven by Framer's requestAnimationFrame
+// loop, which browsers throttle to a near-stop while a tab is backgrounded (and under some
+// battery-saver / heavy-CPU conditions) — leaving the intro stuck at its hidden initial state. This
+// timeout forces the whole sequence to its visible end state regardless of animation progress.
+// It's comfortably longer than the full staggered sequence (~1.3s), so once everything has animated
+// in normally, flipping it is a no-op rather than a snap.
+const ENTRANCE_FALLBACK_MS = 2200;
+
 export default function Home() {
   const shouldAnimate = !hasVisitedHome;
   const [animationReady, setAnimationReady] = useState(false);
+  // Set only by the fallback timer below: collapses every entrance transition to an instant jump so
+  // content appears even when the rAF-driven animation never runs. See ENTRANCE_FALLBACK_MS.
+  const [instantReveal, setInstantReveal] = useState(false);
 
   useEffect(() => {
     hasVisitedHome = true;
     setAnimationReady(true);
   }, []);
+
+  useEffect(() => {
+    if (!shouldAnimate) return;
+    const timer = setTimeout(() => setInstantReveal(true), ENTRANCE_FALLBACK_MS);
+    return () => clearTimeout(timer);
+  }, [shouldAnimate]);
 
   const shouldReduceMotion = useReducedMotion();
 
@@ -38,7 +55,7 @@ export default function Home() {
   const paperRest = { x: 0, y: 0, rotate: 0, filter: 'blur(0px)' };
   const paperInitial = shouldAnimate ? paperOffscreen : false;
   const getPaperAnimate = () => (shouldAnimate && !animationReady ? paperOffscreen : paperRest);
-  const paperTransition = shouldReduceMotion
+  const paperTransition = (shouldReduceMotion || instantReveal)
     ? { duration: 0 }
     : { duration: PAPER_SLIDE_DURATION, ease: ENTRANCE_EASE };
   // Existing per-element stagger delays below are all offset by this so the whole sequence starts
@@ -48,6 +65,11 @@ export default function Home() {
   const animateVisible = { opacity: 1, y: 0, filter: "blur(0px)" };
   const animateHidden = { opacity: 0, y: 20, filter: "blur(1.5px)" };
   const getAnimate = () => (!shouldAnimate || animationReady ? animateVisible : animateHidden);
+  // Per-element entrance transition, collapsed to an instant jump once the fallback fires.
+  const contentTransition = (extraDelay: number) =>
+    instantReveal
+      ? { duration: 0, ease: ENTRANCE_EASE, delay: 0 }
+      : { duration: 0.5, ease: ENTRANCE_EASE, delay: contentBaseDelay + extraDelay };
 
   return (
 
@@ -81,7 +103,7 @@ export default function Home() {
               className="intro-text !text-stone-700 dark:!text-zinc-200 !mb-0 md:!mb-0"
               initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
               animate={getAnimate()}
-              transition={{ duration: 0.5, ease: ENTRANCE_EASE, delay: contentBaseDelay }}
+              transition={contentTransition(0)}
               style={{
                 fontFamily: 'var(--font-crimson-pro), serif',
                 fontSize: '40px',
@@ -100,7 +122,7 @@ export default function Home() {
               className="intro-text !text-stone-500 dark:!text-zinc-400 !font-[460] mt-12 md:mt-14 lg:mt-16 !mb-5"
               initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
               animate={getAnimate()}
-              transition={{ duration: 0.5, ease: ENTRANCE_EASE, delay: contentBaseDelay + 0.08 }}
+              transition={contentTransition(0.08)}
             >
               Product designer with engineering mindset, obsessed with <span className="italic">why</span> behind everything — from systems to pixels.
             </motion.p>
@@ -108,7 +130,7 @@ export default function Home() {
               className="!text-stone-500 dark:!text-zinc-400 !font-[460] !mb-5"
               initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
               animate={getAnimate()}
-              transition={{ duration: 0.5, ease: ENTRANCE_EASE, delay: contentBaseDelay + 0.16 }}
+              transition={contentTransition(0.16)}
             >
               <span className="intro-text">Currently leading design at </span><InlineLinkPreview href="https://www.aniai.ai/" imageUrl='https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/aniai.webp' explanation="A robotics startup specialized in kitchen automation">Aniai</InlineLinkPreview><span className="intro-text">, designing robots and tools behind them.</span>
             </motion.p>
@@ -116,7 +138,7 @@ export default function Home() {
               className="!text-stone-500 dark:!text-zinc-400 !font-[460] mb-0"
               initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
               animate={getAnimate()}
-              transition={{ duration: 0.5, ease: ENTRANCE_EASE, delay: contentBaseDelay + 0.24 }}
+              transition={contentTransition(0.24)}
             >
               <span className="intro-text">Previously, reimagined public benefits at </span><InlineLinkPreview href="https://goinvo.com/" variant="intro-link-light" imageUrl='https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/goinvo.jpg' explanation="A Boston design studio crafting healthcare software for 20+ years">Goinvo</InlineLinkPreview><span className="intro-text"> and advanced healthcare accessibility at </span><InlineLinkPreview href="https://www.athenahealth.com/" variant="intro-link-light" imageUrl="https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/athenahealth.jpeg" explanation='A healthtech company serving 170K+ clinicians across the US'>AthenaHealth</InlineLinkPreview><span className="intro-text">.</span>
             </motion.p>
@@ -131,7 +153,7 @@ export default function Home() {
               href="/alphagrill"
               initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
               animate={getAnimate()}
-              transition={{ duration: 0.5, ease: ENTRANCE_EASE, delay: contentBaseDelay + 0.4 }}
+              transition={contentTransition(0.4)}
             />
             <ProjectListItem
               title="Building the Tools Behind Smarter Robots"
@@ -139,7 +161,7 @@ export default function Home() {
               href="/aniai"
               initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
               animate={getAnimate()}
-              transition={{ duration: 0.5, ease: ENTRANCE_EASE, delay: contentBaseDelay + 0.44 }}
+              transition={contentTransition(0.44)}
             />
             <ProjectListItem
               title="Encouraging Prompt Bill Payment"
@@ -147,7 +169,7 @@ export default function Home() {
               href="/athenahealth"
               initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
               animate={getAnimate()}
-              transition={{ duration: 0.5, ease: ENTRANCE_EASE, delay: contentBaseDelay + 0.48 }}
+              transition={contentTransition(0.48)}
             />
           </div>
         </div>
@@ -157,13 +179,13 @@ export default function Home() {
             className="h-px w-4 bg-stone-400/50 dark:bg-zinc-600/50"
             initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
             animate={getAnimate()}
-            transition={{ duration: 0.5, ease: ENTRANCE_EASE, delay: contentBaseDelay + 0.52 }}
+            transition={contentTransition(0.52)}
           />
           <motion.div
             className="intro-text flex gap-2 w-fit"
             initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
             animate={getAnimate()}
-            transition={{ duration: 0.5, ease: ENTRANCE_EASE, delay: contentBaseDelay + 0.54 }}
+            transition={contentTransition(0.54)}
           >
             <a
               href="https://x.com/sue_park__"
@@ -193,7 +215,7 @@ export default function Home() {
           className="max-w-[480px] mx-auto mt-auto pt-24 sm:pt-32 lg:pt-36 text-center"
           initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
           animate={getAnimate()}
-          transition={{ duration: 0.5, ease: ENTRANCE_EASE, delay: contentBaseDelay + 0.56 }}
+          transition={contentTransition(0.56)}
         >
           <div
             className="text-[14px] text-stone-400 dark:text-zinc-500 font-normal font-sans"

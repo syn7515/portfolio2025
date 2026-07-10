@@ -4,6 +4,7 @@ import localFont from "next/font/local";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import MotionProvider from "@/components/motion-provider";
 import "./globals.css";
 
 const inter = localFont({
@@ -138,7 +139,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           />
         </noscript>
         {/* End Google Tag Manager (noscript) */}
-        {children}
+        <MotionProvider>{children}</MotionProvider>
         <Analytics />
         <SpeedInsights />
       </body>

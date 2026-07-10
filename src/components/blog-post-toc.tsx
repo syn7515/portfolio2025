@@ -1,7 +1,7 @@
 "use client"
 
 import React from 'react'
-import { cn } from '@/lib/utils'
+import { cn, scrollBehavior } from '@/lib/utils'
 
 const CONTENT_SELECTOR = '[data-blog-content]'
 const HEADING_SELECTOR = '[data-blog-heading]'
@@ -95,7 +95,7 @@ export default function BlogPostToc({ contentSelector = CONTENT_SELECTOR, classN
     const el = document.getElementById(id)
     if (el) {
       const top = el.getBoundingClientRect().top + window.scrollY - 54
-      window.scrollTo({ top, behavior: 'smooth' })
+      window.scrollTo({ top, behavior: scrollBehavior() })
     }
   }
 
