@@ -177,7 +177,7 @@ export default function LabelIndicatorCarousel({
     }
   }, [normalized]);
 
-  const { cardWidth: effWidth, cardHeight: effHeight, gap: effGap } = useResponsiveSizing(
+  const { cardWidth: effWidth, cardHeight: effHeight, gap: effGap, offsetX: effOffsetX } = useResponsiveSizing(
     cardWidth,
     cardHeight,
     gap
@@ -368,7 +368,10 @@ export default function LabelIndicatorCarousel({
     >
       <div className="relative z-[50] flex flex-col items-center justify-center w-full">
         {/* Always a vertical stack, at every viewport size */}
-        <div className="flex flex-col items-center w-full" style={{ rowGap: Math.max(effGap * 2, 24) }}>
+        {/* `left` (not transform) applies the shift without creating a stacking
+            context — the cards' z-order must stay resolvable at the root level
+            (see the stacking-context notes in blog-post-layout.tsx) */}
+        <div className="relative flex flex-col items-center w-full" style={{ rowGap: Math.max(effGap * 2, 24), left: effOffsetX || 0 }}>
           {normalized.map((item, i) => (
             <div key={i} className="w-full flex flex-col items-center px-4">
               <div style={{ width: '100%', maxWidth: effWidth }}>

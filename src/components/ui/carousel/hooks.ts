@@ -162,6 +162,10 @@ export function calculateImagePosition(
   return style;
 }
 
+// Minimum gap kept between a card's left edge and the paper's left edge at ≥1280px,
+// where the paper is inset by --sidebar-w but cards center on the viewport.
+const CARD_EDGE_GAP = 48;
+
 export function useResponsiveSizing(
   explicitWidth?: number,
   explicitHeight?: number,
@@ -171,6 +175,7 @@ export function useResponsiveSizing(
     cardWidth: explicitWidth ?? 0,
     cardHeight: explicitHeight ?? 0,
     gap: explicitGap ?? 0,
+    offsetX: 0,
   }));
 
   useEffect(() => {
@@ -183,6 +188,7 @@ export function useResponsiveSizing(
         cardWidth: explicitWidth,
         cardHeight: explicitHeight,
         gap: explicitGap,
+        offsetX: 0,
       });
       return;
     }
@@ -197,29 +203,31 @@ export function useResponsiveSizing(
       if (w < 640) {
         const width = Math.max(120, w - 40);
         const height = Math.round((width * 9) / 16);
-        setSize({ cardWidth: width, cardHeight: height, gap: 8 });
+        setSize({ cardWidth: width, cardHeight: height, gap: 8, offsetX: 0 });
       } else if (w < 768) {
         const width = 520;
         const height = Math.round((width * 9) / 16);
-        setSize({ cardWidth: width, cardHeight: height, gap: 12 });
+        setSize({ cardWidth: width, cardHeight: height, gap: 12, offsetX: 0 });
       } else if (w < 1024) {
         const width = 640;
         const height = 360;
-        setSize({ cardWidth: width, cardHeight: height, gap: 16 });
+        setSize({ cardWidth: width, cardHeight: height, gap: 16, offsetX: 0 });
       } else if (w < 1280) {
-        setSize({ cardWidth: 840, cardHeight: 473, gap: 36 });
+        setSize({ cardWidth: 840, cardHeight: 473, gap: 36, offsetX: 0 });
       } else {
         const t = Math.min(1, (w - 1280) / 220); // 0 at 1280px → 1 at 1500px+
         const idealWidth = Math.round(720 + t * 240); // 720px → 960px
         // The paper surface is inset from the left by --sidebar-w (see globals.css:
-        // clamp(240px, 27.273vw - 109.09px, 300px)) while the card is centered on the
-        // viewport, so only (50vw - sidebar) of paper exists left of the card's center.
-        // Cap the width so the card stays on the paper with 16px breathing room per side.
+        // clamp(240px, 27.273vw - 109.09px, 300px)) while cards center on the viewport,
+        // so a wide card can run off the paper's left edge. Keep the card full-size and
+        // shift it right (offsetX) just enough to hold CARD_EDGE_GAP from that edge;
+        // only shrink if the paper itself is too narrow (defensive — doesn't happen at
+        // these breakpoints).
         const sidebarW = Math.min(300, Math.max(240, 0.27273 * w - 109.09));
-        const maxWidth = Math.floor((w / 2 - sidebarW) * 2) - 32;
-        const cardWidth = Math.min(idealWidth, maxWidth);
+        const cardWidth = Math.min(idealWidth, Math.floor(w - sidebarW - CARD_EDGE_GAP * 2));
         const cardHeight = Math.round(cardWidth * 9 / 16);
-        setSize({ cardWidth, cardHeight, gap: 40 });
+        const offsetX = Math.max(0, Math.round(sidebarW + CARD_EDGE_GAP - (w - cardWidth) / 2));
+        setSize({ cardWidth, cardHeight, gap: 40, offsetX });
       }
     };
 

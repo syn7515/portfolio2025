@@ -219,7 +219,7 @@ export default function Home() {
               className="!text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-lime-200"
               style={{ fontSize: '14px' }}
             >
-              Twitter
+              X
             </a>
             <span className="!text-stone-400 dark:!text-zinc-600" style={{ fontSize: '14px' }}>·</span>
             <a
