@@ -120,7 +120,7 @@ export default function Home() {
           animate={getPaperAnimate()}
           transition={paperTransition}
         >
-        <div className="flex-1 flex flex-col pt-20 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] min-[1280px]:pt-[8.75rem] pb-5 min-[640px]:pb-8 min-[1280px]:pb-10">
+        <div className="flex-1 flex flex-col pt-20 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] min-[1280px]:pt-[clamp(6.25rem,calc(18.182vw_-_8.295rem),8.75rem)] pb-5 min-[640px]:pb-8 min-[1280px]:pb-10">
         <div className="flex-1 flex flex-col px-6 min-[1280px]:px-0 min-[1280px]:ml-[calc(50vw_-_280px_-_var(--sidebar-w))] min-[1280px]:w-[560px]">
         <div className="intro-container max-w-[560px] mx-auto">
           {/* Left column: name */}
