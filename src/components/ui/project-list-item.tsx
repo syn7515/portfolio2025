@@ -57,7 +57,13 @@ export default function ProjectListItem({
   transition = { duration: 0.1, ease: [0.25, 0.1, 0.25, 1] },
 }: ProjectListItemProps) {
   return (
-    <motion.div className="w-full" initial={initial} animate={animate} transition={transition}>
+    <motion.div
+      data-project-list-item
+      className="w-full transition-opacity duration-150"
+      initial={initial}
+      animate={animate}
+      transition={transition}
+    >
       <Link
         href={href}
         className="group block w-full cursor-pointer py-2"
