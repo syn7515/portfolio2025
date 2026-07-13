@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import ProjectListItem from '@/components/ui/project-list-item';
 import InlineLinkPreview from '@/components/ui/inline-link-preview';
+import PaperGridBackground from '@/components/ui/paper-grid-background';
 import {
   PAPER_EXIT_REST,
   PAPER_EXIT_OFFSCREEN,
@@ -111,8 +112,9 @@ export default function Home() {
 
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-4 focus:left-4 focus:px-4 focus:py-2 focus:bg-white focus:text-stone-800 focus:rounded focus:shadow">Skip to content</a>
       <main id="main" className="w-full flex-1 flex flex-col relative">
+        <PaperGridBackground />
         <motion.div
-          className="w-full flex-1 flex flex-col min-[1280px]:mt-[100px] overflow-x-clip"
+          className="relative z-10 w-full flex-1 flex flex-col min-[1280px]:mt-[100px] overflow-x-clip"
           style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}
           initial={paperInitial}
           animate={getPaperAnimate()}

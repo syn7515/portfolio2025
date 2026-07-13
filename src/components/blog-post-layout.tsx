@@ -11,6 +11,7 @@ import styles from './blog-post.module.css'
 import BlogPostHeader from '@/components/blog-post-header'
 import BlogPostToc from '@/components/blog-post-toc'
 import BlogPostMobileMenu from '@/components/blog-post-mobile-menu'
+import PaperGridBackground from '@/components/ui/paper-grid-background'
 import {
   PAPER_EXIT_REST,
   PAPER_EXIT_OFFSCREEN,
@@ -263,6 +264,8 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
       </aside>
 
       <div className="w-full min-h-screen overflow-x-clip flex flex-col relative">
+        <PaperGridBackground />
+
         {/* Dummy paper: static sheet already in place at the paper's rest position, sitting beneath
             everything else so the entrance reads as a new paper landing on an existing stack rather
             than materializing out of nothing. Once the real paper (same rect, same shadow) lands on

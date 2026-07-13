@@ -22,6 +22,10 @@
   --paper-bg: #ffffff;
   --paper-box-shadow: none;
   --sidebar-w: 0px;
+  --paper-grid-minor: rgb(120 113 108 / 0.1);
+  --paper-grid-major: rgb(120 113 108 / 0.12);
+  --paper-grid-hover-minor: rgb(120 113 108 / 0.08);
+  --paper-grid-hover-major: rgb(120 113 108 / 0.09);
 }
 
 @theme inline {
@@ -51,6 +55,10 @@
     --paper-inset-shadow: rgba(82, 82, 91, 0.7); /* zinc-600 */
     --paper-drop-shadow: rgba(0, 0, 0, 0.4);
     --paper-bg: #18181b; /* zinc-900 */
+    --paper-grid-minor: rgb(161 161 170 / 0.08);
+    --paper-grid-major: rgb(161 161 170 / 0.1);
+    --paper-grid-hover-minor: rgb(161 161 170 / 0.06);
+    --paper-grid-hover-major: rgb(161 161 170 / 0.07);
   }
 }
 
@@ -127,6 +135,78 @@ body {
   color: var(--foreground);
   font-family: 'Inter var', var(--font-inter), var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   font-feature-settings: "ss01", "ss07", "cv01", "cv08";
+}
+
+/* Drafting grid beneath each paper surface. Minor cells are 20px; every fifth
+   line is darker. The two masks make the grid fade as it moves left/up away
+   from the paper edges, while the opaque paper hides the rest of the layer. */
+.paper-grid-background {
+  display: none;
+}
+
+@media (min-width: 1280px) {
+  .paper-grid-background {
+    display: block;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(to right, var(--paper-grid-major) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--paper-grid-major) 1px, transparent 1px),
+      linear-gradient(to right, var(--paper-grid-minor) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--paper-grid-minor) 1px, transparent 1px);
+    background-position: var(--sidebar-w) 100px;
+    background-size:
+      100px 100px,
+      100px 100px,
+      20px 20px,
+      20px 20px;
+    -webkit-mask-image:
+      linear-gradient(to right, transparent 0, rgb(0 0 0 / 0.25) 80px, black var(--sidebar-w)),
+      linear-gradient(to bottom, transparent 0, rgb(0 0 0 / 0.25) 35px, black 100px);
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(to right, transparent 0, rgb(0 0 0 / 0.25) 80px, black var(--sidebar-w)),
+      linear-gradient(to bottom, transparent 0, rgb(0 0 0 / 0.25) 35px, black 100px);
+    mask-composite: intersect;
+  }
+
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .paper-grid-background::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      background-image:
+        linear-gradient(to right, var(--paper-grid-hover-major) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--paper-grid-hover-major) 1px, transparent 1px),
+        linear-gradient(to right, var(--paper-grid-hover-minor) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--paper-grid-hover-minor) 1px, transparent 1px);
+      background-position: var(--sidebar-w) 100px;
+      background-size:
+        100px 100px,
+        100px 100px,
+        20px 20px,
+        20px 20px;
+      -webkit-mask-image: radial-gradient(
+        circle 150px at var(--paper-grid-pointer-x, 0px) var(--paper-grid-pointer-y, 0px),
+        black 0,
+        rgb(0 0 0 / 0.75) 35%,
+        transparent 100%
+      );
+      mask-image: radial-gradient(
+        circle 150px at var(--paper-grid-pointer-x, 0px) var(--paper-grid-pointer-y, 0px),
+        black 0,
+        rgb(0 0 0 / 0.75) 35%,
+        transparent 100%
+      );
+      transition: opacity 180ms ease-out;
+    }
+
+    .paper-grid-background[data-pointer-active='true']::after {
+      opacity: 1;
+    }
+  }
 }
 
 /* Global Typography Styles */
