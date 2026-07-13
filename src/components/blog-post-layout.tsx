@@ -298,7 +298,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}
         >
           <motion.div
-            className="pt-20 xs:pt-20 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] min-[1280px]:pt-[8.75rem]"
+            className="pt-20 xs:pt-20 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] min-[1280px]:pt-[clamp(6.25rem,calc(18.182vw_-_8.295rem),8.75rem)]"
             initial={CONTENT_FADE_HIDDEN}
             animate={contentVisible ? CONTENT_FADE_VISIBLE : CONTENT_FADE_HIDDEN}
             transition={instantReveal ? CONTENT_FADE_INSTANT : CONTENT_FADE_TRANSITION}
