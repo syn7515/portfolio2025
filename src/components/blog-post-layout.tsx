@@ -308,7 +308,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                 <BlogPostHeader slug={slug} title={title} subtitle={subtitle} />
 
                 {/* Content */}
-                <div className={cn(styles.mdxContent, 'max-w-[560px] mx-auto')} data-blog-content>
+                <div className={cn(styles.mdxContent, 'max-w-[560px] mx-auto')} data-blog-content data-inline-link-preview-boundary>
                   {children}
                 </div>
 

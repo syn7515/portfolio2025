@@ -5,11 +5,23 @@ import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
-const BELOW_GAP = 12
+const ANCHOR_GAP = 12
 const PREVIEW_WIDTH = 320
 const PREVIEW_HEIGHT = 180
 const HOVER_DELAY_MS = 200
 const MIN_SHIMMER_MS = 800
+const SIDE_RAIL_BREAKPOINT = 1280
+const SIDE_RAIL_GAP = 32
+const SIDE_RAIL_MIN_WIDTH = 220
+const VIEWPORT_EDGE_GAP = 24
+
+interface PreviewPosition {
+  left: number
+  top: number
+  width: number
+  height: number
+  isSideRail: boolean
+}
 
 interface InlineYoutubePreviewProps {
   videoId: string
@@ -62,7 +74,7 @@ export function InlineYoutubePreview({
 }: InlineYoutubePreviewProps) {
   const [isHovered, setIsHovered] = useState(false)
   const [iframeReady, setIframeReady] = useState(false)
-  const [anchorRect, setAnchorRect] = useState<DOMRect | null>(null)
+  const [previewPosition, setPreviewPosition] = useState<PreviewPosition | null>(null)
   const hoverDelayRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const anchorRef = useRef<HTMLAnchorElement>(null)
   const hoverStartRef = useRef<number>(0)
@@ -86,16 +98,62 @@ export function InlineYoutubePreview({
   const watchUrl = buildWatchUrl(videoId, start)
   const embedUrl = buildEmbedUrl(videoId, start)
 
+  const updatePreviewPosition = useCallback(() => {
+    const anchor = anchorRef.current
+    if (!anchor) {
+      setPreviewPosition(null)
+      return
+    }
+
+    const anchorRect = anchor.getBoundingClientRect()
+    const boundary = anchor.closest('[data-inline-link-preview-boundary]') as HTMLElement | null
+
+    if (window.innerWidth >= SIDE_RAIL_BREAKPOINT && boundary) {
+      const left = boundary.getBoundingClientRect().right + SIDE_RAIL_GAP
+      const width = Math.min(PREVIEW_WIDTH, window.innerWidth - left - VIEWPORT_EDGE_GAP)
+
+      if (width >= SIDE_RAIL_MIN_WIDTH) {
+        const height = width * PREVIEW_HEIGHT / PREVIEW_WIDTH
+        setPreviewPosition({
+          left,
+          top: Math.max(VIEWPORT_EDGE_GAP, Math.min(anchorRect.top - 1, window.innerHeight - height - VIEWPORT_EDGE_GAP)),
+          width,
+          height,
+          isSideRail: true,
+        })
+        return
+      }
+    }
+
+    const fallbackWidth = Math.min(PREVIEW_WIDTH, window.innerWidth - VIEWPORT_EDGE_GAP * 2)
+    const fallbackHeight = fallbackWidth * PREVIEW_HEIGHT / PREVIEW_WIDTH
+    const left = anchorRect.left + anchorRect.width / 2 - fallbackWidth / 2
+    const top = anchorRect.top - ANCHOR_GAP - fallbackHeight
+    const { left: clampedLeft, top: clampedTop } = clampPosition(left, top, fallbackWidth, fallbackHeight)
+    setPreviewPosition({
+      left: clampedLeft,
+      top: clampedTop,
+      width: fallbackWidth,
+      height: fallbackHeight,
+      isSideRail: false,
+    })
+  }, [])
+
+  const revealPreview = useCallback(() => {
+    hoverStartRef.current = Date.now()
+    updatePreviewPosition()
+    setIsHovered(true)
+  }, [updatePreviewPosition])
 
   const handleMouseEnter = useCallback(() => {
     anchorRef.current?.style.setProperty('text-decoration-color', 'var(--intro-trigger-decoration-hover)', 'important')
     anchorRef.current?.style.setProperty('opacity', '0.9', 'important')
+    if (hoverDelayRef.current) clearTimeout(hoverDelayRef.current)
     hoverDelayRef.current = setTimeout(() => {
-      hoverStartRef.current = Date.now()
-      setIsHovered(true)
-      setAnchorRect(anchorRef.current?.getBoundingClientRect() ?? null)
+      revealPreview()
+      hoverDelayRef.current = null
     }, HOVER_DELAY_MS)
-  }, [])
+  }, [revealPreview])
 
   const handleMouseLeave = useCallback(() => {
     anchorRef.current?.style.setProperty('text-decoration-color', 'var(--intro-trigger-decoration)', 'important')
@@ -106,8 +164,19 @@ export function InlineYoutubePreview({
     }
     setIsHovered(false)
     setIframeReady(false)
-    setAnchorRect(null)
+    setPreviewPosition(null)
   }, [])
+
+  useEffect(() => {
+    if (!isHovered) return
+
+    window.addEventListener('resize', updatePreviewPosition, { passive: true })
+    window.addEventListener('scroll', updatePreviewPosition, true)
+    return () => {
+      window.removeEventListener('resize', updatePreviewPosition)
+      window.removeEventListener('scroll', updatePreviewPosition, true)
+    }
+  }, [isHovered, updatePreviewPosition])
 
   const handleClick = useCallback(
     (e: React.MouseEvent) => {
@@ -127,28 +196,20 @@ export function InlineYoutubePreview({
     [watchUrl]
   )
 
-  const boxStyle = React.useMemo(() => {
-    if (!anchorRect) return undefined
-    const left = anchorRect.left + anchorRect.width / 2 - PREVIEW_WIDTH / 2
-    const top = anchorRect.bottom + BELOW_GAP
-    const { left: clampedLeft, top: clampedTop } = clampPosition(left, top, PREVIEW_WIDTH, PREVIEW_HEIGHT)
-    return { left: clampedLeft, top: clampedTop, width: PREVIEW_WIDTH, height: PREVIEW_HEIGHT }
-  }, [anchorRect])
-
   const previewBox =
-    isHovered && boxStyle && typeof document !== 'undefined' ? (
+    isHovered && previewPosition && typeof document !== 'undefined' ? (
       <motion.div
         key="preview"
         className="fixed z-50 overflow-hidden bg-stone-900 dark:bg-zinc-900 shadow-lg pointer-events-none"
         style={{
-          left: boxStyle.left,
-          top: boxStyle.top,
-          width: boxStyle.width,
-          height: boxStyle.height,
+          left: previewPosition.left,
+          top: previewPosition.top,
+          width: previewPosition.width,
+          height: previewPosition.height,
         }}
-        initial={{ opacity: 0, y: -8, filter: "blur(2px)" }}
+        initial={{ opacity: 0, y: previewPosition.isSideRail ? 0 : -8, filter: "blur(2px)" }}
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-        exit={{ opacity: 0, y: -4, filter: "blur(2px)" }}
+        exit={{ opacity: 0, y: previewPosition.isSideRail ? 0 : -4, filter: "blur(2px)" }}
         transition={{ type: "spring", duration: 0.2, bounce: 0 }}
         aria-hidden
       >
@@ -185,6 +246,8 @@ export function InlineYoutubePreview({
         onClick={handleClick}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
+        onFocus={revealPreview}
+        onBlur={handleMouseLeave}
         onKeyDown={handleKeyDown}
         role="button"
         tabIndex={0}

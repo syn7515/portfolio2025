@@ -122,11 +122,11 @@ export default function Home() {
         >
         <div className="flex-1 flex flex-col pt-20 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] min-[1280px]:pt-[clamp(6.25rem,calc(18.182vw_-_8.295rem),8.75rem)] pb-5 min-[640px]:pb-8 min-[1280px]:pb-10">
         <div className="flex-1 flex flex-col px-6 min-[1280px]:px-0 min-[1280px]:ml-[calc(50vw_-_280px_-_var(--sidebar-w))] min-[1280px]:w-[560px]">
-        <div className="intro-container max-w-[560px] mx-auto">
+        <div className="max-w-[560px] mx-auto" data-inline-link-preview-boundary>
           {/* Left column: name */}
           <div>
             <motion.h1
-              className="intro-text !mt-0 !text-stone-700 dark:!text-zinc-200 !mb-0 md:!mb-0"
+              className="!mt-0 !text-stone-700 dark:!text-zinc-200 !mb-0 md:!mb-0"
               initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
               animate={getAnimate()}
               transition={contentTransition(0)}
@@ -145,7 +145,7 @@ export default function Home() {
           {/* Right column: bio + social links */}
           <div>
             <motion.p
-              className="intro-text !text-stone-500 dark:!text-zinc-400 !font-[460] mt-12 md:mt-14 lg:mt-16 !mb-5"
+              className="!text-stone-500 dark:!text-zinc-400 !font-[460] mt-12 md:mt-14 lg:mt-16 !mb-5"
               initial={shouldAnimate ? { opacity: 0, y: 20, filter: "blur(1.5px)" } : false}
               animate={getAnimate()}
               transition={contentTransition(0.08)}
@@ -158,7 +158,7 @@ export default function Home() {
               animate={getAnimate()}
               transition={contentTransition(0.16)}
             >
-              <span className="intro-text">Currently leading design at </span><InlineLinkPreview href="https://www.aniai.ai/" imageUrl='https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/aniai.webp' explanation="A robotics startup specialized in kitchen automation">Aniai</InlineLinkPreview><span className="intro-text">, designing robots and tools behind them.</span>
+              <span>Currently leading design at </span><InlineLinkPreview href="https://www.aniai.ai/" explanation="A robotics startup specialized in kitchen automation">Aniai</InlineLinkPreview><span>, designing robots and tools behind them.</span>
             </motion.p>
             <motion.p
               className="!text-stone-500 dark:!text-zinc-400 !font-[460] mb-0"
@@ -166,7 +166,7 @@ export default function Home() {
               animate={getAnimate()}
               transition={contentTransition(0.24)}
             >
-              <span className="intro-text">Previously, reimagined public benefits at </span><InlineLinkPreview href="https://goinvo.com/" variant="intro-link-light" imageUrl='https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/goinvo.jpg' explanation="A Boston design studio crafting healthcare software for 20+ years">Goinvo</InlineLinkPreview><span className="intro-text"> and advanced healthcare accessibility at </span><InlineLinkPreview href="https://www.athenahealth.com/" variant="intro-link-light" imageUrl="https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/athenahealth.jpeg" explanation='A healthtech company serving 170K+ clinicians across the US'>AthenaHealth</InlineLinkPreview><span className="intro-text">.</span>
+              <span>Previously, reimagined public benefits at </span><InlineLinkPreview href="https://goinvo.com/" variant="intro-link-light" explanation="A Boston design studio crafting healthcare software for 20+ years">Goinvo</InlineLinkPreview><span> and advanced healthcare accessibility at </span><InlineLinkPreview href="https://www.athenahealth.com/" variant="intro-link-light" explanation='A healthtech company serving 170K+ clinicians across the US'>AthenaHealth</InlineLinkPreview><span>.</span>
             </motion.p>
           </div>
         </div>
