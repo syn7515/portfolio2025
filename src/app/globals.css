@@ -1,14 +1,6 @@
 @import "tailwindcss";
 @config "../../tailwind.config.js";
 
-@font-face {
-  font-family: "Biro Script";
-  src: url("/fonts/BiroScript.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-}
-
 :root {
   color-scheme: light dark;
   --background: #ffffff;
@@ -543,12 +535,20 @@ a[data-inline-link-preview-trigger] {
   text-decoration-line: underline !important;
   text-decoration-style: dotted !important;
   text-decoration-skip-ink: auto !important;
-  text-decoration-color: rgb(168 162 158) !important;
+  text-decoration-color: rgb(168 162 158 / 0.65) !important;
   /* stone-300 - same as intro-link */
   text-underline-offset: 0.05rem !important;
   font-style: italic !important;
-  opacity: 0.65;
-  transition: color 150ms ease-out, text-decoration-color 150ms ease-out, opacity 150ms ease-out;
+  opacity: 1 !important;
+  transition: color 150ms ease-out, text-decoration-color 150ms ease-out;
+}
+
+a.intro-link[data-inline-link-preview-trigger] {
+  color: rgb(68 64 60 / 0.65) !important;
+}
+
+a.intro-link-light[data-inline-link-preview-trigger] {
+  color: rgb(120 113 108 / 0.65) !important;
 }
 
 a[data-inline-link-preview-trigger]:is(:hover, :focus-visible) {
@@ -644,8 +644,16 @@ a[data-mobile-menu-current] {
   }
 
   a[data-inline-link-preview-trigger] {
-    text-decoration-color: rgb(113 113 122) !important;
+    text-decoration-color: rgb(113 113 122 / 0.65) !important;
     /* zinc-500 - same as intro-link dark */
+  }
+
+  a.intro-link[data-inline-link-preview-trigger] {
+    color: rgb(212 212 216 / 0.65) !important;
+  }
+
+  a.intro-link-light[data-inline-link-preview-trigger] {
+    color: rgb(161 161 170 / 0.65) !important;
   }
 
   a[data-inline-link-preview-trigger]:is(:hover, :focus-visible) {

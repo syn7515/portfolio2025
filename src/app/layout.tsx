@@ -21,6 +21,15 @@ const inter = localFont({
   variable: "--font-inter",
 });
 
+const biroScript = localFont({
+  src: "../../public/fonts/BiroScript.ttf",
+  variable: "--font-biro-script",
+  display: "swap",
+  preload: true,
+  weight: "400",
+  style: "normal",
+});
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -122,7 +131,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       />
       {/* End Google Tag Manager */}
       <body
-        className={`${inter.variable} ${geistSans.variable} ${geistMono.variable} ${libreCaslonText.variable} ${crimsonPro.variable} antialiased`}
+        className={`${inter.variable} ${biroScript.variable} ${geistSans.variable} ${geistMono.variable} ${libreCaslonText.variable} ${crimsonPro.variable} antialiased`}
       >
         <script
           dangerouslySetInnerHTML={{

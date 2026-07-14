@@ -120,7 +120,9 @@ export function InlineLinkPreview({
 
   return (
     <>
-      <span className="relative inline-block">
+      {/* A true inline wrapper keeps Safari from recalculating an inline-block baseline when the
+          trigger's opacity changes on hover. */}
+      <span className="relative inline align-baseline [line-height:inherit]">
         <a
           ref={anchorRef}
           data-inline-link-preview-trigger
@@ -157,7 +159,7 @@ export function InlineLinkPreview({
                   : 'top-full left-0 origin-top-left'
               )}
               style={{
-                fontFamily: '"Biro Script", "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive',
+                fontFamily: 'var(--font-biro-script), "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive',
               }}
               initial={{ opacity: 0, y: isAbove ? 4 : -4, filter: 'blur(1.5px)' }}
               animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
@@ -180,7 +182,7 @@ export function InlineLinkPreview({
                 left: sideRailPosition.left,
                 top: sideRailPosition.top,
                 width: sideRailPosition.width,
-                fontFamily: '"Biro Script", "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive',
+                fontFamily: 'var(--font-biro-script), "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive',
               }}
               initial={{ opacity: 0, filter: 'blur(1.5px)' }}
               animate={{ opacity: 1, filter: 'blur(0px)' }}
