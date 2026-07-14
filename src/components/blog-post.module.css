@@ -102,6 +102,7 @@
     /* stone-900 - darker on hover */
     text-decoration-color: rgb(234 88 12) !important;
     /* stone-500 - darker underline on hover */
+    opacity: 1 !important;
 }
 
 /* Inline YouTube preview trigger: force underline + italic (wins over preflight and .mdxContent a) */
@@ -290,7 +291,7 @@
         /* zinc-100 - lighter text color on hover */
         text-decoration-color: rgb(163 230 53) !important;
         /* zinc-400 - lighter underline on hover */
-        opacity: 1;
+        opacity: 1 !important;
         /* full opacity on hover */
     }
 

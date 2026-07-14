@@ -44,9 +44,9 @@ const dividerStyle: CSSProperties = {
   backgroundRepeat: 'repeat-x',
 };
 
-const titleClassName = "!text-stone-700 dark:!text-zinc-200 transition-colors duration-150 group-hover:!text-orange-700 dark:group-hover:!text-lime-200";
-const dividerClassName = "w-full h-[2px] !text-stone-300 dark:!text-zinc-700 transition-[color,opacity] duration-150 group-hover:opacity-40 group-hover:!text-orange-700 dark:group-hover:!text-lime-200";
-const datesClassName = "text-[15px] !font-[460] leading-[160%] font-sans !text-stone-400 dark:!text-zinc-500 whitespace-nowrap transition-[color,opacity] duration-150 group-hover:opacity-[0.65] group-hover:!text-orange-700 dark:group-hover:!text-lime-200";
+const titleClassName = "!text-stone-700 dark:!text-zinc-200 transition-colors duration-150 group-hover:!text-orange-700 dark:group-hover:!text-lime-300";
+const dividerClassName = "w-full h-[2px] !text-stone-300 dark:!text-zinc-700 transition-[color,opacity] duration-150 group-hover:opacity-40 group-hover:!text-orange-700 dark:group-hover:!text-lime-300";
+const datesClassName = "text-[15px] !font-[460] leading-[160%] font-sans !text-stone-400 dark:!text-zinc-500 whitespace-nowrap transition-[color,opacity] duration-150 group-hover:opacity-[0.65] group-hover:!text-orange-700 dark:group-hover:!text-lime-300";
 
 export default function ProjectListItem({
   title,

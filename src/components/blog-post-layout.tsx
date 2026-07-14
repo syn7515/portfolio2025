@@ -238,7 +238,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
         <div className="relative flex flex-col gap-6 pt-[240px] pl-14 pointer-events-auto">
           <Link
             href="/"
-            className="flex items-center gap-2 w-fit text-sm font-[460] !not-italic !no-underline !text-stone-400 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-lime-200 transition-colors duration-300 ease-out px-3 py-2 -mx-3 -my-2 rounded"
+            className="flex items-center gap-2 w-fit text-sm font-[460] !not-italic !no-underline !text-stone-400 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-lime-300 transition-colors duration-300 ease-out px-3 py-2 -mx-3 -my-2 rounded"
             aria-label="Back to home"
             onClick={() => sessionStorage.setItem(PAPER_BACK_NAV_FLAG, PAPER_BACK_NAV_VALUE)}
           >
@@ -251,7 +251,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           type="button"
           onClick={() => window.scrollTo({ top: 0, behavior: scrollBehavior() })}
           className={cn(
-            'absolute bottom-20 min-[1280px]:bottom-[120px] mb-[120px] left-14 flex items-center gap-2 w-fit whitespace-nowrap text-sm font-[460] text-stone-400 dark:text-zinc-400 hover:text-orange-700 dark:hover:text-lime-200 transition-[color,opacity,filter] duration-300 ease-out cursor-pointer pointer-events-auto px-3 py-2 -mx-3 -my-2 rounded',
+            'absolute bottom-20 min-[1280px]:bottom-[120px] mb-[120px] left-14 flex items-center gap-2 w-fit whitespace-nowrap text-sm font-[460] text-stone-400 dark:text-zinc-400 hover:text-orange-700 dark:hover:text-lime-300 transition-[color,opacity,filter] duration-300 ease-out cursor-pointer pointer-events-auto px-3 py-2 -mx-3 -my-2 rounded',
             showBackToTop && viewportTall
               ? 'opacity-100 blur-none'
               : 'opacity-0 blur-[4px] pointer-events-none'
@@ -337,7 +337,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                             </span>
                           </div>
                           <p
-                            className="mt-0 not-italic project-nav-description transition-colors duration-150 group-hover:!text-orange-700 dark:group-hover:!text-lime-200"
+                            className="mt-0 not-italic project-nav-description transition-colors duration-150 group-hover:!text-orange-700 dark:group-hover:!text-lime-300"
                             style={{ fontFamily: 'var(--font-crimson-pro), serif', fontSize: '19px', fontWeight: 450, lineHeight: '130%', letterSpacing: '-0.02em', textWrap: 'balance' }}
                           >
                             {preventWidow(previousProject.description)}
@@ -366,7 +366,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                             </span>
                           </div>
                           <p
-                            className="mt-0 not-italic project-nav-description transition-colors duration-150 group-hover:!text-orange-700 dark:group-hover:!text-lime-200"
+                            className="mt-0 not-italic project-nav-description transition-colors duration-150 group-hover:!text-orange-700 dark:group-hover:!text-lime-300"
                             style={{ fontFamily: 'var(--font-crimson-pro), serif', fontSize: '19px', fontWeight: 450, lineHeight: '130%', letterSpacing: '-0.02em', textWrap: 'balance' }}
                           >
                             {preventWidow(nextProject.description)}

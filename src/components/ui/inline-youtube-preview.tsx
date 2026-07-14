@@ -147,7 +147,7 @@ export function InlineYoutubePreview({
 
   const handleMouseEnter = useCallback(() => {
     anchorRef.current?.style.setProperty('text-decoration-color', 'var(--intro-trigger-decoration-hover)', 'important')
-    anchorRef.current?.style.setProperty('opacity', '0.9', 'important')
+    anchorRef.current?.style.setProperty('opacity', '1', 'important')
     if (hoverDelayRef.current) clearTimeout(hoverDelayRef.current)
     hoverDelayRef.current = setTimeout(() => {
       revealPreview()
