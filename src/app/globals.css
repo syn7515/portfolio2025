@@ -15,8 +15,8 @@
   --foreground: #171717;
   --intro-trigger-decoration: rgb(168 162 158);
   /* stone-300 - underline color for intro/link preview triggers */
-  --intro-trigger-decoration-hover: rgb(194 65 12);
-  /* orange-700 - underline color on hover */
+  --intro-trigger-decoration-hover: rgb(234 88 12);
+  /* orange-600 - underline color on hover */
   --scrollbar-thumb: rgb(168 162 158 / 0.6);
   /* stone-400 */
   --scrollbar-thumb-hover: rgb(120 113 108 / 0.8);
@@ -534,8 +534,8 @@ a[data-inline-youtube-trigger] {
 }
 
 a[data-inline-youtube-trigger]:hover {
-  color: rgb(194 65 12) !important;
-  text-decoration-color: rgb(194 65 12) !important;
+  color: rgb(234 88 12) !important;
+  text-decoration-color: rgb(234 88 12) !important;
 }
 
 /* Inline link preview trigger: same as .intro-link (underline, italic, decoration color) */
@@ -555,7 +555,7 @@ a[data-inline-link-preview-trigger]:is(:hover, :focus-visible) {
   color: rgb(234 88 12) !important;
   /* orange-600 */
   text-decoration-color: rgb(234 88 12) !important;
-  opacity: 0.9;
+  opacity: 1;
 }
 
 /* Social nav links: same dotted underline as intro links, but not italic */
@@ -649,9 +649,9 @@ a[data-mobile-menu-current] {
   }
 
   a[data-inline-link-preview-trigger]:is(:hover, :focus-visible) {
-    color: rgb(234 88 12) !important;
-    /* orange-600 */
-    text-decoration-color: rgb(234 88 12) !important;
+    color: rgb(217 249 157) !important;
+    /* lime-200 */
+    text-decoration-color: rgb(217 249 157) !important;
   }
 
   a[data-social-link-trigger] {
