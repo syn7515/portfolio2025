@@ -26,6 +26,8 @@ const biroScript = localFont({
   variable: "--font-biro-script",
   display: "swap",
   preload: true,
+  adjustFontFallback: false,
+  fallback: ["Segoe Print", "Bradley Hand", "Comic Sans MS", "cursive"],
   weight: "400",
   style: "normal",
 });

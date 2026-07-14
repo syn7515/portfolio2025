@@ -131,8 +131,8 @@ export default function Home() {
               animate={getAnimate()}
               transition={contentTransition(0)}
               style={{
-                fontFamily: 'var(--font-crimson-pro), serif',
-                fontSize: '40px',
+                fontFamily: 'var(--font-biro-script), "Segoe Print", "Bradley Hand", cursive',
+                fontSize: '48px',
                 lineHeight: '120%',
                 letterSpacing: '-0.03em',
                 fontWeight: 360,
