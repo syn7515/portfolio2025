@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { Undo2 } from 'lucide-react'
 import { cn, prefersReducedMotion } from '@/lib/utils'
 import { PROJECTS } from '@/components/blog-post-layout'
 
@@ -103,6 +104,7 @@ export default function BlogPostMobileMenu({ slug }: BlogPostMobileMenuProps) {
         >
           {items.map(item => {
             const isCurrent = item.slug !== undefined && item.slug === slug
+            const isHome = item.href === '/'
             return (
               <Link
                 key={item.href}
@@ -112,12 +114,14 @@ export default function BlogPostMobileMenu({ slug }: BlogPostMobileMenuProps) {
                 data-mobile-menu-current={isCurrent ? '' : undefined}
                 className={cn(
                   'text-[20px] font-[460] tracking-[-0.01em] !not-italic transition-colors duration-300 ease-out px-3 py-1 rounded',
+                  isHome && 'inline-flex items-center gap-2',
                   isCurrent
                     ? '!text-stone-700 dark:!text-zinc-200'
                     : '!text-stone-500 dark:!text-zinc-400 !no-underline hover:!text-orange-700 dark:hover:!text-lime-200'
                 )}
                 tabIndex={open ? undefined : -1}
               >
+                {isHome && <Undo2 className="size-5 flex-shrink-0" aria-hidden />}
                 {item.label}
               </Link>
             )

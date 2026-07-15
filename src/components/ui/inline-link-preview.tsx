@@ -12,11 +12,31 @@ const SIDE_RAIL_GAP = 32
 const SIDE_RAIL_MAX_WIDTH = 320
 const VIEWPORT_EDGE_GAP = 24
 const SIDE_RAIL_MIN_WIDTH = 220
+const LOCAL_DESCRIPTION_MAX_WIDTH = 480
 
 interface SideRailPosition {
   left: number
   top: number
   width: number
+}
+
+interface LocalDescriptionLayout {
+  left: number
+  width: number
+}
+
+function DescriptionBackdrop() {
+  return (
+    <span
+      aria-hidden
+      className="absolute -inset-x-6 -inset-y-4 z-0 blur-[2px]"
+      style={{
+        background: 'linear-gradient(to right, transparent 0, color-mix(in srgb, var(--background) 60%, transparent) 20px, color-mix(in srgb, var(--background) 60%, transparent) calc(100% - 20px), transparent 100%)',
+        maskImage: 'linear-gradient(to bottom, transparent 0, black 12px, black calc(100% - 12px), transparent 100%)',
+        WebkitMaskImage: 'linear-gradient(to bottom, transparent 0, black 12px, black calc(100% - 12px), transparent 100%)',
+      }}
+    />
+  )
 }
 
 export interface InlineLinkPreviewProps {
@@ -40,6 +60,7 @@ export function InlineLinkPreview({
 }: InlineLinkPreviewProps) {
   const [showExplanation, setShowExplanation] = useState(false)
   const [sideRailPosition, setSideRailPosition] = useState<SideRailPosition | null>(null)
+  const [localDescriptionLayout, setLocalDescriptionLayout] = useState<LocalDescriptionLayout | null>(null)
   const hoverDelayRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const anchorRef = useRef<HTMLAnchorElement>(null)
   const descriptionId = useId()
@@ -52,29 +73,39 @@ export function InlineLinkPreview({
 
   const updateSideRailPosition = useCallback(() => {
     const anchor = anchorRef.current
-    if (!anchor || descriptionPosition !== 'right' || window.innerWidth < SIDE_RAIL_BREAKPOINT) {
+    if (!anchor) {
       setSideRailPosition(null)
+      setLocalDescriptionLayout(null)
       return
     }
 
     const anchorRect = anchor.getBoundingClientRect()
-    const boundary = anchor.closest('[data-inline-link-preview-boundary]') as HTMLElement | null
-    if (!boundary) {
-      setSideRailPosition(null)
-      return
+    if (descriptionPosition === 'right' && window.innerWidth >= SIDE_RAIL_BREAKPOINT) {
+      const boundary = anchor.closest('[data-inline-link-preview-boundary]') as HTMLElement | null
+      if (boundary) {
+        const left = boundary.getBoundingClientRect().right + SIDE_RAIL_GAP
+        const width = Math.min(SIDE_RAIL_MAX_WIDTH, window.innerWidth - left - VIEWPORT_EDGE_GAP)
+
+        if (width >= SIDE_RAIL_MIN_WIDTH) {
+          setSideRailPosition({
+            left,
+            top: Math.max(VIEWPORT_EDGE_GAP, Math.min(anchorRect.top - 1, window.innerHeight - 72)),
+            width,
+          })
+          setLocalDescriptionLayout(null)
+          return
+        }
+      }
     }
 
-    const left = boundary.getBoundingClientRect().right + SIDE_RAIL_GAP
-    const width = Math.min(SIDE_RAIL_MAX_WIDTH, window.innerWidth - left - VIEWPORT_EDGE_GAP)
-
-    if (width < SIDE_RAIL_MIN_WIDTH) {
-      setSideRailPosition(null)
-      return
-    }
-
-    setSideRailPosition({
-      left,
-      top: Math.max(VIEWPORT_EDGE_GAP, Math.min(anchorRect.top - 1, window.innerHeight - 72)),
+    const width = Math.min(LOCAL_DESCRIPTION_MAX_WIDTH, window.innerWidth - VIEWPORT_EDGE_GAP * 2)
+    const viewportLeft = Math.max(
+      VIEWPORT_EDGE_GAP,
+      Math.min(anchorRect.left, window.innerWidth - VIEWPORT_EDGE_GAP - width)
+    )
+    setSideRailPosition(null)
+    setLocalDescriptionLayout({
+      left: viewportLeft - anchorRect.left,
       width,
     })
   }, [descriptionPosition])
@@ -96,12 +127,13 @@ export function InlineLinkPreview({
     clearHoverDelay()
     setShowExplanation(false)
     setSideRailPosition(null)
+    setLocalDescriptionLayout(null)
   }, [clearHoverDelay])
 
   useEffect(() => clearHoverDelay, [clearHoverDelay])
 
   useEffect(() => {
-    if (!showExplanation || descriptionPosition !== 'right') return
+    if (!showExplanation) return
 
     window.addEventListener('resize', updateSideRailPosition, { passive: true })
     window.addEventListener('scroll', updateSideRailPosition, true)
@@ -153,12 +185,14 @@ export function InlineLinkPreview({
             <motion.span
               aria-hidden
               className={cn(
-                'pointer-events-none absolute z-50 block w-max max-w-none whitespace-nowrap text-[20px] font-normal leading-none tracking-[-0.01em] text-stone-700 dark:text-zinc-200',
+                'pointer-events-none absolute z-50 isolate block whitespace-normal text-[20px] font-normal leading-[1.15] tracking-[-0.01em] text-stone-700 dark:text-zinc-200',
                 isAbove
-                  ? 'bottom-full left-0 origin-bottom-left'
-                  : 'top-full left-0 origin-top-left'
+                  ? 'bottom-full origin-bottom-left'
+                  : 'top-full origin-top-left'
               )}
               style={{
+                left: localDescriptionLayout?.left ?? 0,
+                width: localDescriptionLayout?.width,
                 fontFamily: 'var(--font-biro-script), "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive',
               }}
               initial={{ opacity: 0, y: isAbove ? 4 : -4, filter: 'blur(1.5px)' }}
@@ -166,7 +200,8 @@ export function InlineLinkPreview({
               exit={{ opacity: 0, y: isAbove ? 2 : -2, filter: 'blur(1px)' }}
               transition={{ duration: 0.18, ease: [0.25, 0.1, 0.25, 1] }}
             >
-              {explanation}
+              <DescriptionBackdrop />
+              <span className="relative z-10">{explanation}</span>
             </motion.span>
           )}
         </AnimatePresence>
@@ -177,7 +212,7 @@ export function InlineLinkPreview({
           {showSideRailExplanation && (
             <motion.span
               aria-hidden
-              className="pointer-events-none fixed z-50 block whitespace-normal text-[22px] font-normal leading-[1.15] tracking-[-0.01em] text-stone-700 dark:text-zinc-200"
+              className="pointer-events-none fixed z-50 isolate block whitespace-normal text-[22px] font-normal leading-[1.15] tracking-[-0.01em] text-stone-700 dark:text-zinc-200"
               style={{
                 left: sideRailPosition.left,
                 top: sideRailPosition.top,
@@ -189,7 +224,8 @@ export function InlineLinkPreview({
               exit={{ opacity: 0, filter: 'blur(1px)' }}
               transition={{ duration: 0.18, ease: [0.25, 0.1, 0.25, 1] }}
             >
-              {explanation}
+              <DescriptionBackdrop />
+              <span className="relative z-10">{explanation}</span>
             </motion.span>
           )}
         </AnimatePresence>,
