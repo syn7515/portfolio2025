@@ -205,7 +205,10 @@ export function useResponsiveSizing(
         const height = Math.round((width * 9) / 16);
         setSize({ cardWidth: width, cardHeight: height, gap: 8, offsetX: 0 });
       } else if (w < 768) {
-        const width = 520;
+        const width = Math.max(
+          600,
+          Math.min(640, Math.round(600 + ((w - 640) / (768 - 640)) * 40))
+        );
         const height = Math.round((width * 9) / 16);
         setSize({ cardWidth: width, cardHeight: height, gap: 12, offsetX: 0 });
       } else if (w < 1024) {
@@ -278,4 +281,3 @@ export function useLightboxDimensions() {
 
   return dimensions;
 }
-
