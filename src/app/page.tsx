@@ -218,7 +218,7 @@ export default function Home() {
               target="_blank"
               rel="noopener noreferrer"
               data-social-link-trigger
-              className="!text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-lime-200"
+              className="!text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-orange-400"
               style={{ fontSize: '14px' }}
             >
               X
@@ -229,7 +229,7 @@ export default function Home() {
               target="_blank"
               rel="noopener noreferrer"
               data-social-link-trigger
-              className="!text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-lime-200"
+              className="!text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-orange-400"
               style={{ fontSize: '14px' }}
             >
               LinkedIn

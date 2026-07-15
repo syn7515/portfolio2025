@@ -41,8 +41,8 @@
     --foreground: #ededed;
     --intro-trigger-decoration: rgb(113 113 122);
     /* zinc-500 - underline color for intro/link preview triggers */
-    --intro-trigger-decoration-hover: rgb(190 242 100);
-    /* lime-300 - underline color on hover */
+    --intro-trigger-decoration-hover: rgb(253 186 116);
+    /* orange-300 - underline color on hover */
     --scrollbar-thumb: rgb(82 82 91 / 0.6);
     /* zinc-600 */
     --scrollbar-thumb-hover: rgb(113 113 122 / 0.8);
@@ -122,10 +122,10 @@ html:hover::-webkit-scrollbar-thumb:hover {
 
 @media (prefers-color-scheme: dark) {
   ::selection {
-    background-color: rgb(132 204 22 / 0.15) !important;
-    /* lime-500 / 15% */
-    color: rgb(217 249 157) !important;
-    /* lime-200 */
+    background-color: rgb(249 115 22 / 0.15) !important;
+    /* orange-500 / 15% */
+    color: rgb(254 215 170) !important;
+    /* orange-200 */
     opacity: 1 !important;
   }
 }
@@ -448,8 +448,8 @@ pre code {
   }
 
   a:hover {
-    color: rgb(217 249 157);
-    /* lime-200 */
+    color: rgb(254 215 170);
+    /* orange-200 */
   }
 
   ul, ol {
@@ -484,8 +484,8 @@ pre code {
   }
 
   .prose a:hover {
-    color: rgb(217 249 157);
-    /* lime-200 */
+    color: rgb(254 215 170);
+    /* orange-200 */
   }
 }
 
@@ -626,9 +626,9 @@ a[data-mobile-menu-current] {
   }
 
   .intro-link:hover {
-    color: rgb(217 249 157) !important;
-    /* lime-200 */
-    text-decoration-color: rgb(217 249 157) !important;
+    color: rgb(254 215 170) !important;
+    /* orange-200 */
+    text-decoration-color: rgb(254 215 170) !important;
     opacity: 1;
   }
 
@@ -638,9 +638,9 @@ a[data-mobile-menu-current] {
   }
 
   a[data-inline-youtube-trigger]:hover {
-    color: rgb(190 242 100) !important;
-    /* lime-300 */
-    text-decoration-color: rgb(190 242 100) !important;
+    color: rgb(253 186 116) !important;
+    /* orange-300 */
+    text-decoration-color: rgb(253 186 116) !important;
   }
 
   a[data-inline-link-preview-trigger] {
@@ -657,9 +657,9 @@ a[data-mobile-menu-current] {
   }
 
   a[data-inline-link-preview-trigger]:is(:hover, :focus-visible) {
-    color: rgb(190 242 100) !important;
-    /* lime-300 */
-    text-decoration-color: rgb(190 242 100) !important;
+    color: rgb(251 146 60) !important;
+    /* orange-400 */
+    text-decoration-color: rgb(251 146 60) !important;
   }
 
   a[data-social-link-trigger] {
@@ -668,8 +668,8 @@ a[data-mobile-menu-current] {
   }
 
   a[data-social-link-trigger]:hover {
-    text-decoration-color: rgb(217 249 157) !important;
-    /* lime-200 */
+    text-decoration-color: rgb(251 146 60) !important;
+    /* orange-400 */
   }
 
   /* Intro link variant for lighter text paragraphs (stone-500/zinc-400) */
@@ -684,8 +684,8 @@ a[data-mobile-menu-current] {
   .intro-link-light:hover {
     color: rgb(212 212 216) !important;
     /* zinc-300 - lighter on hover */
-    text-decoration-color: rgb(217 249 157) !important;
-    /* lime-200 */
+    text-decoration-color: rgb(254 215 170) !important;
+    /* orange-200 */
     opacity: 1;
   }
 }

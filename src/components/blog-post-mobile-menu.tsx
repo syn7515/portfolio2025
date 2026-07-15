@@ -117,7 +117,7 @@ export default function BlogPostMobileMenu({ slug }: BlogPostMobileMenuProps) {
                   isHome && 'inline-flex items-center gap-2',
                   isCurrent
                     ? '!text-stone-700 dark:!text-zinc-200'
-                    : '!text-stone-500 dark:!text-zinc-400 !no-underline hover:!text-orange-700 dark:hover:!text-lime-200'
+                    : '!text-stone-500 dark:!text-zinc-400 !no-underline hover:!text-orange-700 dark:hover:!text-orange-200'
                 )}
                 tabIndex={open ? undefined : -1}
               >
