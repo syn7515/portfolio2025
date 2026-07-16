@@ -11,5 +11,9 @@
       "Bash(git -C /Users/suepark/Documents/Github_aniai/portfolio2025 push)",
       "Bash(lsof -nP -iTCP -sTCP:LISTEN)"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "shadcn"
+  ],
+  "enableAllProjectMcpServers": true
 }

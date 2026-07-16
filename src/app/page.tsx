@@ -18,13 +18,21 @@ import {
 let hasVisitedHome = false;
 
 // Paper entrance animation: paper slides in from the top-right corner with a blur-in, then content fades in on top of it
-const ENTRANCE_EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
+// ease-out: starts fast (paper shoots in), decelerates to a gentle landing — correct for entering elements.
+const ENTRANCE_EASE: [number, number, number, number] = [0.23, 1, 0.32, 1];
 const PAPER_SLIDE_DURATION = 0.45;
 const PAPER_OFFSET_X = 40;
 const PAPER_OFFSET_Y = -32;
 const PAPER_INITIAL_ROTATE_DEG = 2;
 const PAPER_BLUR_PX = 10;
 const CONTENT_DELAY_RATIO = 0.6;
+// Per-property pacing: opacity clears first (paper materializes quickly), blur clears before the
+// slide finishes (sharp and solid while still approaching rest), translate/rotate use full duration.
+const PAPER_ENTRANCE_TRANSITION_FULL = {
+  default: { duration: PAPER_SLIDE_DURATION, ease: ENTRANCE_EASE },
+  filter: { duration: PAPER_SLIDE_DURATION * 0.75, ease: ENTRANCE_EASE },
+  opacity: { duration: PAPER_SLIDE_DURATION * 0.55, ease: ENTRANCE_EASE },
+};
 
 // Wall-clock floor for revealing content. The entrance is driven by Framer's requestAnimationFrame
 // loop, which browsers throttle to a near-stop while a tab is backgrounded (and under some
@@ -75,13 +83,13 @@ export default function Home() {
   // rest of this page's animations, since it's only ever false on a client-only SPA return-to-home.
   // The animate target is the same either way once ready (no more mid-flight keyframe), so only
   // the transition timing needs to branch on shouldReduceMotion.
-  const paperOffscreen = { x: PAPER_OFFSET_X, y: PAPER_OFFSET_Y, rotate: PAPER_INITIAL_ROTATE_DEG, filter: `blur(${PAPER_BLUR_PX}px)` };
-  const paperRest = { x: 0, y: 0, rotate: 0, filter: 'blur(0px)' };
+  const paperOffscreen = { x: PAPER_OFFSET_X, y: PAPER_OFFSET_Y, rotate: PAPER_INITIAL_ROTATE_DEG, filter: `blur(${PAPER_BLUR_PX}px)`, opacity: 0 };
+  const paperRest = { x: 0, y: 0, rotate: 0, filter: 'blur(0px)', opacity: 1 };
   const paperInitial = shouldAnimate ? paperOffscreen : false;
   const getPaperAnimate = () => (shouldAnimate && !animationReady ? paperOffscreen : paperRest);
   const paperTransition = (shouldReduceMotion || instantReveal)
     ? { duration: 0 }
-    : { duration: PAPER_SLIDE_DURATION, ease: ENTRANCE_EASE };
+    : PAPER_ENTRANCE_TRANSITION_FULL;
   const exitTransition = shouldReduceMotion ? PAPER_EXIT_TRANSITION_REDUCED : PAPER_EXIT_TRANSITION;
   // Existing per-element stagger delays below are all offset by this so the whole sequence starts
   // once the paper has slid in, instead of racing it.
@@ -115,7 +123,7 @@ export default function Home() {
         <PaperGridBackground />
         <motion.div
           className="relative z-10 w-full flex-1 flex flex-col min-[1280px]:mt-[100px] overflow-x-clip"
-          style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}
+          style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)', ...(shouldAnimate ? { opacity: 0 } : {}) }}
           initial={paperInitial}
           animate={getPaperAnimate()}
           transition={paperTransition}

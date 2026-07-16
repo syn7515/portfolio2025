@@ -99,7 +99,8 @@ function preventWidow(text: string): React.ReactNode {
 }
 
 // Paper entrance animation: paper slides in from the top-right corner with a blur-in, then content fades in on top of it
-const ENTRANCE_EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1]
+// ease-out: starts fast (paper shoots in), decelerates to a gentle landing — correct for entering elements.
+const ENTRANCE_EASE: [number, number, number, number] = [0.23, 1, 0.32, 1]
 const PAPER_SLIDE_DURATION = 0.45
 const PAPER_OFFSET_X = 40
 const PAPER_OFFSET_Y = -32
@@ -112,9 +113,15 @@ const PAPER_BLUR_PX = 10
 // can treat a changed reference as a reason to re-evaluate the in-flight tween, which reads as the
 // entrance animation being randomly interrupted depending on whether a scroll/resize event happens
 // to land during the ~0.45s slide.
-const PAPER_OFFSCREEN = { x: PAPER_OFFSET_X, y: PAPER_OFFSET_Y, rotate: PAPER_INITIAL_ROTATE_DEG, filter: `blur(${PAPER_BLUR_PX}px)` }
-const PAPER_REST = { x: 0, y: 0, rotate: 0, filter: 'blur(0px)' }
-const PAPER_TRANSITION_FULL = { duration: PAPER_SLIDE_DURATION, ease: ENTRANCE_EASE }
+const PAPER_OFFSCREEN = { x: PAPER_OFFSET_X, y: PAPER_OFFSET_Y, rotate: PAPER_INITIAL_ROTATE_DEG, filter: `blur(${PAPER_BLUR_PX}px)`, opacity: 0 }
+const PAPER_REST = { x: 0, y: 0, rotate: 0, filter: 'blur(0px)', opacity: 1 }
+// Per-property pacing: opacity clears first (paper materializes quickly), blur clears before the
+// slide finishes (sharp and solid while still approaching rest), translate/rotate use full duration.
+const PAPER_TRANSITION_FULL = {
+  default: { duration: PAPER_SLIDE_DURATION, ease: ENTRANCE_EASE },
+  filter: { duration: PAPER_SLIDE_DURATION * 0.75, ease: ENTRANCE_EASE },
+  opacity: { duration: PAPER_SLIDE_DURATION * 0.55, ease: ENTRANCE_EASE },
+}
 const PAPER_TRANSITION_REDUCED = { duration: 0 }
 const CONTENT_FADE_TRANSITION = { duration: 0.5, ease: ENTRANCE_EASE }
 
@@ -391,7 +398,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           <motion.div
             aria-hidden
             className="absolute inset-0 min-[1280px]:top-[100px] overflow-x-clip pointer-events-none"
-            style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}
+            style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)', opacity: 0 }}
             initial={PAPER_OFFSCREEN}
             animate={animationReady ? PAPER_REST : PAPER_OFFSCREEN}
             transition={paperTransition}
