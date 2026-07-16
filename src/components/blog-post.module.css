@@ -251,6 +251,9 @@
     .mdxContent blockquote {
         color: rgb(161 161 170) !important;
         /* zinc-400 */
+    }
+
+    .mdxContent blockquote {
         border-color: rgb(251 146 60);
         /* orange-400 */
     }

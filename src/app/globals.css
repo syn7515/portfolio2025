@@ -311,7 +311,8 @@ li {
 }
 
 blockquote {
-  border-left: 4px solid rgb(59 130 246);
+  border-left: 4px solid rgb(234 88 12);
+  /* orange-600 */
   padding-left: 1rem;
   font-style: italic;
   margin: 1.5rem 0;
@@ -388,7 +389,8 @@ pre code {
 }
 
 .prose blockquote {
-  border-left: 4px solid rgb(59 130 246);
+  border-left: 4px solid rgb(234 88 12);
+  /* orange-600 */
   padding-left: 1rem;
   font-style: italic;
   margin: 1.5rem 0;
@@ -456,8 +458,11 @@ pre code {
     color: rgb(209 213 219);
   }
 
-  blockquote {
+  blockquote,
+  .prose blockquote {
     color: rgb(209 213 219);
+    border-color: rgb(251 146 60);
+    /* orange-400 */
   }
 
   code {

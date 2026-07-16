@@ -9,11 +9,14 @@
       "Bash(git -C /Users/suepark/Documents/Github_aniai/portfolio2025 add src/app/page.tsx src/components/blog-post-header.tsx src/components/ui/label_indicator_carousel.jsx)",
       "Bash(git -C /Users/suepark/Documents/Github_aniai/portfolio2025 commit -m ' *)",
       "Bash(git -C /Users/suepark/Documents/Github_aniai/portfolio2025 push)",
-      "Bash(lsof -nP -iTCP -sTCP:LISTEN)"
+      "Bash(lsof -nP -iTCP -sTCP:LISTEN)",
+      "Bash(curl -s -o /private/tmp/claude-501/-Users-sooyeon-Documents-GitHub-portfolio2025/f4431241-3c5f-4bf1-a11c-665f3205be02/scratchpad/page.html -w \"status:%{http_code} size:%{size_download}\\\\n\" http://localhost:3000/alphagrill --max-time 60)",
+      "Bash(curl -s -o /dev/null -w \"ipv6:%{http_code}\\\\n\" \"http://[::1]:3000/alphagrill\" --max-time 20)",
+      "Bash(curl -s -o /dev/null -w \"ipv4:%{http_code}\\\\n\" \"http://127.0.0.1:3000/alphagrill\" --max-time 20)"
     ]
   },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "shadcn"
-  ],
-  "enableAllProjectMcpServers": true
+  ]
 }
