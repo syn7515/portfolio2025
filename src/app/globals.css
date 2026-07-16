@@ -24,8 +24,8 @@
   --sidebar-w: 0px;
   --paper-grid-minor: rgb(120 113 108 / 0.1);
   --paper-grid-major: rgb(120 113 108 / 0.12);
-  --paper-grid-hover-minor: rgb(120 113 108 / 0.08);
-  --paper-grid-hover-major: rgb(120 113 108 / 0.09);
+  --paper-grid-hover-minor: rgb(120 113 108 / 0.12);
+  --paper-grid-hover-major: rgb(120 113 108 / 0.13);
 }
 
 @theme inline {
