@@ -23,6 +23,7 @@ export type TransformSnapshot = {
 };
 
 interface LightboxProps {
+  presenceKey: number;
   isOpen: boolean;
   closeLightbox: () => void;
   prevLightbox: () => void;
@@ -269,6 +270,7 @@ function LightboxContent({
 }
 
 export function Lightbox({
+  presenceKey,
   isOpen,
   closeLightbox,
   prevLightbox,
@@ -328,12 +330,15 @@ export function Lightbox({
   };
 
   return (
-    <AnimatePresence onExitComplete={onExitComplete}>
+    <AnimatePresence
+      key={presenceKey}
+      initial={false}
+      onExitComplete={onExitComplete}
+    >
       {isOpen && (
-        <>
+        <div key="lightbox-layer">
           {/* Background overlay with opacity */}
           <motion.div
-            key="lightbox-backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -344,12 +349,10 @@ export function Lightbox({
 
           {/* Lightbox content container */}
           <motion.div
-            key="lightbox-dialog"
             className="fixed inset-0 z-[70] flex items-center justify-center p-4 pointer-events-none"
             role="dialog"
             aria-modal="true"
             initial={false}
-            exit={{}}
           >
             {/* Image container - positioned absolutely to allow animation without clipping */}
             <div
@@ -415,7 +418,6 @@ export function Lightbox({
                       boxShadow: isDarkMode
                         ? 'inset 0 1px 0 0 rgba(255,255,255,0.03), inset 0 0 0 1px rgba(255,255,255,0.03), 0px 2px 8px rgba(0,0,0,0.35)'
                         : '0px 0px 1px 0px rgba(0,0,0,0.3), 0px 2px 8px 0px rgba(0,0,0,0.08)',
-                      transition: 'background-color 150ms ease-out',
                     }}
                     aria-label="Previous"
                   >
@@ -438,7 +440,6 @@ export function Lightbox({
                       boxShadow: isDarkMode
                         ? 'inset 0 1px 0 0 rgba(255,255,255,0.03), inset 0 0 0 1px rgba(255,255,255,0.03), 0px 2px 8px rgba(0,0,0,0.35)'
                         : '0px 0px 1px 0px rgba(0,0,0,0.3), 0px 2px 8px 0px rgba(0,0,0,0.08)',
-                      transition: 'background-color 150ms ease-out',
                     }}
                     aria-label="Next"
                   >
@@ -448,9 +449,8 @@ export function Lightbox({
               )}
             </div>
           </motion.div>
-        </>
+        </div>
       )}
     </AnimatePresence>
   );
 }
-

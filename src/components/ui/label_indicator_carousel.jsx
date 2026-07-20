@@ -17,6 +17,9 @@ const defaultTransition = {
   damping: 28,
 };
 
+const LIGHTBOX_TRANSITION_DURATION = 0.4;
+const LIGHTBOX_EXIT_FALLBACK_BUFFER_MS = 100;
+
 export default function LabelIndicatorCarousel({
   items,
   currentIndex,
@@ -82,11 +85,14 @@ export default function LabelIndicatorCarousel({
   const [lightboxIndex, setLightboxIndex] = useState(index);
   const [initialTransform, setInitialTransform] = useState(null);
   const [exitTransform, setExitTransform] = useState(null);
-  const [exitDuration, setExitDuration] = useState(0.4);
+  const [exitDuration, setExitDuration] = useState(LIGHTBOX_TRANSITION_DURATION);
+  const [lightboxPresenceKey, setLightboxPresenceKey] = useState(0);
   const [pendingLightboxIndex, setPendingLightboxIndex] = useState(null); // For delayed transform calculation
   const [hiddenCardIndex, setHiddenCardIndex] = useState(null); // Card hidden while lightbox is open
   const cardRefs = useRef({});
   const scrollbarGutterRef = useRef(0); // Store scrollbar gutter for exit animation
+  const exitFallbackTimerRef = useRef(null);
+  const isLightboxClosingRef = useRef(false);
   
   // Disable lightbox on sm and below
   const effectiveLightboxEnabled = enableLightbox && !isSmOrBelow;
@@ -106,6 +112,15 @@ export default function LabelIndicatorCarousel({
     const mediaRect = mediaElement.getBoundingClientRect();
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
+
+    if (
+      containerRect.width <= 0 ||
+      containerRect.height <= 0 ||
+      !Number.isFinite(containerRect.left) ||
+      !Number.isFinite(containerRect.top)
+    ) {
+      return null;
+    }
     
     // Calculate final position (center of viewport)
     const finalX = viewportWidth / 2;
@@ -120,10 +135,10 @@ export default function LabelIndicatorCarousel({
     let mediaNaturalWidth = mediaRect.width;
     let mediaNaturalHeight = mediaRect.height;
     
-    if (imageElement && imageElement.complete) {
+    if (imageElement && imageElement.naturalWidth > 0 && imageElement.naturalHeight > 0) {
       mediaNaturalWidth = imageElement.naturalWidth;
       mediaNaturalHeight = imageElement.naturalHeight;
-    } else if (videoElement && videoElement.readyState >= 2) {
+    } else if (videoElement && videoElement.videoWidth > 0 && videoElement.videoHeight > 0) {
       mediaNaturalWidth = videoElement.videoWidth;
       mediaNaturalHeight = videoElement.videoHeight;
     }
@@ -154,6 +169,8 @@ export default function LabelIndicatorCarousel({
       };
     } else {
       // For full-cover images, use existing logic
+    if (!Number.isFinite(mediaAspectRatio) || mediaAspectRatio <= 0) return null;
+
     // Calculate scale factors
     // Final size: max-w-7xl (1280px), reserving space for the prev/next buttons
     const maxFinalWidth = getLightboxMaxWidth(viewportWidth);
@@ -211,6 +228,12 @@ export default function LabelIndicatorCarousel({
   const openLightbox = useCallback((i) => {
     if (!effectiveLightboxEnabled) return;
 
+    if (exitFallbackTimerRef.current !== null) {
+      window.clearTimeout(exitFallbackTimerRef.current);
+      exitFallbackTimerRef.current = null;
+    }
+    isLightboxClosingRef.current = false;
+
     // FIX 2: Set pending index to trigger scroll lock, then calculate transform after layout stabilizes
     setLightboxIndex(i);
     setIndex(i);
@@ -234,13 +257,24 @@ export default function LabelIndicatorCarousel({
   }, [lightboxIndex, normalized.length, setIndex]);
 
   const handleLightboxExitComplete = useCallback(() => {
+    if (exitFallbackTimerRef.current !== null) {
+      window.clearTimeout(exitFallbackTimerRef.current);
+      exitFallbackTimerRef.current = null;
+    }
+    isLightboxClosingRef.current = false;
     setInitialTransform(null);
     setExitTransform(null);
-    setExitDuration(0.4);
+    setExitDuration(LIGHTBOX_TRANSITION_DURATION);
     setHiddenCardIndex(null);
+    // Reset the presence boundary as well. If Motion ever fails to release an
+    // exiting child, changing this key force-unmounts that stale exit tree.
+    setLightboxPresenceKey((key) => key + 1);
   }, []);
 
   const closeLightbox = useCallback(() => {
+    if (!isLightboxOpen || isLightboxClosingRef.current) return;
+    isLightboxClosingRef.current = true;
+
     // Since carousel index is synced with lightbox index, no sliding needed
     // Just animate back to the current card position
     const transform = calculateCardTransform(lightboxIndex);
@@ -253,13 +287,29 @@ export default function LabelIndicatorCarousel({
       }
       flushSync(() => {
         setExitTransform(transform);
-        setExitDuration(0.4);
+        setExitDuration(LIGHTBOX_TRANSITION_DURATION);
       });
       setLightboxOpen(false);
     } else {
       setLightboxOpen(false);
     }
-  }, [lightboxIndex, calculateCardTransform]);
+
+    // onExitComplete is the normal path. This fallback guarantees that a
+    // dropped animation-completion signal can never leave the transition copy
+    // mounted and the source card hidden indefinitely.
+    exitFallbackTimerRef.current = window.setTimeout(
+      handleLightboxExitComplete,
+      LIGHTBOX_TRANSITION_DURATION * 1000 + LIGHTBOX_EXIT_FALLBACK_BUFFER_MS
+    );
+  }, [isLightboxOpen, lightboxIndex, calculateCardTransform, handleLightboxExitComplete]);
+
+  useEffect(() => {
+    return () => {
+      if (exitFallbackTimerRef.current !== null) {
+        window.clearTimeout(exitFallbackTimerRef.current);
+      }
+    };
+  }, []);
 
   // FIX 2: Measure BEFORE scroll lock, then apply scroll lock and open lightbox
   useEffect(() => {
@@ -405,6 +455,7 @@ export default function LabelIndicatorCarousel({
       </div>
 
       <Lightbox
+        presenceKey={lightboxPresenceKey}
         isOpen={effectiveLightboxEnabled && isLightboxOpen}
         closeLightbox={closeLightbox}
         prevLightbox={prevLightbox}
