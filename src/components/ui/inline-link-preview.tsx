@@ -201,7 +201,7 @@ export function InlineLinkPreview({
               transition={{ duration: 0.18, ease: [0.25, 0.1, 0.25, 1] }}
             >
               <DescriptionBackdrop />
-              <span className="relative z-10 xl:text-balance">{explanation}</span>
+              <span className="relative z-10">{explanation}</span>
             </motion.span>
           )}
         </AnimatePresence>
@@ -212,7 +212,7 @@ export function InlineLinkPreview({
           {showSideRailExplanation && (
             <motion.span
               aria-hidden
-              className="pointer-events-none fixed z-50 isolate block whitespace-normal text-[22px] font-normal leading-[1.15] tracking-[-0.01em] text-stone-700 dark:text-zinc-200"
+              className="pointer-events-none fixed z-50 isolate block whitespace-normal text-balance text-[22px] font-normal leading-[1.15] tracking-[-0.01em] text-stone-700 dark:text-zinc-200"
               style={{
                 left: sideRailPosition.left,
                 top: sideRailPosition.top,
@@ -225,7 +225,7 @@ export function InlineLinkPreview({
               transition={{ duration: 0.18, ease: [0.25, 0.1, 0.25, 1] }}
             >
               <DescriptionBackdrop />
-              <span className="relative z-10 xl:text-balance">{explanation}</span>
+              <span className="relative z-10">{explanation}</span>
             </motion.span>
           )}
         </AnimatePresence>,
