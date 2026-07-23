@@ -201,7 +201,7 @@ export function InlineLinkPreview({
               transition={{ duration: 0.18, ease: [0.25, 0.1, 0.25, 1] }}
             >
               <DescriptionBackdrop />
-              <span className="relative z-10">{explanation}</span>
+              <span className="relative z-10 xl:text-balance">{explanation}</span>
             </motion.span>
           )}
         </AnimatePresence>
@@ -225,7 +225,7 @@ export function InlineLinkPreview({
               transition={{ duration: 0.18, ease: [0.25, 0.1, 0.25, 1] }}
             >
               <DescriptionBackdrop />
-              <span className="relative z-10">{explanation}</span>
+              <span className="relative z-10 xl:text-balance">{explanation}</span>
             </motion.span>
           )}
         </AnimatePresence>,

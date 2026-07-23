@@ -217,7 +217,9 @@ export default function LabelIndicatorCarousel({
       const cardIndex = supCardMap[e.detail.supId]
       if (cardIndex !== undefined) {
         setIndex(cardIndex)
-        wrapperRef.current?.scrollIntoView({ behavior: scrollBehavior(), block: 'nearest' })
+        wrapperRef.current
+          ?.querySelector(`[data-carousel-item="${cardIndex}"]`)
+          ?.scrollIntoView({ behavior: scrollBehavior(), block: 'center' })
       }
     }
     window.addEventListener('sup-navigate', handler)
@@ -423,7 +425,7 @@ export default function LabelIndicatorCarousel({
             (see the stacking-context notes in blog-post-layout.tsx) */}
         <div className="relative flex flex-col items-center w-full" style={{ rowGap: Math.max(effGap * 2, 24), left: effOffsetX || 0 }}>
           {normalized.map((item, i) => (
-            <div key={i} className="w-full flex flex-col items-center px-4">
+            <div key={i} data-carousel-item={i} className="w-full flex flex-col items-center px-4">
               <div style={{ width: '100%', maxWidth: effWidth }}>
                 <CarouselCard
                   item={item}

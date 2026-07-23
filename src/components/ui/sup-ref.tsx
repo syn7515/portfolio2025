@@ -46,12 +46,16 @@ export default function SupRef({ id }: SupRefProps) {
     <span
       id={`sup-body-${id}`}
       onClick={handleClick}
-      style={id === 1 || id === 4 ? { paddingRight: '1px' } : undefined}
       className={`${SUP_BADGE_BASE_CLASS} ${
         isHighlighted ? SUP_BADGE_HIGHLIGHTED_CLASS : SUP_BADGE_DEFAULT_CLASS
       }`}
     >
-      {id}
+      <span
+        aria-hidden="true"
+        data-sup-hit-area
+        className="pointer-events-auto absolute inset-x-[-6px] inset-y-[-7px]"
+      />
+      [<span className="mx-[0.5px]">{id}</span>]
     </span>
   )
 }

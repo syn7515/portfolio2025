@@ -42,12 +42,11 @@ export function CaptionSupBadge({ supId, muted = false }: { supId: string; muted
         document.getElementById(`sup-body-${supId}`)?.scrollIntoView({ behavior: scrollBehavior(), block: 'center' })
         window.dispatchEvent(new CustomEvent('sup-highlight', { detail: { supId } }))
       }}
-      style={supId === '1' ? { paddingRight: '1px' } : undefined}
       className={`${SUP_BADGE_BASE_CLASS} ${
         isHighlighted ? SUP_BADGE_HIGHLIGHTED_CLASS : muted ? SUP_BADGE_CAROUSEL_CLASS : SUP_BADGE_DEFAULT_CLASS
       }`}
     >
-      {supId}
+      [<span className="mx-[0.5px]">{supId}</span>]
     </span>
   )
 }
