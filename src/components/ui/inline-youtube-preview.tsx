@@ -252,11 +252,16 @@ export function InlineYoutubePreview({
         role="button"
         tabIndex={0}
         className={cn(
-          'intro-link inline-youtube-preview-trigger focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 dark:focus-visible:ring-zinc-500 focus-visible:ring-offset-1 rounded',
+          'intro-link inline-youtube-preview-trigger relative focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 dark:focus-visible:ring-zinc-500 focus-visible:ring-offset-1 rounded',
           className
         )}
         aria-label={`Play video: ${watchUrl}`}
       >
+        <span
+          aria-hidden
+          data-inline-youtube-preview-hit-area
+          className="pointer-events-auto absolute inset-x-[-4px] inset-y-[-5px]"
+        />
         {children}
       </a>
       {typeof document !== 'undefined' && createPortal(

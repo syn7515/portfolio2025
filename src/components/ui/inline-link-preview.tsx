@@ -170,11 +170,16 @@ export function InlineLinkPreview({
           onBlur={hideExplanation}
           className={cn(
             variant,
-            'focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-600/40 focus-visible:ring-offset-1 rounded',
+            'relative focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-600/40 focus-visible:ring-offset-1 rounded',
             className
           )}
           aria-describedby={explanation ? descriptionId : undefined}
         >
+          <span
+            aria-hidden
+            data-inline-link-preview-hit-area
+            className="pointer-events-auto absolute inset-x-[-4px] inset-y-[-5px]"
+          />
           {children}
         </a>
 
