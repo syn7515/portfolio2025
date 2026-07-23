@@ -75,8 +75,8 @@ portfolio2025/
 │   ├── components/             # React components
 │   │   ├── ui/                 # Reusable UI components
 │   │   │   ├── project-item.tsx
-│   │   │   ├── table-of-contents.tsx
 │   │   │   └── ...
+│   │   ├── blog-post-toc.tsx
 │   │   ├── blog-post-layout.tsx
 │   │   └── blog-post.module.css
 │   └── lib/                    # Utility functions
@@ -88,7 +88,7 @@ portfolio2025/
 
 - **ProjectItem**: Animated project card component with hover effects
 - **BlogPostLayout**: Layout component for MDX blog posts with table of contents
-- **TableOfContents**: Auto-generated table of contents for long-form content
+- **BlogPostToc**: Auto-generated table of contents for long-form content
 - **LabelIndicatorCarousel**: Interactive carousel component for project showcases
 
 ## 📝 Adding New Content

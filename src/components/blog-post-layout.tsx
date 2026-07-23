@@ -257,11 +257,14 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           type="button"
           onClick={() => window.scrollTo({ top: 0, behavior: scrollBehavior() })}
           className={cn(
-            'absolute bottom-20 min-[1280px]:bottom-[120px] mb-[120px] left-14 flex items-center gap-2 w-fit whitespace-nowrap text-sm font-[460] text-stone-400 dark:text-zinc-400 hover:text-orange-700 dark:hover:text-orange-400 transition-[color,opacity,filter] duration-300 ease-out cursor-pointer pointer-events-auto px-3 py-2 -mx-3 -my-2 rounded',
+            'absolute bottom-20 min-[1280px]:bottom-[120px] mb-[120px] left-14 flex items-center gap-2 w-fit whitespace-nowrap text-sm font-[460] text-stone-400 dark:text-zinc-400 hover:text-orange-700 dark:hover:text-orange-400 motion-safe:active:scale-[0.97] cursor-pointer pointer-events-auto px-3 py-2 -mx-3 -my-2 rounded',
             showBackToTop && viewportTall
               ? 'opacity-100 blur-none'
               : 'opacity-0 blur-[4px] pointer-events-none'
           )}
+          style={{
+            transition: 'color 300ms ease-out, opacity 300ms ease-out, filter 300ms ease-out, scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
+          }}
           aria-label="Back to top"
         >
           <ArrowUp className="size-4 flex-shrink-0" />

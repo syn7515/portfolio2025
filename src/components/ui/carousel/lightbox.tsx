@@ -13,6 +13,9 @@ import { GrillLines } from "./grill-lines";
 import { CARD_LIGHT_SHADOW } from "@/components/ui/card-shadow";
 import { renderCaptionWithBadges } from "@/components/ui/sup-caption-badge";
 
+const NAV_BUTTON_MOTION_CLASS =
+  "rounded-full p-2 sm:p-3 pointer-events-auto transition-[scale,background-color] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-safe:enabled:active:scale-[0.97] motion-reduce:transition-[background-color]";
+
 export type TransformSnapshot = {
   x: number;
   y: number;
@@ -401,50 +404,62 @@ export function Lightbox({
               {/* Prev/Next buttons - only when more than one item */}
               {!exitTransform && normalizedItems.length > 1 && (
                 <>
-                  <button
-                    type="button"
-                    onClick={(e) => { e.stopPropagation(); prevLightbox(); }}
-                    onMouseEnter={() => setIsPrevHovered(true)}
-                    onMouseLeave={() => setIsPrevHovered(false)}
-                    disabled={isPrevDisabled}
-                    className={`absolute rounded-full p-2 sm:p-3 z-20 pointer-events-auto ${isDarkMode ? 'text-white' : 'text-stone-700'} ${isPrevDisabled ? 'opacity-40 cursor-default' : 'cursor-pointer'}`}
+                  <div
+                    className="absolute z-20 pointer-events-none"
                     style={{
                       left: `calc(50% - ${dimensions.width / 2}px - ${isLgOrAbove ? 16 : 4}px)`,
                       top: '50%',
                       transform: 'translate(-100%, -50%)',
-                      backgroundColor: isDarkMode
-                        ? isPrevHovered && !isPrevDisabled ? '#202023' : '#18181b'
-                        : isPrevHovered && !isPrevDisabled ? '#f4f4f4' : '#ffffff',
-                      boxShadow: isDarkMode
-                        ? 'inset 0 1px 0 0 rgba(255,255,255,0.03), inset 0 0 0 1px rgba(255,255,255,0.03), 0px 2px 8px rgba(0,0,0,0.35)'
-                        : '0px 0px 1px 0px rgba(0,0,0,0.3), 0px 2px 8px 0px rgba(0,0,0,0.08)',
                     }}
-                    aria-label="Previous"
                   >
-                    <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" style={{ transform: 'translateX(-1.5px)' }} />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={(e) => { e.stopPropagation(); nextLightbox(); }}
-                    onMouseEnter={() => setIsNextHovered(true)}
-                    onMouseLeave={() => setIsNextHovered(false)}
-                    disabled={isNextDisabled}
-                    className={`absolute rounded-full p-2 sm:p-3 z-20 pointer-events-auto ${isDarkMode ? 'text-white' : 'text-stone-700'} ${isNextDisabled ? 'opacity-40 cursor-default' : 'cursor-pointer'}`}
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); prevLightbox(); }}
+                      onMouseEnter={() => setIsPrevHovered(true)}
+                      onMouseLeave={() => setIsPrevHovered(false)}
+                      disabled={isPrevDisabled}
+                      className={`${NAV_BUTTON_MOTION_CLASS} ${isDarkMode ? 'text-white' : 'text-stone-700'} ${isPrevDisabled ? 'opacity-40 cursor-default' : 'cursor-pointer'}`}
+                      style={{
+                        backgroundColor: isDarkMode
+                          ? isPrevHovered && !isPrevDisabled ? '#202023' : '#18181b'
+                          : isPrevHovered && !isPrevDisabled ? '#f4f4f4' : '#ffffff',
+                        boxShadow: isDarkMode
+                          ? 'inset 0 1px 0 0 rgba(255,255,255,0.03), inset 0 0 0 1px rgba(255,255,255,0.03), 0px 2px 8px rgba(0,0,0,0.35)'
+                          : '0px 0px 1px 0px rgba(0,0,0,0.3), 0px 2px 8px 0px rgba(0,0,0,0.08)',
+                      }}
+                      aria-label="Previous"
+                    >
+                      <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" style={{ transform: 'translateX(-1.5px)' }} />
+                    </button>
+                  </div>
+                  <div
+                    className="absolute z-20 pointer-events-none"
                     style={{
                       left: `calc(50% + ${dimensions.width / 2}px + ${isLgOrAbove ? 16 : 4}px)`,
                       top: '50%',
                       transform: 'translateY(-50%)',
-                      backgroundColor: isDarkMode
-                        ? isNextHovered && !isNextDisabled ? '#202023' : '#18181b'
-                        : isNextHovered && !isNextDisabled ? '#f4f4f4' : '#ffffff',
-                      boxShadow: isDarkMode
-                        ? 'inset 0 1px 0 0 rgba(255,255,255,0.03), inset 0 0 0 1px rgba(255,255,255,0.03), 0px 2px 8px rgba(0,0,0,0.35)'
-                        : '0px 0px 1px 0px rgba(0,0,0,0.3), 0px 2px 8px 0px rgba(0,0,0,0.08)',
                     }}
-                    aria-label="Next"
                   >
-                    <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" style={{ transform: 'translateX(1.5px)' }} />
-                  </button>
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); nextLightbox(); }}
+                      onMouseEnter={() => setIsNextHovered(true)}
+                      onMouseLeave={() => setIsNextHovered(false)}
+                      disabled={isNextDisabled}
+                      className={`${NAV_BUTTON_MOTION_CLASS} ${isDarkMode ? 'text-white' : 'text-stone-700'} ${isNextDisabled ? 'opacity-40 cursor-default' : 'cursor-pointer'}`}
+                      style={{
+                        backgroundColor: isDarkMode
+                          ? isNextHovered && !isNextDisabled ? '#202023' : '#18181b'
+                          : isNextHovered && !isNextDisabled ? '#f4f4f4' : '#ffffff',
+                        boxShadow: isDarkMode
+                          ? 'inset 0 1px 0 0 rgba(255,255,255,0.03), inset 0 0 0 1px rgba(255,255,255,0.03), 0px 2px 8px rgba(0,0,0,0.35)'
+                          : '0px 0px 1px 0px rgba(0,0,0,0.3), 0px 2px 8px 0px rgba(0,0,0,0.08)',
+                      }}
+                      aria-label="Next"
+                    >
+                      <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" style={{ transform: 'translateX(1.5px)' }} />
+                    </button>
+                  </div>
                 </>
               )}
             </div>

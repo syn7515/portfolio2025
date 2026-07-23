@@ -109,7 +109,7 @@ export default function BlogPostToc({ contentSelector = CONTENT_SELECTOR, classN
           type="button"
           onClick={() => handleClick(id)}
           className={cn(
-            'cursor-pointer text-left transition-all duration-200 ease-out hover:translate-x-[12px]',
+            'origin-left cursor-pointer text-left hover:translate-x-[12px] motion-safe:active:scale-[0.97]',
             activeId === id
               ? 'text-stone-800 dark:text-zinc-100'
               : 'text-stone-400 dark:text-zinc-400'
@@ -120,6 +120,7 @@ export default function BlogPostToc({ contentSelector = CONTENT_SELECTOR, classN
             fontWeight: 450,
             letterSpacing: '-0.02em',
             textShadow: 'var(--toc-text-shadow)',
+            transition: 'color 200ms ease-out, translate 200ms ease-out, scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
           }}
         >
           {text}
