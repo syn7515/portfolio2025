@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { cn, scrollBehavior } from '@/lib/utils'
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight, ArrowUp, Undo2 } from 'lucide-react'
@@ -140,6 +140,48 @@ const CONTENT_FADE_VISIBLE = { opacity: 1 }
 // ~0.45s entrance so it never cuts a normally-running animation short.
 const ENTRANCE_FALLBACK_MS = 1200
 
+function startInterruptibleScrollToTop(): () => void {
+  if (scrollBehavior() === 'auto') {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+    return () => {}
+  }
+
+  const controller = new AbortController()
+  let finished = false
+  let fallbackTimer: number
+
+  const cleanUp = () => {
+    if (finished) return
+    finished = true
+    controller.abort()
+    window.clearTimeout(fallbackTimer)
+  }
+
+  const interrupt = () => {
+    if (finished) return
+    window.scrollTo({ top: window.scrollY, behavior: 'auto' })
+    cleanUp()
+  }
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (['ArrowDown', 'PageDown', 'End', ' '].includes(event.key)) {
+      interrupt()
+    }
+  }
+
+  const listenerOptions = { passive: true, signal: controller.signal }
+  window.addEventListener('wheel', interrupt, listenerOptions)
+  window.addEventListener('touchmove', interrupt, listenerOptions)
+  window.addEventListener('pointerdown', interrupt, listenerOptions)
+  window.addEventListener('keydown', handleKeyDown, { signal: controller.signal })
+  window.addEventListener('scrollend', cleanUp, { once: true, signal: controller.signal })
+
+  fallbackTimer = window.setTimeout(cleanUp, 2000)
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+
+  return interrupt
+}
+
 export default function BlogPostLayout({ children, slug, title, subtitle }: BlogPostLayoutProps) {
   const { previousProject, nextProject } = getProjectNavigation(slug)
   const [animationReady, setAnimationReady] = useState(false)
@@ -160,6 +202,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
   // state.
   const [exitEntrance, setExitEntrance] = useState(false)
   const [exitDone, setExitDone] = useState(false)
+  const cancelBackToTopRef = useRef<(() => void) | null>(null)
 
   useEffect(() => {
     if (sessionStorage.getItem(PAPER_BACK_NAV_FLAG) === PAPER_BACK_NAV_VALUE) {
@@ -196,6 +239,15 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
       window.removeEventListener('scroll', update)
       window.removeEventListener('resize', update)
     }
+  }, [])
+
+  useEffect(() => {
+    return () => cancelBackToTopRef.current?.()
+  }, [])
+
+  const handleBackToTop = useCallback(() => {
+    cancelBackToTopRef.current?.()
+    cancelBackToTopRef.current = startInterruptibleScrollToTop()
   }, [])
 
   const shouldReduceMotion = useReducedMotion()
@@ -255,7 +307,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
         </div>
         <button
           type="button"
-          onClick={() => window.scrollTo({ top: 0, behavior: scrollBehavior() })}
+          onClick={handleBackToTop}
           className={cn(
             'absolute bottom-20 min-[1280px]:bottom-[120px] mb-[120px] left-14 flex items-center gap-2 w-fit whitespace-nowrap text-sm font-[460] text-stone-400 dark:text-zinc-400 hover:text-orange-700 dark:hover:text-orange-400 motion-safe:active:scale-[0.97] cursor-pointer pointer-events-auto px-3 py-2 -mx-3 -my-2 rounded',
             showBackToTop && viewportTall
