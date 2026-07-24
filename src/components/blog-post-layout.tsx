@@ -296,7 +296,10 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
         <div className="relative flex flex-col gap-6 pt-[240px] pl-14 pointer-events-auto">
           <Link
             href="/"
-            className="flex items-center gap-2 w-fit text-sm font-[460] !not-italic !no-underline !text-stone-400 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-orange-400 transition-colors duration-300 ease-out px-3 py-2 -mx-3 -my-2 rounded"
+            className="flex items-center gap-2 w-fit text-sm font-[460] !not-italic !no-underline !text-stone-400 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-orange-400 motion-safe:active:scale-[0.97] px-3 py-2 -mx-3 -my-2 rounded"
+            style={{
+              transition: 'color 300ms ease-out, scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
+            }}
             aria-label="Back to home"
             onClick={() => sessionStorage.setItem(PAPER_BACK_NAV_FLAG, PAPER_BACK_NAV_VALUE)}
           >
