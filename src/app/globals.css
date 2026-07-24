@@ -7,6 +7,8 @@
   --foreground: #171717;
   --intro-trigger-decoration: rgb(168 162 158);
   /* stone-300 - underline color for intro/link preview triggers */
+  --inline-youtube-trigger-decoration: rgb(168 162 158);
+  /* stone-300 - YouTube underline color in light mode */
   --intro-trigger-decoration-hover: rgb(234 88 12);
   /* orange-600 - underline color on hover */
   --scrollbar-thumb: rgb(168 162 158 / 0.6);
@@ -41,6 +43,8 @@
     --foreground: #ededed;
     --intro-trigger-decoration: rgb(113 113 122);
     /* zinc-500 - underline color for intro/link preview triggers */
+    --inline-youtube-trigger-decoration: currentColor;
+    /* match the YouTube trigger's text color in dark mode */
     --intro-trigger-decoration-hover: rgb(253 186 116);
     /* orange-300 - underline color on hover */
     --scrollbar-thumb: rgb(82 82 91 / 0.6);
@@ -524,7 +528,7 @@ a[data-inline-youtube-trigger] {
   text-decoration-line: underline !important;
   text-decoration-style: dotted !important;
   text-decoration-skip-ink: auto !important;
-  text-decoration-color: rgb(168 162 158) !important;
+  text-decoration-color: var(--inline-youtube-trigger-decoration) !important;
   /* stone-300 - same as intro-link */
   text-underline-offset: 0.05rem !important;
   font-style: italic !important;
@@ -638,8 +642,7 @@ a[data-mobile-menu-current] {
   }
 
   a[data-inline-youtube-trigger] {
-    text-decoration-color: rgb(113 113 122) !important;
-    /* zinc-500 - same as intro-link dark */
+    text-decoration-color: var(--inline-youtube-trigger-decoration) !important;
   }
 
   a[data-inline-youtube-trigger]:hover {

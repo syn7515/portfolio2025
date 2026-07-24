@@ -110,7 +110,7 @@
     text-decoration-line: underline !important;
     text-decoration-style: solid !important;
     text-decoration-skip-ink: auto !important;
-    text-decoration-color: rgb(168 162 158) !important;
+    text-decoration-color: var(--inline-youtube-trigger-decoration) !important;
     text-decoration-thickness: 10% !important;
     text-underline-offset: 0.05rem !important;
     text-underline-position: from-font !important;
@@ -306,7 +306,7 @@
     .mdxContent a.inline-youtube-preview-trigger {
         color: rgb(212 212 216 / 0.7) !important;
         opacity: 0.9;
-        text-decoration-color: rgb(113 113 122 / 0.7) !important;
+        text-decoration-color: var(--inline-youtube-trigger-decoration) !important;
     }
 
     .mdxContent a.inline-youtube-preview-trigger:hover {
