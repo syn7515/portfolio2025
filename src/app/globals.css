@@ -74,6 +74,9 @@
 }
 
 html {
+  /* iOS Safari exposes the root canvas during rubber-band overscroll. Keep it
+     aligned with the page surface so dark mode never reveals a light band. */
+  background-color: var(--background);
   scrollbar-gutter: stable;
   scrollbar-width: thin;
   scrollbar-color: transparent transparent;

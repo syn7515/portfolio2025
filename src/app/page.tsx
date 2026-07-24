@@ -252,7 +252,7 @@ export default function Home() {
           transition={contentTransition(0.56)}
         >
           <div
-            className="text-[14px] text-stone-400 dark:text-zinc-500 font-normal font-sans"
+            className="text-[14px] text-stone-400 dark:text-zinc-500 font-normal font-sans text-balance"
           >
             © {new Date().getFullYear()} Sue Park. — Built with millions of tokens of love.
           </div>
