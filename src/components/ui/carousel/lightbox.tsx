@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client"
 
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
@@ -48,6 +48,70 @@ interface LightboxContentProps {
   exitDuration: number;
   isDarkMode: boolean;
   dimensions: { width: number; height: number };
+}
+
+interface LightboxVideoProps {
+  src: string;
+  poster?: string | null;
+  className: string;
+  style: CSSProperties;
+  autoPlay: boolean;
+  loop: boolean;
+  muted: boolean;
+  controls: boolean;
+  ariaLabel: string;
+}
+
+function LightboxVideo({
+  src,
+  poster,
+  className,
+  style,
+  autoPlay,
+  loop,
+  muted,
+  controls,
+  ariaLabel,
+}: LightboxVideoProps) {
+  const [isReady, setIsReady] = useState(false);
+
+  return (
+    <>
+      {poster && (
+        <img
+          src={poster}
+          alt=""
+          aria-hidden
+          className={className}
+          fetchPriority="high"
+          style={{
+            ...style,
+            opacity: isReady ? 0 : 1,
+            pointerEvents: 'none',
+          }}
+        />
+      )}
+      <video
+        src={src}
+        poster={poster ?? undefined}
+        className={className}
+        autoPlay={autoPlay}
+        loop={loop}
+        muted={muted}
+        controls={controls}
+        playsInline
+        preload="auto"
+        aria-label={ariaLabel}
+        onLoadedData={() => setIsReady(true)}
+        onCanPlay={() => setIsReady(true)}
+        style={{
+          ...style,
+          opacity: isReady ? 1 : 0,
+          pointerEvents: isReady ? 'auto' : 'none',
+        }}
+      />
+    </>
+  );
 }
 
 function LightboxContent({
@@ -109,17 +173,17 @@ function LightboxContent({
                 </div>
               )}
               {hasPositionedVideo && (
-                <video
-                  src={currentItem.videoUrl ?? undefined}
+                <LightboxVideo
+                  key={currentItem.videoUrl}
+                  src={currentItem.videoUrl!}
+                  poster={currentItem.imageUrl}
                   className="absolute object-contain z-[1]"
                   autoPlay={currentItem.videoAutoplay ?? true}
                   loop={currentItem.videoLoop ?? true}
                   muted={currentItem.videoMuted ?? true}
                   controls={currentItem.videoControls ?? false}
-                  playsInline
-                  aria-label={currentItem.alt || currentItem.label || "Lightbox video"}
+                  ariaLabel={currentItem.alt || currentItem.label || "Lightbox video"}
                   style={{
-                    opacity: 1,
                     display: 'block',
                     transformOrigin: 'center center',
                     height: `${currentItem.imageSizePercent}%`,
@@ -136,17 +200,17 @@ function LightboxContent({
                 style={{ backgroundColor: isDarkMode ? '#232326' : '#fafafa' }}
               />
               {hasPositionedVideo ? (
-                <video
-                  src={currentItem.videoUrl ?? undefined}
+                <LightboxVideo
+                  key={currentItem.videoUrl}
+                  src={currentItem.videoUrl!}
+                  poster={currentItem.imageUrl}
                   className="absolute object-contain"
                   autoPlay={currentItem.videoAutoplay ?? true}
                   loop={currentItem.videoLoop ?? true}
                   muted={currentItem.videoMuted ?? true}
                   controls={currentItem.videoControls ?? false}
-                  playsInline
-                  aria-label={currentItem.alt || currentItem.label || "Lightbox video"}
+                  ariaLabel={currentItem.alt || currentItem.label || "Lightbox video"}
                   style={{
-                    opacity: 1,
                     display: 'block',
                     transformOrigin: 'center center',
                     height: `${currentItem.imageSizePercent}%`,
@@ -236,15 +300,17 @@ function LightboxContent({
         {/* overflow-hidden scoped to inner div so border overlay shadow is not clipped */}
         <div className="absolute inset-0 overflow-hidden rounded-[4px]">
           {hasVideo ? (
-            <video
-              src={currentItem.videoUrl ?? undefined}
-              className="object-contain w-full h-full"
+            <LightboxVideo
+              key={currentItem.videoUrl}
+              src={currentItem.videoUrl!}
+              poster={currentItem.imageUrl}
+              className="absolute inset-0 object-contain w-full h-full"
               autoPlay={currentItem.videoAutoplay ?? true}
               loop={currentItem.videoLoop ?? true}
               muted={currentItem.videoMuted ?? true}
               controls={currentItem.videoControls ?? false}
-              playsInline
-              style={{ opacity: 1, display: 'block', transformOrigin: 'center center' }}
+              ariaLabel={currentItem.alt || currentItem.label || "Lightbox video"}
+              style={{ display: 'block', transformOrigin: 'center center' }}
             />
           ) : (
             <img

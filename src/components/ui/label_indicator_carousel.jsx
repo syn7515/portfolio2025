@@ -217,9 +217,24 @@ export default function LabelIndicatorCarousel({
       const cardIndex = supCardMap[e.detail.supId]
       if (cardIndex !== undefined) {
         setIndex(cardIndex)
-        wrapperRef.current
+        const target = wrapperRef.current
           ?.querySelector(`[data-carousel-item="${cardIndex}"]`)
-          ?.scrollIntoView({ behavior: scrollBehavior(), block: 'center' })
+
+        if (target) {
+          const targetRect = target.getBoundingClientRect()
+          const top = window.scrollY + targetRect.top
+            - (window.innerHeight - targetRect.height) / 2
+
+          // scrollIntoView also scrolls overflow-hidden ancestors horizontally.
+          // This carousel has an intentional right offset at large viewports, so
+          // that behavior changes its scrollLeft and makes the cards jump left.
+          // Scroll only the window's vertical axis and preserve horizontal state.
+          window.scrollTo({
+            top: Math.max(0, top),
+            left: window.scrollX,
+            behavior: scrollBehavior(),
+          })
+        }
       }
     }
     window.addEventListener('sup-navigate', handler)

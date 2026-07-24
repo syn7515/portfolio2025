@@ -152,6 +152,7 @@ export function CarouselCard({
                   hasPositionedVideo ? (
                     <video
                       src={videoUrl}
+                      poster={imageUrl ?? undefined}
                       className="absolute object-contain z-[1]"
                       autoPlay={videoAutoplay}
                       loop={videoLoop}
@@ -169,6 +170,7 @@ export function CarouselCard({
                   ) : (
                     <video
                       src={videoUrl}
+                      poster={imageUrl ?? undefined}
                       className="absolute inset-0 w-full h-full object-cover z-[1]"
                       autoPlay={videoAutoplay}
                       loop={videoLoop}
@@ -187,6 +189,7 @@ export function CarouselCard({
                   hasPositionedVideo ? (
                   <video
                     src={videoUrl}
+                    poster={imageUrl ?? undefined}
                     className="absolute object-contain"
                     autoPlay={videoAutoplay}
                     loop={videoLoop}
@@ -209,6 +212,7 @@ export function CarouselCard({
                 ) : (
                   <video
                     src={videoUrl}
+                    poster={imageUrl ?? undefined}
                     className="w-full h-full object-cover"
                     autoPlay={videoAutoplay}
                     loop={videoLoop}
