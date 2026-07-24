@@ -75,7 +75,7 @@ export const metadata: Metadata = {
     siteName: "Sue Park",
     images: [
       {
-        url: "/og-image",
+        url: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/og-image.png",
         width: 1200,
         height: 630,
         type: "image/png",
@@ -90,7 +90,7 @@ export const metadata: Metadata = {
     description: "Sue Park — Portfolio",
     images: [
       {
-        url: "/og-image",
+        url: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/og-image.png",
         width: 1200,
         height: 630,
         type: "image/png",
