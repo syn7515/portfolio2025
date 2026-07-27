@@ -7,6 +7,11 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import MotionProvider from "@/components/motion-provider";
 import "./globals.css";
 
+// X and other social crawlers cache card images by URL. Bump this fingerprint
+// whenever og-image.png is replaced in Vercel Blob.
+const OG_IMAGE_URL =
+  "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/og-image.png?v=cd63c326";
+
 const inter = localFont({
   src: [
     {
@@ -75,7 +80,7 @@ export const metadata: Metadata = {
     siteName: "Sue Park",
     images: [
       {
-        url: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/og-image.png",
+        url: OG_IMAGE_URL,
         width: 1200,
         height: 630,
         type: "image/png",
@@ -90,7 +95,7 @@ export const metadata: Metadata = {
     description: "Sue Park — Portfolio",
     images: [
       {
-        url: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/og-image.png",
+        url: OG_IMAGE_URL,
         width: 1200,
         height: 630,
         type: "image/png",
