@@ -7,10 +7,10 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import MotionProvider from "@/components/motion-provider";
 import "./globals.css";
 
-// X and other social crawlers cache card images by URL. Bump this fingerprint
-// whenever og-image.png is replaced in Vercel Blob.
+// X and other social crawlers cache card images by URL. Use a content-versioned
+// filename so replacing the image always produces a new crawler cache key.
 const OG_IMAGE_URL =
-  "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/og-image.png?v=cd63c326";
+  "https://suepark.xyz/og-image-cd63c326.png";
 
 const inter = localFont({
   src: [
