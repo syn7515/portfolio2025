@@ -18,14 +18,14 @@ export const PAPER_EXIT_OFFSCREEN = {
   opacity: 0,
 }
 
-// Accelerate curve (Material Design's standard exit easing): speeds up continuously with no
-// decelerating tail, since the sheet is leaving the screen rather than settling into place.
-const EXIT_EASE: [number, number, number, number] = [0.4, 0, 1, 1]
-const EXIT_DURATION = 0.3
+// Match the entrance's decisive ease-out: the sheet launches immediately, then sheds velocity
+// smoothly as it clears the viewport instead of starting slowly and accelerating away.
+const EXIT_EASE: [number, number, number, number] = [0.23, 1, 0.32, 1]
+const EXIT_DURATION = 0.7
 // Opacity gets a head-start delay so the sheet stays visibly solid while the slide/rotate/blur are
 // just getting going, rather than dissolving from the very first frame. The fade then compresses
 // into the remaining time so it still finishes exactly when the rest of the animation does.
-const EXIT_OPACITY_DELAY = 0.1
+const EXIT_OPACITY_DELAY = 0.2
 
 const EXIT_TRANSITION_FULL = { duration: EXIT_DURATION, ease: EXIT_EASE }
 const EXIT_OPACITY_TRANSITION_FULL = {
