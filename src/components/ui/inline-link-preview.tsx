@@ -170,9 +170,12 @@ export function InlineLinkPreview({
           onBlur={hideExplanation}
           className={cn(
             variant,
-            'relative focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-600/40 focus-visible:ring-offset-1 rounded',
+            'relative inline-block align-baseline focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-600/40 focus-visible:ring-offset-1 rounded motion-safe:active:scale-[0.97]',
             className
           )}
+          style={{
+            transition: 'color 150ms ease-out, text-decoration-color 150ms ease-out, scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
+          }}
           aria-describedby={explanation ? descriptionId : undefined}
         >
           <span

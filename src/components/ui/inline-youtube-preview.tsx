@@ -252,9 +252,12 @@ export function InlineYoutubePreview({
         role="button"
         tabIndex={0}
         className={cn(
-          'intro-link inline-youtube-preview-trigger relative focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 dark:focus-visible:ring-zinc-500 focus-visible:ring-offset-1 rounded',
+          'intro-link inline-youtube-preview-trigger relative inline-block align-baseline focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 dark:focus-visible:ring-zinc-500 focus-visible:ring-offset-1 rounded motion-safe:active:scale-[0.97]',
           className
         )}
+        style={{
+          transition: 'color 150ms ease-out, text-decoration-color 150ms ease-out, scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
+        }}
         aria-label={`Play video: ${watchUrl}`}
       >
         <span

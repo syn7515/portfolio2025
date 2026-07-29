@@ -226,8 +226,11 @@ export default function Home() {
               target="_blank"
               rel="noopener noreferrer"
               data-social-link-trigger
-              className="!text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-orange-400"
-              style={{ fontSize: '14px' }}
+              className="!text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-orange-400 motion-safe:active:scale-[0.97]"
+              style={{
+                fontSize: '14px',
+                transition: 'scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
+              }}
             >
               X
             </a>
@@ -237,8 +240,11 @@ export default function Home() {
               target="_blank"
               rel="noopener noreferrer"
               data-social-link-trigger
-              className="!text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-orange-400"
-              style={{ fontSize: '14px' }}
+              className="!text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-orange-400 motion-safe:active:scale-[0.97]"
+              style={{
+                fontSize: '14px',
+                transition: 'scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
+              }}
             >
               LinkedIn
             </a>

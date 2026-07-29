@@ -82,6 +82,8 @@
 }
 
 .mdxContent a {
+    display: inline-block;
+    vertical-align: baseline;
     color: rgb(68 64 60) !important;
     /* text-blue-600 */
     cursor: pointer !important;
@@ -95,6 +97,7 @@
     text-underline-offset: 0.05rem;
     /* underline-offset-1 = 2px */
     text-underline-position: from-font;
+    transition: color 150ms ease-out, text-decoration-color 150ms ease-out, scale 150ms cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .mdxContent a:hover {
@@ -103,6 +106,12 @@
     text-decoration-color: rgb(234 88 12) !important;
     /* stone-500 - darker underline on hover */
     opacity: 1 !important;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .mdxContent a:active {
+        scale: 0.97;
+    }
 }
 
 /* Inline YouTube preview trigger: force underline + italic (wins over preflight and .mdxContent a) */
