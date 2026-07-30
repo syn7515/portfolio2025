@@ -46,9 +46,12 @@ export default function SupRef({ id }: SupRefProps) {
     <span
       id={`sup-body-${id}`}
       onClick={handleClick}
-      className={`${SUP_BADGE_BASE_CLASS} ${
+      className={`${SUP_BADGE_BASE_CLASS} motion-safe:active:scale-[0.97] ${
         isHighlighted ? SUP_BADGE_HIGHLIGHTED_CLASS : SUP_BADGE_DEFAULT_CLASS
       }`}
+      style={{
+        transition: 'color 200ms ease-out, scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
+      }}
     >
       <span
         aria-hidden="true"

@@ -303,7 +303,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
             aria-label="Back to home"
             onClick={() => sessionStorage.setItem(PAPER_BACK_NAV_FLAG, PAPER_BACK_NAV_VALUE)}
           >
-            <Undo2 className="size-4 flex-shrink-0" />
+            <Undo2 className="size-4 flex-shrink-0 -translate-y-px" />
             Home
           </Link>
           <BlogPostToc />
