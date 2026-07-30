@@ -48,7 +48,7 @@ Commercial kitchens move fast and AlphaGrill automates one task: grilling pattie
 
 Two decisions anchored the redesign:
 
-**Showing readiness, not temperature<SupRef id={1} />** Chefs didn't want to know the current temperature — they wanted to know when the robot would be ready. I replaced numeric readings with a circular gauge showing degrees remaining, matching the question they were actually asking.
+**Showing readiness, not raw data<SupRef id={1} />** The current temperature reading didn't tell chefs much—they wanted to know when the robot would be ready. I replaced numeric readings with a circular progress gauge that visualized the countdown to readiness, directly answering what they actually needed.
 
 **Tapping instead of swiping<SupRef id={2} />** Swipe-based recipe selection failed often with oily gloved hands. Tap won on reliability. Swipe requires recognizing both position and direction; tap needs only position — which lowers both the time per action and the failure rate.
 <Table
@@ -69,9 +69,9 @@ Kitchen robots need regular cleaning, but the original AlphaGrill wasn't designe
 The reframe: cleaning already happens at closing. The opportunity wasn't to enforce it, but to fold it into that existing routine.
 
 Three findings from research shaped the newly added cleaning mode:
-- Low-visibility surfaces were the ones being easily skipped.
 - Kitchen staff were pouring water on hot griddles, causing deformation.
 - Staff were reluctant to handle the hot grill parts, leading them to skip cleaning.
+- Low-visibility surfaces were the ones being easily skipped.
 
 <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] my-20">
   <LabelIndicatorCarousel
