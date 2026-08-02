@@ -176,8 +176,8 @@
 .mdxContent blockquote {
     color: rgb(68 64 60) !important;
     /* stone-700 */
-    border-left-width: 4px;
-    /* border-l-4 */
+    border-left-width: 2px;
+    /* border-l-2 */
     border-color: rgb(234 88 12);
     /* orange-600 */
     padding-left: 1rem;
