@@ -116,7 +116,7 @@ export function CarouselCard({
             : isActive
             ? canOpenLightboxFromCard ? 'cursor-zoom-in' : 'cursor-default'
             : index < currentIndex ? 'cursor-[w-resize]' : 'cursor-[e-resize]'
-        } focus-visible:ring-2 focus-visible:ring-stone-400 ${!disableCursor && !isActive ? 'hover:opacity-70' : ''}`}
+        } focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-600/60 dark:focus-visible:ring-orange-300/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background ${!disableCursor && !isActive ? 'hover:opacity-70' : ''}`}
         style={{
           width: "100%",
           aspectRatio: '16/9',

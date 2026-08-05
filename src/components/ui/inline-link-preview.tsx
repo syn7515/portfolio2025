@@ -170,7 +170,7 @@ export function InlineLinkPreview({
           onBlur={hideExplanation}
           className={cn(
             variant,
-            'relative inline-block align-baseline focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-600/40 focus-visible:ring-offset-1 rounded motion-safe:active:scale-[0.97]',
+            'relative inline-block align-baseline focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-600/60 dark:focus-visible:ring-orange-300/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background rounded motion-safe:active:scale-[0.97]',
             className
           )}
           style={{

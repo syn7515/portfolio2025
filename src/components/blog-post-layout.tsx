@@ -378,7 +378,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
 
                 {/* Project Navigation Footer — inside paper */}
                 {(previousProject || nextProject) ? (
-                  <div className="max-w-[560px] mx-auto min-[1280px]:max-w-none mt-16 min-[1280px]:mt-32 pb-12 min-[640px]:pb-16 min-[1280px]:pb-[120px] overflow-x-hidden">
+                  <div className="max-w-[560px] mx-auto min-[1280px]:max-w-none mt-16 min-[1280px]:mt-32 pb-12 min-[640px]:pb-16 min-[1280px]:pb-[120px] overflow-x-visible">
                     <Divider variant="default" color="stone" spacing="md" />
                     <div className="flex justify-between items-start mt-4 min-[1280px]:mt-12 gap-8">
                       {/* Previous Project */}

@@ -127,7 +127,24 @@ html:hover::-webkit-scrollbar-thumb:hover {
   opacity: 1 !important;
 }
 
+/* Keep keyboard focus consistent across native controls and components. */
+:focus {
+  @apply outline-none;
+}
+
+:focus-visible {
+  @apply ring-2 ring-orange-600/60 ring-offset-1 ring-offset-background;
+}
+
+a:focus-visible {
+  @apply rounded;
+}
+
 @media (prefers-color-scheme: dark) {
+  :focus-visible {
+    @apply ring-orange-300/60;
+  }
+
   ::selection {
     background-color: rgb(249 115 22 / 0.15) !important;
     /* orange-500 / 15% */
@@ -295,7 +312,7 @@ a {
   font-style: italic;
 }
 
-a:hover {
+a:is(:hover, :focus-visible) {
   color: rgb(29 78 216);
 }
 
@@ -427,7 +444,7 @@ pre code {
   font-style: italic;
 }
 
-.prose a:hover {
+.prose a:is(:hover, :focus-visible) {
   color: rgb(194 65 12);
   /* orange-700 */
 }
@@ -456,7 +473,7 @@ pre code {
     cursor: pointer;
   }
 
-  a:hover {
+  a:is(:hover, :focus-visible) {
     color: rgb(254 215 170);
     /* orange-200 */
   }
@@ -495,7 +512,7 @@ pre code {
     cursor: pointer;
   }
 
-  .prose a:hover {
+  .prose a:is(:hover, :focus-visible) {
     color: rgb(254 215 170);
     /* orange-200 */
   }
@@ -520,7 +537,7 @@ pre code {
   font-style: italic !important;
 }
 
-.intro-link:hover {
+.intro-link:is(:hover, :focus-visible) {
   color: rgb(194 65 12) !important;
   /* orange-700 */
   text-decoration-color: rgb(194 65 12) !important;
@@ -537,7 +554,7 @@ a[data-inline-youtube-trigger] {
   font-style: italic !important;
 }
 
-a[data-inline-youtube-trigger]:hover {
+a[data-inline-youtube-trigger]:is(:hover, :focus-visible) {
   color: rgb(234 88 12) !important;
   text-decoration-color: rgb(234 88 12) !important;
 }
@@ -583,7 +600,7 @@ a[data-social-link-trigger] {
   font-style: normal !important;
 }
 
-a[data-social-link-trigger]:hover {
+a[data-social-link-trigger]:is(:hover, :focus-visible) {
   text-decoration-color: rgb(194 65 12) !important;
   /* orange-700 */
 }
@@ -620,7 +637,7 @@ a[data-mobile-menu-current] {
   font-style: italic;
 }
 
-.intro-link-light:hover {
+.intro-link-light:is(:hover, :focus-visible) {
   color: rgb(68 64 60) !important;
   /* stone-700 - darker on hover */
   text-decoration-color: rgb(194 65 12) !important;
@@ -637,7 +654,7 @@ a[data-mobile-menu-current] {
     /* zinc-500 */
   }
 
-  .intro-link:hover {
+  .intro-link:is(:hover, :focus-visible) {
     color: rgb(254 215 170) !important;
     /* orange-200 */
     text-decoration-color: rgb(254 215 170) !important;
@@ -648,7 +665,7 @@ a[data-mobile-menu-current] {
     text-decoration-color: var(--inline-youtube-trigger-decoration) !important;
   }
 
-  a[data-inline-youtube-trigger]:hover {
+  a[data-inline-youtube-trigger]:is(:hover, :focus-visible) {
     color: rgb(253 186 116) !important;
     /* orange-300 */
     text-decoration-color: rgb(253 186 116) !important;
@@ -678,7 +695,7 @@ a[data-mobile-menu-current] {
     /* zinc-500 - same as intro-link dark */
   }
 
-  a[data-social-link-trigger]:hover {
+  a[data-social-link-trigger]:is(:hover, :focus-visible) {
     text-decoration-color: rgb(251 146 60) !important;
     /* orange-400 */
   }
@@ -692,7 +709,7 @@ a[data-mobile-menu-current] {
     /* zinc-500 */
   }
 
-  .intro-link-light:hover {
+  .intro-link-light:is(:hover, :focus-visible) {
     color: rgb(212 212 216) !important;
     /* zinc-300 - lighter on hover */
     text-decoration-color: rgb(254 215 170) !important;

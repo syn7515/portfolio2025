@@ -44,9 +44,9 @@ const dividerStyle: CSSProperties = {
   backgroundRepeat: 'repeat-x',
 };
 
-const titleClassName = "!text-stone-700 dark:!text-zinc-200 transition-colors duration-150 group-hover:!text-orange-700 dark:group-hover:!text-orange-400";
-const dividerClassName = "w-full h-[2px] !text-stone-300 dark:!text-zinc-700 transition-[color,opacity] duration-150 group-hover:opacity-40 group-hover:!text-orange-700 dark:group-hover:!text-orange-400";
-const datesClassName = "text-[15px] !font-[460] leading-[160%] font-sans !text-stone-400 dark:!text-zinc-500 whitespace-nowrap transition-[color,opacity] duration-150 group-hover:opacity-[0.65] group-hover:!text-orange-700 dark:group-hover:!text-orange-400";
+const titleClassName = "!text-stone-700 dark:!text-zinc-200 transition-colors duration-150 group-hover:!text-orange-700 group-focus-visible:!text-orange-700 dark:group-hover:!text-orange-400 dark:group-focus-visible:!text-orange-400";
+const dividerClassName = "w-full h-[2px] !text-stone-300 dark:!text-zinc-700 transition-[color,opacity] duration-150 group-hover:opacity-40 group-focus-visible:opacity-40 group-hover:!text-orange-700 group-focus-visible:!text-orange-700 dark:group-hover:!text-orange-400 dark:group-focus-visible:!text-orange-400";
+const datesClassName = "text-[15px] !font-[460] leading-[160%] font-sans !text-stone-400 dark:!text-zinc-500 whitespace-nowrap transition-[color,opacity] duration-150 group-hover:opacity-[0.65] group-focus-visible:opacity-[0.65] group-hover:!text-orange-700 group-focus-visible:!text-orange-700 dark:group-hover:!text-orange-400 dark:group-focus-visible:!text-orange-400";
 
 export default function ProjectListItem({
   title,
@@ -66,7 +66,7 @@ export default function ProjectListItem({
     >
       <Link
         href={href}
-        className="group block w-full cursor-pointer py-2"
+        className="group block w-full cursor-pointer rounded py-2"
         style={{ textDecoration: 'none' }}
       >
         {/* Mobile: title wraps on its own line, dates as a small line below (no divider — it has nothing to lead into on its own row) */}
