@@ -1,4 +1,25 @@
 /* MDX Content Styles - High specificity to override global CSS */
+@keyframes content-blur-reveal {
+    from {
+        filter: blur(6px);
+        opacity: 0;
+    }
+
+    to {
+        filter: blur(0);
+        opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .contentBlurRevealItem,
+    .contentBlurReveal > :not(:has([data-carousel])),
+    .contentBlurReveal > * > :not(:has([data-carousel])),
+    .contentBlurReveal [data-carousel-layer] {
+        animation: content-blur-reveal 350ms cubic-bezier(0.23, 1, 0.32, 1);
+    }
+}
+
 .mdxContent h1 {
     color: rgb(68 64 60) !important;
     /* stone-700 */

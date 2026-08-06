@@ -353,18 +353,33 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           <div
             className="pt-20 xs:pt-20 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] min-[1280px]:pt-[clamp(6.25rem,calc(18.182vw_-_8.295rem),8.75rem)]"
           >
-            <div className="px-6 min-[1280px]:px-0 min-[1280px]:ml-[calc(50vw_-_280px_-_var(--sidebar-w))] min-[1280px]:w-[560px]">
+              <div className="px-6 min-[1280px]:px-0 min-[1280px]:ml-[calc(50vw_-_280px_-_var(--sidebar-w))] min-[1280px]:w-[560px]">
                 {/* Header: title, subtitle */}
-                <BlogPostHeader slug={slug} title={title} subtitle={subtitle} />
+                <div className={contentVisible ? styles.contentBlurRevealItem : undefined}>
+                  <BlogPostHeader slug={slug} title={title} subtitle={subtitle} />
+                </div>
 
                 {/* Content */}
-                <div className={cn(styles.mdxContent, 'max-w-[560px] mx-auto')} data-blog-content data-inline-link-preview-boundary>
+                <div
+                  className={cn(
+                    styles.mdxContent,
+                    'max-w-[560px] mx-auto',
+                    contentVisible && styles.contentBlurReveal
+                  )}
+                  data-blog-content
+                  data-inline-link-preview-boundary
+                >
                   {children}
                 </div>
 
                 {/* Project Navigation Footer — inside paper */}
                 {(previousProject || nextProject) ? (
-                  <div className="max-w-[560px] mx-auto min-[1280px]:max-w-none mt-16 min-[1280px]:mt-32 pb-12 min-[640px]:pb-16 min-[1280px]:pb-[120px] overflow-x-visible">
+                  <div
+                    className={cn(
+                      'max-w-[560px] mx-auto min-[1280px]:max-w-none mt-16 min-[1280px]:mt-32 pb-12 min-[640px]:pb-16 min-[1280px]:pb-[120px] overflow-x-visible',
+                      contentVisible && styles.contentBlurRevealItem
+                    )}
+                  >
                     <Divider variant="default" color="stone" spacing="md" />
                     <div className="flex justify-between items-start mt-4 min-[1280px]:mt-12 gap-8">
                       {/* Previous Project */}

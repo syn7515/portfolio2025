@@ -433,7 +433,7 @@ export default function LabelIndicatorCarousel({
       data-carousel
       aria-label={ariaLabel}
     >
-      <div className="relative z-[50] flex flex-col items-center justify-center w-full">
+      <div data-carousel-layer className="relative z-[50] flex flex-col items-center justify-center w-full">
         {/* Always a vertical stack, at every viewport size */}
         {/* `left` (not transform) applies the shift without creating a stacking
             context — the cards' z-order must stay resolvable at the root level
