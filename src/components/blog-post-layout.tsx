@@ -98,7 +98,8 @@ function preventWidow(text: string): React.ReactNode {
   )
 }
 
-// Paper entrance animation: paper slides in from the top-right corner with a blur-in, then content fades in on top of it
+// Paper entrance animation: paper slides in from the top-right corner with a blur-in, then content
+// is revealed at full opacity on the landing frame.
 // ease-out: starts fast (paper shoots in), decelerates to a gentle landing — correct for entering elements.
 const ENTRANCE_EASE: [number, number, number, number] = [0.23, 1, 0.32, 1]
 const PAPER_SLIDE_DURATION = 0.45
@@ -123,14 +124,10 @@ const PAPER_TRANSITION_FULL = {
   opacity: { duration: PAPER_SLIDE_DURATION * 0.55, ease: ENTRANCE_EASE },
 }
 const PAPER_TRANSITION_REDUCED = { duration: 0 }
-const CONTENT_FADE_TRANSITION = { duration: 0.5, ease: ENTRANCE_EASE }
 
 // Slide-out (backwards navigation, footer Previous or sidebar Home) uses its own easing/duration/
 // opacity pacing, independent of the entrance above — see src/lib/paper-exit-transition.ts, which
 // is shared with app/page.tsx so both exits feel identical.
-const CONTENT_FADE_INSTANT = { duration: 0 }
-const CONTENT_FADE_HIDDEN = { opacity: 0 }
-const CONTENT_FADE_VISIBLE = { opacity: 1 }
 
 // Wall-clock floor for revealing content. The reveal is normally driven by the entrance overlay's
 // onAnimationComplete, which runs on Framer's requestAnimationFrame loop — and browsers throttle rAF
@@ -191,10 +188,6 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
   // never-transformed) content underneath it. See the "Real paper" / "Decorative entrance overlay"
   // comments below for why content and the slide animation live on separate elements.
   const [contentVisible, setContentVisible] = useState(false)
-  // Set only when the reveal is forced by the fallback timer below rather than the entrance
-  // completing normally, so the content skips its fade and appears instantly (a fade would itself
-  // be a frozen rAF animation in exactly the situations the fallback exists to recover from).
-  const [instantReveal, setInstantReveal] = useState(false)
   // Backwards navigation (footer "Previous" or sidebar "Home"): instead of a new paper sliding in,
   // the current top sheet slides OUT to the top-right, revealing this post's content already sitting
   // on the paper underneath. Signaled across the route change via sessionStorage (set in the
@@ -208,9 +201,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
     if (sessionStorage.getItem(PAPER_BACK_NAV_FLAG) === PAPER_BACK_NAV_VALUE) {
       sessionStorage.removeItem(PAPER_BACK_NAV_FLAG)
       setExitEntrance(true)
-      // Content must be fully present beneath the departing sheet before it moves, so reuse the
-      // instant-reveal path: dummy paper fades, real paper turns visible, content opacity snaps to 1.
-      setInstantReveal(true)
+      // Content must be fully present beneath the departing sheet before it moves.
       setContentVisible(true)
     }
     setAnimationReady(true)
@@ -221,7 +212,6 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
   useEffect(() => {
     if (contentVisible) return
     const timer = setTimeout(() => {
-      setInstantReveal(true)
       setContentVisible(true)
     }, ENTRANCE_FALLBACK_MS)
     return () => clearTimeout(timer)
@@ -348,12 +338,11 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
         />
 
         {/* Real paper: holds the actual header/content/footer, floats after sidebar at ≥1500px. This
-            element is never transformed — a transform/filter (even an identity one like
-            translate(0,0)) permanently creates a CSS stacking context, which would trap descendants
-            (e.g. the carousel's z-[50]) below page-level fixed overlays like the top-edge fade
-            regardless of their own z-index. So the slide-in visual lives on a separate, disposable
-            overlay below, and this element just stays hidden (via `visibility`, which does not create
-            a stacking context) until that overlay lands. */}
+            element and its content wrapper are never transformed or faded — transform, filter, and
+            opacity below 1 create stacking contexts that would trap descendants (e.g. the carousel's
+            z-[50]) below page-level fixed overlays like the top-edge fade regardless of their own
+            z-index. The slide-in visual therefore lives on a separate, disposable overlay below,
+            while this element stays hidden via `visibility` until that overlay lands. */}
         <div
           className={cn(
             'flex-1 min-[1280px]:mt-[100px] overflow-x-clip relative',
@@ -361,11 +350,8 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           )}
           style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}
         >
-          <motion.div
+          <div
             className="pt-20 xs:pt-20 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] min-[1280px]:pt-[clamp(6.25rem,calc(18.182vw_-_8.295rem),8.75rem)]"
-            initial={CONTENT_FADE_HIDDEN}
-            animate={contentVisible ? CONTENT_FADE_VISIBLE : CONTENT_FADE_HIDDEN}
-            transition={instantReveal ? CONTENT_FADE_INSTANT : CONTENT_FADE_TRANSITION}
           >
             <div className="px-6 min-[1280px]:px-0 min-[1280px]:ml-[calc(50vw_-_280px_-_var(--sidebar-w))] min-[1280px]:w-[560px]">
                 {/* Header: title, subtitle */}
@@ -445,7 +431,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                   <div className="pb-12 min-[1280px]:pb-[148px]" aria-hidden />
                 )}
               </div>
-          </motion.div>
+          </div>
         </div>
 
         {/* Decorative entrance overlay: plays the slide-in-from-top-right-corner-with-a-blur-in visual
