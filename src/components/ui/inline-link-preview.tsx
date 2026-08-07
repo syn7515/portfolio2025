@@ -208,7 +208,9 @@ export function InlineLinkPreview({
               }}
               initial={{ opacity: 0, y: isAbove ? 4 : -4, filter: 'blur(1.5px)' }}
               animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, transition: { duration: 0 } }}
+              // Blurs away rather than cutting, but short enough to still read as
+              // immediate. No y offset on exit — the drift is what felt laggy.
+              exit={{ opacity: 0, filter: 'blur(1px)', transition: { duration: 0.12, ease: 'easeOut' } }}
               transition={{ duration: 0.18, ease: [0.25, 0.1, 0.25, 1] }}
             >
               <DescriptionBackdrop />
@@ -232,7 +234,7 @@ export function InlineLinkPreview({
               }}
               initial={{ opacity: 0, filter: 'blur(1.5px)' }}
               animate={{ opacity: 1, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, transition: { duration: 0 } }}
+              exit={{ opacity: 0, filter: 'blur(1px)', transition: { duration: 0.12, ease: 'easeOut' } }}
               transition={{ duration: 0.18, ease: [0.25, 0.1, 0.25, 1] }}
             >
               <DescriptionBackdrop />

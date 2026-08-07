@@ -212,7 +212,9 @@ export function InlineYoutubePreview({
         }}
         initial={{ opacity: 0, y: previewPosition.isSideRail ? 0 : -8, filter: "blur(2px)" }}
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-        exit={{ opacity: 0, transition: { duration: 0 } }}
+        // Blurs away rather than cutting, but short enough to still read as
+        // immediate. No y offset on exit — the drift is what felt laggy.
+        exit={{ opacity: 0, filter: "blur(2px)", transition: { duration: 0.12, ease: "easeOut" } }}
         transition={{ type: "spring", duration: 0.2, bounce: 0 }}
         aria-hidden
       >
