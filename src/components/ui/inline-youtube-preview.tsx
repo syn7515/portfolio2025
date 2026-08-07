@@ -15,6 +15,7 @@ const SIDE_RAIL_GAP = 32
 const SIDE_RAIL_MIN_WIDTH = 220
 const VIEWPORT_EDGE_GAP = 24
 
+/** Document-space coordinates so the preview scrolls natively with the page. */
 interface PreviewPosition {
   left: number
   top: number
@@ -114,9 +115,11 @@ export function InlineYoutubePreview({
 
       if (width >= SIDE_RAIL_MIN_WIDTH) {
         const height = width * PREVIEW_HEIGHT / PREVIEW_WIDTH
+        // Clamped against the viewport once, then stored in document space.
+        const top = Math.max(VIEWPORT_EDGE_GAP, Math.min(anchorRect.top - 1, window.innerHeight - height - VIEWPORT_EDGE_GAP))
         setPreviewPosition({
-          left,
-          top: Math.max(VIEWPORT_EDGE_GAP, Math.min(anchorRect.top - 1, window.innerHeight - height - VIEWPORT_EDGE_GAP)),
+          left: left + window.scrollX,
+          top: top + window.scrollY,
           width,
           height,
           isSideRail: true,
@@ -131,8 +134,8 @@ export function InlineYoutubePreview({
     const top = anchorRect.top - ANCHOR_GAP - fallbackHeight
     const { left: clampedLeft, top: clampedTop } = clampPosition(left, top, fallbackWidth, fallbackHeight)
     setPreviewPosition({
-      left: clampedLeft,
-      top: clampedTop,
+      left: clampedLeft + window.scrollX,
+      top: clampedTop + window.scrollY,
       width: fallbackWidth,
       height: fallbackHeight,
       isSideRail: false,
@@ -170,11 +173,11 @@ export function InlineYoutubePreview({
   useEffect(() => {
     if (!isHovered) return
 
+    // No scroll listener: the preview is positioned in document space, so the
+    // browser keeps it pinned to the anchor without a frame of JS-driven lag.
     window.addEventListener('resize', updatePreviewPosition, { passive: true })
-    window.addEventListener('scroll', updatePreviewPosition, true)
     return () => {
       window.removeEventListener('resize', updatePreviewPosition)
-      window.removeEventListener('scroll', updatePreviewPosition, true)
     }
   }, [isHovered, updatePreviewPosition])
 
@@ -200,7 +203,7 @@ export function InlineYoutubePreview({
     isHovered && previewPosition && typeof document !== 'undefined' ? (
       <motion.div
         key="preview"
-        className="fixed z-50 overflow-hidden bg-stone-900 dark:bg-zinc-900 shadow-lg pointer-events-none"
+        className="absolute z-50 overflow-hidden bg-stone-900 dark:bg-zinc-900 shadow-lg pointer-events-none"
         style={{
           left: previewPosition.left,
           top: previewPosition.top,
@@ -209,7 +212,7 @@ export function InlineYoutubePreview({
         }}
         initial={{ opacity: 0, y: previewPosition.isSideRail ? 0 : -8, filter: "blur(2px)" }}
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-        exit={{ opacity: 0, y: previewPosition.isSideRail ? 0 : -4, filter: "blur(2px)" }}
+        exit={{ opacity: 0, transition: { duration: 0 } }}
         transition={{ type: "spring", duration: 0.2, bounce: 0 }}
         aria-hidden
       >

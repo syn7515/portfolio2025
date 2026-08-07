@@ -14,6 +14,7 @@ const VIEWPORT_EDGE_GAP = 24
 const SIDE_RAIL_MIN_WIDTH = 220
 const LOCAL_DESCRIPTION_MAX_WIDTH = 480
 
+/** Document-space coordinates so the rail scrolls natively with the page. */
 interface SideRailPosition {
   left: number
   top: number
@@ -87,9 +88,11 @@ export function InlineLinkPreview({
         const width = Math.min(SIDE_RAIL_MAX_WIDTH, window.innerWidth - left - VIEWPORT_EDGE_GAP)
 
         if (width >= SIDE_RAIL_MIN_WIDTH) {
+          // Clamped against the viewport once, then stored in document space.
+          const top = Math.max(VIEWPORT_EDGE_GAP, Math.min(anchorRect.top - 1, window.innerHeight - 72))
           setSideRailPosition({
-            left,
-            top: Math.max(VIEWPORT_EDGE_GAP, Math.min(anchorRect.top - 1, window.innerHeight - 72)),
+            left: left + window.scrollX,
+            top: top + window.scrollY,
             width,
           })
           setLocalDescriptionLayout(null)
@@ -135,11 +138,11 @@ export function InlineLinkPreview({
   useEffect(() => {
     if (!showExplanation) return
 
+    // No scroll listener: the description is positioned in document space, so the
+    // browser keeps it pinned to the anchor without a frame of JS-driven lag.
     window.addEventListener('resize', updateSideRailPosition, { passive: true })
-    window.addEventListener('scroll', updateSideRailPosition, true)
     return () => {
       window.removeEventListener('resize', updateSideRailPosition)
-      window.removeEventListener('scroll', updateSideRailPosition, true)
     }
   }, [descriptionPosition, showExplanation, updateSideRailPosition])
 
@@ -205,7 +208,7 @@ export function InlineLinkPreview({
               }}
               initial={{ opacity: 0, y: isAbove ? 4 : -4, filter: 'blur(1.5px)' }}
               animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, y: isAbove ? 2 : -2, filter: 'blur(1px)' }}
+              exit={{ opacity: 0, transition: { duration: 0 } }}
               transition={{ duration: 0.18, ease: [0.25, 0.1, 0.25, 1] }}
             >
               <DescriptionBackdrop />
@@ -220,7 +223,7 @@ export function InlineLinkPreview({
           {showSideRailExplanation && (
             <motion.span
               aria-hidden
-              className="pointer-events-none fixed z-50 isolate block whitespace-normal text-balance text-[22px] font-normal leading-[1.15] tracking-[-0.01em] text-stone-700 dark:text-zinc-200"
+              className="pointer-events-none absolute z-50 isolate block whitespace-normal text-balance text-[22px] font-normal leading-[1.15] tracking-[-0.01em] text-stone-700 dark:text-zinc-200"
               style={{
                 left: sideRailPosition.left,
                 top: sideRailPosition.top,
@@ -229,7 +232,7 @@ export function InlineLinkPreview({
               }}
               initial={{ opacity: 0, filter: 'blur(1.5px)' }}
               animate={{ opacity: 1, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, filter: 'blur(1px)' }}
+              exit={{ opacity: 0, transition: { duration: 0 } }}
               transition={{ duration: 0.18, ease: [0.25, 0.1, 0.25, 1] }}
             >
               <DescriptionBackdrop />

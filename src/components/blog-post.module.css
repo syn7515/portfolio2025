@@ -458,8 +458,8 @@
     }
 
     .mdxContent strong {
-        color: rgb(254 254 253 / 0.7) !important;
-        /* zinc-50 */
+        color: rgb(254 254 253 / 0.9) !important;
+        /* near-white at 90% */
         font-weight: 540;
         opacity: 1;
     }
