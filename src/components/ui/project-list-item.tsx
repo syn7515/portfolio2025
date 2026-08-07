@@ -2,15 +2,15 @@
 
 import type { ReactNode, CSSProperties } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 
 interface ProjectListItemProps {
   title: string;
   dates: string;
   href: string;
-  initial?: { opacity: number; y: number; filter?: string } | false;
-  animate?: { opacity: number; y: number; filter?: string };
-  transition?: { duration: number; ease: [number, number, number, number]; delay?: number };
+  // The home page's entrance is CSS-driven so it can run before hydration; these carry that
+  // animation's class and its per-item delay rather than a Framer transition.
+  className?: string;
+  style?: CSSProperties;
 }
 
 // Prevent widows by keeping the last two words together on their own line
@@ -52,17 +52,14 @@ export default function ProjectListItem({
   title,
   dates,
   href,
-  initial,
-  animate = { opacity: 1, y: 0 },
-  transition = { duration: 0.1, ease: [0.25, 0.1, 0.25, 1] },
+  className,
+  style,
 }: ProjectListItemProps) {
   return (
-    <motion.div
+    <div
       data-project-list-item
-      className="w-full transition-opacity duration-150"
-      initial={initial}
-      animate={animate}
-      transition={transition}
+      className={`w-full transition-opacity duration-150${className ? ` ${className}` : ''}`}
+      style={style}
     >
       <Link
         href={href}
@@ -84,6 +81,6 @@ export default function ProjectListItem({
           <span className={datesClassName}>{dates}</span>
         </div>
       </Link>
-    </motion.div>
+    </div>
   );
 }

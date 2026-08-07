@@ -1,7 +1,77 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties, RefObject } from "react";
 import { useState, useEffect } from "react";
 
 export const FALLBACK_ITEMS = ["Dean", "Lil B", "Lazer", "Simz", "Bladee"];
+
+// How far ahead of the viewport a card starts fetching its media. Roughly one viewport of runway,
+// so a card is decoded and playing by the time it is scrolled to, without every card on the page
+// competing for bandwidth during the initial load.
+const MEDIA_PREFETCH_MARGIN = "600px";
+
+// Upper bound on how long to wait for the `load` event before starting to observe anyway, so a
+// single stalled request can't leave every carousel permanently blank.
+const MEDIA_GATE_MAX_WAIT_MS = 3000;
+
+// Latches true once the element has come within MEDIA_PREFETCH_MARGIN of the viewport, and stays
+// true afterwards — media is only ever swapped in, never torn back out on scroll.
+//
+// Starts false on the server and on the first client render, which is the point: carousel media is
+// always well below the fold, so keeping it out of the initial markup keeps ~10MB of video and
+// full-size PNG off the critical path. React only hoists *eager* images into <head> preloads, so
+// this also stops the below-fold stills from being fetched at high priority ahead of the JS.
+//
+// Observation additionally waits for the `load` event. A generous prefetch margin means the first
+// carousel on a page can already be "near" at scroll position zero — on /alphagrill that would put
+// 10MB of video back in flight while the fonts and the title are still arriving, which is the exact
+// contention this is meant to remove. Deferring costs nothing perceptible (by the time anyone has
+// scrolled, the runway is live) and guarantees media can never compete with first paint.
+export function useNearViewport(ref: RefObject<Element | null>): boolean {
+  const [isNear, setIsNear] = useState(false);
+
+  useEffect(() => {
+    if (isNear) return;
+    const el = ref.current;
+    if (!el) return;
+
+    // Without IntersectionObserver, fall back to loading everything rather than nothing. Deferred
+    // by a tick so this isn't a synchronous setState during the effect.
+    if (typeof IntersectionObserver === "undefined") {
+      const timer = setTimeout(() => setIsNear(true), 0);
+      return () => clearTimeout(timer);
+    }
+
+    let observer: IntersectionObserver | undefined;
+    const startObserving = () => {
+      if (observer) return;
+      observer = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((entry) => entry.isIntersecting)) {
+            setIsNear(true);
+            observer?.disconnect();
+          }
+        },
+        { rootMargin: MEDIA_PREFETCH_MARGIN }
+      );
+      observer.observe(el);
+    };
+
+    // Already complete on any client-side navigation into the page.
+    if (document.readyState === "complete") {
+      startObserving();
+      return () => observer?.disconnect();
+    }
+
+    const timer = setTimeout(startObserving, MEDIA_GATE_MAX_WAIT_MS);
+    window.addEventListener("load", startObserving, { once: true });
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("load", startObserving);
+      observer?.disconnect();
+    };
+  }, [ref, isNear]);
+
+  return isNear;
+}
 
 export type ImagePosition = {
   top?: number | "center";

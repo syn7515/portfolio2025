@@ -41,8 +41,47 @@ const EXIT_TRANSITION_REDUCED = { duration: 0 }
 export const PAPER_EXIT_TRANSITION = { default: EXIT_TRANSITION_FULL, opacity: EXIT_OPACITY_TRANSITION_FULL }
 export const PAPER_EXIT_TRANSITION_REDUCED = { default: EXIT_TRANSITION_REDUCED, opacity: EXIT_TRANSITION_REDUCED }
 
-// sessionStorage signal set by the departing link's onClick, read once by the destination page's
-// mount effect (never during render — see blog-post-layout.tsx for why: reading client-only storage
-// synchronously during render would diverge from the server-rendered markup on an actual SSR pass).
+// Backwards-navigation signal, carried on two channels because it has to survive both kinds of
+// navigation and be readable before the destination's first paint:
+//
+//   - an attribute on <html>, which is what the destination's CSS actually branches on. Set
+//     synchronously in the departing link's onClick, so on a client-side navigation (every in-app
+//     link is a next/link) it is already in place when the new page renders its first frame.
+//   - sessionStorage, which is the only one of the two that survives a full document load. The
+//     inline script in app/layout.tsx promotes it back onto <html> before first paint.
+//
+// The entrance animation is pure CSS precisely so it doesn't wait for hydration (see
+// blog-post.module.css), which means the "should I animate at all?" answer has to be available to
+// CSS at paint time. A React state flag set in a mount effect would arrive a frame too late.
 export const PAPER_BACK_NAV_FLAG = 'paper-direction'
 export const PAPER_BACK_NAV_VALUE = 'back'
+export const PAPER_BACK_NAV_ATTR = 'data-paper-nav'
+
+// Called by the departing link, before the route change.
+export function markPaperBackNav() {
+  try {
+    sessionStorage.setItem(PAPER_BACK_NAV_FLAG, PAPER_BACK_NAV_VALUE)
+  } catch {
+    // Private-mode / storage-disabled: the attribute below still covers client-side navigation,
+    // which is the only path an in-app link takes.
+  }
+  document.documentElement.setAttribute(PAPER_BACK_NAV_ATTR, PAPER_BACK_NAV_VALUE)
+}
+
+export function isPaperBackNav() {
+  return (
+    typeof document !== 'undefined' &&
+    document.documentElement.getAttribute(PAPER_BACK_NAV_ATTR) === PAPER_BACK_NAV_VALUE
+  )
+}
+
+// Called once the departing sheet has finished leaving, so the next forward navigation animates
+// its entrance normally.
+export function clearPaperBackNav() {
+  try {
+    sessionStorage.removeItem(PAPER_BACK_NAV_FLAG)
+  } catch {
+    // Nothing to undo if it was never written.
+  }
+  document.documentElement.removeAttribute(PAPER_BACK_NAV_ATTR)
+}

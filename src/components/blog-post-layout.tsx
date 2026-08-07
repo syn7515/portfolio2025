@@ -16,8 +16,9 @@ import {
   PAPER_EXIT_OFFSCREEN,
   PAPER_EXIT_TRANSITION,
   PAPER_EXIT_TRANSITION_REDUCED,
-  PAPER_BACK_NAV_FLAG,
-  PAPER_BACK_NAV_VALUE,
+  markPaperBackNav,
+  isPaperBackNav,
+  clearPaperBackNav,
 } from '@/lib/paper-exit-transition'
 
 interface BlogPostLayoutProps {
@@ -98,44 +99,16 @@ function preventWidow(text: string): React.ReactNode {
   )
 }
 
-// Paper entrance animation: paper slides in from the top-right corner with a blur-in, then content
-// is revealed at full opacity on the landing frame.
-// ease-out: starts fast (paper shoots in), decelerates to a gentle landing — correct for entering elements.
-const ENTRANCE_EASE: [number, number, number, number] = [0.23, 1, 0.32, 1]
-const PAPER_SLIDE_DURATION = 0.45
-const PAPER_OFFSET_X = 40
-const PAPER_OFFSET_Y = -32
-const PAPER_INITIAL_ROTATE_DEG = 2
-const PAPER_BLUR_PX = 10
-
-// Hoisted to stable module-level references (rather than object literals recreated per render) so
-// that unrelated re-renders — e.g. the scroll/resize listeners below firing mid-animation — never
-// hand Framer Motion a new `animate`/`transition` object reference for the same target. Framer Motion
-// can treat a changed reference as a reason to re-evaluate the in-flight tween, which reads as the
-// entrance animation being randomly interrupted depending on whether a scroll/resize event happens
-// to land during the ~0.45s slide.
-const PAPER_OFFSCREEN = { x: PAPER_OFFSET_X, y: PAPER_OFFSET_Y, rotate: PAPER_INITIAL_ROTATE_DEG, filter: `blur(${PAPER_BLUR_PX}px)`, opacity: 0 }
-const PAPER_REST = { x: 0, y: 0, rotate: 0, filter: 'blur(0px)', opacity: 1 }
-// Per-property pacing: opacity clears first (paper materializes quickly), blur clears before the
-// slide finishes (sharp and solid while still approaching rest), translate/rotate use full duration.
-const PAPER_TRANSITION_FULL = {
-  default: { duration: PAPER_SLIDE_DURATION, ease: ENTRANCE_EASE },
-  filter: { duration: PAPER_SLIDE_DURATION * 0.75, ease: ENTRANCE_EASE },
-  opacity: { duration: PAPER_SLIDE_DURATION * 0.55, ease: ENTRANCE_EASE },
-}
-const PAPER_TRANSITION_REDUCED = { duration: 0 }
-
-// Slide-out (backwards navigation, footer Previous or sidebar Home) uses its own easing/duration/
-// opacity pacing, independent of the entrance above — see src/lib/paper-exit-transition.ts, which
-// is shared with app/page.tsx so both exits feel identical.
-
-// Wall-clock floor for revealing content. The reveal is normally driven by the entrance overlay's
-// onAnimationComplete, which runs on Framer's requestAnimationFrame loop — and browsers throttle rAF
-// to a near-stop while a tab is backgrounded (also under some battery-saver / heavy-CPU conditions).
-// Without a floor, content gated behind that callback could stay hidden indefinitely. This timeout
-// guarantees the reveal fires regardless of animation progress; it's comfortably longer than the
-// ~0.45s entrance so it never cuts a normally-running animation short.
-const ENTRANCE_FALLBACK_MS = 1200
+// The paper entrance (sheet slides in from the top-right with a blur-in, then content is revealed
+// on the landing frame) is defined entirely in blog-post.module.css. It has no dynamic inputs, so
+// CSS can run it on the first painted frame instead of waiting for the JS bundle to download and
+// hydrate — which is what used to gate this page's First Contentful Paint. See the comment block
+// at the top of that stylesheet.
+//
+// Slide-out (backwards navigation, footer Previous or sidebar Home) is still Framer-driven: it's
+// triggered by an interaction, so it's post-hydration by definition and costs nothing at load. Its
+// easing/duration/opacity pacing live in src/lib/paper-exit-transition.ts, shared with app/page.tsx
+// so both exits feel identical.
 
 function startInterruptibleScrollToTop(): () => void {
   if (scrollBehavior() === 'auto') {
@@ -181,41 +154,21 @@ function startInterruptibleScrollToTop(): () => void {
 
 export default function BlogPostLayout({ children, slug, title, subtitle }: BlogPostLayoutProps) {
   const { previousProject, nextProject } = getProjectNavigation(slug)
-  const [animationReady, setAnimationReady] = useState(false)
   const [showBackToTop, setShowBackToTop] = useState(false)
   const [viewportTall, setViewportTall] = useState(false)
-  // Flips once the decorative entrance overlay finishes landing; reveals the real (always-mounted,
-  // never-transformed) content underneath it. See the "Real paper" / "Decorative entrance overlay"
-  // comments below for why content and the slide animation live on separate elements.
-  const [contentVisible, setContentVisible] = useState(false)
   // Backwards navigation (footer "Previous" or sidebar "Home"): instead of a new paper sliding in,
   // the current top sheet slides OUT to the top-right, revealing this post's content already sitting
-  // on the paper underneath. Signaled across the route change via sessionStorage (set in the
-  // departing link's onClick), and read only post-mount so SSR output never branches on client-only
-  // state.
+  // on the paper underneath. The CSS half of that branch reads the <html> attribute directly on the
+  // first frame; this state only decides whether to mount the departing sheet, which is a
+  // post-hydration concern, so reading it in an effect is fine (and keeps SSR output from ever
+  // branching on client-only state).
   const [exitEntrance, setExitEntrance] = useState(false)
   const [exitDone, setExitDone] = useState(false)
   const cancelBackToTopRef = useRef<(() => void) | null>(null)
 
   useEffect(() => {
-    if (sessionStorage.getItem(PAPER_BACK_NAV_FLAG) === PAPER_BACK_NAV_VALUE) {
-      sessionStorage.removeItem(PAPER_BACK_NAV_FLAG)
-      setExitEntrance(true)
-      // Content must be fully present beneath the departing sheet before it moves.
-      setContentVisible(true)
-    }
-    setAnimationReady(true)
+    if (isPaperBackNav()) setExitEntrance(true)
   }, [])
-
-  // Fallback reveal — see ENTRANCE_FALLBACK_MS. Cleanup cancels the timer the instant the entrance
-  // completes normally (contentVisible flips true), so this only ever fires when that never happens.
-  useEffect(() => {
-    if (contentVisible) return
-    const timer = setTimeout(() => {
-      setContentVisible(true)
-    }, ENTRANCE_FALLBACK_MS)
-    return () => clearTimeout(timer)
-  }, [contentVisible])
 
   useEffect(() => {
     const update = () => {
@@ -240,13 +193,9 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
     cancelBackToTopRef.current = startInterruptibleScrollToTop()
   }, [])
 
+  // Only the exit needs this now — the entrance handles reduced motion in CSS, where the media
+  // query resolves at paint time and can't disagree with the server the way this hook can.
   const shouldReduceMotion = useReducedMotion()
-  // Pre-mount state (server + first client paint) never branches on shouldReduceMotion: that hook
-  // resolves differently between server (always null) and client first-render, so using it here
-  // would cause a hydration mismatch. It only affects the transition below, which applies after
-  // animationReady flips post-hydration. The animate target is the same either way now (no more
-  // mid-flight keyframe), so only the transition timing needs to branch.
-  const paperTransition = shouldReduceMotion ? PAPER_TRANSITION_REDUCED : PAPER_TRANSITION_FULL
   const exitTransition = shouldReduceMotion ? PAPER_EXIT_TRANSITION_REDUCED : PAPER_EXIT_TRANSITION
 
   return (
@@ -291,7 +240,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
               transition: 'color 300ms ease-out, scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
             }}
             aria-label="Back to home"
-            onClick={() => sessionStorage.setItem(PAPER_BACK_NAV_FLAG, PAPER_BACK_NAV_VALUE)}
+            onClick={markPaperBackNav}
           >
             <Undo2 className="size-4 flex-shrink-0 -translate-y-px" />
             Home
@@ -325,15 +274,15 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
             than materializing out of nothing. Once the real paper (same rect, same shadow) lands on
             top of it, it's fully redundant — left at full opacity, its shadow would sit exactly
             underneath the real paper's identical shadow and compound into a darker edge than either
-            shadow alone, so it fades out as soon as the real content is revealed. */}
+            shadow alone, so it fades out as soon as the real content is revealed. Its timing is in
+            blog-post.module.css (.paperUnderlay), keyed off the same 450ms landing frame. */}
         <div
           aria-hidden
-          className="absolute inset-0 min-[1280px]:top-[100px] transition-opacity duration-500 ease-out"
+          className={cn('absolute inset-0 min-[1280px]:top-[100px]', styles.paperUnderlay)}
           style={{
             backgroundColor: 'var(--paper-bg)',
             boxShadow: 'var(--paper-box-shadow)',
             marginLeft: 'var(--sidebar-w)',
-            opacity: contentVisible ? 0 : 1,
           }}
         />
 
@@ -342,12 +291,11 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
             opacity below 1 create stacking contexts that would trap descendants (e.g. the carousel's
             z-[50]) below page-level fixed overlays like the top-edge fade regardless of their own
             z-index. The slide-in visual therefore lives on a separate, disposable overlay below,
-            while this element stays hidden via `visibility` until that overlay lands. */}
+            which covers this element while it travels.
+            This element is never hidden: it and its text are what FCP and LCP are measured on, so
+            anything that withheld them until JS ran would be measuring the bundle, not the page. */}
         <div
-          className={cn(
-            'flex-1 min-[1280px]:mt-[100px] overflow-x-clip relative',
-            contentVisible ? 'visible' : 'invisible'
-          )}
+          className="flex-1 min-[1280px]:mt-[100px] overflow-x-clip relative"
           style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}
         >
           <div
@@ -355,7 +303,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           >
               <div className="px-6 min-[1280px]:px-0 min-[1280px]:ml-[calc(50vw_-_280px_-_var(--sidebar-w))] min-[1280px]:w-[560px]">
                 {/* Header: title, subtitle */}
-                <div className={contentVisible ? styles.contentBlurRevealItem : undefined}>
+                <div className={styles.contentBlurRevealItem}>
                   <BlogPostHeader slug={slug} title={title} subtitle={subtitle} />
                 </div>
 
@@ -364,7 +312,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                   className={cn(
                     styles.mdxContent,
                     'max-w-[560px] mx-auto',
-                    contentVisible && styles.contentBlurReveal
+                    styles.contentBlurReveal
                   )}
                   data-blog-content
                   data-inline-link-preview-boundary
@@ -377,7 +325,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                   <div
                     className={cn(
                       'max-w-[560px] mx-auto min-[1280px]:max-w-none mt-16 min-[1280px]:mt-32 pb-12 min-[640px]:pb-16 min-[1280px]:pb-[120px] overflow-x-visible',
-                      contentVisible && styles.contentBlurRevealItem
+                      styles.contentBlurRevealItem
                     )}
                   >
                     <Divider variant="default" color="stone" spacing="md" />
@@ -388,7 +336,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                           href={`/${previousProject.slug}`}
                           className="flex-1 group cursor-pointer"
                           style={{ textDecoration: 'none' }}
-                          onClick={() => sessionStorage.setItem(PAPER_BACK_NAV_FLAG, PAPER_BACK_NAV_VALUE)}
+                          onClick={markPaperBackNav}
                         >
                           <div className="text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic mb-1.5 opacity-80 font-sans">
                             <span className="relative inline-flex items-center">
@@ -450,20 +398,21 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
         </div>
 
         {/* Decorative entrance overlay: plays the slide-in-from-top-right-corner-with-a-blur-in visual
-            on top of the (currently hidden) real paper above, then reveals it and removes itself once
-            settled. Has no real children, so it's safe for this to be a Framer Motion transform target
-            — nothing here needs to escape a stacking context. */}
-        {!contentVisible && !exitEntrance && (
-          <motion.div
-            aria-hidden
-            className="absolute inset-0 min-[1280px]:top-[100px] overflow-x-clip pointer-events-none"
-            style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)', opacity: 0 }}
-            initial={PAPER_OFFSCREEN}
-            animate={animationReady ? PAPER_REST : PAPER_OFFSCREEN}
-            transition={paperTransition}
-            onAnimationComplete={() => setContentVisible(true)}
-          />
-        )}
+            on top of the real paper above, covering it while it travels, then retires itself on the
+            landing frame. Has no real children, so it's safe for this to be a transform target —
+            nothing here needs to escape a stacking context.
+            Server-rendered unconditionally and animated purely by .paperEntranceOverlay, so the
+            sheet is already moving on the first painted frame. That stylesheet also owns the two
+            cases where the entrance shouldn't play at all (reduced motion, backwards navigation) —
+            both are things CSS can answer at paint time and React can't. */}
+        <div
+          aria-hidden
+          className={cn(
+            'absolute inset-0 min-[1280px]:top-[100px] overflow-x-clip pointer-events-none',
+            styles.paperEntranceOverlay
+          )}
+          style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}
+        />
 
         {/* Departing-sheet overlay (backwards navigation): the inverse of the entrance above. The
             content is already revealed underneath (instant-reveal in the mount effect), and this
@@ -480,7 +429,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
             initial={PAPER_EXIT_REST}
             animate={PAPER_EXIT_OFFSCREEN}
             transition={exitTransition}
-            onAnimationComplete={() => setExitDone(true)}
+            onAnimationComplete={() => { clearPaperBackNav(); setExitDone(true) }}
           />
         )}
       </div>

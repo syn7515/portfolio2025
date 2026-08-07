@@ -2,9 +2,9 @@
 "use client"
 
 import type { CSSProperties, ReactNode } from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, type Transition } from "framer-motion";
-import { calculateImagePosition, type CarouselItem } from "./hooks";
+import { calculateImagePosition, useNearViewport, type CarouselItem } from "./hooks";
 import { GrillLines } from "./grill-lines";
 import { CARD_LIGHT_SHADOW } from "@/components/ui/card-shadow";
 import { renderCaptionWithBadges } from "@/components/ui/sup-caption-badge";
@@ -56,16 +56,45 @@ export function CarouselCard({
   forceActive = false
 }: CarouselCardProps) {
   const { label, caption, imageUrl, videoUrl, alt, imageSizePercent, imagePosition, videoAutoplay, videoLoop, videoMuted, videoControls, cardVariant, backgroundLines, fetchPriority, withInsetShadow } = item;
-  const videoPreload = fetchPriority === 'high' ? 'auto' : 'metadata';
   const hasMedia = !!(imageUrl || videoUrl);
   const [isMediaLoading, setIsMediaLoading] = useState(hasMedia);
   const [isHovered, setIsHovered] = useState(false);
+
+  // Carousels only ever appear well below the fold, so no card's media belongs on the initial
+  // load. Both the video source and the still are withheld until the card is within a viewport of
+  // being scrolled to — see useNearViewport.
+  const mediaGateRef = useRef<HTMLDivElement | null>(null);
+  const isNearViewport = useNearViewport(mediaGateRef);
+  // `src` is only ever attached once the card is near — an unset src downloads nothing, and
+  // preload="none" keeps the browser from speculatively buffering a non-autoplaying video even
+  // after it is attached.
+  //
+  // The elements keep their `autoPlay` attribute. That attribute used to be what forced a full
+  // download on page load, but only because `src` was there from the start; gating the source is
+  // what actually fixes that, and autoplay then does the right thing at the right moment. Keeping
+  // it also keeps the browser's own playback lifecycle — a muted video that the browser paused
+  // because its tab went to the background resumes by itself when the viewer returns, which a
+  // one-shot play() call would not.
+  const videoSrc = isNearViewport ? videoUrl ?? undefined : undefined;
+  // The still behind a video is a `poster`, which has no lazy equivalent — the browser fetches it
+  // as soon as the attribute is present. Withholding it is what keeps the four stills on
+  // /alphagrill (2.6MB of PNG) off the initial load alongside their videos.
+  const videoPoster = isNearViewport ? imageUrl ?? undefined : undefined;
+  // Eager only for a still explicitly marked high priority; everything else defers so React does
+  // not hoist it into a <head> preload that competes with the page's own JS and CSS.
+  const imageLoading = fetchPriority === 'high' ? 'eager' : 'lazy';
 
   useEffect(() => {
     if (imageUrl || videoUrl) {
       setIsMediaLoading(true);
     }
   }, [imageUrl, videoUrl]);
+
+  // The spinner means "media is on its way". A card that hasn't been scrolled near yet hasn't
+  // started loading anything, and a non-autoplaying video won't load until the viewer presses
+  // play — neither should sit there spinning.
+  const showSpinner =
+    isMediaLoading && hasMedia && !renderCard && (videoUrl ? isNearViewport && videoAutoplay : true);
 
   const hasPositionedImage = imageSizePercent != null && imageUrl;
   const hasPositionedVideo = imageSizePercent != null && videoUrl;
@@ -83,6 +112,7 @@ export function CarouselCard({
 
   return (
     <div
+      ref={mediaGateRef}
       className={`flex flex-col items-center${isHiddenByLightbox ? " opacity-0 pointer-events-none" : ""}`}
       style={{ width: effWidth }}
     >
@@ -151,15 +181,15 @@ export function CarouselCard({
                 {hasVideo && (
                   hasPositionedVideo ? (
                     <video
-                      src={videoUrl}
-                      poster={imageUrl ?? undefined}
-                      className="absolute object-contain z-[1]"
+                      src={videoSrc}
                       autoPlay={videoAutoplay}
+                      poster={videoPoster}
+                      className="absolute object-contain z-[1]"
                       loop={videoLoop}
                       muted={videoMuted}
                       controls={videoControls}
                       playsInline
-                      preload={videoPreload}
+                      preload="none"
                       onCanPlay={() => setIsMediaLoading(false)}
                       style={{
                         height: `${imageSizePercent}%`,
@@ -169,15 +199,15 @@ export function CarouselCard({
                     />
                   ) : (
                     <video
-                      src={videoUrl}
-                      poster={imageUrl ?? undefined}
-                      className="absolute inset-0 w-full h-full object-cover z-[1]"
+                      src={videoSrc}
                       autoPlay={videoAutoplay}
+                      poster={videoPoster}
+                      className="absolute inset-0 w-full h-full object-cover z-[1]"
                       loop={videoLoop}
                       muted={videoMuted}
                       controls={videoControls}
                       playsInline
-                      preload={videoPreload}
+                      preload="none"
                       onCanPlay={() => setIsMediaLoading(false)}
                     />
                   )
@@ -188,15 +218,15 @@ export function CarouselCard({
                 {hasVideo ? (
                   hasPositionedVideo ? (
                   <video
-                    src={videoUrl}
-                    poster={imageUrl ?? undefined}
-                    className="absolute object-contain"
+                    src={videoSrc}
                     autoPlay={videoAutoplay}
+                    poster={videoPoster}
+                    className="absolute object-contain"
                     loop={videoLoop}
                     muted={videoMuted}
                     controls={videoControls}
                     playsInline
-                    preload={videoPreload}
+                    preload="none"
                     onCanPlay={() => setIsMediaLoading(false)}
                     style={{
                       height: `${imageSizePercent}%`,
@@ -211,15 +241,15 @@ export function CarouselCard({
                   />
                 ) : (
                   <video
-                    src={videoUrl}
-                    poster={imageUrl ?? undefined}
-                    className="w-full h-full object-cover"
+                    src={videoSrc}
                     autoPlay={videoAutoplay}
+                    poster={videoPoster}
+                    className="w-full h-full object-cover"
                     loop={videoLoop}
                     muted={videoMuted}
                     controls={videoControls}
                     playsInline
-                    preload={videoPreload}
+                    preload="none"
                     onCanPlay={() => setIsMediaLoading(false)}
                   />
                 )
@@ -230,6 +260,8 @@ export function CarouselCard({
                     alt={alt ?? label}
                     className="absolute object-contain"
                     fetchPriority={fetchPriority}
+                    loading={imageLoading}
+                    decoding="async"
                     ref={(el) => { if (el?.complete) setIsMediaLoading(false); }}
                     onLoad={() => setIsMediaLoading(false)}
                     style={{
@@ -244,6 +276,8 @@ export function CarouselCard({
                     alt={alt ?? label}
                     className="w-full h-full object-cover"
                     fetchPriority={fetchPriority}
+                    loading={imageLoading}
+                    decoding="async"
                     ref={(el) => { if (el?.complete) setIsMediaLoading(false); }}
                     onLoad={() => setIsMediaLoading(false)}
                   />
@@ -258,7 +292,7 @@ export function CarouselCard({
           </div>
         )}
         {/* Loading spinner */}
-        {isMediaLoading && hasMedia && !renderCard && (
+        {showSpinner && (
           <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
             <div className="w-6 h-6 rounded-full border-2 border-stone-300 dark:border-zinc-600 border-t-stone-500 dark:border-t-zinc-400 animate-spin" />
           </div>
