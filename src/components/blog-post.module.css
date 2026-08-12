@@ -106,11 +106,30 @@
 }
 
 /* Backwards navigation (footer "Previous" or sidebar "Home"): no sheet arrives — the departing
-   sheet slides out over content that is already settled. The signal is an attribute on <html>,
-   set by the departing link before the route change and restored pre-paint after a full document
-   load (see markPaperBackNav in src/lib/paper-exit-transition.ts and the inline script in
-   app/layout.tsx), so it is readable on this page's very first frame. */
+   sheet slides out over content that is already settled.
+
+   Two selectors carry this, and both are required:
+
+   `html[data-paper-nav='back']` is the pre-paint signal, set by the departing link before the route
+   change and restored after a full document load (see markPaperBackNav in
+   src/lib/paper-exit-transition.ts and the inline script in app/layout.tsx). It is the only one of
+   the two readable on this page's very first frame, before React has hydrated.
+
+   `.paperNoEntrance` is the durable one, applied by the layout once it has captured that signal
+   into state. The attribute has to be cleared before the next forward navigation, or that page's
+   entrance would be suppressed too — but clearing it is a change to the computed animation-name,
+   and going from `none` back to a real name is exactly how CSS *starts* an animation. With the
+   attribute alone, releasing it at the end of the exit relaunched the whole entrance: the empty
+   sheet slid back in and every content block re-hid for 450ms and faded in again. This class is
+   already in the DOM by then, so the computed value stays `none` across the handoff and nothing
+   restarts. */
 :global(html[data-paper-nav='back']) :is(.paperEntranceOverlay,
+.paperUnderlay,
+.contentBlurRevealItem,
+.contentBlurReveal > :not(:has([data-carousel])),
+.contentBlurReveal > * > :not(:has([data-carousel])),
+.contentBlurReveal [data-carousel-layer]),
+.paperNoEntrance :is(.paperEntranceOverlay,
 .paperUnderlay,
 .contentBlurRevealItem,
 .contentBlurReveal > :not(:has([data-carousel])),
@@ -119,11 +138,13 @@
     animation: none;
 }
 
-:global(html[data-paper-nav='back']) .paperEntranceOverlay {
+:global(html[data-paper-nav='back']) .paperEntranceOverlay,
+.paperNoEntrance .paperEntranceOverlay {
     display: none;
 }
 
-:global(html[data-paper-nav='back']) .paperUnderlay {
+:global(html[data-paper-nav='back']) .paperUnderlay,
+.paperNoEntrance .paperUnderlay {
     opacity: 0;
 }
 

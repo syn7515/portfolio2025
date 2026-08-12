@@ -71,6 +71,13 @@
     }
 }
 
-:global(html[data-paper-nav='back']) :is(.paperEntrance, .contentRise) {
+/* Two selectors, both required — see the matching block in src/components/blog-post.module.css for
+   the full reasoning. Briefly: the <html> attribute is the only signal readable before hydration,
+   but it has to be cleared before the next forward navigation, and clearing it flips these
+   animations' computed name from `none` back to a real name, which restarts them. The class is
+   applied by the page once it has captured the signal into state, so the computed value stays
+   `none` across that handoff. */
+:global(html[data-paper-nav='back']) :is(.paperEntrance, .contentRise),
+.noEntrance :is(.paperEntrance, .contentRise) {
     animation: none;
 }

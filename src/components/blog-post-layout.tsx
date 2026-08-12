@@ -170,6 +170,16 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
     if (isPaperBackNav()) setExitEntrance(true)
   }, [])
 
+  // Release the <html> attribute as soon as the suppression class above it has committed. It has to
+  // go before the next forward navigation — otherwise that page's entrance would be suppressed too —
+  // but it must not go while it is the *only* thing suppressing this one: clearing it flips every
+  // entrance animation's computed name from `none` back to a real name, which is how CSS starts an
+  // animation. Doing that at the end of the exit made the empty sheet slide straight back in and
+  // re-hid all the content. Keyed on exitEntrance so it runs strictly after that render commits.
+  useEffect(() => {
+    if (exitEntrance) clearPaperBackNav()
+  }, [exitEntrance])
+
   useEffect(() => {
     const update = () => {
       setShowBackToTop(window.scrollY > 300)
@@ -266,7 +276,12 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
         </button>
       </aside>
 
-      <div className="w-full min-h-screen overflow-x-clip flex flex-col relative">
+      <div
+        className={cn(
+          'w-full min-h-screen overflow-x-clip flex flex-col relative',
+          exitEntrance && styles.paperNoEntrance
+        )}
+      >
         <PaperGridBackground />
 
         {/* Dummy paper: static sheet already in place at the paper's rest position, sitting beneath
@@ -429,7 +444,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
             initial={PAPER_EXIT_REST}
             animate={PAPER_EXIT_OFFSCREEN}
             transition={exitTransition}
-            onAnimationComplete={() => { clearPaperBackNav(); setExitDone(true) }}
+            onAnimationComplete={() => setExitDone(true)}
           />
         )}
       </div>

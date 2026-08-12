@@ -58,6 +58,14 @@ export default function Home() {
     hasVisitedHome = true;
   }, []);
 
+  // Release the <html> attribute once the suppression class has committed. Clearing it while it was
+  // the only thing suppressing the entrance restarted every animation (CSS starts an animation when
+  // its computed name goes from `none` to a real name), which replayed the whole intro right after
+  // the departing sheet had left. See page.module.css.
+  useEffect(() => {
+    if (exitEntrance) clearPaperBackNav();
+  }, [exitEntrance]);
+
   const shouldReduceMotion = useReducedMotion();
   const exitTransition = shouldReduceMotion ? PAPER_EXIT_TRANSITION_REDUCED : PAPER_EXIT_TRANSITION;
 
@@ -71,7 +79,7 @@ export default function Home() {
   return (
 
 
-    <div className="font-sans w-full min-h-screen overflow-x-clip flex flex-col">
+    <div className={`font-sans w-full min-h-screen overflow-x-clip flex flex-col${exitEntrance ? ` ${styles.noEntrance}` : ''}`}>
       {/* Top-edge fade overlay */}
       <div
         aria-hidden
@@ -224,7 +232,7 @@ export default function Home() {
             initial={PAPER_EXIT_REST}
             animate={PAPER_EXIT_OFFSCREEN}
             transition={exitTransition}
-            onAnimationComplete={() => { clearPaperBackNav(); setExitDone(true) }}
+            onAnimationComplete={() => setExitDone(true)}
           />
         )}
       </main>

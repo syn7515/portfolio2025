@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { Undo2 } from 'lucide-react'
 import { cn, prefersReducedMotion } from '@/lib/utils'
 import { PROJECTS } from '@/components/blog-post-layout'
+import { markPaperBackNav } from '@/lib/paper-exit-transition'
 
 interface BlogPostMobileMenuProps {
   slug?: string
@@ -39,9 +40,15 @@ export default function BlogPostMobileMenu({ slug }: BlogPostMobileMenuProps) {
       setOpen(false)
       return
     }
-    // Home: let the Link navigate immediately with no exit fade, matching the
-    // sidebar's back-to-home link in blog-post-layout.
-    if (href === '/') return
+    // Home: let the Link navigate immediately with no exit fade, matching the sidebar's
+    // back-to-home link in blog-post-layout — including flagging the departure as backwards, so
+    // home lands with its content already settled and a sheet sliding off it. Without this the two
+    // Home links played opposite motions for the same action: a sheet sliding *in* here, a sheet
+    // sliding *out* from the sidebar.
+    if (href === '/') {
+      markPaperBackNav()
+      return
+    }
     e.preventDefault()
     // Reduced motion: skip the fade-to-paper entirely and navigate at once.
     if (prefersReducedMotion()) {
