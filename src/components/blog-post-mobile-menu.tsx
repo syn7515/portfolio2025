@@ -12,7 +12,7 @@ interface BlogPostMobileMenuProps {
   slug?: string
 }
 
-const BAR_CLASS = 'absolute left-[9px] right-[9px] h-[2px] rounded-[2px] bg-stone-500 dark:bg-zinc-400 motion-safe:transition-[translate,rotate,opacity,filter] motion-safe:duration-250 motion-safe:ease-out'
+const BAR_CLASS = 'absolute left-[9px] right-[9px] h-[2px] rounded-none bg-stone-500 dark:bg-zinc-400 motion-safe:transition-[translate,rotate,opacity,filter] motion-safe:duration-250 motion-safe:ease-out'
 
 // How long the overlay takes to settle into a solid paper sheet before the route swap happens
 const LEAVE_FADE_MS = 300
@@ -85,7 +85,7 @@ export default function BlogPostMobileMenu({ slug }: BlogPostMobileMenuProps) {
   ]
 
   return (
-    <div className="min-[640px]:hidden">
+    <div className="min-[820px]:hidden">
       {/* Blurred full-viewport overlay */}
       <div
         id="mobile-menu"

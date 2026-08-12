@@ -5,6 +5,7 @@ import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import { DescriptionBackdrop } from '@/components/ui/description-backdrop'
 
 const HOVER_DELAY_MS = 150
 const SIDE_RAIL_BREAKPOINT = 1280
@@ -24,20 +25,6 @@ interface SideRailPosition {
 interface LocalDescriptionLayout {
   left: number
   width: number
-}
-
-function DescriptionBackdrop() {
-  return (
-    <span
-      aria-hidden
-      className="absolute -inset-x-6 -inset-y-4 z-0 blur-[2px]"
-      style={{
-        background: 'linear-gradient(to right, transparent 0, color-mix(in srgb, var(--background) 60%, transparent) 20px, color-mix(in srgb, var(--background) 60%, transparent) calc(100% - 20px), transparent 100%)',
-        maskImage: 'linear-gradient(to bottom, transparent 0, black 12px, black calc(100% - 12px), transparent 100%)',
-        WebkitMaskImage: 'linear-gradient(to bottom, transparent 0, black 12px, black calc(100% - 12px), transparent 100%)',
-      }}
-    />
-  )
 }
 
 export interface InlineLinkPreviewProps {

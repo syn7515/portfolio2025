@@ -10,6 +10,7 @@ import styles from './blog-post.module.css'
 import BlogPostHeader from '@/components/blog-post-header'
 import BlogPostToc from '@/components/blog-post-toc'
 import BlogPostMobileMenu from '@/components/blog-post-mobile-menu'
+import BlogPostRailNav from '@/components/blog-post-rail-nav'
 import PaperGridBackground from '@/components/ui/paper-grid-background'
 import {
   PAPER_EXIT_REST,
@@ -220,8 +221,12 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
         }}
       />
 
-      {/* Mobile menu: hamburger + blurred overlay; visible only below 1280px */}
+      {/* Mobile menu: hamburger + blurred overlay; visible only below 820px */}
       <BlogPostMobileMenu slug={slug} />
+
+      {/* Compact rail: Home + tick-mark TOC, for the 820–1280px band where the paper is full-bleed
+          and there is no gutter for the text sidebar below. */}
+      <BlogPostRailNav />
 
       {/* Fixed side nav: back + TOC; visible only on lg+ */}
       <aside
