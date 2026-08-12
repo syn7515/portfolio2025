@@ -1,12 +1,18 @@
 "use client"
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import type { MouseEvent } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Undo2 } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn, prefersReducedMotion } from '@/lib/utils'
 import { useToc } from '@/components/use-toc'
 import { DescriptionBackdrop } from '@/components/ui/description-backdrop'
-import { markPaperBackNav } from '@/lib/paper-exit-transition'
+import {
+  clearPaperHomeForwardNav,
+  isPaperHomeForwardNav,
+  markPaperBackNav,
+} from '@/lib/paper-exit-transition'
 import styles from './blog-post-rail-nav.module.css'
 
 interface BlogPostRailNavProps {
@@ -23,6 +29,8 @@ const TOC_LABEL_STYLE: React.CSSProperties = {
   letterSpacing: '-0.02em',
 }
 
+const RAIL_EXIT_MS = 300
+
 /**
  * Home + table of contents for 820–1280px.
  *
@@ -34,9 +42,92 @@ const TOC_LABEL_STYLE: React.CSSProperties = {
  * Everything floats over body copy, which is why the labels carry DescriptionBackdrop.
  */
 export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProps) {
+  const router = useRouter()
   const { items, activeId, goTo } = useToc(contentSelector)
+  const railNavRef = useRef<HTMLDivElement>(null)
+  const exitAnimationRef = useRef<Animation | null>(null)
+  const exitTimerRef = useRef<number | null>(null)
+  const isLeavingRef = useRef(false)
   const hasHoveredItemRef = useRef(false)
   const [showTitlesInstantly, setShowTitlesInstantly] = useState(false)
+
+  // CSS reads the Home-origin attribute before first paint. Clear its one-navigation lifetime once
+  // the entrance has had time to finish; animationend normally clears it sooner. The fallback also
+  // covers viewports where this rail is hidden and reduced-motion users, where no animation fires.
+  useEffect(() => {
+    if (!isPaperHomeForwardNav()) return
+    // Intentionally let this short fallback survive an early unmount so the session signal cannot
+    // leak into a later, unrelated navigation.
+    window.setTimeout(clearPaperHomeForwardNav, 650)
+  }, [])
+
+  useEffect(() => () => {
+    if (exitTimerRef.current) window.clearTimeout(exitTimerRef.current)
+    exitAnimationRef.current?.cancel()
+  }, [])
+
+  const handleHomeClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    // Preserve native new-tab/window behavior without leaving this document in a navigation state.
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+
+    event.preventDefault()
+    if (isLeavingRef.current) return
+    isLeavingRef.current = true
+
+    const railNav = railNavRef.current
+    if (!railNav || prefersReducedMotion()) {
+      markPaperBackNav()
+      router.push('/')
+      return
+    }
+
+    // Capture the presentation value before markPaperBackNav changes the pre-paint attribute and
+    // potentially cancels an in-progress entrance. This makes a quick reversal continue from the
+    // exact current position instead of jumping to the settled rail first.
+    const computedTransform = window.getComputedStyle(railNav).transform
+    let targetX: number
+    try {
+      const currentMatrix = computedTransform === 'none'
+        ? new DOMMatrixReadOnly()
+        : new DOMMatrixReadOnly(computedTransform)
+      const untransformedRight = railNav.getBoundingClientRect().right - currentMatrix.m41
+      targetX = -untransformedRight
+    } catch {
+      markPaperBackNav()
+      router.push('/')
+      return
+    }
+
+    markPaperBackNav()
+
+    let hasNavigated = false
+    const navigateHome = () => {
+      if (hasNavigated) return
+      hasNavigated = true
+      if (exitTimerRef.current) window.clearTimeout(exitTimerRef.current)
+      router.push('/')
+    }
+
+    try {
+      exitAnimationRef.current = railNav.animate(
+        [
+          { transform: computedTransform === 'none' ? 'translateX(0)' : computedTransform },
+          { transform: `translateX(${targetX}px)` },
+        ],
+        {
+          duration: RAIL_EXIT_MS,
+          easing: 'cubic-bezier(0.68, 0, 0.77, 0)',
+          fill: 'forwards',
+        }
+      )
+    } catch {
+      navigateHome()
+      return
+    }
+    railNav.style.pointerEvents = 'none'
+    exitAnimationRef.current.onfinish = navigateHome
+    exitTimerRef.current = window.setTimeout(navigateHome, RAIL_EXIT_MS + 100)
+  }
 
   const handleRailMouseLeave = () => {
     hasHoveredItemRef.current = false
@@ -54,7 +145,12 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
 
   return (
     <div
+      ref={railNavRef}
+      onAnimationEnd={(event) => {
+        if (event.currentTarget === event.target) clearPaperHomeForwardNav()
+      }}
       className={cn(
+        styles.railNav,
         'hidden min-[820px]:flex min-[1280px]:hidden',
         // Vertically centred so the cluster stays reachable at any scroll position without being
         // fixed to an edge. The left offset opens up as the gutter does: at 820px space remains
@@ -69,7 +165,7 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
           the current one out. */}
       <Link
         href="/"
-        onClick={markPaperBackNav}
+        onClick={handleHomeClick}
         aria-label="Back to home"
         className={cn(
           styles.homeButton,

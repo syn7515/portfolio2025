@@ -1,7 +1,8 @@
 "use client";
 
-import type { ReactNode, CSSProperties } from 'react';
+import type { ReactNode, CSSProperties, MouseEvent } from 'react';
 import Link from 'next/link';
+import { markPaperHomeForwardNav } from '@/lib/paper-exit-transition';
 
 interface ProjectListItemProps {
   title: string;
@@ -55,6 +56,13 @@ export default function ProjectListItem({
   className,
   style,
 }: ProjectListItemProps) {
+  const handleNavigation = (event: MouseEvent<HTMLAnchorElement>) => {
+    // Modified clicks open another browsing context; don't leave the current Home document carrying
+    // an origin signal for a navigation that did not occur there.
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    markPaperHomeForwardNav();
+  };
+
   return (
     <div
       data-project-list-item
@@ -63,6 +71,7 @@ export default function ProjectListItem({
     >
       <Link
         href={href}
+        onClick={handleNavigation}
         className="group block w-full cursor-pointer rounded py-2"
         style={{ textDecoration: 'none' }}
       >

@@ -5,6 +5,37 @@
    Reveal is CSS rather than JS: it is pure hover state with no dynamic values, so there is nothing
    for React to decide, and keeping it in CSS means no work at all until a pointer arrives. */
 
+/* Home → case study is a spatial transition: the entire navigation cluster arrives from the edge
+   it occupies. The pre-paint attribute is set by the Home project link, so the first rendered frame
+   is already offscreen rather than jumping there after hydration. No fade or bounce—the rail is one
+   lightweight, critically damped object. */
+@keyframes rail-enter-from-left {
+    from {
+        transform: translateX(calc(-100% - var(--rail-nav-left)));
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+.railNav {
+    --rail-nav-left: 1.5rem;
+}
+
+@media (min-width: 820px) and (max-width: 1279.98px) and (prefers-reduced-motion: no-preference) {
+    :global(html[data-paper-nav='home']) .railNav {
+        animation: rail-enter-from-left 450ms cubic-bezier(0.23, 1, 0.32, 1) both;
+        will-change: transform;
+    }
+}
+
+@media (min-width: 1024px) and (max-width: 1279.98px) {
+    .railNav {
+        --rail-nav-left: 2.5rem;
+    }
+}
+
 /* The Y half of `translate` is the vertical centring against the tick, and it has to live here
    rather than on a Tailwind class. Tailwind v4 compiles `-translate-y-1/2` to this same `translate`
    property, so the two cannot coexist — this rule would silently win and drop the centring, leaving

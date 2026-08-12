@@ -147,14 +147,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       <body
         className={`${inter.variable} ${biroScript.variable} ${geistSans.variable} ${geistMono.variable} ${libreCaslonText.variable} ${crimsonPro.variable} antialiased`}
       >
-        {/* Restores the backwards-navigation signal after a full document load, before anything
-            paints. The paper entrance is CSS-driven so it runs without waiting for hydration, which
-            means the "arrived via a Back link, so play the exit instead" branch has to be readable
-            by CSS on the first frame — see src/lib/paper-exit-transition.ts. On client-side
-            navigation the departing link sets the attribute directly and this never runs. */}
+        {/* Restores the one-navigation direction/origin signal after a full document load, before
+            anything paints. Both the paper's backwards branch and the responsive rail's Home-origin
+            entrance are CSS-driven, so their condition has to be readable on the first frame. On
+            client-side navigation the departing link sets the attribute directly. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{if(sessionStorage.getItem('paper-direction')==='back'){document.documentElement.setAttribute('data-paper-nav','back');}}catch(e){}})();`,
+            __html: `(function(){try{var v=sessionStorage.getItem('paper-direction');if(v==='back'||v==='home'){document.documentElement.setAttribute('data-paper-nav',v);}}catch(e){}})();`,
           }}
         />
         <script

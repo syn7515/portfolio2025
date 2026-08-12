@@ -55,6 +55,7 @@ export const PAPER_EXIT_TRANSITION_REDUCED = { default: EXIT_TRANSITION_REDUCED,
 // CSS at paint time. A React state flag set in a mount effect would arrive a frame too late.
 export const PAPER_BACK_NAV_FLAG = 'paper-direction'
 export const PAPER_BACK_NAV_VALUE = 'back'
+export const PAPER_HOME_FORWARD_NAV_VALUE = 'home'
 export const PAPER_BACK_NAV_ATTR = 'data-paper-nav'
 
 // Called by the departing link, before the route change.
@@ -68,10 +69,29 @@ export function markPaperBackNav() {
   document.documentElement.setAttribute(PAPER_BACK_NAV_ATTR, PAPER_BACK_NAV_VALUE)
 }
 
+// Called by case-study links on Home. Unlike the backwards signal, this does not alter the paper
+// entrance; it gives responsive navigation chrome a pre-paint origin so it can enter from the same
+// viewport edge it belongs to.
+export function markPaperHomeForwardNav() {
+  try {
+    sessionStorage.setItem(PAPER_BACK_NAV_FLAG, PAPER_HOME_FORWARD_NAV_VALUE)
+  } catch {
+    // The attribute still covers the normal client-side navigation path.
+  }
+  document.documentElement.setAttribute(PAPER_BACK_NAV_ATTR, PAPER_HOME_FORWARD_NAV_VALUE)
+}
+
 export function isPaperBackNav() {
   return (
     typeof document !== 'undefined' &&
     document.documentElement.getAttribute(PAPER_BACK_NAV_ATTR) === PAPER_BACK_NAV_VALUE
+  )
+}
+
+export function isPaperHomeForwardNav() {
+  return (
+    typeof document !== 'undefined' &&
+    document.documentElement.getAttribute(PAPER_BACK_NAV_ATTR) === PAPER_HOME_FORWARD_NAV_VALUE
   )
 }
 
@@ -84,4 +104,18 @@ export function clearPaperBackNav() {
     // Nothing to undo if it was never written.
   }
   document.documentElement.removeAttribute(PAPER_BACK_NAV_ATTR)
+}
+
+export function clearPaperHomeForwardNav() {
+  try {
+    if (sessionStorage.getItem(PAPER_BACK_NAV_FLAG) === PAPER_HOME_FORWARD_NAV_VALUE) {
+      sessionStorage.removeItem(PAPER_BACK_NAV_FLAG)
+    }
+  } catch {
+    // Nothing to undo if it was never written.
+  }
+
+  if (document.documentElement.getAttribute(PAPER_BACK_NAV_ATTR) === PAPER_HOME_FORWARD_NAV_VALUE) {
+    document.documentElement.removeAttribute(PAPER_BACK_NAV_ATTR)
+  }
 }
