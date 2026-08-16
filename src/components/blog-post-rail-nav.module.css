@@ -77,10 +77,10 @@
         translate 180ms cubic-bezier(0.25, 0.1, 0.25, 1) 150ms;
 }
 
-/* The first title in each rail-hover session keeps the intentional reveal above. Once the pointer
-   moves to another row, titles behave like adjacent tooltips: both the old title's exit and the new
-   title's entrance are instant. Leaving the rail removes this class and resets the next entrance. */
-.rail.railTitlesInstant .tickRow .reveal {
+/* The first title in a shared Home/TOC hover session keeps the intentional reveal above. Follow-up
+   titles behave like adjacent tooltips: both the previous title's exit and the next title's entrance
+   are instant. React keeps this session warm briefly across the physical gap between Home and rail. */
+.railNav.titlesInstant :is(.homeButton, .tickRow) .reveal {
     transition: none;
 }
 

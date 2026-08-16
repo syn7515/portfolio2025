@@ -30,6 +30,7 @@ const TOC_LABEL_STYLE: React.CSSProperties = {
 }
 
 const RAIL_EXIT_MS = 300
+const TITLE_HOVER_SESSION_MS = 2500
 
 /**
  * Home + table of contents for 820–1280px.
@@ -47,8 +48,9 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
   const railNavRef = useRef<HTMLDivElement>(null)
   const exitAnimationRef = useRef<Animation | null>(null)
   const exitTimerRef = useRef<number | null>(null)
+  const titleHoverSessionTimerRef = useRef<number | null>(null)
   const isLeavingRef = useRef(false)
-  const hasHoveredItemRef = useRef(false)
+  const hasHoveredTitleRef = useRef(false)
   const [showTitlesInstantly, setShowTitlesInstantly] = useState(false)
 
   // CSS reads the Home-origin attribute before first paint. Clear its one-navigation lifetime once
@@ -63,6 +65,7 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
 
   useEffect(() => () => {
     if (exitTimerRef.current) window.clearTimeout(exitTimerRef.current)
+    if (titleHoverSessionTimerRef.current) window.clearTimeout(titleHoverSessionTimerRef.current)
     exitAnimationRef.current?.cancel()
   }, [])
 
@@ -129,18 +132,25 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
     exitTimerRef.current = window.setTimeout(navigateHome, RAIL_EXIT_MS + 100)
   }
 
-  const handleRailMouseLeave = () => {
-    hasHoveredItemRef.current = false
-    setShowTitlesInstantly(false)
-  }
-
-  const handleItemMouseEnter = () => {
-    if (hasHoveredItemRef.current) {
-      setShowTitlesInstantly(true)
-      return
+  const handleTitleMouseEnter = () => {
+    if (titleHoverSessionTimerRef.current) {
+      window.clearTimeout(titleHoverSessionTimerRef.current)
+      titleHoverSessionTimerRef.current = null
     }
 
-    hasHoveredItemRef.current = true
+    setShowTitlesInstantly(hasHoveredTitleRef.current)
+    hasHoveredTitleRef.current = true
+  }
+
+  const handleTitleMouseLeave = () => {
+    if (titleHoverSessionTimerRef.current) {
+      window.clearTimeout(titleHoverSessionTimerRef.current)
+    }
+    titleHoverSessionTimerRef.current = window.setTimeout(() => {
+      hasHoveredTitleRef.current = false
+      setShowTitlesInstantly(false)
+      titleHoverSessionTimerRef.current = null
+    }, TITLE_HOVER_SESSION_MS)
   }
 
   return (
@@ -151,6 +161,7 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
       }}
       className={cn(
         styles.railNav,
+        showTitlesInstantly && styles.titlesInstant,
         'hidden min-[820px]:flex min-[1280px]:hidden',
         // Vertically centred so the cluster stays reachable at any scroll position without being
         // fixed to an edge. The left offset opens up as the gutter does: at 820px space remains
@@ -166,6 +177,8 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
       <Link
         href="/"
         onClick={handleHomeClick}
+        onMouseEnter={handleTitleMouseEnter}
+        onMouseLeave={handleTitleMouseLeave}
         aria-label="Back to home"
         className={cn(
           styles.homeButton,
@@ -207,10 +220,9 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
       {items.length > 0 && (
         <nav
           aria-label="Table of contents"
-          onMouseLeave={handleRailMouseLeave}
+          onMouseLeave={handleTitleMouseLeave}
           className={cn(
             styles.rail,
-            showTitlesInstantly && styles.railTitlesInstant,
             'flex flex-col items-start gap-0 py-1 pl-2'
           )}
         >
@@ -221,7 +233,7 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
                 key={id}
                 type="button"
                 onClick={() => goTo(id)}
-                onMouseEnter={handleItemMouseEnter}
+                onMouseEnter={handleTitleMouseEnter}
                 aria-current={isActive ? 'true' : undefined}
                 className={cn(
                   styles.tickRow,
