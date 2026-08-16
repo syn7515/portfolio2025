@@ -576,10 +576,6 @@ a.intro-link[data-inline-link-preview-trigger] {
   color: rgb(68 64 60 / 0.65) !important;
 }
 
-a.intro-link-light[data-inline-link-preview-trigger] {
-  color: rgb(120 113 108 / 0.65) !important;
-}
-
 a[data-inline-link-preview-trigger]:is(:hover, :focus-visible) {
   color: rgb(234 88 12) !important;
   /* orange-600 */
@@ -618,36 +614,10 @@ a[data-mobile-menu-current] {
   font-style: normal !important;
 }
 
-/* Intro link variant for lighter text paragraphs (stone-500/zinc-400) */
-.intro-link-light {
-  color: rgb(120 113 108) !important;
-  /* stone-500 */
-  cursor: pointer !important;
-  text-decoration-line: underline;
-  text-decoration-style: dotted;
-  text-decoration-skip-ink: auto;
-  text-decoration-color: rgb(168 162 158);
-  /* stone-300 */
-  text-decoration-thickness: 10%;
-  text-underline-offset: 0.05rem;
-  text-underline-position: from-font;
-  transition-property: color, background-color, border-color, fill, stroke;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
-  font-style: italic;
-}
-
-.intro-link-light:is(:hover, :focus-visible) {
-  color: rgb(68 64 60) !important;
-  /* stone-700 - darker on hover */
-  text-decoration-color: rgb(194 65 12) !important;
-  /* orange-700 */
-}
-
 @media (prefers-color-scheme: dark) {
   .intro-link {
-    color: rgb(212 212 216) !important;
-    /* zinc-300 - matches p text color */
+    color: rgb(161 161 170) !important;
+    /* zinc-400 */
     opacity: 0.9;
     /* matches p opacity */
     text-decoration-color: rgb(113 113 122);
@@ -672,16 +642,12 @@ a[data-mobile-menu-current] {
   }
 
   a[data-inline-link-preview-trigger] {
-    text-decoration-color: rgb(113 113 122 / 0.65) !important;
+    text-decoration-color: rgb(113 113 122) !important;
     /* zinc-500 - same as intro-link dark */
   }
 
   a.intro-link[data-inline-link-preview-trigger] {
-    color: rgb(212 212 216 / 0.65) !important;
-  }
-
-  a.intro-link-light[data-inline-link-preview-trigger] {
-    color: rgb(161 161 170 / 0.65) !important;
+    color: rgb(161 161 170) !important;
   }
 
   a[data-inline-link-preview-trigger]:is(:hover, :focus-visible) {
@@ -700,22 +666,6 @@ a[data-mobile-menu-current] {
     /* orange-400 */
   }
 
-  /* Intro link variant for lighter text paragraphs (stone-500/zinc-400) */
-  .intro-link-light {
-    color: rgb(161 161 170) !important;
-    /* zinc-400 - matches lighter paragraph text color */
-    opacity: 0.9;
-    text-decoration-color: rgb(113 113 122);
-    /* zinc-500 */
-  }
-
-  .intro-link-light:is(:hover, :focus-visible) {
-    color: rgb(212 212 216) !important;
-    /* zinc-300 - lighter on hover */
-    text-decoration-color: rgb(254 215 170) !important;
-    /* orange-200 */
-    opacity: 1;
-  }
 }
 
 /* Prose footnote markers only — circular badges use span.sup-badge, not <sup> */

@@ -448,8 +448,8 @@
     }
 
     .mdxContent a[data-inline-link-preview-trigger] {
-        color: rgb(212 212 216 / 0.455) !important;
-        text-decoration-color: rgb(113 113 122 / 0.455) !important;
+        color: rgb(161 161 170) !important;
+        text-decoration-color: rgb(113 113 122) !important;
     }
 
     .mdxContent a:is(:hover, :focus-visible) {
@@ -462,7 +462,7 @@
     }
 
     .mdxContent a.inline-youtube-preview-trigger {
-        color: rgb(212 212 216 / 0.7) !important;
+        color: rgb(161 161 170) !important;
         opacity: 0.9;
         text-decoration-color: var(--inline-youtube-trigger-decoration) !important;
     }

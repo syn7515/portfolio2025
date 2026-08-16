@@ -6,7 +6,7 @@ export function useMDXComponents(components: MDXComponents = {}): MDXComponents 
     a: ({ href, children, className, explanation, descriptionPosition, smallViewportDescriptionPosition, ...rest }) => {
       if (!href) return <a href={href} className={className} {...rest}>{children}</a>
       return (
-        <InlineLinkPreview href={href} variant="intro-link" className={className} explanation={explanation} descriptionPosition={descriptionPosition} smallViewportDescriptionPosition={smallViewportDescriptionPosition}>
+        <InlineLinkPreview href={href} className={className} explanation={explanation} descriptionPosition={descriptionPosition} smallViewportDescriptionPosition={smallViewportDescriptionPosition}>
           {children}
         </InlineLinkPreview>
       )

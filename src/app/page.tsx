@@ -118,24 +118,24 @@ export default function Home() {
             </h1>
           </div>
           {/* Right column: bio + social links */}
-          <div>
+          <div className="mt-12 flex flex-col gap-5 md:mt-14 lg:mt-16">
             <p
-              className={`!text-stone-500 dark:!text-zinc-400 !font-[460] mt-12 md:mt-14 lg:mt-16 !mb-5${riseClass}`}
+              className={`!text-stone-500 dark:!text-zinc-400 !font-[460] !mb-0${riseClass}`}
               style={riseDelay(DELAY.bioFirst)}
             >
               Product designer with engineering mindset, obsessed with <span className="italic">why</span> behind everything — from systems to pixels.
             </p>
             <p
-              className={`!text-stone-500 dark:!text-zinc-400 !font-[460] !mb-5${riseClass}`}
+              className={`!text-stone-500 dark:!text-zinc-400 !font-[460] !mb-0${riseClass}`}
               style={riseDelay(DELAY.bioSecond)}
             >
               <span>Currently leading design at </span><InlineLinkPreview href="https://www.aniai.ai/" explanation="A robotics startup specialized in kitchen automation">Aniai</InlineLinkPreview><span>, designing robots and tools behind them.</span>
             </p>
             <p
-              className={`!text-stone-500 dark:!text-zinc-400 !font-[460] mb-0${riseClass}`}
+              className={`!text-stone-500 dark:!text-zinc-400 !font-[460] !mb-0${riseClass}`}
               style={riseDelay(DELAY.bioThird)}
             >
-              <span>Previously, reimagined public benefits at </span><InlineLinkPreview href="https://goinvo.com/" variant="intro-link-light" explanation="A Boston design studio crafting healthcare software over twenty years">Goinvo</InlineLinkPreview><span> and advanced healthcare accessibility at </span><InlineLinkPreview href="https://www.athenahealth.com/" variant="intro-link-light" explanation='A healthtech company serving 170K+ clinicians across the US'>AthenaHealth</InlineLinkPreview><span>.</span>
+              <span>Previously, reimagined public benefits at </span><InlineLinkPreview href="https://goinvo.com/" explanation="A Boston design studio crafting healthcare software over twenty years">Goinvo</InlineLinkPreview><span> and advanced healthcare accessibility at </span><InlineLinkPreview href="https://www.athenahealth.com/" explanation='A healthtech company serving 170K+ clinicians across the US'>AthenaHealth</InlineLinkPreview><span>.</span>
             </p>
           </div>
         </div>
