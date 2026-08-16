@@ -26,7 +26,7 @@ export default function BlogPostToc({ contentSelector, className }: BlogPostTocP
           type="button"
           onClick={() => goTo(id)}
           className={cn(
-            'origin-left cursor-pointer rounded text-left hover:translate-x-[12px] motion-safe:active:scale-[0.97]',
+            'origin-left cursor-pointer rounded text-left hover:translate-x-[12px] hover:text-orange-700 dark:hover:text-orange-400 motion-safe:active:scale-[0.97]',
             activeId === id
               ? 'text-stone-800 dark:text-zinc-100'
               : 'text-stone-400 dark:text-zinc-400'

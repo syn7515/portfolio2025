@@ -65,8 +65,7 @@ export default function ProjectListItem({
 
   return (
     <div
-      data-project-list-item
-      className={`w-full transition-opacity duration-150${className ? ` ${className}` : ''}`}
+      className={`w-full${className ? ` ${className}` : ''}`}
       style={style}
     >
       <Link
