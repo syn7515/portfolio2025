@@ -29,7 +29,7 @@ const TOC_LABEL_STYLE: React.CSSProperties = {
   letterSpacing: '-0.02em',
 }
 
-const RAIL_EXIT_MS = 300
+const RAIL_EXIT_MS = 180
 const TITLE_HOVER_SESSION_MS = 2500
 
 /**
@@ -60,7 +60,7 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
     if (!isPaperHomeForwardNav()) return
     // Intentionally let this short fallback survive an early unmount so the session signal cannot
     // leak into a later, unrelated navigation.
-    window.setTimeout(clearPaperHomeForwardNav, 650)
+    window.setTimeout(clearPaperHomeForwardNav, 550)
   }, [])
 
   useEffect(() => () => {
@@ -84,22 +84,12 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
       return
     }
 
-    // Capture the presentation value before markPaperBackNav changes the pre-paint attribute and
-    // potentially cancels an in-progress entrance. This makes a quick reversal continue from the
-    // exact current position instead of jumping to the settled rail first.
-    const computedTransform = window.getComputedStyle(railNav).transform
-    let targetX: number
-    try {
-      const currentMatrix = computedTransform === 'none'
-        ? new DOMMatrixReadOnly()
-        : new DOMMatrixReadOnly(computedTransform)
-      const untransformedRight = railNav.getBoundingClientRect().right - currentMatrix.m41
-      targetX = -untransformedRight
-    } catch {
-      markPaperBackNav()
-      router.push('/')
-      return
-    }
+    // Capture the presentation values before markPaperBackNav changes the pre-paint attribute and
+    // potentially cancels an in-progress entrance. A quick reversal therefore softens from the
+    // rail's exact current opacity and blur instead of flashing to its settled state first.
+    const computedStyle = window.getComputedStyle(railNav)
+    const currentOpacity = computedStyle.opacity
+    const currentFilter = computedStyle.filter
 
     markPaperBackNav()
 
@@ -114,12 +104,12 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
     try {
       exitAnimationRef.current = railNav.animate(
         [
-          { transform: computedTransform === 'none' ? 'translateX(0)' : computedTransform },
-          { transform: `translateX(${targetX}px)` },
+          { opacity: currentOpacity, filter: currentFilter },
+          { opacity: '0', filter: 'blur(4px)' },
         ],
         {
           duration: RAIL_EXIT_MS,
-          easing: 'cubic-bezier(0.68, 0, 0.77, 0)',
+          easing: 'cubic-bezier(0.23, 1, 0.32, 1)',
           fill: 'forwards',
         }
       )
