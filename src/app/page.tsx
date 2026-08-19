@@ -180,23 +180,21 @@ export default function Home() {
               target="_blank"
               rel="noopener noreferrer"
               data-social-link-trigger
-              className="!text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-orange-400 motion-safe:active:scale-[0.97]"
+              className="text-[15px] sm:text-[14px] !text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-orange-400 motion-safe:active:scale-[0.97]"
               style={{
-                fontSize: '14px',
                 transition: 'scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
               }}
             >
               X
             </a>
-            <span className="!text-stone-400 dark:!text-zinc-600" style={{ fontSize: '14px' }}>·</span>
+            <span className="text-[15px] sm:text-[14px] !text-stone-400 dark:!text-zinc-600">·</span>
             <a
               href="https://www.linkedin.com/in/sooyeonp/"
               target="_blank"
               rel="noopener noreferrer"
               data-social-link-trigger
-              className="!text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-orange-400 motion-safe:active:scale-[0.97]"
+              className="text-[15px] sm:text-[14px] !text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-orange-400 motion-safe:active:scale-[0.97]"
               style={{
-                fontSize: '14px',
                 transition: 'scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
               }}
             >
@@ -210,7 +208,7 @@ export default function Home() {
           style={riseDelay(DELAY.footer)}
         >
           <div
-            className="text-[14px] text-stone-400 dark:text-zinc-500 font-normal font-sans text-balance"
+            className="text-[15px] sm:text-[14px] text-stone-400 dark:text-zinc-500 font-normal font-sans text-balance"
           >
             © {new Date().getFullYear()} Sue Park. — Built with millions of tokens of love.
           </div>

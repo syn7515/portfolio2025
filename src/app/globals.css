@@ -297,6 +297,14 @@ p {
   font-family: 'Inter var', var(--font-inter), sans-serif;
 }
 
+/* Mobile reading size. Desktop keeps the compact 15px scale, while narrow
+   screens get a more comfortable 17px measure. */
+@media (max-width: 639.98px) {
+  p {
+    font-size: 1.0625rem;
+  }
+}
+
 /* Global paragraph styles - scoped to avoid MDX conflicts */
 .site-content p {
   margin-bottom: 1rem;

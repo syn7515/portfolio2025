@@ -114,7 +114,7 @@ export function CarouselCard({
     <div
       ref={mediaGateRef}
       className={`flex flex-col items-center${isHiddenByLightbox ? " opacity-0 pointer-events-none" : ""}`}
-      style={{ width: effWidth }}
+      style={{ width: effWidth > 0 ? effWidth : "100%" }}
     >
       <motion.div
         ref={cardRef}
@@ -325,7 +325,7 @@ export function CarouselCard({
           renderCaption({ index, label, caption, active: isActive })
         ) : (
           <div
-            className="carousel-caption text-center text-balance text-xs sm:text-sm mt-2 sm:mt-3 md:mt-4 font-sans"
+            className="carousel-caption text-center text-balance text-sm mt-2 sm:mt-3 md:mt-4 font-sans"
             style={{ width: "100%", ...(captionStyle || {}) }}
           >
             {renderCaptionWithBadges(caption, { muted: true })}

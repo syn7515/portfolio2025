@@ -441,7 +441,10 @@ export default function LabelIndicatorCarousel({
         <div className="relative flex flex-col items-center w-full" style={{ rowGap: Math.max(effGap * 2, 24), left: effOffsetX || 0 }}>
           {normalized.map((item, i) => (
             <div key={i} data-carousel-item={i} className="w-full flex flex-col items-center px-4">
-              <div style={{ width: '100%', maxWidth: effWidth }}>
+              <div
+                className="w-full max-w-[calc(100vw-40px)] sm:max-w-[640px] md:max-w-[640px] lg:max-w-[840px] min-[1280px]:max-w-[960px]"
+                style={effWidth > 0 ? { maxWidth: effWidth } : undefined}
+              >
                 <CarouselCard
                   item={item}
                   index={i}

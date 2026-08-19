@@ -449,7 +449,7 @@ export function Lightbox({
                 if (!caption) return null;
                 return (
                   <motion.div
-                    className={`fixed left-0 right-0 text-center font-sans text-xs sm:text-sm pointer-events-none ${isDarkMode ? '!text-white' : '!text-stone-600'}`}
+                    className={`fixed left-0 right-0 text-center font-sans text-sm pointer-events-none ${isDarkMode ? '!text-white' : '!text-stone-600'}`}
                     style={{ top: `calc(50% + ${dimensions.height / 2}px + 1rem)` }}
                     initial={{ opacity: 0, filter: 'blur(2px)' }}
                     animate={

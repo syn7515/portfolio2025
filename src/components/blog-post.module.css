@@ -317,6 +317,23 @@
     opacity: 0.85;
 }
 
+/* Give case-study copy a roomier mobile scale without changing the established
+   desktop typography. */
+@media (max-width: 639.98px) {
+    .mdxContent h4 {
+        font-size: 1.1875rem;
+    }
+
+    .mdxContent h5 {
+        font-size: 1rem;
+    }
+
+    .mdxContent p,
+    .mdxContent li {
+        font-size: 1.0625rem;
+    }
+}
+
 .mdxContent li::marker {
     color: rgb(168 162 158);
     /* stone-400 */
