@@ -180,20 +180,20 @@ export default function Home() {
               target="_blank"
               rel="noopener noreferrer"
               data-social-link-trigger
-              className="text-[15px] sm:text-[14px] !text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-orange-400 motion-safe:active:scale-[0.97]"
+              className="text-[17px] sm:text-[14px] !text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-orange-400 motion-safe:active:scale-[0.97]"
               style={{
                 transition: 'scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
               }}
             >
               X
             </a>
-            <span className="text-[15px] sm:text-[14px] !text-stone-400 dark:!text-zinc-600">·</span>
+            <span className="text-[17px] sm:text-[14px] !text-stone-400 dark:!text-zinc-600">·</span>
             <a
               href="https://www.linkedin.com/in/sooyeonp/"
               target="_blank"
               rel="noopener noreferrer"
               data-social-link-trigger
-              className="text-[15px] sm:text-[14px] !text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-orange-400 motion-safe:active:scale-[0.97]"
+              className="text-[17px] sm:text-[14px] !text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-orange-400 motion-safe:active:scale-[0.97]"
               style={{
                 transition: 'scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
               }}
