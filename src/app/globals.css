@@ -179,7 +179,10 @@ body {
       linear-gradient(to bottom, var(--paper-grid-major) 1px, transparent 1px),
       linear-gradient(to right, var(--paper-grid-minor) 1px, transparent 1px),
       linear-gradient(to bottom, var(--paper-grid-minor) 1px, transparent 1px);
-    background-position: var(--sidebar-w) 100px;
+    /* Center the 1px grid strokes on the paper boundary. Without the half-pixel
+       offset, gradients paint right/down from the shared origin and make the
+       corner look misaligned against the paper's inset edge. */
+    background-position: calc(var(--sidebar-w) - 0.5px) 99.5px;
     background-size:
       100px 100px,
       100px 100px,
@@ -206,7 +209,7 @@ body {
         linear-gradient(to bottom, var(--paper-grid-hover-major) 1px, transparent 1px),
         linear-gradient(to right, var(--paper-grid-hover-minor) 1px, transparent 1px),
         linear-gradient(to bottom, var(--paper-grid-hover-minor) 1px, transparent 1px);
-      background-position: var(--sidebar-w) 100px;
+      background-position: calc(var(--sidebar-w) - 0.5px) 99.5px;
       background-size:
         100px 100px,
         100px 100px,
