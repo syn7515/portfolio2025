@@ -411,7 +411,10 @@ export function Lightbox({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.4, ease: [0.77, 0, 0.175, 1] }}
+            transition={{
+              duration: exitTransform ? exitDuration : 0.4,
+              ease: [0.77, 0, 0.175, 1],
+            }}
             className={`fixed inset-0 z-[70] backdrop-blur-[1.5px] cursor-zoom-out ${isDarkMode ? 'bg-black/70' : 'bg-stone-100/85'}`}
             onClick={closeLightbox}
           />

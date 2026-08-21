@@ -18,7 +18,19 @@ const defaultTransition = {
 };
 
 const LIGHTBOX_TRANSITION_DURATION = 0.4;
+const LIGHTBOX_EXIT_DURATION_PER_INDEX = 0.08;
+const LIGHTBOX_EXIT_MAX_EXTRA_DURATION = 0.24;
 const LIGHTBOX_EXIT_FALLBACK_BUFFER_MS = 100;
+
+const getLightboxExitDuration = (openingIndex, currentIndex) => {
+  const indexDistance = Math.abs(currentIndex - openingIndex);
+  const extraDuration = Math.min(
+    indexDistance * LIGHTBOX_EXIT_DURATION_PER_INDEX,
+    LIGHTBOX_EXIT_MAX_EXTRA_DURATION
+  );
+
+  return LIGHTBOX_TRANSITION_DURATION + extraDuration;
+};
 
 export default function LabelIndicatorCarousel({
   items,
@@ -90,6 +102,8 @@ export default function LabelIndicatorCarousel({
   const [pendingLightboxIndex, setPendingLightboxIndex] = useState(null); // For delayed transform calculation
   const [hiddenCardIndex, setHiddenCardIndex] = useState(null); // Card hidden while lightbox is open
   const cardRefs = useRef({});
+  const openingLightboxIndexRef = useRef(index);
+  const exitDurationRef = useRef(LIGHTBOX_TRANSITION_DURATION);
   const scrollbarGutterRef = useRef(0); // Store scrollbar gutter for exit animation
   const exitFallbackTimerRef = useRef(null);
   const isLightboxClosingRef = useRef(false);
@@ -250,6 +264,8 @@ export default function LabelIndicatorCarousel({
       exitFallbackTimerRef.current = null;
     }
     isLightboxClosingRef.current = false;
+    openingLightboxIndexRef.current = i;
+    exitDurationRef.current = LIGHTBOX_TRANSITION_DURATION;
 
     // FIX 2: Set pending index to trigger scroll lock, then calculate transform after layout stabilizes
     setLightboxIndex(i);
@@ -282,6 +298,7 @@ export default function LabelIndicatorCarousel({
     setInitialTransform(null);
     setExitTransform(null);
     setExitDuration(LIGHTBOX_TRANSITION_DURATION);
+    exitDurationRef.current = LIGHTBOX_TRANSITION_DURATION;
     setHiddenCardIndex(null);
     // Reset the presence boundary as well. If Motion ever fails to release an
     // exiting child, changing this key force-unmounts that stale exit tree.
@@ -295,6 +312,10 @@ export default function LabelIndicatorCarousel({
     // Since carousel index is synced with lightbox index, no sliding needed
     // Just animate back to the current card position
     const transform = calculateCardTransform(lightboxIndex);
+    const exitAnimationDuration = transform
+      ? getLightboxExitDuration(openingLightboxIndexRef.current, lightboxIndex)
+      : LIGHTBOX_TRANSITION_DURATION;
+
     if (transform) {
       // Apply same scrollbar gutter compensation as opening
       // When scroll lock is removed, the gutter will reappear and content shifts left
@@ -302,9 +323,10 @@ export default function LabelIndicatorCarousel({
       if (scrollbarGutter > 0) {
         transform.x = transform.x + scrollbarGutter / 2;
       }
+      exitDurationRef.current = exitAnimationDuration;
       flushSync(() => {
         setExitTransform(transform);
-        setExitDuration(LIGHTBOX_TRANSITION_DURATION);
+        setExitDuration(exitAnimationDuration);
       });
       setLightboxOpen(false);
     } else {
@@ -316,7 +338,7 @@ export default function LabelIndicatorCarousel({
     // mounted and the source card hidden indefinitely.
     exitFallbackTimerRef.current = window.setTimeout(
       handleLightboxExitComplete,
-      LIGHTBOX_TRANSITION_DURATION * 1000 + LIGHTBOX_EXIT_FALLBACK_BUFFER_MS
+      exitAnimationDuration * 1000 + LIGHTBOX_EXIT_FALLBACK_BUFFER_MS
     );
   }, [isLightboxOpen, lightboxIndex, calculateCardTransform, handleLightboxExitComplete]);
 
@@ -386,7 +408,7 @@ export default function LabelIndicatorCarousel({
       return () => {
         // When closing, wait for exit animation to complete before restoring scroll
         const savedScrollY = scrollY;
-        const animationDuration = exitDuration * 1000;
+        const animationDuration = exitDurationRef.current * 1000;
         setTimeout(() => {
           const body = document.body;
           body.style.position = '';
@@ -398,7 +420,7 @@ export default function LabelIndicatorCarousel({
         }, animationDuration);
       };
     }
-  }, [effectiveLightboxEnabled, isLightboxOpen, exitDuration]);
+  }, [effectiveLightboxEnabled, isLightboxOpen]);
 
   // Keyboard handler for lightbox (defined after callbacks)
   useEffect(() => {
