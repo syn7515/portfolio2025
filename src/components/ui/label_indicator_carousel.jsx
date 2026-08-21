@@ -431,9 +431,10 @@ export default function LabelIndicatorCarousel({
       ref={wrapperRef}
       className={`relative flex h-auto py-0 sm:py-2 md:py-3 w-full flex-col items-center justify-center ${className}`}
       data-carousel
+      data-carousel-layer
       aria-label={ariaLabel}
     >
-      <div data-carousel-layer className="relative z-[50] flex flex-col items-center justify-center w-full">
+      <div className="relative z-[50] flex flex-col items-center justify-center w-full">
         {/* Always a vertical stack, at every viewport size */}
         {/* `left` (not transform) applies the shift without creating a stacking
             context — the cards' z-order must stay resolvable at the root level

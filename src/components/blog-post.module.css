@@ -60,15 +60,23 @@
     }
 }
 
-@keyframes content-blur-reveal {
+@keyframes content-opacity-reveal {
     from {
-        filter: blur(6px);
         opacity: 0;
     }
 
     to {
-        filter: blur(0);
         opacity: 1;
+    }
+}
+
+@keyframes content-blur-reveal {
+    from {
+        filter: blur(6px);
+    }
+
+    to {
+        filter: blur(0);
     }
 }
 
@@ -95,13 +103,15 @@
         animation: paper-underlay-retire 500ms ease-out 450ms forwards;
     }
 
-    /* Held at the hidden keyframe (`backwards`) for the length of the slide, then revealed on the
-       landing frame — the delay is what used to be the Framer `onAnimationComplete` callback. */
+    /* Opacity overlaps the paper's final 190ms for responsiveness. Blur starts closer to the
+       landing frame so it remains visible after the paper overlay clears. */
     .contentBlurRevealItem,
     .contentBlurReveal > :not(:has([data-carousel])),
     .contentBlurReveal > * > :not(:has([data-carousel])),
     .contentBlurReveal [data-carousel-layer] {
-        animation: content-blur-reveal 350ms cubic-bezier(0.23, 1, 0.32, 1) 450ms backwards;
+        animation:
+            content-opacity-reveal 350ms cubic-bezier(0.23, 1, 0.32, 1) 260ms backwards,
+            content-blur-reveal 300ms cubic-bezier(0.23, 1, 0.32, 1) 400ms backwards;
     }
 }
 
