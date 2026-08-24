@@ -26,9 +26,9 @@ let hasVisitedHome = false;
 // This also retires the old rAF-throttling fallback: CSS animations advance on the document
 // timeline, so a tab opened in the background arrives already settled instead of stuck hidden.
 
-// Stagger, in ms, applied per element on top of the base offset. The base holds the sequence until
-// the sheet is ~60% of the way in, so content rises onto a landing sheet rather than racing it.
-const CONTENT_BASE_DELAY_MS = 270;
+// Stagger, in ms, applied per element on top of the base offset. The sequence now starts while the
+// sheet is still approaching rest, giving the first text block 270ms of overlap with the 450ms slide.
+const CONTENT_BASE_DELAY_MS = 180;
 const DELAY = {
   name: 0,
   bioFirst: 80,
