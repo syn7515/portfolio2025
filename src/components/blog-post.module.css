@@ -260,10 +260,8 @@
 }
 
 .mdxContent a:is(:hover, :focus-visible) {
-    color: rgb(234 88 12) !important;
-    /* stone-900 - darker on hover */
-    text-decoration-color: rgb(234 88 12) !important;
-    /* stone-500 - darker underline on hover */
+    color: var(--intro-trigger-decoration-hover) !important;
+    text-decoration-color: currentColor !important;
     opacity: 1 !important;
 }
 
@@ -283,11 +281,12 @@
     text-underline-offset: 0.05rem !important;
     text-underline-position: from-font !important;
     font-style: italic !important;
+    opacity: 1 !important;
 }
 
 .mdxContent a.inline-youtube-preview-trigger:is(:hover, :focus-visible) {
-    color: rgb(234 88 12) !important;
-    text-decoration-color: rgb(234 88 12) !important;
+    color: var(--intro-trigger-decoration-hover) !important;
+    text-decoration-color: currentColor !important;
 }
 
 .mdxContent ul {
@@ -480,24 +479,21 @@
     }
 
     .mdxContent a:is(:hover, :focus-visible) {
-        color: rgb(251 146 60) !important;
-        /* orange-400 */
-        text-decoration-color: rgb(251 146 60) !important;
-        /* orange-400 */
+        color: var(--intro-trigger-decoration-hover) !important;
+        text-decoration-color: currentColor !important;
         opacity: 1 !important;
         /* full opacity on hover */
     }
 
     .mdxContent a.inline-youtube-preview-trigger {
         color: rgb(161 161 170) !important;
-        opacity: 0.9;
+        opacity: 1 !important;
         text-decoration-color: var(--inline-youtube-trigger-decoration) !important;
     }
 
     .mdxContent a.inline-youtube-preview-trigger:is(:hover, :focus-visible) {
-        color: rgb(251 146 60) !important;
-        text-decoration-color: rgb(251 146 60) !important;
-        opacity: 1;
+        color: var(--intro-trigger-decoration-hover) !important;
+        text-decoration-color: currentColor !important;
     }
 
     .mdxContent sup:not(.sup-badge) {

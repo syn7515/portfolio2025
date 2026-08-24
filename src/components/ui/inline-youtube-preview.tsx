@@ -88,7 +88,6 @@ export function InlineYoutubePreview({
     el.style.setProperty('text-decoration-thickness', '10%', 'important')
     el.style.setProperty('text-underline-offset', '0.05rem', 'important')
     el.style.setProperty('font-style', 'italic', 'important')
-    el.style.setProperty('opacity', '0.65', 'important')
   }, [])
 
   const setAnchorRef = useCallback((el: HTMLAnchorElement | null) => {
@@ -149,8 +148,7 @@ export function InlineYoutubePreview({
   }, [updatePreviewPosition])
 
   const handleMouseEnter = useCallback(() => {
-    anchorRef.current?.style.setProperty('text-decoration-color', 'var(--intro-trigger-decoration-hover)', 'important')
-    anchorRef.current?.style.setProperty('opacity', '1', 'important')
+    anchorRef.current?.style.setProperty('text-decoration-color', 'currentColor', 'important')
     if (hoverDelayRef.current) clearTimeout(hoverDelayRef.current)
     hoverDelayRef.current = setTimeout(() => {
       revealPreview()
@@ -158,9 +156,13 @@ export function InlineYoutubePreview({
     }, HOVER_DELAY_MS)
   }, [revealPreview])
 
+  const handleFocus = useCallback(() => {
+    anchorRef.current?.style.setProperty('text-decoration-color', 'currentColor', 'important')
+    revealPreview()
+  }, [revealPreview])
+
   const handleMouseLeave = useCallback(() => {
     anchorRef.current?.style.setProperty('text-decoration-color', 'var(--inline-youtube-trigger-decoration)', 'important')
-    anchorRef.current?.style.setProperty('opacity', '0.65', 'important')
     if (hoverDelayRef.current) {
       clearTimeout(hoverDelayRef.current)
       hoverDelayRef.current = null
@@ -251,7 +253,7 @@ export function InlineYoutubePreview({
         onClick={handleClick}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        onFocus={revealPreview}
+        onFocus={handleFocus}
         onBlur={handleMouseLeave}
         onKeyDown={handleKeyDown}
         role="button"

@@ -9,8 +9,8 @@
   /* stone-300 - underline color for intro/link preview triggers */
   --inline-youtube-trigger-decoration: rgb(168 162 158);
   /* stone-300 - YouTube underline color in light mode */
-  --intro-trigger-decoration-hover: rgb(234 88 12);
-  /* orange-600 - underline color on hover */
+  --intro-trigger-decoration-hover: rgb(194 65 12);
+  /* orange-700 - shared inline-preview highlight */
   --scrollbar-thumb: rgb(168 162 158 / 0.6);
   /* stone-400 */
   --scrollbar-thumb-hover: rgb(120 113 108 / 0.8);
@@ -45,8 +45,8 @@
     /* zinc-500 - underline color for intro/link preview triggers */
     --inline-youtube-trigger-decoration: currentColor;
     /* match the YouTube trigger's text color in dark mode */
-    --intro-trigger-decoration-hover: rgb(253 186 116);
-    /* orange-300 - underline color on hover */
+    --intro-trigger-decoration-hover: rgb(251 146 60);
+    /* orange-400 - shared inline-preview highlight */
     --scrollbar-thumb: rgb(82 82 91 / 0.6);
     /* zinc-600 */
     --scrollbar-thumb-hover: rgb(113 113 122 / 0.8);
@@ -563,11 +563,12 @@ a[data-inline-youtube-trigger] {
   /* stone-300 - same as intro-link */
   text-underline-offset: 0.05rem !important;
   font-style: italic !important;
+  opacity: 1 !important;
 }
 
 a[data-inline-youtube-trigger]:is(:hover, :focus-visible) {
-  color: rgb(234 88 12) !important;
-  text-decoration-color: rgb(234 88 12) !important;
+  color: var(--intro-trigger-decoration-hover) !important;
+  text-decoration-color: currentColor !important;
 }
 
 /* Inline link preview trigger: same as .intro-link (underline, italic, decoration color) */
@@ -588,9 +589,8 @@ a.intro-link[data-inline-link-preview-trigger] {
 }
 
 a[data-inline-link-preview-trigger]:is(:hover, :focus-visible) {
-  color: rgb(234 88 12) !important;
-  /* orange-600 */
-  text-decoration-color: rgb(234 88 12) !important;
+  color: var(--intro-trigger-decoration-hover) !important;
+  text-decoration-color: currentColor !important;
   opacity: 1;
 }
 
@@ -647,9 +647,8 @@ a[data-mobile-menu-current] {
   }
 
   a[data-inline-youtube-trigger]:is(:hover, :focus-visible) {
-    color: rgb(253 186 116) !important;
-    /* orange-300 */
-    text-decoration-color: rgb(253 186 116) !important;
+    color: var(--intro-trigger-decoration-hover) !important;
+    text-decoration-color: currentColor !important;
   }
 
   a[data-inline-link-preview-trigger] {
@@ -662,9 +661,8 @@ a[data-mobile-menu-current] {
   }
 
   a[data-inline-link-preview-trigger]:is(:hover, :focus-visible) {
-    color: rgb(251 146 60) !important;
-    /* orange-400 */
-    text-decoration-color: rgb(251 146 60) !important;
+    color: var(--intro-trigger-decoration-hover) !important;
+    text-decoration-color: currentColor !important;
   }
 
   a[data-social-link-trigger] {
