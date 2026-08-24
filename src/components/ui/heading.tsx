@@ -51,7 +51,7 @@ export function Heading({ title, year, tocLabel, className }: HeadingProps) {
                 style={{
                   backgroundImage: 'radial-gradient(circle, currentColor 1px, transparent 1px)',
                   backgroundSize: '5px 2px',
-                  backgroundRepeat: 'repeat-x',
+                  backgroundRepeat: 'space no-repeat',
                 }}
               />
             </div>

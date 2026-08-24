@@ -41,7 +41,7 @@ const titleStyle: CSSProperties = {
 const dividerStyle: CSSProperties = {
   backgroundImage: 'radial-gradient(circle, currentColor 1px, transparent 1px)',
   backgroundSize: '5px 2px',
-  backgroundRepeat: 'repeat-x',
+  backgroundRepeat: 'space no-repeat',
 };
 
 const titleClassName = "text-[21px] sm:text-[19px] !text-stone-700 dark:!text-zinc-200 transition-colors duration-150 group-hover:!text-orange-700 group-focus-visible:!text-orange-700 dark:group-hover:!text-orange-400 dark:group-focus-visible:!text-orange-400";
