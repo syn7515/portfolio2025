@@ -183,8 +183,8 @@ export function InlineLinkPreview({
               className={cn(
                 'pointer-events-none absolute z-50 isolate block whitespace-normal text-[20px] font-normal leading-[1.15] tracking-[-0.01em] text-stone-700 dark:text-zinc-200',
                 isAbove
-                  ? 'bottom-full origin-bottom-left'
-                  : 'top-full origin-top-left'
+                  ? 'bottom-full origin-bottom-left mb-1'
+                  : 'top-full origin-top-left mt-1'
               )}
               style={{
                 left: localDescriptionLayout?.left ?? 0,
