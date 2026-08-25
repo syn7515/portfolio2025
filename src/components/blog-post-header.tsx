@@ -9,10 +9,10 @@ interface BlogPostHeaderProps {
 
 export default function BlogPostHeader({ title, subtitle }: BlogPostHeaderProps) {
   return (
-    <header className="max-w-[560px] mx-auto mb-16 xs:mb-16 sm:mb-20 lg:mb-[100px] text-left">
+    <header className="max-w-[560px] mx-auto pt-4 sm:pt-0 mb-16 xs:mb-16 sm:mb-20 lg:mb-[100px] text-left">
       {/* Subtitle / metadata - small, light grey */}
       {subtitle && (
-        <p className="text-[15px] sm:text-sm !text-stone-500 dark:!text-zinc-400 !mb-3" style={{ fontWeight: 460 }}>
+        <p className="!text-[16px] !font-[420] !leading-[160%] !tracking-[0rem] sm:!text-sm sm:!font-[460] sm:!leading-[165%] sm:!tracking-normal !text-stone-500 dark:!text-zinc-400 !mb-3">
           {subtitle}
         </p>
       )}

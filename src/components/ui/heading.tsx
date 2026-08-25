@@ -17,7 +17,7 @@ interface HeadingProps {
 
 export function Heading({ title, year, tocLabel, className }: HeadingProps) {
   const id = slugify(title);
-  const titleClassName = 'text-[21px] sm:text-[19px] text-stone-800 dark:text-zinc-200';
+  const titleClassName = 'text-[20px] sm:text-[19px] [text-wrap:wrap] text-stone-800 dark:text-zinc-200';
   const titleStyle = {
     fontFamily: 'var(--font-crimson-pro), serif',
     fontWeight: 450,
@@ -25,7 +25,7 @@ export function Heading({ title, year, tocLabel, className }: HeadingProps) {
     letterSpacing: '-0.02em',
     fontStyle: 'normal',
   } as const;
-  const yearClassName = 'text-[16px] sm:text-[15px] !font-[460] leading-[160%] font-sans text-stone-400 dark:text-zinc-500';
+  const yearClassName = 'text-[16px] sm:text-[15px] !font-[420] sm:!font-[460] leading-[160%] font-sans text-stone-400 dark:text-zinc-500';
 
   return (
     <div

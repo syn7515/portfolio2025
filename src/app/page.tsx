@@ -172,7 +172,7 @@ export default function Home() {
             style={riseDelay(DELAY.divider)}
           />
           <div
-            className={`intro-text flex gap-2 w-fit${riseClass}`}
+            className={`${styles.socialLinks} intro-text flex gap-2 w-fit${riseClass}`}
             style={riseDelay(DELAY.socials)}
           >
             <a
@@ -180,7 +180,7 @@ export default function Home() {
               target="_blank"
               rel="noopener noreferrer"
               data-social-link-trigger
-              className="text-[17px] sm:text-[14px] !text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-orange-400 motion-safe:active:scale-[0.97]"
+              className="text-[17px] sm:text-[14px] !text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 active:!text-orange-700 dark:hover:!text-orange-400 dark:active:!text-orange-400 motion-safe:active:scale-[0.97]"
               style={{
                 transition: 'scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
               }}
@@ -193,7 +193,7 @@ export default function Home() {
               target="_blank"
               rel="noopener noreferrer"
               data-social-link-trigger
-              className="text-[17px] sm:text-[14px] !text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-orange-400 motion-safe:active:scale-[0.97]"
+              className="text-[17px] sm:text-[14px] !text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 active:!text-orange-700 dark:hover:!text-orange-400 dark:active:!text-orange-400 motion-safe:active:scale-[0.97]"
               style={{
                 transition: 'scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
               }}
@@ -204,13 +204,13 @@ export default function Home() {
         </div>
 
         <div
-          className={`max-w-[480px] mx-auto mt-auto pt-24 sm:pt-32 lg:pt-36 text-center${riseClass}`}
+          className={`w-full max-w-[480px] mx-auto mt-auto pt-24 sm:pt-32 lg:pt-36 text-left sm:text-center${riseClass}`}
           style={riseDelay(DELAY.footer)}
         >
           <div
-            className="text-[15px] sm:text-[14px] text-stone-400 dark:text-zinc-500 font-normal font-sans text-balance"
+            className="text-[15px] sm:text-[14px] text-stone-400 dark:text-zinc-500 font-normal font-sans [text-wrap:wrap] sm:text-balance"
           >
-            © {new Date().getFullYear()} Sue Park. — Built with millions of tokens of love.
+            © {new Date().getFullYear()} Sue Park<span className="hidden sm:inline">. — Built with millions of tokens of love.</span>
           </div>
         </div>
         </div>

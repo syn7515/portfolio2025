@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { cn, scrollBehavior } from '@/lib/utils'
 import Link from 'next/link'
-import { ArrowLeft, ArrowRight, ArrowUp, Undo2 } from 'lucide-react'
+import { ArrowUp, ChevronLeft, ChevronRight, Undo2 } from 'lucide-react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { Divider } from '@/components/ui/divider'
 import styles from './blog-post.module.css'
@@ -221,7 +221,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
         }}
       />
 
-      {/* Mobile menu: hamburger + blurred overlay; visible only below 820px */}
+      {/* Mobile navigation: home logo + hamburger + blurred overlay; visible only below 820px */}
       <BlogPostMobileMenu slug={slug} />
 
       {/* Compact rail: Home + tick-mark TOC, for the 820–1280px band where the paper is full-bleed
@@ -344,7 +344,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                 {(previousProject || nextProject) ? (
                   <div
                     className={cn(
-                      'max-w-[560px] mx-auto min-[1280px]:max-w-none mt-16 min-[1280px]:mt-32 pb-12 min-[640px]:pb-16 min-[1280px]:pb-[120px] overflow-x-visible',
+                      'max-w-[560px] mx-auto min-[1280px]:max-w-none mt-16 min-[1280px]:mt-32 pb-[28px] min-[640px]:pb-16 min-[1280px]:pb-[120px] overflow-x-visible',
                       styles.contentBlurRevealItem
                     )}
                   >
@@ -363,13 +363,13 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                           style={{ textDecoration: 'none' }}
                           onClick={markPaperBackNav}
                         >
-                          <div className="text-[18px] sm:text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic mb-0 sm:mb-1.5 opacity-80 font-sans">
-                            <span className="relative inline-flex items-center">
-                              <ArrowLeft
-                                className="absolute left-0 size-4 sm:size-3.5 text-current opacity-100 sm:opacity-0 blur-none sm:blur-[1px] motion-safe:transition-[opacity,filter] motion-safe:duration-300 motion-safe:ease-out sm:group-hover:opacity-100 sm:group-hover:blur-none sm:group-focus-visible:opacity-100 sm:group-focus-visible:blur-none motion-reduce:opacity-100 motion-reduce:blur-none"
+                          <div className="text-[16px] sm:text-[14px] text-stone-500 dark:text-zinc-400 font-[420] sm:font-normal not-italic mb-0 sm:mb-1.5 opacity-80 font-sans">
+                            <span className="relative inline-flex items-center -translate-x-3 sm:translate-x-0">
+                              <ChevronLeft
+                                className="absolute left-0 size-4 sm:size-3.5 text-stone-400 dark:text-zinc-500 opacity-100 sm:opacity-0 blur-none sm:blur-[1px] motion-safe:transition-[opacity,filter] motion-safe:duration-300 motion-safe:ease-out sm:group-hover:opacity-100 sm:group-hover:blur-none sm:group-focus-visible:opacity-100 sm:group-focus-visible:blur-none motion-reduce:opacity-100 motion-reduce:blur-none"
                                 aria-hidden
                               />
-                              <span className="relative z-10 translate-x-5 sm:translate-x-0 motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out sm:group-hover:translate-x-4 sm:group-focus-visible:translate-x-4 motion-reduce:translate-x-4">
+                              <span className="relative z-10 translate-x-5 sm:translate-x-0 motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out sm:group-hover:translate-x-4 sm:group-focus-visible:translate-x-4 sm:motion-reduce:translate-x-4">
                                 Previous
                               </span>
                             </span>
@@ -392,13 +392,13 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                           className="flex-1 text-right group cursor-pointer"
                           style={{ textDecoration: 'none' }}
                         >
-                          <div className="text-[18px] sm:text-[14px] text-stone-500 dark:text-zinc-400 font-normal not-italic mb-0 sm:mb-1.5 opacity-80 font-sans">
-                            <span className="relative inline-flex items-center justify-end">
-                              <ArrowRight
-                                className="absolute right-0 size-4 sm:size-3.5 text-current opacity-100 sm:opacity-0 blur-none sm:blur-[1px] motion-safe:transition-[opacity,filter] motion-safe:duration-300 motion-safe:ease-out sm:group-hover:opacity-100 sm:group-hover:blur-none sm:group-focus-visible:opacity-100 sm:group-focus-visible:blur-none motion-reduce:opacity-100 motion-reduce:blur-none"
+                          <div className="text-[16px] sm:text-[14px] text-stone-500 dark:text-zinc-400 font-[420] sm:font-normal not-italic mb-0 sm:mb-1.5 opacity-80 font-sans">
+                            <span className="relative inline-flex items-center justify-end translate-x-3 sm:translate-x-0">
+                              <ChevronRight
+                                className="absolute right-0 size-4 sm:size-3.5 text-stone-400 dark:text-zinc-500 opacity-100 sm:opacity-0 blur-none sm:blur-[1px] motion-safe:transition-[opacity,filter] motion-safe:duration-300 motion-safe:ease-out sm:group-hover:opacity-100 sm:group-hover:blur-none sm:group-focus-visible:opacity-100 sm:group-focus-visible:blur-none motion-reduce:opacity-100 motion-reduce:blur-none"
                                 aria-hidden
                               />
-                              <span className="relative z-10 -translate-x-5 sm:translate-x-0 motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out sm:group-hover:-translate-x-4 sm:group-focus-visible:-translate-x-4 motion-reduce:-translate-x-4">
+                              <span className="relative z-10 -translate-x-5 sm:translate-x-0 motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out sm:group-hover:-translate-x-4 sm:group-focus-visible:-translate-x-4 sm:motion-reduce:-translate-x-4">
                                 Next
                               </span>
                             </span>

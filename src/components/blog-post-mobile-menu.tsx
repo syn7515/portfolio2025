@@ -3,7 +3,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Undo2 } from 'lucide-react'
 import { cn, prefersReducedMotion } from '@/lib/utils'
 import { PROJECTS } from '@/components/blog-post-layout'
 import { markPaperBackNav } from '@/lib/paper-exit-transition'
@@ -12,7 +11,7 @@ interface BlogPostMobileMenuProps {
   slug?: string
 }
 
-const BAR_CLASS = 'absolute left-[9px] right-[9px] h-[2px] rounded-none bg-stone-500 dark:bg-zinc-400 motion-safe:transition-[translate,rotate,opacity,filter] motion-safe:duration-250 motion-safe:ease-out'
+const BAR_CLASS = 'absolute left-[8px] right-[8px] h-[2px] rounded-none bg-stone-500 dark:bg-zinc-400 motion-safe:transition-[translate,rotate,opacity,filter] motion-safe:duration-250 motion-safe:ease-out'
 
 // How long the overlay takes to settle into a solid paper sheet before the route swap happens
 const LEAVE_FADE_MS = 300
@@ -40,11 +39,9 @@ export default function BlogPostMobileMenu({ slug }: BlogPostMobileMenuProps) {
       setOpen(false)
       return
     }
-    // Home: let the Link navigate immediately with no exit fade, matching the sidebar's
-    // back-to-home link in blog-post-layout — including flagging the departure as backwards, so
-    // home lands with its content already settled and a sheet sliding off it. Without this the two
-    // Home links played opposite motions for the same action: a sheet sliding *in* here, a sheet
-    // sliding *out* from the sidebar.
+    // The logo navigates home immediately with no exit fade, matching the sidebar's back-to-home
+    // link in blog-post-layout — including flagging the departure as backwards, so home lands with
+    // its content already settled and a sheet sliding off it.
     if (href === '/') {
       markPaperBackNav()
       return
@@ -79,10 +76,11 @@ export default function BlogPostMobileMenu({ slug }: BlogPostMobileMenuProps) {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [open, leaving])
 
-  const items = [
-    { href: '/', label: 'Home', slug: undefined as string | undefined },
-    ...PROJECTS.map(p => ({ href: `/${p.slug}`, label: p.title, slug: p.slug as string | undefined })),
-  ]
+  const items = PROJECTS.map(p => ({
+    href: `/${p.slug}`,
+    label: p.title,
+    slug: p.slug as string | undefined,
+  }))
 
   return (
     <div className="min-[820px]:hidden">
@@ -111,7 +109,6 @@ export default function BlogPostMobileMenu({ slug }: BlogPostMobileMenuProps) {
         >
           {items.map(item => {
             const isCurrent = item.slug !== undefined && item.slug === slug
-            const isHome = item.href === '/'
             return (
               <Link
                 key={item.href}
@@ -121,14 +118,12 @@ export default function BlogPostMobileMenu({ slug }: BlogPostMobileMenuProps) {
                 data-mobile-menu-current={isCurrent ? '' : undefined}
                 className={cn(
                   'text-[20px] font-[460] tracking-[-0.01em] !not-italic transition-colors duration-300 ease-out px-3 py-1 rounded',
-                  isHome && 'inline-flex items-center gap-2',
                   isCurrent
                     ? '!text-stone-700 dark:!text-zinc-200'
                     : '!text-stone-500 dark:!text-zinc-400 !no-underline hover:!text-orange-700 dark:hover:!text-orange-200'
                 )}
                 tabIndex={open ? undefined : -1}
               >
-                {isHome && <Undo2 className="size-5 flex-shrink-0" aria-hidden />}
                 {item.label}
               </Link>
             )
@@ -136,34 +131,62 @@ export default function BlogPostMobileMenu({ slug }: BlogPostMobileMenuProps) {
         </nav>
       </div>
 
-      {/* Hamburger / close toggle — stays in the same top-right spot in both states */}
-      <button
-        type="button"
-        onClick={() => { if (!leaving) setOpen(v => !v) }}
-        aria-label={open ? 'Close menu' : 'Open menu'}
-        aria-expanded={open}
-        aria-controls="mobile-menu"
+      {/* Persistent mobile top navigation: home logo on the left, menu toggle on the right. */}
+      <nav
+        aria-label="Primary"
         className={cn(
-          'fixed top-4 right-4 z-[70] w-10 h-10 p-2 cursor-pointer [-webkit-tap-highlight-color:transparent] transition-opacity duration-250 ease-out',
+          'fixed inset-x-0 top-0 z-[70] flex h-12 items-center justify-between px-6 pointer-events-none transition-opacity duration-250 ease-out',
           leaving && 'opacity-0 pointer-events-none'
         )}
       >
-        {/* Top bar: rotates while sliding down to the center, forming the "\" diagonal (pointing top-left) */}
-        <span
-          aria-hidden
-          className={cn(BAR_CLASS, 'top-[12px]', open && 'translate-y-[7px] rotate-45')}
-        />
-        {/* Middle bar: dissolves with a blur */}
-        <span
-          aria-hidden
-          className={cn(BAR_CLASS, 'top-[19px]', open && 'opacity-0 blur-[3px]')}
-        />
-        {/* Bottom bar: rotates while sliding up to the center, forming the "/" diagonal */}
-        <span
-          aria-hidden
-          className={cn(BAR_CLASS, 'top-[26px]', open && '-translate-y-[7px] -rotate-45')}
-        />
-      </button>
+        <Link
+          href="/"
+          aria-label="Sue Park — Home"
+          aria-hidden={leaving || undefined}
+          tabIndex={leaving ? -1 : undefined}
+          onClick={(e) => handleLinkClick(e, '/', false)}
+          className={cn(
+            'pointer-events-auto inline-flex h-9 translate-y-[3px] items-center rounded !text-stone-700 dark:!text-zinc-200 !no-underline motion-safe:active:scale-[0.97]',
+            leaving && 'pointer-events-none'
+          )}
+          style={{
+            fontFamily: 'var(--font-biro-script), "Segoe Print", "Bradley Hand", cursive',
+            fontSize: '28px',
+            lineHeight: '120%',
+            letterSpacing: '-0.03em',
+            fontWeight: 360,
+            transition: 'scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
+          }}
+        >
+          Sue Park
+        </Link>
+
+        <button
+          type="button"
+          onClick={() => { if (!leaving) setOpen(v => !v) }}
+          disabled={leaving}
+          aria-label={open ? 'Close menu' : 'Open menu'}
+          aria-expanded={open}
+          aria-controls="mobile-menu"
+          className="pointer-events-auto relative -mr-2 size-9 cursor-pointer disabled:pointer-events-none [-webkit-tap-highlight-color:transparent]"
+        >
+          {/* Top bar: rotates while sliding down to the center, forming the "\" diagonal (pointing top-left) */}
+          <span
+            aria-hidden
+            className={cn(BAR_CLASS, 'top-[10px]', open && 'translate-y-[7px] rotate-45')}
+          />
+          {/* Middle bar: dissolves with a blur */}
+          <span
+            aria-hidden
+            className={cn(BAR_CLASS, 'top-[17px]', open && 'opacity-0 blur-[3px]')}
+          />
+          {/* Bottom bar: rotates while sliding up to the center, forming the "/" diagonal */}
+          <span
+            aria-hidden
+            className={cn(BAR_CLASS, 'top-[24px]', open && '-translate-y-[7px] -rotate-45')}
+          />
+        </button>
+      </nav>
     </div>
   )
 }

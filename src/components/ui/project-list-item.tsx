@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode, CSSProperties, MouseEvent } from 'react';
+import type { CSSProperties, MouseEvent } from 'react';
 import Link from 'next/link';
 import { markPaperHomeForwardNav } from '@/lib/paper-exit-transition';
 
@@ -14,28 +14,11 @@ interface ProjectListItemProps {
   style?: CSSProperties;
 }
 
-// Prevent widows by keeping the last two words together on their own line
-function preventWidow(text: string): ReactNode {
-  const words = text.split(' ');
-  if (words.length <= 2) return text;
-
-  const lastTwoWords = words.slice(-2).join(' ');
-  const restOfText = words.slice(0, -2).join(' ');
-
-  return (
-    <>
-      {restOfText && `${restOfText} `}
-      <span style={{ whiteSpace: 'nowrap' }}>{lastTwoWords}</span>
-    </>
-  );
-}
-
 const titleStyle: CSSProperties = {
   fontFamily: 'var(--font-crimson-pro), serif',
   fontWeight: 450,
   lineHeight: '130%',
   letterSpacing: '-0.02em',
-  textWrap: 'balance',
 };
 
 const dividerStyle: CSSProperties = {
@@ -44,9 +27,9 @@ const dividerStyle: CSSProperties = {
   backgroundRepeat: 'space no-repeat',
 };
 
-const titleClassName = "text-[21px] sm:text-[19px] !text-stone-700 dark:!text-zinc-200 transition-colors duration-150 group-hover:!text-orange-700 group-focus-visible:!text-orange-700 dark:group-hover:!text-orange-400 dark:group-focus-visible:!text-orange-400";
-const dividerClassName = "w-full h-[2px] !text-stone-300 dark:!text-zinc-700 transition-[color,opacity] duration-150 group-hover:opacity-40 group-focus-visible:opacity-40 group-hover:!text-orange-700 group-focus-visible:!text-orange-700 dark:group-hover:!text-orange-400 dark:group-focus-visible:!text-orange-400";
-const datesClassName = "text-[16px] sm:text-[15px] !font-[460] leading-[160%] font-sans !text-stone-400 dark:!text-zinc-500 whitespace-nowrap transition-[color,opacity] duration-150 group-hover:opacity-100 group-focus-visible:opacity-100 group-hover:!text-orange-700 group-focus-visible:!text-orange-700 dark:group-hover:!text-orange-400 dark:group-focus-visible:!text-orange-400";
+const titleClassName = "text-[20px] sm:text-[19px] [text-wrap:wrap] sm:[text-wrap:balance] !text-stone-700 dark:!text-zinc-200 transition-colors duration-150 group-hover:!text-orange-700 group-active:!text-orange-700 group-focus-visible:!text-orange-700 dark:group-hover:!text-orange-400 dark:group-active:!text-orange-400 dark:group-focus-visible:!text-orange-400";
+const dividerClassName = "w-full h-[2px] !text-stone-300 dark:!text-zinc-700 transition-[color,opacity] duration-150 group-hover:opacity-40 group-active:opacity-40 group-focus-visible:opacity-40 group-hover:!text-orange-700 group-active:!text-orange-700 group-focus-visible:!text-orange-700 dark:group-hover:!text-orange-400 dark:group-active:!text-orange-400 dark:group-focus-visible:!text-orange-400";
+const datesClassName = "text-[16px] sm:text-[15px] !font-[420] sm:!font-[460] leading-[160%] font-sans !text-stone-400 dark:!text-zinc-500 whitespace-nowrap transition-[color,opacity] duration-150 group-hover:opacity-100 group-active:opacity-100 group-focus-visible:opacity-100 group-hover:!text-orange-700 group-active:!text-orange-700 group-focus-visible:!text-orange-700 dark:group-hover:!text-orange-400 dark:group-active:!text-orange-400 dark:group-focus-visible:!text-orange-400";
 
 export default function ProjectListItem({
   title,
@@ -75,7 +58,7 @@ export default function ProjectListItem({
       >
         {/* Mobile: title wraps on its own line, dates as a small line below (no divider — it has nothing to lead into on its own row) */}
         <div className="flex sm:hidden flex-col gap-0.5 not-italic">
-          <span className={titleClassName} style={titleStyle}>{preventWidow(title)}</span>
+          <span className={titleClassName} style={titleStyle}>{title}</span>
           <span className={datesClassName}>{dates}</span>
         </div>
 
