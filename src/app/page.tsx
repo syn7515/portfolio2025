@@ -106,7 +106,7 @@ export default function Home() {
               className={`!mt-0 !text-stone-700 dark:!text-zinc-200 !mb-0 md:!mb-0${riseClass}`}
               style={{
                 fontFamily: 'var(--font-biro-script), "Segoe Print", "Bradley Hand", cursive',
-                fontSize: '48px',
+                fontSize: '40px',
                 lineHeight: '120%',
                 letterSpacing: '-0.03em',
                 fontWeight: 360,

@@ -353,8 +353,8 @@
     /* stone-700 */
     border-left-width: 2px;
     /* border-l-2 */
-    border-color: rgb(234 88 12);
-    /* orange-600 */
+    border-color: rgb(214 211 209);
+    /* stone-300 */
     padding-left: 1rem;
     /* pl-4 */
     font-style: italic;
@@ -438,8 +438,8 @@
     }
 
     .mdxContent blockquote {
-        border-color: rgb(251 146 60);
-        /* orange-400 */
+        border-color: rgb(63 63 70);
+        /* zinc-700 */
     }
 
     .mdxContent li {
