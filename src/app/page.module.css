@@ -59,6 +59,22 @@
     animation: home-content-rise 500ms cubic-bezier(0.23, 1, 0.32, 1) backwards;
 }
 
+.introParagraph {
+    font-size: 15px !important;
+    font-weight: 460 !important;
+    letter-spacing: normal !important;
+    line-height: 165% !important;
+}
+
+@media (max-width: 639.98px) {
+    .introParagraph {
+        font-size: 17px !important;
+        font-weight: 460 !important;
+        letter-spacing: 0 !important;
+        line-height: 160% !important;
+    }
+}
+
 /* Reduced motion, and backwards navigation (where a departing sheet plays instead — see
    markPaperBackNav in src/lib/paper-exit-transition.ts): show the settled end state immediately.
    Both are conditions CSS can evaluate at paint time, which is the whole point of keeping the

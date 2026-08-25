@@ -341,6 +341,12 @@
     .mdxContent li {
         font-size: 1.0625rem;
     }
+
+    .mdxContent p {
+        font-weight: 460;
+        letter-spacing: 0;
+        line-height: 160%;
+    }
 }
 
 .mdxContent li::marker {
