@@ -115,6 +115,27 @@
     }
 }
 
+/* Phone-sized route changes are intentionally instant: show the settled content and retire both
+   decorative paper layers without running their entrance animations. */
+@media (max-width: 639.98px) {
+    .paperEntranceOverlay {
+        display: none;
+        animation: none;
+    }
+
+    .paperUnderlay {
+        opacity: 0;
+        animation: none;
+    }
+
+    .contentBlurRevealItem,
+    .contentBlurReveal > :not(:has([data-carousel])),
+    .contentBlurReveal > * > :not(:has([data-carousel])),
+    .contentBlurReveal [data-carousel-layer] {
+        animation: none;
+    }
+}
+
 /* Backwards navigation (footer "Previous" or sidebar "Home"): no sheet arrives — the departing
    sheet slides out over content that is already settled.
 
@@ -139,6 +160,12 @@
 .contentBlurReveal > :not(:has([data-carousel])),
 .contentBlurReveal > * > :not(:has([data-carousel])),
 .contentBlurReveal [data-carousel-layer]),
+:global(html[data-blog-mask-nav]) :is(.paperEntranceOverlay,
+.paperUnderlay,
+.contentBlurRevealItem,
+.contentBlurReveal > :not(:has([data-carousel])),
+.contentBlurReveal > * > :not(:has([data-carousel])),
+.contentBlurReveal [data-carousel-layer]),
 .paperNoEntrance :is(.paperEntranceOverlay,
 .paperUnderlay,
 .contentBlurRevealItem,
@@ -149,11 +176,13 @@
 }
 
 :global(html[data-paper-nav='back']) .paperEntranceOverlay,
+:global(html[data-blog-mask-nav]) .paperEntranceOverlay,
 .paperNoEntrance .paperEntranceOverlay {
     display: none;
 }
 
 :global(html[data-paper-nav='back']) .paperUnderlay,
+:global(html[data-blog-mask-nav]) .paperUnderlay,
 .paperNoEntrance .paperUnderlay {
     opacity: 0;
 }

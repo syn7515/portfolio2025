@@ -1,0 +1,68 @@
+.mask {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: calc(100% + 48px);
+    z-index: 55;
+    visibility: hidden;
+    pointer-events: none;
+    background: var(--paper-bg);
+    transition: none;
+    contain: paint;
+}
+
+.mask[data-direction='next'] {
+    left: -48px;
+    background: linear-gradient(
+        to right,
+        transparent 0,
+        var(--paper-bg) 48px
+    );
+    transform: translate3d(100%, 0, 0);
+}
+
+.mask[data-direction='previous'] {
+    right: -48px;
+    background: linear-gradient(
+        to left,
+        transparent 0,
+        var(--paper-bg) 48px
+    );
+    transform: translate3d(-100%, 0, 0);
+}
+
+.mask[data-phase='preparing'],
+.mask[data-phase='covering'],
+.mask[data-phase='revealing'] {
+    visibility: visible;
+    will-change: transform;
+}
+
+.mask[data-direction='next'][data-phase='preparing'] {
+    transform: translate3d(100%, 0, 0);
+}
+
+.mask[data-direction='previous'][data-phase='preparing'] {
+    transform: translate3d(-100%, 0, 0);
+}
+
+.mask[data-phase='covering'] {
+    transform: translate3d(0, 0, 0);
+    transition: transform 360ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.mask[data-direction='next'][data-phase='revealing'] {
+    transform: translate3d(100%, 0, 0);
+    transition: transform 400ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.mask[data-direction='previous'][data-phase='revealing'] {
+    transform: translate3d(-100%, 0, 0);
+    transition: transform 400ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .mask {
+        transition: none;
+    }
+}

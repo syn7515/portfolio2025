@@ -67,6 +67,12 @@
 }
 
 @media (max-width: 639.98px) {
+    /* Phone-sized route changes are intentionally instant. */
+    .paperEntrance,
+    .contentRise {
+        animation: none;
+    }
+
     .introParagraph {
         font-size: 16px !important;
         font-weight: 420 !important;

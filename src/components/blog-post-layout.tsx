@@ -9,9 +9,14 @@ import { Divider } from '@/components/ui/divider'
 import styles from './blog-post.module.css'
 import BlogPostHeader from '@/components/blog-post-header'
 import BlogPostToc from '@/components/blog-post-toc'
-import BlogPostMobileMenu from '@/components/blog-post-mobile-menu'
 import BlogPostRailNav from '@/components/blog-post-rail-nav'
 import PaperGridBackground from '@/components/ui/paper-grid-background'
+import { PROJECTS } from '@/lib/projects'
+import {
+  isBlogPostMaskNavigation,
+  requestBlogPostMaskNavigation,
+  type BlogPostMaskDirection,
+} from '@/lib/blog-post-mask-transition'
 import {
   PAPER_EXIT_REST,
   PAPER_EXIT_OFFSCREEN,
@@ -28,25 +33,6 @@ interface BlogPostLayoutProps {
   title: string
   subtitle?: string
 }
-
-// Project navigation data
-export const PROJECTS = [
-  {
-    slug: 'alphagrill',
-    title: 'AlphaGrill',
-    description: 'Robot Interface for Collaboration in Kitchen'
-  },
-  {
-    slug: 'aniai',
-    title: 'Aniai',
-    description: 'Building the Tools Behind Smarter Robots'
-  },
-  {
-    slug: 'athenahealth',
-    title: 'AthenaHealth',
-    description: 'Encouraging Prompt Medical Bill Payment'
-  }
-] as const
 
 interface ProjectNavigation {
   previousProject?: {
@@ -165,11 +151,13 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
   // branching on client-only state).
   const [exitEntrance, setExitEntrance] = useState(false)
   const [exitDone, setExitDone] = useState(false)
+  const [maskSuppressedSlug, setMaskSuppressedSlug] = useState<string | null>(null)
   const cancelBackToTopRef = useRef<(() => void) | null>(null)
 
   useEffect(() => {
     if (isPaperBackNav()) setExitEntrance(true)
-  }, [])
+    if (isBlogPostMaskNavigation()) setMaskSuppressedSlug(slug ?? null)
+  }, [slug])
 
   // Release the <html> attribute as soon as the suppression class above it has committed. It has to
   // go before the next forward navigation — otherwise that page's entrance would be suppressed too —
@@ -204,6 +192,23 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
     cancelBackToTopRef.current = startInterruptibleScrollToTop()
   }, [])
 
+  const handleProjectNavigation = (
+    event: React.MouseEvent<HTMLAnchorElement>,
+    href: string,
+    direction: BlogPostMaskDirection
+  ) => {
+    if (
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    ) return
+
+    event.preventDefault()
+    requestBlogPostMaskNavigation(href, direction)
+  }
+
   // Only the exit needs this now — the entrance handles reduced motion in CSS, where the media
   // query resolves at paint time and can't disagree with the server the way this hook can.
   const shouldReduceMotion = useReducedMotion()
@@ -220,9 +225,6 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           background: 'linear-gradient(to bottom, var(--top-fade-from) 0%, transparent 100%)',
         }}
       />
-
-      {/* Mobile navigation: home logo + hamburger + blurred overlay; visible only below 820px */}
-      <BlogPostMobileMenu slug={slug} />
 
       {/* Compact rail: Home + tick-mark TOC, for the 820–1280px band where the paper is full-bleed
           and there is no gutter for the text sidebar below. */}
@@ -284,7 +286,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
       <div
         className={cn(
           'w-full min-h-screen overflow-x-clip flex flex-col relative',
-          exitEntrance && styles.paperNoEntrance
+          (exitEntrance || maskSuppressedSlug === slug) && styles.paperNoEntrance
         )}
       >
         <PaperGridBackground />
@@ -361,7 +363,11 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                           href={`/${previousProject.slug}`}
                           className="flex-1 group cursor-pointer"
                           style={{ textDecoration: 'none' }}
-                          onClick={markPaperBackNav}
+                          onClick={(event) => handleProjectNavigation(
+                            event,
+                            `/${previousProject.slug}`,
+                            'previous'
+                          )}
                         >
                           <div className="text-[16px] sm:text-[14px] text-stone-500 dark:text-zinc-400 group-hover:!text-orange-700 group-active:!text-orange-700 dark:group-hover:!text-orange-400 dark:group-active:!text-orange-400 transition-colors duration-150 font-[420] sm:font-normal not-italic mb-0 sm:mb-1.5 opacity-80 font-sans">
                             <span className="relative inline-flex items-center -translate-x-3 sm:translate-x-0">
@@ -391,6 +397,11 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                           href={`/${nextProject.slug}`}
                           className="flex-1 text-right group cursor-pointer"
                           style={{ textDecoration: 'none' }}
+                          onClick={(event) => handleProjectNavigation(
+                            event,
+                            `/${nextProject.slug}`,
+                            'next'
+                          )}
                         >
                           <div className="text-[16px] sm:text-[14px] text-stone-500 dark:text-zinc-400 group-hover:!text-orange-700 group-active:!text-orange-700 dark:group-hover:!text-orange-400 dark:group-active:!text-orange-400 transition-colors duration-150 font-[420] sm:font-normal not-italic mb-0 sm:mb-1.5 opacity-80 font-sans">
                             <span className="relative inline-flex items-center justify-end translate-x-3 sm:translate-x-0">

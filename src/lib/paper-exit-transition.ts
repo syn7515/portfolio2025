@@ -57,9 +57,28 @@ export const PAPER_BACK_NAV_FLAG = 'paper-direction'
 export const PAPER_BACK_NAV_VALUE = 'back'
 export const PAPER_HOME_FORWARD_NAV_VALUE = 'home'
 export const PAPER_BACK_NAV_ATTR = 'data-paper-nav'
+const MOBILE_PAGE_TRANSITION_QUERY = '(max-width: 639.98px)'
+
+export function shouldSkipPaperPageTransition() {
+  return typeof window !== 'undefined' && window.matchMedia(MOBILE_PAGE_TRANSITION_QUERY).matches
+}
+
+function clearPaperNavigationSignal() {
+  try {
+    sessionStorage.removeItem(PAPER_BACK_NAV_FLAG)
+  } catch {
+    // Nothing to undo if storage is unavailable.
+  }
+  document.documentElement.removeAttribute(PAPER_BACK_NAV_ATTR)
+}
 
 // Called by the departing link, before the route change.
 export function markPaperBackNav() {
+  if (shouldSkipPaperPageTransition()) {
+    clearPaperNavigationSignal()
+    return
+  }
+
   try {
     sessionStorage.setItem(PAPER_BACK_NAV_FLAG, PAPER_BACK_NAV_VALUE)
   } catch {
@@ -73,6 +92,11 @@ export function markPaperBackNav() {
 // entrance; it gives responsive navigation chrome a pre-paint origin so it can enter from the same
 // viewport edge it belongs to.
 export function markPaperHomeForwardNav() {
+  if (shouldSkipPaperPageTransition()) {
+    clearPaperNavigationSignal()
+    return
+  }
+
   try {
     sessionStorage.setItem(PAPER_BACK_NAV_FLAG, PAPER_HOME_FORWARD_NAV_VALUE)
   } catch {
@@ -82,6 +106,11 @@ export function markPaperHomeForwardNav() {
 }
 
 export function isPaperBackNav() {
+  if (shouldSkipPaperPageTransition()) {
+    clearPaperNavigationSignal()
+    return false
+  }
+
   return (
     typeof document !== 'undefined' &&
     document.documentElement.getAttribute(PAPER_BACK_NAV_ATTR) === PAPER_BACK_NAV_VALUE

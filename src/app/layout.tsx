@@ -5,6 +5,8 @@ import Script from "next/script";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import MotionProvider from "@/components/motion-provider";
+import BlogPostMobileMenu from "@/components/blog-post-mobile-menu";
+import BlogPostTransitionMask from "@/components/blog-post-transition-mask";
 import "./globals.css";
 
 // X and other social crawlers cache card images by URL. Use a content-versioned
@@ -153,7 +155,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             client-side navigation the departing link sets the attribute directly. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var v=sessionStorage.getItem('paper-direction');if(v==='back'||v==='home'){document.documentElement.setAttribute('data-paper-nav',v);}}catch(e){}})();`,
+            __html: `(function(){try{if(window.matchMedia('(max-width: 639.98px)').matches){sessionStorage.removeItem('paper-direction');document.documentElement.removeAttribute('data-paper-nav');return;}var v=sessionStorage.getItem('paper-direction');if(v==='back'||v==='home'){document.documentElement.setAttribute('data-paper-nav',v);}}catch(e){}})();`,
           }}
         />
         <script
@@ -171,6 +173,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           />
         </noscript>
         {/* End Google Tag Manager (noscript) */}
+        <BlogPostMobileMenu />
+        <BlogPostTransitionMask />
         <MotionProvider>{children}</MotionProvider>
         <Analytics />
         <SpeedInsights />
