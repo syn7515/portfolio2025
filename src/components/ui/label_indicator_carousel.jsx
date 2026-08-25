@@ -464,7 +464,7 @@ export default function LabelIndicatorCarousel({
         <div
           className="relative flex flex-col items-center w-full"
           style={{
-            rowGap: Math.max(effGap * 2, effWidth > 0 && effWidth < 600 ? 40 : 24),
+            rowGap: Math.max(effGap * 2, effWidth > 0 && effWidth < 600 ? 48 : 24),
             left: effOffsetX || 0,
           }}
         >
