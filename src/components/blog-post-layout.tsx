@@ -363,19 +363,19 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                           style={{ textDecoration: 'none' }}
                           onClick={markPaperBackNav}
                         >
-                          <div className="text-[16px] sm:text-[14px] text-stone-500 dark:text-zinc-400 font-[420] sm:font-normal not-italic mb-0 sm:mb-1.5 opacity-80 font-sans">
+                          <div className="text-[16px] sm:text-[14px] text-stone-500 dark:text-zinc-400 group-hover:!text-orange-700 group-active:!text-orange-700 dark:group-hover:!text-orange-400 dark:group-active:!text-orange-400 transition-colors duration-150 font-[420] sm:font-normal not-italic mb-0 sm:mb-1.5 opacity-80 font-sans">
                             <span className="relative inline-flex items-center -translate-x-3 sm:translate-x-0">
                               <ChevronLeft
-                                className="absolute left-0 size-4 sm:size-3.5 text-stone-400 dark:text-zinc-500 opacity-100 sm:opacity-0 blur-none sm:blur-[1px] motion-safe:transition-[opacity,filter] motion-safe:duration-300 motion-safe:ease-out sm:group-hover:opacity-100 sm:group-hover:blur-none sm:group-focus-visible:opacity-100 sm:group-focus-visible:blur-none motion-reduce:opacity-100 motion-reduce:blur-none"
+                                className="absolute left-0 size-4 sm:size-3.5 text-stone-400 dark:text-zinc-500 opacity-100 sm:opacity-0 blur-none sm:blur-[1px] motion-safe:transition-[opacity,filter] motion-safe:duration-300 motion-safe:ease-out sm:group-hover:opacity-100 sm:group-hover:blur-none sm:group-active:opacity-100 sm:group-active:blur-none sm:group-focus-visible:opacity-100 sm:group-focus-visible:blur-none motion-reduce:opacity-100 motion-reduce:blur-none"
                                 aria-hidden
                               />
-                              <span className="relative z-10 translate-x-5 sm:translate-x-0 motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out sm:group-hover:translate-x-4 sm:group-focus-visible:translate-x-4 sm:motion-reduce:translate-x-4">
+                              <span className="relative z-10 translate-x-5 sm:translate-x-0 motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out sm:group-hover:translate-x-4 sm:group-active:translate-x-4 sm:group-focus-visible:translate-x-4 sm:motion-reduce:translate-x-4">
                                 Previous
                               </span>
                             </span>
                           </div>
                           <p
-                            className="hidden sm:block mt-0 not-italic project-nav-description transition-colors duration-150 group-hover:!text-orange-700 dark:group-hover:!text-orange-400"
+                            className="hidden sm:block mt-0 not-italic project-nav-description transition-colors duration-150 group-hover:!text-orange-700 group-active:!text-orange-700 dark:group-hover:!text-orange-400 dark:group-active:!text-orange-400"
                             style={{ fontFamily: 'var(--font-crimson-pro), serif', fontSize: '19px', fontWeight: 450, lineHeight: '130%', letterSpacing: '-0.02em', textWrap: 'balance' }}
                           >
                             {preventWidow(previousProject.description)}
@@ -392,19 +392,19 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                           className="flex-1 text-right group cursor-pointer"
                           style={{ textDecoration: 'none' }}
                         >
-                          <div className="text-[16px] sm:text-[14px] text-stone-500 dark:text-zinc-400 font-[420] sm:font-normal not-italic mb-0 sm:mb-1.5 opacity-80 font-sans">
+                          <div className="text-[16px] sm:text-[14px] text-stone-500 dark:text-zinc-400 group-hover:!text-orange-700 group-active:!text-orange-700 dark:group-hover:!text-orange-400 dark:group-active:!text-orange-400 transition-colors duration-150 font-[420] sm:font-normal not-italic mb-0 sm:mb-1.5 opacity-80 font-sans">
                             <span className="relative inline-flex items-center justify-end translate-x-3 sm:translate-x-0">
                               <ChevronRight
-                                className="absolute right-0 size-4 sm:size-3.5 text-stone-400 dark:text-zinc-500 opacity-100 sm:opacity-0 blur-none sm:blur-[1px] motion-safe:transition-[opacity,filter] motion-safe:duration-300 motion-safe:ease-out sm:group-hover:opacity-100 sm:group-hover:blur-none sm:group-focus-visible:opacity-100 sm:group-focus-visible:blur-none motion-reduce:opacity-100 motion-reduce:blur-none"
+                                className="absolute right-0 size-4 sm:size-3.5 text-stone-400 dark:text-zinc-500 opacity-100 sm:opacity-0 blur-none sm:blur-[1px] motion-safe:transition-[opacity,filter] motion-safe:duration-300 motion-safe:ease-out sm:group-hover:opacity-100 sm:group-hover:blur-none sm:group-active:opacity-100 sm:group-active:blur-none sm:group-focus-visible:opacity-100 sm:group-focus-visible:blur-none motion-reduce:opacity-100 motion-reduce:blur-none"
                                 aria-hidden
                               />
-                              <span className="relative z-10 -translate-x-5 sm:translate-x-0 motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out sm:group-hover:-translate-x-4 sm:group-focus-visible:-translate-x-4 sm:motion-reduce:-translate-x-4">
+                              <span className="relative z-10 -translate-x-5 sm:translate-x-0 motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out sm:group-hover:-translate-x-4 sm:group-active:-translate-x-4 sm:group-focus-visible:-translate-x-4 sm:motion-reduce:-translate-x-4">
                                 Next
                               </span>
                             </span>
                           </div>
                           <p
-                            className="hidden sm:block mt-0 not-italic project-nav-description transition-colors duration-150 group-hover:!text-orange-700 dark:group-hover:!text-orange-400"
+                            className="hidden sm:block mt-0 not-italic project-nav-description transition-colors duration-150 group-hover:!text-orange-700 group-active:!text-orange-700 dark:group-hover:!text-orange-400 dark:group-active:!text-orange-400"
                             style={{ fontFamily: 'var(--font-crimson-pro), serif', fontSize: '19px', fontWeight: 450, lineHeight: '130%', letterSpacing: '-0.02em', textWrap: 'balance' }}
                           >
                             {preventWidow(nextProject.description)}
