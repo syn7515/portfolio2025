@@ -25,20 +25,20 @@ export function Heading({ title, year, tocLabel, className }: HeadingProps) {
     letterSpacing: '-0.02em',
     fontStyle: 'normal',
   } as const;
-  const yearClassName = 'text-[16px] sm:text-[15px] !font-[420] sm:!font-[460] leading-[160%] font-sans text-stone-400 dark:text-zinc-500';
+  const yearClassName = 'text-[15px] !font-[400] sm:!font-[460] leading-[150%] sm:leading-[160%] font-sans text-stone-400 dark:text-zinc-500 whitespace-nowrap';
 
   return (
     <div
       id={id}
       data-blog-heading
       data-toc-label={tocLabel ?? title}
-      className={cn('mt-13 mb-8', className)}
+      className={cn('mt-13 mb-6 sm:mb-8', className)}
     >
       {year && (
         <>
-          {/* Mobile: title and year use separate lines, with no divider. */}
-          <div className="flex sm:hidden flex-col items-start gap-0.5">
-            <span className={titleClassName} style={titleStyle}>{title}</span>
+          {/* Mobile: keep title and year together when they fit; otherwise wrap the year intact. */}
+          <div className="flex sm:hidden flex-wrap items-baseline gap-x-2 gap-y-0.5">
+            <span className={cn(titleClassName, 'w-max max-w-full shrink-0')} style={titleStyle}>{title}</span>
             <span className={yearClassName} style={{ fontStyle: 'normal' }}>{year}</span>
           </div>
 

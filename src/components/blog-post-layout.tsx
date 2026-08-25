@@ -369,7 +369,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                             'previous'
                           )}
                         >
-                          <div className="text-[16px] sm:text-[14px] text-stone-500 dark:text-zinc-400 group-hover:!text-orange-700 group-active:!text-orange-700 dark:group-hover:!text-orange-400 dark:group-active:!text-orange-400 transition-colors duration-150 font-[420] sm:font-normal not-italic mb-0 sm:mb-1.5 opacity-80 font-sans">
+                          <div className="text-[15px] sm:text-[14px] text-stone-500 dark:text-zinc-400 group-hover:!text-orange-700 group-active:!text-orange-700 dark:group-hover:!text-orange-400 dark:group-active:!text-orange-400 transition-colors duration-150 font-[400] sm:font-normal not-italic mb-0 sm:mb-1.5 opacity-80 font-sans">
                             <span className="relative inline-flex items-center -translate-x-3 sm:translate-x-0">
                               <ChevronLeft
                                 className="absolute left-0 size-4 sm:size-3.5 text-stone-400 dark:text-zinc-500 opacity-100 sm:opacity-0 blur-none sm:blur-[1px] motion-safe:transition-[opacity,filter] motion-safe:duration-300 motion-safe:ease-out sm:group-hover:opacity-100 sm:group-hover:blur-none sm:group-active:opacity-100 sm:group-active:blur-none sm:group-focus-visible:opacity-100 sm:group-focus-visible:blur-none motion-reduce:opacity-100 motion-reduce:blur-none"
@@ -403,7 +403,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                             'next'
                           )}
                         >
-                          <div className="text-[16px] sm:text-[14px] text-stone-500 dark:text-zinc-400 group-hover:!text-orange-700 group-active:!text-orange-700 dark:group-hover:!text-orange-400 dark:group-active:!text-orange-400 transition-colors duration-150 font-[420] sm:font-normal not-italic mb-0 sm:mb-1.5 opacity-80 font-sans">
+                          <div className="text-[15px] sm:text-[14px] text-stone-500 dark:text-zinc-400 group-hover:!text-orange-700 group-active:!text-orange-700 dark:group-hover:!text-orange-400 dark:group-active:!text-orange-400 transition-colors duration-150 font-[400] sm:font-normal not-italic mb-0 sm:mb-1.5 opacity-80 font-sans">
                             <span className="relative inline-flex items-center justify-end translate-x-3 sm:translate-x-0">
                               <ChevronRight
                                 className="absolute right-0 size-4 sm:size-3.5 text-stone-400 dark:text-zinc-500 opacity-100 sm:opacity-0 blur-none sm:blur-[1px] motion-safe:transition-[opacity,filter] motion-safe:duration-300 motion-safe:ease-out sm:group-hover:opacity-100 sm:group-hover:blur-none sm:group-active:opacity-100 sm:group-active:blur-none sm:group-focus-visible:opacity-100 sm:group-focus-visible:blur-none motion-reduce:opacity-100 motion-reduce:blur-none"

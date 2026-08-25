@@ -103,10 +103,9 @@ export default function Home() {
           {/* Left column: name */}
           <div>
             <h1
-              className={`!mt-0 !text-stone-700 dark:!text-zinc-200 !mb-0 md:!mb-0${riseClass}`}
+              className={`!mt-0 !text-[32px] sm:!text-[40px] !text-stone-700 dark:!text-zinc-200 !mb-0 md:!mb-0${riseClass}`}
               style={{
                 fontFamily: 'var(--font-biro-script), "Segoe Print", "Bradley Hand", cursive',
-                fontSize: '40px',
                 lineHeight: '120%',
                 letterSpacing: '-0.03em',
                 fontWeight: 360,
@@ -141,7 +140,7 @@ export default function Home() {
         </div>
 
         <div className="max-w-[560px] mx-auto w-full mt-16 sm:mt-14 lg:mt-16">
-          <div className="flex flex-col gap-3 sm:gap-1 lg:gap-1">
+          <div className="flex flex-col gap-1">
             <ProjectListItem
               title="Robot Interface for Collaboration in Kitchen"
               dates="2026 - Ongoing"
@@ -166,7 +165,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="max-w-[560px] mx-auto w-full mt-8 sm:mt-12 lg:mt-14 flex flex-col gap-6">
+        <div className="hidden max-w-[560px] mx-auto w-full mt-8 sm:mt-12 lg:mt-14 sm:flex flex-col gap-6">
           <div
             className={`h-px w-4 bg-stone-400/50 dark:bg-zinc-600/50${riseClass}`}
             style={riseDelay(DELAY.divider)}
@@ -204,13 +203,42 @@ export default function Home() {
         </div>
 
         <div
-          className={`w-full max-w-[480px] mx-auto mt-auto pt-24 sm:pt-32 lg:pt-36 text-left sm:text-center${riseClass}`}
+          className={`w-full max-w-[560px] sm:max-w-[480px] mx-auto mt-auto pt-24 sm:pt-32 lg:pt-36${riseClass}`}
           style={riseDelay(DELAY.footer)}
         >
-          <div
-            className="text-[15px] sm:text-[14px] text-stone-400 dark:text-zinc-500 font-normal font-sans [text-wrap:wrap] sm:text-balance"
-          >
-            © {new Date().getFullYear()} Sue Park<span className="hidden sm:inline">. — Built with millions of tokens of love.</span>
+          <div className="flex items-baseline justify-between gap-4 sm:block">
+            <div className={`${styles.socialLinks} intro-text flex sm:hidden gap-2 w-fit`}>
+              <a
+                href="https://x.com/sue_park__"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-social-link-trigger
+                className="!text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 active:!text-orange-700 dark:hover:!text-orange-400 dark:active:!text-orange-400 motion-safe:active:scale-[0.97]"
+                style={{
+                  transition: 'scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
+                }}
+              >
+                X
+              </a>
+              <span className="!text-stone-400 dark:!text-zinc-600">·</span>
+              <a
+                href="https://www.linkedin.com/in/sooyeonp/"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-social-link-trigger
+                className="!text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 active:!text-orange-700 dark:hover:!text-orange-400 dark:active:!text-orange-400 motion-safe:active:scale-[0.97]"
+                style={{
+                  transition: 'scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
+                }}
+              >
+                LinkedIn
+              </a>
+            </div>
+            <div
+              className="text-right sm:text-center text-[15px] sm:text-[14px] text-stone-400 dark:text-zinc-500 font-normal font-sans [text-wrap:nowrap] sm:text-balance"
+            >
+              © {new Date().getFullYear()} Sue Park<span className="hidden sm:inline">. — Built with millions of tokens of love.</span>
+            </div>
           </div>
         </div>
         </div>

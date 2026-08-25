@@ -325,7 +325,7 @@ export function CarouselCard({
           renderCaption({ index, label, caption, active: isActive })
         ) : (
           <div
-            className="carousel-caption text-center text-balance text-sm mt-2 sm:mt-3 md:mt-4 font-sans"
+            className="carousel-caption text-center text-balance text-[13px] leading-[145%] sm:text-sm sm:leading-[1.6] mt-2 sm:mt-3 md:mt-4 font-sans"
             style={{ width: "100%", ...(captionStyle || {}) }}
           >
             {renderCaptionWithBadges(caption, { muted: true })}

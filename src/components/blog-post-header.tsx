@@ -12,7 +12,7 @@ export default function BlogPostHeader({ title, subtitle }: BlogPostHeaderProps)
     <header className="max-w-[560px] mx-auto pt-4 sm:pt-0 mb-16 xs:mb-16 sm:mb-20 lg:mb-[100px] text-left">
       {/* Subtitle / metadata - small, light grey */}
       {subtitle && (
-        <p className="!text-[16px] !font-[420] !leading-[160%] !tracking-[0rem] sm:!text-sm sm:!font-[460] sm:!leading-[165%] sm:!tracking-normal !text-stone-500 dark:!text-zinc-400 !mb-3">
+        <p className="!text-[15px] !font-[400] !leading-[150%] !tracking-[0rem] sm:!text-sm sm:!font-[460] sm:!leading-[165%] sm:!tracking-normal !text-stone-500 dark:!text-zinc-400 !mb-3">
           {subtitle}
         </p>
       )}
@@ -21,7 +21,7 @@ export default function BlogPostHeader({ title, subtitle }: BlogPostHeaderProps)
         className="!mt-0 !text-stone-700 dark:!text-zinc-200 !mb-0 whitespace-pre-line"
         style={{
           fontFamily: 'var(--font-crimson-pro), serif',
-          fontSize: 'clamp(2.125rem, 8.72vw, 2.5rem)',
+          fontSize: 'clamp(1.875rem, 8.72vw, 2.125rem)',
           lineHeight: '120%',
           letterSpacing: '-0.03em',
           fontWeight: 360,

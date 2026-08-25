@@ -368,13 +368,13 @@
 
     .mdxContent p,
     .mdxContent li {
-        font-size: 1rem;
-        font-weight: 420;
+        font-size: 0.9375rem;
+        font-weight: 400;
     }
 
     .mdxContent p {
         letter-spacing: 0rem;
-        line-height: 160%;
+        line-height: 150%;
     }
 }
 
