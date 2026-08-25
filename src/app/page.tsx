@@ -97,7 +97,7 @@ export default function Home() {
           className={`relative z-10 w-full flex-1 flex flex-col min-[1280px]:mt-[100px] overflow-x-clip${paperClass}`}
           style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}
         >
-        <div className="flex-1 flex flex-col pt-16 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] min-[1280px]:pt-[clamp(6.25rem,calc(18.182vw_-_8.295rem),8.75rem)] pb-2 min-[640px]:pb-8 min-[1280px]:pb-10">
+        <div className="flex-1 flex flex-col pt-16 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] min-[1280px]:pt-[clamp(6.25rem,calc(18.182vw_-_8.295rem),8.75rem)] pb-5 min-[640px]:pb-8 min-[1280px]:pb-10">
         <div className="flex-1 flex flex-col px-6 min-[1280px]:px-0 min-[1280px]:ml-[calc(50vw_-_280px_-_var(--sidebar-w))] min-[1280px]:w-[560px]">
         <div className="max-w-[560px] mx-auto" data-inline-link-preview-boundary>
           {/* Left column: name */}
@@ -143,14 +143,14 @@ export default function Home() {
           <div className="flex flex-col gap-1">
             <ProjectListItem
               title="Robot Interface for Collaboration in Kitchen"
-              dates="2026 - Ongoing"
+              dates="2026 – Ongoing"
               href="/alphagrill"
               className={riseClass.trim() || undefined}
               style={riseDelay(DELAY.projectFirst)}
             />
             <ProjectListItem
               title="Building the Tools Behind Smarter Robots"
-              dates="2024 - 2025"
+              dates="2024 – 2025"
               href="/aniai"
               className={riseClass.trim() || undefined}
               style={riseDelay(DELAY.projectSecond)}
@@ -239,7 +239,7 @@ export default function Home() {
               </a>
             </div>
             <div
-              className="text-right sm:text-center text-[15px] sm:text-[14px] text-stone-400 dark:text-zinc-500 font-normal font-sans [text-wrap:nowrap] sm:text-balance"
+              className="text-right sm:!text-center text-[15px] sm:text-[14px] text-stone-400 dark:text-zinc-500 font-normal font-sans [text-wrap:nowrap] sm:text-balance"
             >
               © {new Date().getFullYear()} Sue Park<span className="hidden sm:inline">. — Built with millions of tokens of love.</span>
             </div>

@@ -18,10 +18,9 @@ export default function BlogPostHeader({ title, subtitle }: BlogPostHeaderProps)
       )}
       {/* Title - typography per design spec */}
       <h1
-        className="!mt-0 !text-stone-700 dark:!text-zinc-200 !mb-0 whitespace-pre-line"
+        className="!mt-0 !text-[clamp(1.75rem,8.72vw,2rem)] sm:!text-[clamp(2.125rem,8.72vw,2.5rem)] !text-stone-700 dark:!text-zinc-200 !mb-0 whitespace-pre-line"
         style={{
           fontFamily: 'var(--font-crimson-pro), serif',
-          fontSize: 'clamp(1.75rem, 8.72vw, 2rem)',
           lineHeight: '120%',
           letterSpacing: '-0.03em',
           fontWeight: 360,
