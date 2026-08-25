@@ -346,7 +346,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                 {(previousProject || nextProject) ? (
                   <div
                     className={cn(
-                      'max-w-[560px] mx-auto min-[1280px]:max-w-none mt-16 min-[1280px]:mt-32 pb-[28px] min-[640px]:pb-16 min-[1280px]:pb-[120px] overflow-x-visible',
+                      'max-w-[560px] mx-auto min-[1280px]:max-w-none mt-24 min-[640px]:mt-16 min-[1280px]:mt-32 pb-[28px] min-[640px]:pb-16 min-[1280px]:pb-[120px] overflow-x-visible',
                       styles.contentBlurRevealItem
                     )}
                   >
@@ -354,7 +354,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                       variant="default"
                       color="stone"
                       spacing="md"
-                      className="w-[calc(100%+3rem)] -mx-6 sm:w-full sm:mx-0"
+                      className="hidden sm:block sm:w-full sm:mx-0"
                     />
                     <div className="flex justify-between items-start mt-4 min-[1280px]:mt-12 gap-8">
                       {/* Previous Project */}

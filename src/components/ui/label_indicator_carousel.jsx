@@ -45,7 +45,7 @@ export default function LabelIndicatorCarousel({
   captionStyle = { lineHeight: 1.6 },
   transition = defaultTransition,
   ariaLabel = "Label indicator carousel",
-  className = "h-auto w-full max-w-full overflow-hidden",
+  className = "h-auto w-full max-w-full overflow-x-clip overflow-y-visible",
   // Lightbox options
   enableLightbox = true,
   openLightboxOnCardClick = true,

@@ -159,7 +159,7 @@ export default function BlogPostMobileMenu() {
         aria-label="Primary"
         aria-hidden={!isProjectRoute}
         className={cn(
-          'fixed inset-x-0 top-0 z-[70] flex h-12 transform-gpu items-center justify-between px-6 pointer-events-none motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none',
+          'fixed inset-x-0 top-0 z-[70] flex h-12 transform-gpu items-center justify-between px-6 pointer-events-none motion-safe:transition-transform motion-safe:duration-[400ms] motion-safe:ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none',
           isProjectRoute ? 'translate-y-0' : '-translate-y-full'
         )}
       >
