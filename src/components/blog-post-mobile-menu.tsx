@@ -7,7 +7,7 @@ import { cn, prefersReducedMotion } from '@/lib/utils'
 import { PROJECTS } from '@/lib/projects'
 import { markPaperBackNav } from '@/lib/paper-exit-transition'
 
-const BAR_CLASS = 'absolute left-[8px] right-[8px] h-[2px] rounded-none bg-stone-500 dark:bg-zinc-400 motion-safe:transition-[translate,rotate,opacity,filter] motion-safe:duration-250 motion-safe:ease-out'
+const BAR_CLASS = 'absolute left-[8px] right-[8px] h-[1.5px] rounded-none bg-stone-500 dark:bg-zinc-400 motion-safe:transition-[translate,rotate,opacity,filter] motion-safe:duration-250 motion-safe:ease-out'
 
 // How long the overlay takes to settle into a solid paper sheet before the route swap happens
 const LEAVE_FADE_MS = 300

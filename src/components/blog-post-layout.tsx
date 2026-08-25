@@ -219,10 +219,10 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
       {/* Top-edge fade overlay */}
       <div
         aria-hidden
-        className="fixed top-0 left-0 right-0 z-40 pointer-events-none"
+        className={cn('fixed top-0 left-0 right-0 z-40 pointer-events-none', styles.mobileTopFade)}
         style={{
           height: '80px',
-          background: 'linear-gradient(to bottom, var(--top-fade-from) 0%, transparent 100%)',
+          background: 'var(--blog-top-fade-gradient, linear-gradient(to bottom, var(--top-fade-from) 0%, transparent 100%))',
         }}
       />
 

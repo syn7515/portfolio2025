@@ -56,10 +56,10 @@ export default function ProjectListItem({
         className="group block w-full cursor-pointer rounded py-2"
         style={{ textDecoration: 'none' }}
       >
-        {/* Mobile: title wraps on its own line, dates as a small line below (no divider — it has nothing to lead into on its own row) */}
-        <div className="flex sm:hidden flex-col gap-0.5 not-italic">
-          <span className={titleClassName} style={titleStyle}>{title}</span>
+        {/* Mobile: dates lead into the title on separate lines, with no divider. */}
+        <div className="flex sm:hidden flex-col gap-0 not-italic">
           <span className={datesClassName}>{dates}</span>
+          <span className={titleClassName} style={titleStyle}>{title}</span>
         </div>
 
         {/* Desktop: title, dotted divider, and dates on a single row */}

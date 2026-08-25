@@ -79,7 +79,7 @@ export default function Home() {
   return (
 
 
-    <div className={`font-sans w-full min-h-screen overflow-x-clip flex flex-col${exitEntrance ? ` ${styles.noEntrance}` : ''}`}>
+    <div className={`font-sans w-full min-h-[100dvh] min-[640px]:min-h-screen overflow-x-clip flex flex-col${exitEntrance ? ` ${styles.noEntrance}` : ''}`}>
       {/* Top-edge fade overlay */}
       <div
         aria-hidden
@@ -97,7 +97,7 @@ export default function Home() {
           className={`relative z-10 w-full flex-1 flex flex-col min-[1280px]:mt-[100px] overflow-x-clip${paperClass}`}
           style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}
         >
-        <div className="flex-1 flex flex-col pt-16 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] min-[1280px]:pt-[clamp(6.25rem,calc(18.182vw_-_8.295rem),8.75rem)] pb-5 min-[640px]:pb-8 min-[1280px]:pb-10">
+        <div className="flex-1 flex flex-col pt-16 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] min-[1280px]:pt-[clamp(6.25rem,calc(18.182vw_-_8.295rem),8.75rem)] pb-2 min-[640px]:pb-8 min-[1280px]:pb-10">
         <div className="flex-1 flex flex-col px-6 min-[1280px]:px-0 min-[1280px]:ml-[calc(50vw_-_280px_-_var(--sidebar-w))] min-[1280px]:w-[560px]">
         <div className="max-w-[560px] mx-auto" data-inline-link-preview-boundary>
           {/* Left column: name */}
@@ -202,8 +202,12 @@ export default function Home() {
           </div>
         </div>
 
+        {/* On mobile, absorb spare viewport height while preserving at least 64px between the
+            project list and footer when the content needs to scroll. */}
+        <div className="min-h-16 flex-1 sm:hidden" aria-hidden />
+
         <div
-          className={`w-full max-w-[560px] sm:max-w-[480px] mx-auto mt-16 sm:mt-auto sm:pt-32 lg:pt-36${riseClass}`}
+          className={`w-full max-w-[560px] sm:max-w-[480px] mx-auto sm:mt-auto sm:pt-32 lg:pt-36${riseClass}`}
           style={riseDelay(DELAY.footer)}
         >
           <div className="flex items-baseline justify-between gap-4 sm:block">
