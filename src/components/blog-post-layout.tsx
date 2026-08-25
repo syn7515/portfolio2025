@@ -286,7 +286,8 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
       <div
         className={cn(
           'w-full min-h-screen overflow-x-clip flex flex-col relative',
-          (exitEntrance || maskSuppressedSlug === slug) && styles.paperNoEntrance
+          (exitEntrance || maskSuppressedSlug === slug) && styles.paperNoEntrance,
+          maskSuppressedSlug === slug && styles.maskContentEntrance
         )}
       >
         <PaperGridBackground />

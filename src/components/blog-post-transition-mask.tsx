@@ -5,17 +5,20 @@ import { usePathname, useRouter } from 'next/navigation'
 import { prefersReducedMotion } from '@/lib/utils'
 import {
   BLOG_POST_MASK_NAV_EVENT,
+  clearBlogPostMaskEntrance,
   clearBlogPostMaskNavigation,
+  markBlogPostMaskEntrance,
   markBlogPostMaskNavigation,
   type BlogPostMaskDirection,
   type BlogPostMaskNavigationDetail,
 } from '@/lib/blog-post-mask-transition'
 import styles from './blog-post-transition-mask.module.css'
 
-type MaskPhase = 'idle' | 'preparing' | 'covering' | 'revealing'
+type MaskPhase = 'idle' | 'preparing' | 'covering'
 
 const COVER_DURATION_MS = 360
-const REVEAL_DURATION_MS = 480
+const CONTENT_ENTER_DELAY_MS = 60
+const CONTENT_ENTER_DURATION_MS = 350
 
 export default function BlogPostTransitionMask() {
   const router = useRouter()
@@ -26,7 +29,8 @@ export default function BlogPostTransitionMask() {
   const hrefRef = useRef<string | null>(null)
   const departurePathRef = useRef<string | null>(null)
   const coverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const revealTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const contentEnterDelayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const contentEnterTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     const handleNavigation = (event: Event) => {
@@ -78,23 +82,32 @@ export default function BlogPostTransitionMask() {
       pathname === departurePathRef.current
     ) return
 
-    const frame = requestAnimationFrame(() => {
-      setPhase('revealing')
-      revealTimerRef.current = setTimeout(() => {
+    let frame: number | null = null
+    contentEnterDelayTimerRef.current = setTimeout(() => {
+      frame = requestAnimationFrame(() => {
+        markBlogPostMaskEntrance()
         setPhase('idle')
         clearBlogPostMaskNavigation()
-        activeRef.current = false
-        hrefRef.current = null
-        departurePathRef.current = null
-      }, REVEAL_DURATION_MS)
-    })
+        contentEnterTimerRef.current = setTimeout(() => {
+          clearBlogPostMaskEntrance()
+          activeRef.current = false
+          hrefRef.current = null
+          departurePathRef.current = null
+        }, CONTENT_ENTER_DURATION_MS)
+      })
+    }, CONTENT_ENTER_DELAY_MS)
 
-    return () => cancelAnimationFrame(frame)
+    return () => {
+      if (contentEnterDelayTimerRef.current) clearTimeout(contentEnterDelayTimerRef.current)
+      if (frame !== null) cancelAnimationFrame(frame)
+    }
   }, [pathname])
 
   useEffect(() => () => {
     if (coverTimerRef.current) clearTimeout(coverTimerRef.current)
-    if (revealTimerRef.current) clearTimeout(revealTimerRef.current)
+    if (contentEnterDelayTimerRef.current) clearTimeout(contentEnterDelayTimerRef.current)
+    if (contentEnterTimerRef.current) clearTimeout(contentEnterTimerRef.current)
+    clearBlogPostMaskEntrance()
     clearBlogPostMaskNavigation()
   }, [])
 

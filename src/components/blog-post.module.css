@@ -199,6 +199,24 @@
     opacity: 0;
 }
 
+/* Between blog posts, the directional mask only carries the outgoing page away. Once the new
+   route is ready, the mask retires in one frame and the incoming content resolves from a soft
+   blur. Keeping this on the content blocks avoids creating a stacking context around the paper,
+   which would trap fixed carousel and navigation layers beneath the page chrome. */
+@media (prefers-reduced-motion: no-preference) {
+    :global(html[data-blog-mask-enter]) .maskContentEntrance :is(
+        .contentBlurRevealItem,
+        .contentBlurReveal > :not(:has([data-carousel])),
+        .contentBlurReveal > * > :not(:has([data-carousel])),
+        .contentBlurReveal [data-carousel-layer]
+    ) {
+        animation:
+            content-opacity-reveal 350ms cubic-bezier(0.23, 1, 0.32, 1) both,
+            content-blur-reveal 320ms cubic-bezier(0.23, 1, 0.32, 1) both;
+        will-change: opacity, filter;
+    }
+}
+
 .mdxContent h1 {
     color: rgb(68 64 60) !important;
     /* stone-700 */

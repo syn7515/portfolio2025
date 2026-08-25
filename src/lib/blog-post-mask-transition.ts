@@ -7,6 +7,7 @@ export interface BlogPostMaskNavigationDetail {
 
 export const BLOG_POST_MASK_NAV_EVENT = 'blog-post-mask-navigation'
 export const BLOG_POST_MASK_NAV_ATTR = 'data-blog-mask-nav'
+export const BLOG_POST_MASK_ENTER_ATTR = 'data-blog-mask-enter'
 
 export function requestBlogPostMaskNavigation(
   href: string,
@@ -20,6 +21,7 @@ export function requestBlogPostMaskNavigation(
 }
 
 export function markBlogPostMaskNavigation() {
+  document.documentElement.removeAttribute(BLOG_POST_MASK_ENTER_ATTR)
   document.documentElement.setAttribute(BLOG_POST_MASK_NAV_ATTR, '')
 }
 
@@ -32,4 +34,12 @@ export function isBlogPostMaskNavigation() {
 
 export function clearBlogPostMaskNavigation() {
   document.documentElement.removeAttribute(BLOG_POST_MASK_NAV_ATTR)
+}
+
+export function markBlogPostMaskEntrance() {
+  document.documentElement.setAttribute(BLOG_POST_MASK_ENTER_ATTR, '')
+}
+
+export function clearBlogPostMaskEntrance() {
+  document.documentElement.removeAttribute(BLOG_POST_MASK_ENTER_ATTR)
 }
