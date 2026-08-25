@@ -203,7 +203,7 @@
    route is ready, the mask retires in one frame and the incoming content resolves from a soft
    blur. Keeping this on the content blocks avoids creating a stacking context around the paper,
    which would trap fixed carousel and navigation layers beneath the page chrome. */
-@media (prefers-reduced-motion: no-preference) {
+@media (max-width: 639.98px) and (prefers-reduced-motion: no-preference) {
     :global(html[data-blog-mask-enter]) .maskContentEntrance :is(
         .contentBlurRevealItem,
         .contentBlurReveal > :not(:has([data-carousel])),

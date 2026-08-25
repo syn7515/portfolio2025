@@ -25,6 +25,7 @@ import {
   markPaperBackNav,
   isPaperBackNav,
   clearPaperBackNav,
+  shouldSkipPaperPageTransition,
 } from '@/lib/paper-exit-transition'
 
 interface BlogPostLayoutProps {
@@ -204,6 +205,11 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
       event.shiftKey ||
       event.altKey
     ) return
+
+    if (!shouldSkipPaperPageTransition()) {
+      if (direction === 'previous') markPaperBackNav()
+      return
+    }
 
     event.preventDefault()
     requestBlogPostMaskNavigation(href, direction)
