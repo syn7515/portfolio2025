@@ -85,11 +85,11 @@ export function Table({
 
   return (
     <div
-      className={cn(styles.wrapper, 'w-full my-12', className)}
+      className={cn(styles.wrapper, 'w-full mt-12 mb-9 sm:my-12', className)}
     >
       <div
         ref={scrollRef}
-        className={cn(styles.scrollArea, 'w-full')}
+        className={cn(styles.scrollArea, 'w-full pb-3 sm:pb-0')}
         onScroll={updateFadeOpacity}
         role="region"
         aria-label="Scrollable table"

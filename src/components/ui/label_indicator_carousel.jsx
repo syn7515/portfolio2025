@@ -461,7 +461,13 @@ export default function LabelIndicatorCarousel({
         {/* `left` (not transform) applies the shift without creating a stacking
             context — the cards' z-order must stay resolvable at the root level
             (see the stacking-context notes in blog-post-layout.tsx) */}
-        <div className="relative flex flex-col items-center w-full" style={{ rowGap: Math.max(effGap * 2, 24), left: effOffsetX || 0 }}>
+        <div
+          className="relative flex flex-col items-center w-full"
+          style={{
+            rowGap: Math.max(effGap * 2, effWidth > 0 && effWidth < 600 ? 40 : 24),
+            left: effOffsetX || 0,
+          }}
+        >
           {normalized.map((item, i) => (
             <div key={i} data-carousel-item={i} className="w-full flex flex-col items-center px-4">
               <div
