@@ -15,7 +15,7 @@ import styles from './blog-post-transition-mask.module.css'
 type MaskPhase = 'idle' | 'preparing' | 'covering' | 'revealing'
 
 const COVER_DURATION_MS = 360
-const REVEAL_DURATION_MS = 400
+const REVEAL_DURATION_MS = 480
 
 export default function BlogPostTransitionMask() {
   const router = useRouter()

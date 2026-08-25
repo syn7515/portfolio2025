@@ -97,7 +97,7 @@ export default function Home() {
           className={`relative z-10 w-full flex-1 flex flex-col min-[1280px]:mt-[100px] overflow-x-clip${paperClass}`}
           style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}
         >
-        <div className="flex-1 flex flex-col pt-20 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] min-[1280px]:pt-[clamp(6.25rem,calc(18.182vw_-_8.295rem),8.75rem)] pb-5 min-[640px]:pb-8 min-[1280px]:pb-10">
+        <div className="flex-1 flex flex-col pt-16 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] min-[1280px]:pt-[clamp(6.25rem,calc(18.182vw_-_8.295rem),8.75rem)] pb-5 min-[640px]:pb-8 min-[1280px]:pb-10">
         <div className="flex-1 flex flex-col px-6 min-[1280px]:px-0 min-[1280px]:ml-[calc(50vw_-_280px_-_var(--sidebar-w))] min-[1280px]:w-[560px]">
         <div className="max-w-[560px] mx-auto" data-inline-link-preview-boundary>
           {/* Left column: name */}
@@ -139,7 +139,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="max-w-[560px] mx-auto w-full mt-16 sm:mt-14 lg:mt-16">
+        <div className="max-w-[560px] mx-auto w-full mt-12 sm:mt-14 lg:mt-16">
           <div className="flex flex-col gap-1">
             <ProjectListItem
               title="Robot Interface for Collaboration in Kitchen"
@@ -203,7 +203,7 @@ export default function Home() {
         </div>
 
         <div
-          className={`w-full max-w-[560px] sm:max-w-[480px] mx-auto mt-auto pt-24 sm:pt-32 lg:pt-36${riseClass}`}
+          className={`w-full max-w-[560px] sm:max-w-[480px] mx-auto mt-16 sm:mt-auto sm:pt-32 lg:pt-36${riseClass}`}
           style={riseDelay(DELAY.footer)}
         >
           <div className="flex items-baseline justify-between gap-4 sm:block">
