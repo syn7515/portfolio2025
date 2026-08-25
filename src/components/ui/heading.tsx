@@ -37,7 +37,7 @@ export function Heading({ title, year, tocLabel, className }: HeadingProps) {
       {year && (
         <>
           {/* Mobile: keep title and year together when they fit; otherwise wrap the year intact. */}
-          <div className="flex sm:hidden flex-wrap items-baseline gap-x-2 gap-y-0">
+          <div className="flex sm:hidden flex-wrap items-baseline gap-x-3 gap-y-0">
             <span className={cn(titleClassName, 'w-max max-w-full shrink-0')} style={titleStyle}>{title}</span>
             <span className={yearClassName} style={{ fontStyle: 'normal' }}>{year}</span>
           </div>

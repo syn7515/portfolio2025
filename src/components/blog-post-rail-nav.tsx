@@ -172,7 +172,7 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
         aria-label="Back to home"
         className={cn(
           styles.homeButton,
-          'relative grid size-8 place-items-center rounded-full',
+          'relative flex h-8 w-14 items-center rounded-full pl-2',
           // Type and colour copied from the ≥1280px sidebar Home link so the two are the same
           // control. No hover background: the label below is the hover affordance, and it and the
           // icon both take the orange together — a tint behind the icon on top of that read as two
@@ -196,7 +196,7 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
           aria-hidden
           className={cn(
             styles.reveal,
-            'absolute left-[calc(100%+10px)] top-1/2 isolate whitespace-nowrap'
+            'absolute left-[calc(2rem+10px)] top-1/2 isolate whitespace-nowrap'
           )}
         >
           <DescriptionBackdrop />
@@ -228,10 +228,11 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
                 className={cn(
                   styles.tickRow,
                   isActive && styles.tickRowActive,
-                  // The 44px box spans from the rail container's left edge to the label edge; its
-                  // padding keeps the tick at the original x-position. A 14px height fills the
-                  // complete row pitch, so neighboring targets remain contiguous, not overlapping.
-                  'relative -ml-2 flex h-[14px] w-11 cursor-pointer items-center rounded-sm pl-2',
+                  // The 56px box expands the hover/click target to the right. Padding keeps the tick
+                  // at its original x-position, while the label remains anchored at the former
+                  // 44px edge. A 14px height fills the complete row pitch, so neighboring targets
+                  // remain contiguous, not overlapping.
+                  'relative -ml-2 flex h-[14px] w-14 cursor-pointer items-center rounded-sm pl-2',
                   'focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-600/60 dark:focus-visible:ring-orange-300/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
                   'motion-safe:active:scale-[0.97]'
                 )}
@@ -240,7 +241,7 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
                 <span
                   className={cn(
                     styles.reveal,
-                    'absolute left-full top-1/2 isolate whitespace-nowrap text-left',
+                    'absolute left-11 top-1/2 isolate whitespace-nowrap text-left',
                     isActive ? 'text-stone-800 dark:text-zinc-100' : 'text-stone-500 dark:text-zinc-400'
                   )}
                   style={TOC_LABEL_STYLE}
