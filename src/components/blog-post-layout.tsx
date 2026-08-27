@@ -265,7 +265,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
             aria-label="Back to home"
             onClick={markPaperBackNav}
           >
-            <Undo2 className="size-4 flex-shrink-0 -translate-y-px" />
+            <Undo2 className="size-4 flex-shrink-0 -translate-y-px" strokeWidth={1.75} />
             Home
           </Link>
           <BlogPostToc />
@@ -284,7 +284,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           }}
           aria-label="Back to top"
         >
-          <ArrowUp className="size-4 flex-shrink-0" />
+          <ArrowUp className="size-4 flex-shrink-0" strokeWidth={1.75} />
           Back to top
         </button>
       </aside>
