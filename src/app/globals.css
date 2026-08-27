@@ -7,8 +7,10 @@
   --foreground: #171717;
   --intro-trigger-decoration: rgb(168 162 158);
   /* stone-300 - underline color for intro/link preview triggers */
-  --inline-youtube-trigger-decoration: rgb(168 162 158);
-  /* stone-300 - YouTube underline color in light mode */
+  --inline-link-decoration-thickness: 0.08em;
+  --inline-link-underline-offset: 0.025em;
+  --dotted-divider-dot-radius: 0.75px;
+  --dotted-divider-height: 1.5px;
   --intro-trigger-decoration-hover: rgb(194 65 12);
   /* orange-700 - shared inline-preview highlight */
   --scrollbar-thumb: rgb(168 162 158 / 0.6);
@@ -19,7 +21,7 @@
   --gradient-transparent: transparent;
   --toc-text-shadow: none;
   --top-fade-from: color-mix(in srgb, var(--background) 80%, transparent);
-  --paper-inset-shadow: rgba(120, 113, 108, 0.4); /* stone-500 */
+  --paper-inset-shadow: rgba(120, 113, 108, 0.15); /* stone-500 */
   --paper-drop-shadow: rgba(0, 0, 0, 0.12);
   --paper-bg: #ffffff;
   --paper-box-shadow: none;
@@ -43,8 +45,6 @@
     --foreground: #ededed;
     --intro-trigger-decoration: rgb(113 113 122);
     /* zinc-500 - underline color for intro/link preview triggers */
-    --inline-youtube-trigger-decoration: currentColor;
-    /* match the YouTube trigger's text color in dark mode */
     --intro-trigger-decoration-hover: rgb(251 146 60);
     /* orange-400 - shared inline-preview highlight */
     --scrollbar-thumb: rgb(82 82 91 / 0.6);
@@ -529,6 +529,17 @@ pre code {
   }
 }
 
+.dotted-divider {
+  height: var(--dotted-divider-height);
+  background-image: radial-gradient(
+    circle,
+    currentColor var(--dotted-divider-dot-radius),
+    transparent var(--dotted-divider-dot-radius)
+  );
+  background-size: 5px var(--dotted-divider-height);
+  background-repeat: space no-repeat;
+}
+
 /* Intro link styles - matching blog-post.module.css; !important overrides Tailwind preflight */
 .intro-link {
   color: rgb(68 64 60) !important;
@@ -537,10 +548,10 @@ pre code {
   text-decoration-line: underline !important;
   text-decoration-style: dotted !important;
   text-decoration-skip-ink: auto !important;
-  text-decoration-color: rgb(168 162 158) !important;
+  text-decoration-color: var(--intro-trigger-decoration) !important;
   /* stone-300 */
-  text-decoration-thickness: 10% !important;
-  text-underline-offset: 0.05rem !important;
+  text-decoration-thickness: var(--inline-link-decoration-thickness) !important;
+  text-underline-offset: var(--inline-link-underline-offset) !important;
   text-underline-position: from-font !important;
   transition-property: color, background-color, border-color, fill, stroke;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -559,9 +570,11 @@ a[data-inline-youtube-trigger] {
   text-decoration-line: underline !important;
   text-decoration-style: dotted !important;
   text-decoration-skip-ink: auto !important;
-  text-decoration-color: var(--inline-youtube-trigger-decoration) !important;
+  text-decoration-color: var(--intro-trigger-decoration) !important;
   /* stone-300 - same as intro-link */
-  text-underline-offset: 0.05rem !important;
+  text-decoration-thickness: var(--inline-link-decoration-thickness) !important;
+  text-underline-offset: var(--inline-link-underline-offset) !important;
+  text-underline-position: from-font !important;
   font-style: italic !important;
   opacity: 1 !important;
 }
@@ -576,9 +589,11 @@ a[data-inline-link-preview-trigger] {
   text-decoration-line: underline !important;
   text-decoration-style: dotted !important;
   text-decoration-skip-ink: auto !important;
-  text-decoration-color: rgb(168 162 158 / 0.65) !important;
+  text-decoration-color: var(--intro-trigger-decoration) !important;
   /* stone-300 - same as intro-link */
-  text-underline-offset: 0.05rem !important;
+  text-decoration-thickness: var(--inline-link-decoration-thickness) !important;
+  text-underline-offset: var(--inline-link-underline-offset) !important;
+  text-underline-position: from-font !important;
   font-style: italic !important;
   opacity: 1 !important;
   transition: color 150ms ease-out, text-decoration-color 150ms ease-out;
@@ -599,16 +614,16 @@ a[data-social-link-trigger] {
   text-decoration-line: underline !important;
   text-decoration-style: dotted !important;
   text-decoration-skip-ink: auto !important;
-  text-decoration-color: rgb(168 162 158) !important;
+  text-decoration-color: var(--intro-trigger-decoration) !important;
   /* stone-300 - same as intro-link */
-  text-decoration-thickness: 10% !important;
-  text-underline-offset: 0.05rem !important;
+  text-decoration-thickness: var(--inline-link-decoration-thickness) !important;
+  text-underline-offset: var(--inline-link-underline-offset) !important;
   text-underline-position: from-font !important;
   font-style: normal !important;
 }
 
 a[data-social-link-trigger]:is(:hover, :active, :focus-visible) {
-  text-decoration-color: rgb(194 65 12) !important;
+  text-decoration-color: var(--intro-trigger-decoration-hover) !important;
   /* orange-700 */
 }
 
@@ -643,7 +658,7 @@ a[data-mobile-menu-current] {
   }
 
   a[data-inline-youtube-trigger] {
-    text-decoration-color: var(--inline-youtube-trigger-decoration) !important;
+    text-decoration-color: var(--intro-trigger-decoration) !important;
   }
 
   a[data-inline-youtube-trigger]:is(:hover, :focus-visible) {
@@ -652,7 +667,7 @@ a[data-mobile-menu-current] {
   }
 
   a[data-inline-link-preview-trigger] {
-    text-decoration-color: rgb(113 113 122) !important;
+    text-decoration-color: var(--intro-trigger-decoration) !important;
     /* zinc-500 - same as intro-link dark */
   }
 
@@ -666,12 +681,12 @@ a[data-mobile-menu-current] {
   }
 
   a[data-social-link-trigger] {
-    text-decoration-color: rgb(113 113 122) !important;
+    text-decoration-color: var(--intro-trigger-decoration) !important;
     /* zinc-500 - same as intro-link dark */
   }
 
   a[data-social-link-trigger]:is(:hover, :active, :focus-visible) {
-    text-decoration-color: rgb(251 146 60) !important;
+    text-decoration-color: var(--intro-trigger-decoration-hover) !important;
     /* orange-400 */
   }
 

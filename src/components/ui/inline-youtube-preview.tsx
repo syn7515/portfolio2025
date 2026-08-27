@@ -80,21 +80,6 @@ export function InlineYoutubePreview({
   const anchorRef = useRef<HTMLAnchorElement>(null)
   const hoverStartRef = useRef<number>(0)
 
-  const applyTriggerStyles = useCallback((el: HTMLAnchorElement | null) => {
-    if (!el) return
-    el.style.setProperty('text-decoration-line', 'underline', 'important')
-    el.style.setProperty('text-decoration-style', 'dotted', 'important')
-    el.style.setProperty('text-decoration-color', 'var(--inline-youtube-trigger-decoration)', 'important')
-    el.style.setProperty('text-decoration-thickness', '10%', 'important')
-    el.style.setProperty('text-underline-offset', '0.05rem', 'important')
-    el.style.setProperty('font-style', 'italic', 'important')
-  }, [])
-
-  const setAnchorRef = useCallback((el: HTMLAnchorElement | null) => {
-    anchorRef.current = el
-    applyTriggerStyles(el)
-  }, [applyTriggerStyles])
-
   const watchUrl = buildWatchUrl(videoId, start)
   const embedUrl = buildEmbedUrl(videoId, start)
 
@@ -148,7 +133,6 @@ export function InlineYoutubePreview({
   }, [updatePreviewPosition])
 
   const handleMouseEnter = useCallback(() => {
-    anchorRef.current?.style.setProperty('text-decoration-color', 'currentColor', 'important')
     if (hoverDelayRef.current) clearTimeout(hoverDelayRef.current)
     hoverDelayRef.current = setTimeout(() => {
       revealPreview()
@@ -157,12 +141,10 @@ export function InlineYoutubePreview({
   }, [revealPreview])
 
   const handleFocus = useCallback(() => {
-    anchorRef.current?.style.setProperty('text-decoration-color', 'currentColor', 'important')
     revealPreview()
   }, [revealPreview])
 
   const handleMouseLeave = useCallback(() => {
-    anchorRef.current?.style.setProperty('text-decoration-color', 'var(--inline-youtube-trigger-decoration)', 'important')
     if (hoverDelayRef.current) {
       clearTimeout(hoverDelayRef.current)
       hoverDelayRef.current = null
@@ -245,7 +227,7 @@ export function InlineYoutubePreview({
   return (
     <>
       <a
-        ref={setAnchorRef}
+        ref={anchorRef}
         data-inline-youtube-trigger
         href={watchUrl}
         target="_blank"

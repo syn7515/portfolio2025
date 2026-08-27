@@ -47,12 +47,7 @@ export function Heading({ title, year, tocLabel, className }: HeadingProps) {
             <span className={titleClassName} style={{ ...titleStyle, whiteSpace: 'nowrap' }}>{title}</span>
             <div className="flex-1 mx-0 my-0">
               <div
-                className="w-full h-[2px] !text-stone-300 dark:!text-zinc-700"
-                style={{
-                  backgroundImage: 'radial-gradient(circle, currentColor 1px, transparent 1px)',
-                  backgroundSize: '5px 2px',
-                  backgroundRepeat: 'space no-repeat',
-                }}
+                className="dotted-divider w-full !text-stone-300 dark:!text-zinc-700"
               />
             </div>
             <span className={yearClassName} style={{ fontStyle: 'normal' }}>{year}</span>
