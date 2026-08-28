@@ -79,6 +79,19 @@ export function useToc(contentSelector: string = CONTENT_SELECTOR) {
     const observer = new IntersectionObserver(
       (entries) => {
         if (Date.now() - lastClickTimeRef.current < SCROLL_SETTLE_MS) return
+
+        const firstId = items[0]?.id
+        const firstEntry = entries.find((entry) => entry.target.id === firstId)
+        if (
+          firstEntry &&
+          !firstEntry.isIntersecting &&
+          firstEntry.boundingClientRect.top >=
+            (firstEntry.rootBounds?.bottom ?? window.innerHeight * 0.4)
+        ) {
+          setActiveId(null)
+          return
+        }
+
         for (const entry of entries) {
           if (!entry.isIntersecting) continue
           const id = entry.target.id

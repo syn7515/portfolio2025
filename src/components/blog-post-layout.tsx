@@ -268,7 +268,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
             <Undo2 className="size-4 flex-shrink-0 -translate-y-px" strokeWidth={1.75} />
             Home
           </Link>
-          <BlogPostToc />
+          <BlogPostToc className="mt-2" />
         </div>
         <button
           type="button"
