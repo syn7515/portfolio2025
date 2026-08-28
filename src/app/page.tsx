@@ -140,7 +140,7 @@ export default function Home() {
         </div>
 
         <div className="max-w-[560px] mx-auto w-full mt-12 sm:mt-14 lg:mt-16">
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-2 sm:gap-1">
             <ProjectListItem
               title="Robot Interface for Collaboration in Kitchen"
               dates="2026 – Ongoing"
@@ -211,6 +211,11 @@ export default function Home() {
           style={riseDelay(DELAY.footer)}
         >
           <div className="flex items-baseline justify-between gap-4 sm:block">
+            <div
+              className="text-left sm:!text-center text-[15px] sm:text-[14px] text-stone-400 dark:text-zinc-500 font-normal font-sans [text-wrap:nowrap] sm:text-balance"
+            >
+              © {new Date().getFullYear()} Sue Park<span className="hidden sm:inline">. — Built with millions of tokens of love.</span>
+            </div>
             <div className={`${styles.socialLinks} intro-text flex sm:hidden gap-2 w-fit`}>
               <a
                 href="https://x.com/sue_park__"
@@ -237,11 +242,6 @@ export default function Home() {
               >
                 LinkedIn
               </a>
-            </div>
-            <div
-              className="text-right sm:!text-center text-[15px] sm:text-[14px] text-stone-400 dark:text-zinc-500 font-normal font-sans [text-wrap:nowrap] sm:text-balance"
-            >
-              © {new Date().getFullYear()} Sue Park<span className="hidden sm:inline">. — Built with millions of tokens of love.</span>
             </div>
           </div>
         </div>
