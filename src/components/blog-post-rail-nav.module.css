@@ -78,8 +78,12 @@
 /* At rest every tick is the same length — the section you're in is marked by colour alone. Length
    carries no meaning until the pointer arrives. */
 .tick {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    translate: 0 -50%;
     height: 2px;
-    width: 12px;
+    width: 10px;
     border-radius: 0;
     background-color: rgb(214 211 209);
     /* stone-300 */
