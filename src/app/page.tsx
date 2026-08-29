@@ -214,7 +214,7 @@ export default function Home() {
             <div
               className="text-left sm:!text-center text-[15px] sm:text-[14px] text-stone-400 dark:text-zinc-500 font-normal font-sans [text-wrap:nowrap] sm:text-balance"
             >
-              © {new Date().getFullYear()} Sue Park<span className="hidden sm:inline">. — Built with millions of tokens of love.</span>
+              © {new Date().getFullYear()} Sue Park<span className="hidden sm:inline"> — Built with millions of tokens of love.</span>
             </div>
             <div className={`${styles.socialLinks} intro-text flex sm:hidden gap-2 w-fit`}>
               <a
