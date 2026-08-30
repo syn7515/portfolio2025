@@ -328,24 +328,6 @@
     }
 }
 
-/* Inline YouTube preview trigger: force underline + italic (wins over preflight and .mdxContent a) */
-.mdxContent a.inline-youtube-preview-trigger {
-    text-decoration-line: underline !important;
-    text-decoration-style: dotted !important;
-    text-decoration-skip-ink: auto !important;
-    text-decoration-color: var(--intro-trigger-decoration) !important;
-    text-decoration-thickness: var(--inline-link-decoration-thickness) !important;
-    text-underline-offset: var(--inline-link-underline-offset) !important;
-    text-underline-position: from-font !important;
-    font-style: italic !important;
-    opacity: 1 !important;
-}
-
-.mdxContent a.inline-youtube-preview-trigger:is(:hover, :focus-visible) {
-    color: var(--intro-trigger-decoration-hover) !important;
-    text-decoration-color: currentColor !important;
-}
-
 .mdxContent ul {
     color: rgb(68 64 60) !important;
     /* stone-700 */
@@ -546,17 +528,6 @@
         text-decoration-color: currentColor !important;
         opacity: 1 !important;
         /* full opacity on hover */
-    }
-
-    .mdxContent a.inline-youtube-preview-trigger {
-        color: rgb(161 161 170) !important;
-        opacity: 1 !important;
-        text-decoration-color: var(--intro-trigger-decoration) !important;
-    }
-
-    .mdxContent a.inline-youtube-preview-trigger:is(:hover, :focus-visible) {
-        color: var(--intro-trigger-decoration-hover) !important;
-        text-decoration-color: currentColor !important;
     }
 
     .mdxContent sup:not(.sup-badge) {

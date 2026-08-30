@@ -565,25 +565,6 @@ pre code {
   text-decoration-color: rgb(194 65 12) !important;
 }
 
-/* Inline YouTube preview trigger: same as .intro-link (underline, italic, decoration color) */
-a[data-inline-youtube-trigger] {
-  text-decoration-line: underline !important;
-  text-decoration-style: dotted !important;
-  text-decoration-skip-ink: auto !important;
-  text-decoration-color: var(--intro-trigger-decoration) !important;
-  /* stone-300 - same as intro-link */
-  text-decoration-thickness: var(--inline-link-decoration-thickness) !important;
-  text-underline-offset: var(--inline-link-underline-offset) !important;
-  text-underline-position: from-font !important;
-  font-style: italic !important;
-  opacity: 1 !important;
-}
-
-a[data-inline-youtube-trigger]:is(:hover, :focus-visible) {
-  color: var(--intro-trigger-decoration-hover) !important;
-  text-decoration-color: currentColor !important;
-}
-
 /* Inline link preview trigger: same as .intro-link (underline, italic, decoration color) */
 a[data-inline-link-preview-trigger] {
   text-decoration-line: underline !important;
@@ -655,15 +636,6 @@ a[data-mobile-menu-current] {
     /* orange-200 */
     text-decoration-color: rgb(254 215 170) !important;
     opacity: 1;
-  }
-
-  a[data-inline-youtube-trigger] {
-    text-decoration-color: var(--intro-trigger-decoration) !important;
-  }
-
-  a[data-inline-youtube-trigger]:is(:hover, :focus-visible) {
-    color: var(--intro-trigger-decoration-hover) !important;
-    text-decoration-color: currentColor !important;
   }
 
   a[data-inline-link-preview-trigger] {
