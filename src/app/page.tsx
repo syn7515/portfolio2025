@@ -42,6 +42,14 @@ const DELAY = {
   footer: 560,
 } as const;
 
+// When the last-delayed block has finished its 500ms rise, the whole entrance is over. From then on
+// the .contentRise/.paperEntrance classes are inert *unless* a media query flips their computed
+// animation-name from `none` back to a real name — which is what crossing the 640px breakpoint does,
+// since the phone block below that width suppresses both. That replayed the entire intro on every
+// resize past 640px, so once this timer fires the page pins itself into the settled state.
+const CONTENT_RISE_DURATION_MS = 500;
+const ENTRANCE_TOTAL_MS = CONTENT_BASE_DELAY_MS + DELAY.footer + CONTENT_RISE_DURATION_MS;
+
 export default function Home() {
   const shouldAnimate = !hasVisitedHome;
   // Backwards navigation (sidebar "Home" link on a blog post): instead of the normal staggered
@@ -52,10 +60,22 @@ export default function Home() {
   // src/lib/paper-exit-transition.ts.
   const [exitEntrance, setExitEntrance] = useState(false);
   const [exitDone, setExitDone] = useState(false);
+  // Starts false on both the server and the first client render (shouldAnimate is only ever false
+  // after a client-side visit, which can't happen before hydration), so there's no mismatch.
+  const [entranceSettled, setEntranceSettled] = useState(false);
 
   useEffect(() => {
     if (isPaperBackNav()) setExitEntrance(true);
     hasVisitedHome = true;
+  }, []);
+
+  // See ENTRANCE_TOTAL_MS: retire the entrance classes once they've played, so a later viewport
+  // change across 640px can't re-arm them. A timer rather than an animationend listener because the
+  // phone and reduced-motion cases never fire one — there the entrance is `none` from the start and
+  // this just settles immediately after the same delay.
+  useEffect(() => {
+    const id = window.setTimeout(() => setEntranceSettled(true), ENTRANCE_TOTAL_MS);
+    return () => window.clearTimeout(id);
   }, []);
 
   // Release the <html> attribute once the suppression class has committed. Clearing it while it was
@@ -79,7 +99,7 @@ export default function Home() {
   return (
 
 
-    <div className={`font-sans w-full min-h-[100dvh] min-[640px]:min-h-screen overflow-x-clip flex flex-col${exitEntrance ? ` ${styles.noEntrance}` : ''}`}>
+    <div className={`font-sans w-full min-h-[100dvh] min-[640px]:min-h-screen overflow-x-clip flex flex-col${exitEntrance || entranceSettled ? ` ${styles.noEntrance}` : ''}`}>
       {/* Top-edge fade overlay */}
       <div
         aria-hidden
@@ -97,6 +117,10 @@ export default function Home() {
           className={`relative z-10 w-full flex-1 flex flex-col min-[1280px]:mt-[100px] overflow-x-clip${paperClass}`}
           style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}
         >
+        {/* 640–1279px only: the paper is full-bleed there, so PaperGridBackground has nothing left
+            to peek out of. This draws the same grid inside the paper's bottom edge under a diagonal
+            fade instead — see .paper-grid-bottom in globals.css. */}
+        <div aria-hidden className="paper-grid-bottom" />
         <div className="flex-1 flex flex-col pt-16 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] min-[1280px]:pt-[clamp(6.25rem,calc(18.182vw_-_8.295rem),8.75rem)] pb-5 min-[640px]:pb-8 min-[1280px]:pb-10">
         <div className="flex-1 flex flex-col px-6 min-[1280px]:px-0 min-[1280px]:ml-[calc(50vw_-_280px_-_var(--sidebar-w))] min-[1280px]:w-[560px]">
         <div className="max-w-[560px] mx-auto" data-inline-link-preview-boundary>

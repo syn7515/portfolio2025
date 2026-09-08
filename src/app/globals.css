@@ -236,6 +236,58 @@ body {
   }
 }
 
+/* Same drafting grid as .paper-grid-background, drawn along the bottom edge of the paper for the
+   640–1279px band. Below 1280px --sidebar-w collapses to 0 and the paper goes full-bleed, so the
+   layer underneath has no margin left to show through — this one sits inside the paper instead.
+   Only the mask differs: a diagonal wipe that keeps the grid readable in the bottom-left corner and
+   fades it out toward the upper right. The fade *edge* is the diagonal; the grid lines themselves
+   stay orthogonal. A gradient angle of 22deg puts that edge 22° off horizontal — deliberately
+   shallower than a 45° corner-to-corner fade. */
+.paper-grid-bottom {
+  display: none;
+}
+
+@media (min-width: 640px) and (max-width: 1279.98px) {
+  .paper-grid-bottom {
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* Behind the in-flow content but still above the paper's own background, which is what a
+       negative index buys inside the paper's stacking context (it carries z-10 + position). */
+    z-index: -1;
+    height: min(460px, 60%);
+    pointer-events: none;
+    background-image:
+      linear-gradient(to right, var(--paper-grid-major) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--paper-grid-major) 1px, transparent 1px),
+      linear-gradient(to right, var(--paper-grid-minor) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--paper-grid-minor) 1px, transparent 1px);
+    background-position: 0 100%;
+    background-size:
+      100px 100px,
+      100px 100px,
+      20px 20px,
+      20px 20px;
+    /* Absolute stops rather than percentages: the gradient line's length grows with the viewport,
+       so percentage stops would stretch the wedge wider on a 1279px screen than on a 640px one.
+       In pixels the fade always reaches ~450px up the left edge and ~1120px along the bottom. */
+    -webkit-mask-image: linear-gradient(
+      22deg,
+      black 0,
+      rgb(0 0 0 / 0.4) 200px,
+      transparent 420px
+    );
+    mask-image: linear-gradient(
+      22deg,
+      black 0,
+      rgb(0 0 0 / 0.4) 200px,
+      transparent 420px
+    );
+  }
+}
+
 /* Global Typography Styles */
 h1 {
   font-size: 2.25rem;

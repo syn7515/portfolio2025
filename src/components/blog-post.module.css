@@ -165,7 +165,14 @@
    attribute alone, releasing it at the end of the exit relaunched the whole entrance: the empty
    sheet slid back in and every content block re-hid for 450ms and faded in again. This class is
    already in the DOM by then, so the computed value stays `none` across the handoff and nothing
-   restarts. */
+   restarts.
+
+   The layout also applies .paperNoEntrance once the entrance has finished playing
+   (ENTRANCE_TOTAL_MS in blog-post-layout.tsx). Same failure mode from a third direction: the phone
+   block above sets `animation: none`, so resizing back up past 640px re-armed everything and
+   replayed the entrance. Pinning the settled state means it runs once per page load and never
+   again. Note the mask-navigation rule at the bottom of this file deliberately outranks this
+   selector, so a post-to-post mask entrance still plays. */
 :global(html[data-paper-nav='back']) :is(.paperEntranceOverlay,
 .paperUnderlay,
 .contentBlurRevealItem,

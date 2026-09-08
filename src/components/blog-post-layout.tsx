@@ -28,6 +28,15 @@ import {
   shouldSkipPaperPageTransition,
 } from '@/lib/paper-exit-transition'
 
+// The last thing the entrance in blog-post.module.css finishes is the underlay retiring — a 500ms
+// fade that starts on the sheet's 450ms landing frame. (Content reveal ends earlier, at 700ms.)
+// Once that has run, the entrance classes are inert *unless* a media query flips their computed
+// animation-name from `none` back to a real name, which is exactly what crossing the 640px
+// breakpoint does: the phone block suppresses all of them below that width, so resizing back up
+// replayed the whole entrance — the empty sheet slid in again and every content block re-hid.
+// Pinning .paperNoEntrance once this elapses makes the entrance run once per page load, full stop.
+const ENTRANCE_TOTAL_MS = 950
+
 interface BlogPostLayoutProps {
   children: React.ReactNode
   slug?: string
@@ -153,6 +162,11 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
   const [exitEntrance, setExitEntrance] = useState(false)
   const [exitDone, setExitDone] = useState(false)
   const [maskSuppressedSlug, setMaskSuppressedSlug] = useState<string | null>(null)
+  // Keyed by slug for the same reason maskSuppressedSlug is: this component survives client-side
+  // navigation between posts, so a bare boolean would carry one post's settled state into the next
+  // one and suppress its entrance. On a slug change the comparison below fails on the first render,
+  // before the effect has even re-armed the timer.
+  const [settledSlug, setSettledSlug] = useState<string | null>(null)
   const cancelBackToTopRef = useRef<(() => void) | null>(null)
 
   useEffect(() => {
@@ -169,6 +183,16 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
   useEffect(() => {
     if (exitEntrance) clearPaperBackNav()
   }, [exitEntrance])
+
+  // See ENTRANCE_TOTAL_MS: retire the entrance classes once they've played, so a later viewport
+  // change across 640px can't re-arm them. A timer rather than an animationend listener because the
+  // phone and reduced-motion cases never fire one — there the entrance is `none` from the start and
+  // this just settles after the same delay. The class it adds is a visual no-op at this point: both
+  // decorative sheets have already animated to the state it pins them at.
+  useEffect(() => {
+    const id = window.setTimeout(() => setSettledSlug(slug ?? null), ENTRANCE_TOTAL_MS)
+    return () => window.clearTimeout(id)
+  }, [slug])
 
   useEffect(() => {
     const update = () => {
@@ -292,7 +316,8 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
       <div
         className={cn(
           'w-full min-h-screen overflow-x-clip flex flex-col relative',
-          (exitEntrance || maskSuppressedSlug === slug) && styles.paperNoEntrance,
+          (exitEntrance || maskSuppressedSlug === slug || settledSlug === (slug ?? null)) &&
+            styles.paperNoEntrance,
           maskSuppressedSlug === slug && styles.maskContentEntrance
         )}
       >

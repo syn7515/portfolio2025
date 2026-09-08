@@ -105,7 +105,12 @@
    but it has to be cleared before the next forward navigation, and clearing it flips these
    animations' computed name from `none` back to a real name, which restarts them. The class is
    applied by the page once it has captured the signal into state, so the computed value stays
-   `none` across that handoff. */
+   `none` across that handoff.
+
+   The page also applies .noEntrance once the entrance has finished playing (ENTRANCE_TOTAL_MS in
+   page.tsx). Same failure mode from the other direction: the phone block above sets `animation:
+   none`, so resizing back up past 640px would otherwise re-arm every animation and replay the whole
+   intro. Pinning the settled state means the entrance runs once per page load and never again. */
 :global(html[data-paper-nav='back']) :is(.paperEntrance, .contentRise),
 .noEntrance :is(.paperEntrance, .contentRise) {
     animation: none;
