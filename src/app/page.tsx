@@ -117,9 +117,9 @@ export default function Home() {
           className={`relative z-10 w-full flex-1 flex flex-col min-[1280px]:mt-[100px] overflow-x-clip${paperClass}`}
           style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}
         >
-        {/* 640–1279px only: the paper is full-bleed there, so PaperGridBackground has nothing left
-            to peek out of. This draws the same grid inside the paper's bottom edge under a diagonal
-            fade instead — see .paper-grid-bottom in globals.css. */}
+        {/* Below 1280px the paper is full-bleed, so PaperGridBackground has nothing left to peek out
+            of. This draws the same grid inside the paper's bottom edge under a diagonal fade
+            instead — see .paper-grid-bottom in globals.css. */}
         <div aria-hidden className="paper-grid-bottom" />
         <div className="flex-1 flex flex-col pt-16 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] min-[1280px]:pt-[clamp(6.25rem,calc(18.182vw_-_8.295rem),8.75rem)] pb-5 min-[640px]:pb-8 min-[1280px]:pb-10">
         <div className="flex-1 flex flex-col px-6 min-[1280px]:px-0 min-[1280px]:ml-[calc(50vw_-_280px_-_var(--sidebar-w))] min-[1280px]:w-[560px]">

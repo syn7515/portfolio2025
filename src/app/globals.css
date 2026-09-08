@@ -236,9 +236,9 @@ body {
   }
 }
 
-/* Same drafting grid as .paper-grid-background, drawn along the bottom edge of the paper for the
-   640–1279px band. Below 1280px --sidebar-w collapses to 0 and the paper goes full-bleed, so the
-   layer underneath has no margin left to show through — this one sits inside the paper instead.
+/* Same drafting grid as .paper-grid-background, drawn along the bottom edge of the paper everywhere
+   below 1280px. That's where --sidebar-w collapses to 0 and the paper goes full-bleed, so the layer
+   underneath has no margin left to show through — this one sits inside the paper instead.
    Only the mask differs: a diagonal wipe that keeps the grid readable in the bottom-left corner and
    fades it out toward the upper right. The fade *edge* is the diagonal; the grid lines themselves
    stay orthogonal. A gradient angle of 22deg puts that edge 22° off horizontal — deliberately
@@ -247,7 +247,7 @@ body {
   display: none;
 }
 
-@media (min-width: 640px) and (max-width: 1279.98px) {
+@media (max-width: 1279.98px) {
   .paper-grid-bottom {
     display: block;
     position: absolute;
@@ -270,20 +270,28 @@ body {
       100px 100px,
       20px 20px,
       20px 20px;
-    /* Absolute stops rather than percentages: the gradient line's length grows with the viewport,
-       so percentage stops would stretch the wedge wider on a 1279px screen than on a 640px one.
-       In pixels the fade always reaches ~450px up the left edge and ~1120px along the bottom. */
+    /* Stops are lengths, not percentages: the gradient line grows with the viewport, so percentage
+       stops would stretch the wedge wider on a 1279px screen than on a 640px one. In pixels the
+       fade reaches --grid-fade-end / cos(22°) up the left edge and --grid-fade-end / sin(22°)
+       along the bottom — ~450px and ~1120px at the 420px ceiling.
+       The vw term is for phones: a 375px screen is far narrower than that 1120px reach, so the
+       full-size fade would leave the bottom-right corner at ~58% and read as a plain bottom-up
+       fade with no visible diagonal. Scaling with the viewport keeps the wedge a wedge down there,
+       and the clamp locks to the fixed size once the screen is wide enough to show all of it —
+       continuous across 640px rather than stepping at the breakpoint. */
+    --grid-fade-end: clamp(200px, 65vw, 420px);
+    --grid-fade-mid: calc(var(--grid-fade-end) * 0.48);
     -webkit-mask-image: linear-gradient(
       22deg,
       black 0,
-      rgb(0 0 0 / 0.4) 200px,
-      transparent 420px
+      rgb(0 0 0 / 0.4) var(--grid-fade-mid),
+      transparent var(--grid-fade-end)
     );
     mask-image: linear-gradient(
       22deg,
       black 0,
-      rgb(0 0 0 / 0.4) 200px,
-      transparent 420px
+      rgb(0 0 0 / 0.4) var(--grid-fade-mid),
+      transparent var(--grid-fade-end)
     );
   }
 }
