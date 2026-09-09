@@ -169,8 +169,14 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
   const [settledSlug, setSettledSlug] = useState<string | null>(null)
   const cancelBackToTopRef = useRef<(() => void) | null>(null)
 
+  // Re-evaluated on every slug change, not just on mount: this component survives client-side
+  // navigation between posts, so leaving the flags latched from the previous exit meant the second
+  // "Previous" in a row never remounted the departing sheet — it stayed retired by exitDone and the
+  // exit silently degraded to a hard cut, unlike the sidebar "Home" exit, which always gets a fresh
+  // page mount. Resetting both here makes the two paths play the identical animation every time.
   useEffect(() => {
-    if (isPaperBackNav()) setExitEntrance(true)
+    setExitDone(false)
+    setExitEntrance(isPaperBackNav())
     if (isBlogPostMaskNavigation()) setMaskSuppressedSlug(slug ?? null)
   }, [slug])
 
@@ -182,7 +188,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
   // re-hid all the content. Keyed on exitEntrance so it runs strictly after that render commits.
   useEffect(() => {
     if (exitEntrance) clearPaperBackNav()
-  }, [exitEntrance])
+  }, [exitEntrance, slug])
 
   // See ENTRANCE_TOTAL_MS: retire the entrance classes once they've played, so a later viewport
   // change across 640px can't re-arm them. A timer rather than an animationend listener because the
@@ -347,9 +353,13 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
             z-index. The slide-in visual therefore lives on a separate, disposable overlay below,
             which covers this element while it travels.
             This element is never hidden: it and its text are what FCP and LCP are measured on, so
-            anything that withheld them until JS ran would be measuring the bundle, not the page. */}
+            anything that withheld them until JS ran would be measuring the bundle, not the page.
+            paper-grid-bottom composites the drafting grid into this element's own background below
+            1280px, where the full-bleed paper leaves PaperGridBackground nothing to peek out of. It
+            has to be a background rather than a child layer precisely because this element isn't a
+            stacking context — see globals.css. */}
         <div
-          className="flex-1 min-[1280px]:mt-[100px] overflow-x-clip relative"
+          className="paper-grid-bottom flex-1 min-[1280px]:mt-[100px] overflow-x-clip relative"
           style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}
         >
           <div
@@ -378,15 +388,23 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                 {(previousProject || nextProject) ? (
                   <div
                     className={cn(
-                      'max-w-[560px] mx-auto min-[1280px]:max-w-none mt-24 min-[640px]:mt-16 min-[1280px]:mt-32 pb-[28px] min-[640px]:pb-16 min-[1280px]:pb-[120px] overflow-x-visible',
+                      // Below 1280px the divider is gone, so the gap does the separating on its own
+                      // and gets a little more room. The old split (96px on phones, 64px from 640px
+                      // up) existed because the divider's my-4 pair added ~33px on top of the 64 —
+                      // the two were tuned to land in the same place, so one value now covers both.
+                      'max-w-[560px] mx-auto min-[1280px]:max-w-none mt-28 min-[1280px]:mt-32 pb-[28px] min-[640px]:pb-16 min-[1280px]:pb-[120px] overflow-x-visible',
                       styles.contentBlurRevealItem
                     )}
                   >
+                    {/* ≥1280px only. Below that the paper is full-bleed and carries the drafting
+                        grid along its bottom edge (paper-grid-bottom), which already separates the
+                        footer nav from the article — a rule on top of it just reads as clutter.
+                        Phone widths never showed it in the first place. */}
                     <Divider
                       variant="default"
                       color="stone"
                       spacing="md"
-                      className="hidden sm:block sm:w-full sm:mx-0"
+                      className="hidden min-[1280px]:block min-[1280px]:w-full min-[1280px]:mx-0"
                     />
                     <div className="flex justify-between items-start mt-4 min-[1280px]:mt-12 gap-8">
                       {/* Previous Project */}
@@ -491,6 +509,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
             stays below the sidebar (z-60). */}
         {exitEntrance && !exitDone && (
           <motion.div
+            key={slug ?? 'paper-exit'}
             aria-hidden
             className="absolute inset-0 min-[1280px]:top-[100px] overflow-x-clip pointer-events-none z-[55]"
             style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}

@@ -113,14 +113,13 @@ export default function Home() {
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-4 focus:left-4 focus:px-4 focus:py-2 focus:bg-white focus:text-stone-800 focus:rounded focus:shadow">Skip to content</a>
       <main id="main" className="w-full flex-1 flex flex-col relative">
         <PaperGridBackground />
+        {/* paper-grid-bottom: below 1280px the paper is full-bleed, so PaperGridBackground has
+            nothing left to peek out of — the same grid is composited into this element's own
+            background instead, under a diagonal fade. See globals.css. */}
         <div
-          className={`relative z-10 w-full flex-1 flex flex-col min-[1280px]:mt-[100px] overflow-x-clip${paperClass}`}
+          className={`paper-grid-bottom relative z-10 w-full flex-1 flex flex-col min-[1280px]:mt-[100px] overflow-x-clip${paperClass}`}
           style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}
         >
-        {/* Below 1280px the paper is full-bleed, so PaperGridBackground has nothing left to peek out
-            of. This draws the same grid inside the paper's bottom edge under a diagonal fade
-            instead — see .paper-grid-bottom in globals.css. */}
-        <div aria-hidden className="paper-grid-bottom" />
         <div className="flex-1 flex flex-col pt-16 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] min-[1280px]:pt-[clamp(6.25rem,calc(18.182vw_-_8.295rem),8.75rem)] pb-5 min-[640px]:pb-8 min-[1280px]:pb-10">
         <div className="flex-1 flex flex-col px-6 min-[1280px]:px-0 min-[1280px]:ml-[calc(50vw_-_280px_-_var(--sidebar-w))] min-[1280px]:w-[560px]">
         <div className="max-w-[560px] mx-auto" data-inline-link-preview-boundary>

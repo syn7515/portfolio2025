@@ -2,7 +2,11 @@
 
 import { useEffect, useRef } from 'react';
 
-const INTERACTIVE_GRID_QUERY = '(min-width: 1280px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)';
+// No width clause: two grids want this pointer position and they live on opposite sides of 1280px
+// — this component's own layer above it, and the paper's bottom-edge grid (.paper-grid-bottom)
+// below it. Each is display-gated by its own media query in globals.css, so at any given width only
+// one of them can actually light up and the other reads its variables harmlessly.
+const INTERACTIVE_GRID_QUERY = '(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)';
 
 export default function PaperGridBackground() {
   const gridRef = useRef<HTMLDivElement>(null);
@@ -12,6 +16,13 @@ export default function PaperGridBackground() {
     const interactiveGrid = window.matchMedia(INTERACTIVE_GRID_QUERY);
     if (!grid) return;
 
+    // The bottom-edge grid is painted into the paper's own background rather than into a layer of
+    // its own (globals.css explains why), so it can't read the position off this element — it needs
+    // the pointer in its own box's coordinates. It's always a sibling: this component and the paper
+    // sit next to each other under <main> on the home page and under the paper wrapper on a post.
+    const paper = grid.parentElement?.querySelector<HTMLElement>('.paper-grid-bottom') ?? null;
+    const targets = paper ? [grid, paper] : [grid];
+
     let frameId = 0;
     let pointerX = 0;
     let pointerY = 0;
@@ -19,10 +30,12 @@ export default function PaperGridBackground() {
 
     const renderPointerPosition = () => {
       frameId = 0;
-      const bounds = grid.getBoundingClientRect();
-      grid.style.setProperty('--paper-grid-pointer-x', `${pointerX - bounds.left}px`);
-      grid.style.setProperty('--paper-grid-pointer-y', `${pointerY - bounds.top}px`);
-      grid.dataset.pointerActive = 'true';
+      for (const target of targets) {
+        const bounds = target.getBoundingClientRect();
+        target.style.setProperty('--paper-grid-pointer-x', `${pointerX - bounds.left}px`);
+        target.style.setProperty('--paper-grid-pointer-y', `${pointerY - bounds.top}px`);
+        target.dataset.pointerActive = 'true';
+      }
     };
 
     const schedulePointerPosition = () => {
@@ -47,7 +60,7 @@ export default function PaperGridBackground() {
 
     const hidePointerEffect = () => {
       pointerActive = false;
-      delete grid.dataset.pointerActive;
+      for (const target of targets) delete target.dataset.pointerActive;
     };
 
     const handlePointerOut = (event: PointerEvent) => {

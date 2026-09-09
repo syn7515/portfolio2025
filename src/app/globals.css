@@ -236,44 +236,41 @@ body {
   }
 }
 
-/* Same drafting grid as .paper-grid-background, drawn along the bottom edge of the paper everywhere
-   below 1280px. That's where --sidebar-w collapses to 0 and the paper goes full-bleed, so the layer
-   underneath has no margin left to show through — this one sits inside the paper instead.
-   Only the mask differs: a diagonal wipe that keeps the grid readable in the bottom-left corner and
-   fades it out toward the upper right. The fade *edge* is the diagonal; the grid lines themselves
-   stay orthogonal. A gradient angle of 22deg puts that edge 22° off horizontal — deliberately
-   shallower than a 45° corner-to-corner fade. */
-.paper-grid-bottom {
-  display: none;
+/* Radius of the pointer spotlight on .paper-grid-bottom. Registered so it can be transitioned:
+   the spotlight lives inside a background gradient, and an unregistered custom property would jump
+   between 0 and its full size instead of growing. Grow/shrink is this grid's equivalent of the
+   opacity fade .paper-grid-background::after uses for the same moment. */
+@property --paper-grid-hover-r {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
 }
 
+/* Same drafting grid as .paper-grid-background, this time composited into the bottom of the paper
+   itself, everywhere below 1280px. That's where --sidebar-w collapses to 0 and the paper goes
+   full-bleed, so the layer underneath has no margin left to show through.
+
+   Applied as background layers on the paper rather than as an overlay element on purpose. A child
+   would have to sit between the paper's background and its text, which needs `z-index: -1` inside a
+   stacking context — and the blog paper deliberately isn't one (carousel layers with z-[50] escape
+   it to clear page-level fixed overlays; see blog-post-layout.tsx). Background layers paint right
+   above the element's own background-color and below all of its content, in every case, with no
+   stacking context involved.
+
+   The fade differs from .paper-grid-background's: a diagonal wipe that keeps the grid readable in
+   the bottom-left corner and clears it toward the upper right. The fade *edge* is the diagonal; the
+   grid lines themselves stay orthogonal. A gradient angle of 22deg puts that edge 22° off horizontal
+   — deliberately shallower than a 45° corner-to-corner fade. Since this can't use a mask (that
+   would apply to the paper's text too), the topmost layer is a paper-coloured eraser painting the
+   inverse: transparent over the corner, opaque everywhere the grid should be gone. */
 @media (max-width: 1279.98px) {
   .paper-grid-bottom {
-    display: block;
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    /* Behind the in-flow content but still above the paper's own background, which is what a
-       negative index buys inside the paper's stacking context (it carries z-10 + position). */
-    z-index: -1;
-    height: min(460px, 60%);
-    pointer-events: none;
-    background-image:
-      linear-gradient(to right, var(--paper-grid-major) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--paper-grid-major) 1px, transparent 1px),
-      linear-gradient(to right, var(--paper-grid-minor) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--paper-grid-minor) 1px, transparent 1px);
-    background-position: 0 100%;
-    background-size:
-      100px 100px,
-      100px 100px,
-      20px 20px,
-      20px 20px;
     /* Stops are lengths, not percentages: the gradient line grows with the viewport, so percentage
        stops would stretch the wedge wider on a 1279px screen than on a 640px one. In pixels the
        fade reaches --grid-fade-end / cos(22°) up the left edge and --grid-fade-end / sin(22°)
-       along the bottom — ~450px and ~1120px at the 420px ceiling.
+       along the bottom — ~450px and ~1120px at the 420px ceiling. Absolute stops also keep the
+       wedge hugging the bottom-left corner on a blog post's very tall paper, where a percentage
+       would scale with the whole article.
        The vw term is for phones: a 375px screen is far narrower than that 1120px reach, so the
        full-size fade would leave the bottom-right corner at ~58% and read as a plain bottom-up
        fade with no visible diagonal. Scaling with the viewport keeps the wedge a wedge down there,
@@ -281,18 +278,70 @@ body {
        continuous across 640px rather than stepping at the breakpoint. */
     --grid-fade-end: clamp(200px, 65vw, 420px);
     --grid-fade-mid: calc(var(--grid-fade-end) * 0.48);
-    -webkit-mask-image: linear-gradient(
-      22deg,
-      black 0,
-      rgb(0 0 0 / 0.4) var(--grid-fade-mid),
-      transparent var(--grid-fade-end)
-    );
-    mask-image: linear-gradient(
-      22deg,
-      black 0,
-      rgb(0 0 0 / 0.4) var(--grid-fade-mid),
-      transparent var(--grid-fade-end)
-    );
+    /* Pointer spotlight, off by default: with all three colours transparent, layers 6-10 below
+       render as nothing at all, which is exactly what a touch device should paint. The hover query
+       further down turns them on. */
+    --paper-grid-hover-veil: transparent;
+    --paper-grid-hover-ink-major: transparent;
+    --paper-grid-hover-ink-minor: transparent;
+    /* Ten layers, top of the stack first:
+       1     the diagonal eraser,
+       2-5   the grid at rest,
+       6     the pointer veil — opaque paper everywhere except a circle at the cursor,
+       7-10  a second, darker grid, which therefore shows only inside that circle.
+       The veil is why this needs no mask: an opaque layer hides what's under it, so the darker grid
+       is revealed by punching a hole rather than by masking it in. Layers 2-5 sit *above* the veil
+       so the resting grid survives it, and the eraser sits above everything so the spotlight can't
+       light up ground the fade has already cleared. */
+    background-image:
+      linear-gradient(
+        22deg,
+        transparent 0,
+        color-mix(in srgb, var(--paper-bg) 60%, transparent) var(--grid-fade-mid),
+        var(--paper-bg) var(--grid-fade-end)
+      ),
+      linear-gradient(to right, var(--paper-grid-major) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--paper-grid-major) 1px, transparent 1px),
+      linear-gradient(to right, var(--paper-grid-minor) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--paper-grid-minor) 1px, transparent 1px),
+      radial-gradient(
+        circle var(--paper-grid-hover-r) at var(--paper-grid-pointer-x, 0px) var(--paper-grid-pointer-y, 0px),
+        transparent 0,
+        color-mix(in srgb, var(--paper-grid-hover-veil) 25%, transparent) 35%,
+        var(--paper-grid-hover-veil) 100%
+      ),
+      linear-gradient(to right, var(--paper-grid-hover-ink-major) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--paper-grid-hover-ink-major) 1px, transparent 1px),
+      linear-gradient(to right, var(--paper-grid-hover-ink-minor) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--paper-grid-hover-ink-minor) 1px, transparent 1px);
+    background-repeat:
+      no-repeat, repeat, repeat, repeat, repeat,
+      no-repeat, repeat, repeat, repeat, repeat;
+    /* Grid layers anchored to the bottom edge so a line lands on it exactly — both copies share the
+       anchor, so the spotlight's lines sit exactly on the resting ones. The eraser and the veil
+       fill the whole box. */
+    background-position:
+      0 0, 0 100%, 0 100%, 0 100%, 0 100%,
+      0 0, 0 100%, 0 100%, 0 100%, 0 100%;
+    background-size:
+      auto, 100px 100px, 100px 100px, 20px 20px, 20px 20px,
+      auto, 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+  }
+
+  /* Same gate as .paper-grid-background's spotlight. The JS half (PaperGridBackground) applies the
+     identical query before it ever sets data-pointer-active, so this is belt and braces — but it
+     also keeps a touch device from rasterising two layers it can never light up. */
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .paper-grid-bottom {
+      --paper-grid-hover-veil: var(--paper-bg);
+      --paper-grid-hover-ink-major: var(--paper-grid-hover-major);
+      --paper-grid-hover-ink-minor: var(--paper-grid-hover-minor);
+      transition: --paper-grid-hover-r 180ms ease-out;
+    }
+
+    .paper-grid-bottom[data-pointer-active='true'] {
+      --paper-grid-hover-r: 150px;
+    }
   }
 }
 
