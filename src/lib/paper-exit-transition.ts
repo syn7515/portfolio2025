@@ -9,6 +9,15 @@ const PAPER_EXIT_OFFSET_Y = -32
 const PAPER_EXIT_ROTATE_DEG = 2
 const PAPER_EXIT_BLUR_PX = 10
 
+// The departing sheet is `absolute inset-0`, so its height is the destination document's height —
+// ~890px on Home but ~8800px on a long blog post. transform-origin defaults to the element's own
+// centre, which put the rotation pivot ~4400px below the fold there and turned the shared 2deg
+// rotate into a ~154px lateral sweep across the visible area, against ~15px on Home. Same
+// transition, wildly different motion. Pinning the pivot to the middle of the viewport makes the
+// rotation read identically regardless of how tall the page underneath happens to be; 50vh is
+// what Home was already effectively using, so that path is unchanged.
+export const PAPER_EXIT_TRANSFORM_ORIGIN = '50% 50vh'
+
 export const PAPER_EXIT_REST = { x: 0, y: 0, rotate: 0, filter: 'blur(0px)', opacity: 1 }
 export const PAPER_EXIT_OFFSCREEN = {
   x: PAPER_EXIT_OFFSET_X,

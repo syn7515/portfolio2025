@@ -22,6 +22,7 @@ import {
   PAPER_EXIT_OFFSCREEN,
   PAPER_EXIT_TRANSITION,
   PAPER_EXIT_TRANSITION_REDUCED,
+  PAPER_EXIT_TRANSFORM_ORIGIN,
   markPaperBackNav,
   isPaperBackNav,
   clearPaperBackNav,
@@ -169,14 +170,8 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
   const [settledSlug, setSettledSlug] = useState<string | null>(null)
   const cancelBackToTopRef = useRef<(() => void) | null>(null)
 
-  // Re-evaluated on every slug change, not just on mount: this component survives client-side
-  // navigation between posts, so leaving the flags latched from the previous exit meant the second
-  // "Previous" in a row never remounted the departing sheet — it stayed retired by exitDone and the
-  // exit silently degraded to a hard cut, unlike the sidebar "Home" exit, which always gets a fresh
-  // page mount. Resetting both here makes the two paths play the identical animation every time.
   useEffect(() => {
-    setExitDone(false)
-    setExitEntrance(isPaperBackNav())
+    if (isPaperBackNav()) setExitEntrance(true)
     if (isBlogPostMaskNavigation()) setMaskSuppressedSlug(slug ?? null)
   }, [slug])
 
@@ -188,7 +183,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
   // re-hid all the content. Keyed on exitEntrance so it runs strictly after that render commits.
   useEffect(() => {
     if (exitEntrance) clearPaperBackNav()
-  }, [exitEntrance, slug])
+  }, [exitEntrance])
 
   // See ENTRANCE_TOTAL_MS: retire the entrance classes once they've played, so a later viewport
   // change across 640px can't re-arm them. A timer rather than an animationend listener because the
@@ -509,10 +504,9 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
             stays below the sidebar (z-60). */}
         {exitEntrance && !exitDone && (
           <motion.div
-            key={slug ?? 'paper-exit'}
             aria-hidden
             className="absolute inset-0 min-[1280px]:top-[100px] overflow-x-clip pointer-events-none z-[55]"
-            style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}
+            style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)', transformOrigin: PAPER_EXIT_TRANSFORM_ORIGIN }}
             initial={PAPER_EXIT_REST}
             animate={PAPER_EXIT_OFFSCREEN}
             transition={exitTransition}

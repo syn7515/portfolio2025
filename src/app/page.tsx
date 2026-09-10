@@ -11,6 +11,7 @@ import {
   PAPER_EXIT_OFFSCREEN,
   PAPER_EXIT_TRANSITION,
   PAPER_EXIT_TRANSITION_REDUCED,
+  PAPER_EXIT_TRANSFORM_ORIGIN,
   isPaperBackNav,
   clearPaperBackNav,
 } from '@/lib/paper-exit-transition';
@@ -281,7 +282,7 @@ export default function Home() {
           <motion.div
             aria-hidden
             className="absolute inset-0 min-[1280px]:top-[100px] overflow-x-clip pointer-events-none z-[55]"
-            style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}
+            style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)', transformOrigin: PAPER_EXIT_TRANSFORM_ORIGIN }}
             initial={PAPER_EXIT_REST}
             animate={PAPER_EXIT_OFFSCREEN}
             transition={exitTransition}
