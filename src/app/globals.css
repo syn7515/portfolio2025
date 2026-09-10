@@ -25,6 +25,13 @@
   --paper-drop-shadow: rgba(0, 0, 0, 0.12);
   --paper-bg: #ffffff;
   --paper-box-shadow: none;
+  /* Rotation pivot for every paper slide (entrance and exit alike). Those sheets are sized to the
+     document, not the viewport — a post's paper runs 2800-8800px tall against Home's ~940px — so
+     the default centre origin put the pivot thousands of px below the fold and turned the shared
+     2deg rotate into a swing that scaled with page length: 15px on Home, 154px on the longest
+     post. Pinning the pivot to the middle of the viewport makes the rotation read identically on
+     every page. 50vh is what Home was already effectively using, so it stays as it was. */
+  --paper-swing-origin: 50% 50vh;
   --sidebar-w: 0px;
   --paper-grid-minor: rgb(120 113 108 / 0.1);
   --paper-grid-major: rgb(120 113 108 / 0.12);

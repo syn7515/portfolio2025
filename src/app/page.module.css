@@ -50,6 +50,9 @@
 }
 
 .paperEntrance {
+    /* Shared with the blog-post entrance and both exits — see --paper-swing-origin in globals.css.
+       Home's paper is already viewport-tall, so this matches the centre origin it had before. */
+    transform-origin: var(--paper-swing-origin);
     animation: home-paper-entrance 450ms cubic-bezier(0.23, 1, 0.32, 1) both;
 }
 

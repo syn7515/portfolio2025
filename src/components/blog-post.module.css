@@ -93,6 +93,9 @@
 @media (prefers-reduced-motion: no-preference) {
     .paperEntranceOverlay {
         display: block;
+        /* See --paper-swing-origin in globals.css: this overlay is `absolute inset-0`, so its
+           height is the whole post. Without this the 2deg above swings by page length. */
+        transform-origin: var(--paper-swing-origin);
         animation:
             paper-entrance 450ms cubic-bezier(0.23, 1, 0.32, 1) both,
             paper-entrance-dismiss 1ms linear 450ms forwards;
