@@ -1,5 +1,6 @@
 "use client";
 
+import type { CSSProperties } from 'react';
 import { useEffect, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import ProjectListItem from '@/components/ui/project-list-item';
@@ -38,9 +39,10 @@ const DELAY = {
   projectFirst: 400,
   projectSecond: 440,
   projectThird: 480,
-  divider: 520,
-  socials: 540,
-  footer: 560,
+  chapterBreak: 520,
+  projectPersonal: 560,
+  divider: 600,
+  footer: 640,
 } as const;
 
 // When the last-delayed block has finished its 500ms rise, the whole entrance is over. From then on
@@ -50,6 +52,27 @@ const DELAY = {
 // resize past 640px, so once this timer fires the page pins itself into the settled state.
 const CONTENT_RISE_DURATION_MS = 500;
 const ENTRANCE_TOTAL_MS = CONTENT_BASE_DELAY_MS + DELAY.footer + CONTENT_RISE_DURATION_MS;
+
+// Chapter-break dinkus. Set in the title serif at the size of the metadata column, so it reads as a
+// typographic mark in the page's own voice rather than a widget.
+const DINKUS_FONT_SIZE_PX = 16;
+// Traditional dinkus spacing is roughly an em between marks. Crimson Pro's asterisk advances
+// ~0.43em, so an 8px flex gap puts glyph centres just under an em apart at this size.
+// This is deliberately the container's gap rather than letter-spacing on the glyphs: each span
+// holds a single character, so letter-spacing would only pad its right-hand side, adding a trailing
+// space that pushes the group off centre without separating anything.
+// The asterisk's ink hangs high in the em box. Measured on the rendered glyph in Crimson Pro: the
+// ink spans 0.342em to 0.682em above the baseline, putting its centre 0.512em up while the line
+// box's own centre (at line-height 1) sits lower. Translating down by the difference lands the ink
+// on the block's optical centre, so the symmetric margins above and below read as symmetric.
+// Re-measure if the display face ever changes.
+const DINKUS_INK_OFFSET_EM = 0.178;
+const DINKUS_STYLE: CSSProperties = {
+  fontFamily: 'var(--font-crimson-pro), serif',
+  fontSize: `${DINKUS_FONT_SIZE_PX}px`,
+  lineHeight: 1,
+  transform: `translateY(${DINKUS_INK_OFFSET_EM}em)`,
+};
 
 export default function Home() {
   const shouldAnimate = !hasVisitedHome;
@@ -187,43 +210,61 @@ export default function Home() {
               style={riseDelay(DELAY.projectThird)}
             />
           </div>
+
+          {/* Chapter break, in the sense a book uses one: a centred dinkus rather than a rule, so it
+              reads as "new section" without introducing a heading level to a page that has none. Set
+              in the title serif, since a dinkus is a typographic mark and not a piece of UI chrome.
+
+              An asterisk's ink sits high in its em box — it hangs off the cap line rather than
+              straddling the baseline — so `items-center` centres the line box while the glyphs
+              themselves ride visibly above centre, which would eat into the space above and leave a
+              gap below. DINKUS_INK_OFFSET_EM pushes them back down onto the block's optical centre;
+              see the constant for how it is derived. */}
+          {/* The space before the interpolation is load-bearing: Tailwind's scanner reads the source
+              text, and a utility glued directly to `${'${'}` is not extracted. Written as
+              `sm:mb-5${'${'}riseClass}` the class silently never reached the stylesheet, and `mb-6`
+              won at 24px against a 20px top margin. */}
+          <div
+            aria-hidden
+            className={`flex items-center justify-center gap-[8px] my-6 sm:my-5 ${riseClass.trim()}`}
+            style={riseDelay(DELAY.chapterBreak)}
+          >
+            {[0, 1, 2].map(i => (
+              <span
+                key={i}
+                className="text-stone-400 dark:text-zinc-600 select-none"
+                style={DINKUS_STYLE}
+              >
+                *
+              </span>
+            ))}
+          </div>
+
+          {/* Personal work, set apart from the case studies above. The page has no headings of its
+              own, so rather than introducing a section layer for a single row, three cues carry the
+              distinction: the chapter break, the right-hand column naming the category instead of a
+              year — which also explains why the date sequence breaks here — and the row being a
+              named product rather than a descriptive project title. Worth revisiting as labelled
+              "Work"/"Personal" groups once there are two or three personal projects to name. */}
+          <div>
+            <ProjectListItem
+              title="Been There — Every Place, Stitched"
+              dates="Personal, 2026"
+              href="https://been-there.suepark.xyz"
+              className={riseClass.trim() || undefined}
+              style={riseDelay(DELAY.projectPersonal)}
+            />
+          </div>
         </div>
 
-        <div className="hidden max-w-[560px] mx-auto w-full mt-8 sm:mt-12 lg:mt-14 sm:flex flex-col gap-6">
+        {/* End-of-content mark closing the project list. It used to sit above the social links,
+            which have since moved into the footer; the rule stays because without it the column
+            just stops. Desktop only — on phones the footer follows close enough to do the job. */}
+        <div className="hidden max-w-[560px] mx-auto w-full mt-8 sm:mt-12 lg:mt-14 sm:block">
           <div
-            className={`h-px w-4 bg-stone-400/50 dark:bg-zinc-600/50${riseClass}`}
+            className={`h-px w-4 bg-stone-400/50 dark:bg-zinc-600/50 ${riseClass.trim()}`}
             style={riseDelay(DELAY.divider)}
           />
-          <div
-            className={`${styles.socialLinks} intro-text flex gap-2 w-fit${riseClass}`}
-            style={riseDelay(DELAY.socials)}
-          >
-            <a
-              href="https://x.com/sue_park__"
-              target="_blank"
-              rel="noopener noreferrer"
-              data-social-link-trigger
-              className="text-[17px] sm:text-[14px] !text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 active:!text-orange-700 dark:hover:!text-orange-400 dark:active:!text-orange-400 motion-safe:active:scale-[0.97]"
-              style={{
-                transition: 'scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
-              }}
-            >
-              X
-            </a>
-            <span className="text-[17px] sm:text-[14px] !text-stone-400 dark:!text-zinc-600">·</span>
-            <a
-              href="https://www.linkedin.com/in/sooyeonp/"
-              target="_blank"
-              rel="noopener noreferrer"
-              data-social-link-trigger
-              className="text-[17px] sm:text-[14px] !text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 active:!text-orange-700 dark:hover:!text-orange-400 dark:active:!text-orange-400 motion-safe:active:scale-[0.97]"
-              style={{
-                transition: 'scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
-              }}
-            >
-              LinkedIn
-            </a>
-          </div>
         </div>
 
         {/* On mobile, absorb spare viewport height while preserving at least 64px between the
@@ -231,41 +272,43 @@ export default function Home() {
         <div className="min-h-16 flex-1 sm:hidden" aria-hidden />
 
         <div
-          className={`w-full max-w-[560px] sm:max-w-[480px] mx-auto sm:mt-auto sm:pt-32 lg:pt-36${riseClass}`}
+          className={`w-full max-w-[560px] mx-auto sm:mt-auto sm:pt-20 lg:pt-24 ${riseClass.trim()}`}
           style={riseDelay(DELAY.footer)}
         >
-          <div className="flex items-baseline justify-between gap-4 sm:block">
-            <div
-              className="text-left sm:!text-center text-[15px] sm:text-[14px] text-stone-400 dark:text-zinc-500 font-normal font-sans [text-wrap:nowrap] sm:text-balance"
-            >
-              © {new Date().getFullYear()} Sue Park<span className="hidden sm:inline"> — Built with millions of tokens of love.</span>
-            </div>
-            <div className={`${styles.socialLinks} intro-text flex sm:hidden gap-2 w-fit`}>
+          {/* One baseline row at every width: socials left, copyright right. They sit in DOM order,
+              which also reads correctly — the footer's navigation before its legal line. */}
+          <div className="flex items-baseline justify-between gap-4">
+            <div className={`${styles.socialLinks} intro-text flex gap-2 w-fit`}>
               <a
                 href="https://x.com/sue_park__"
                 target="_blank"
                 rel="noopener noreferrer"
                 data-social-link-trigger
-                className="!text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 active:!text-orange-700 dark:hover:!text-orange-400 dark:active:!text-orange-400 motion-safe:active:scale-[0.97]"
+                className="sm:text-[14px] !text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 active:!text-orange-700 dark:hover:!text-orange-400 dark:active:!text-orange-400 motion-safe:active:scale-[0.97]"
                 style={{
                   transition: 'scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
                 }}
               >
                 X
               </a>
-              <span className="!text-stone-400 dark:!text-zinc-600">·</span>
+              <span className="sm:text-[14px] !text-stone-400 dark:!text-zinc-600">·</span>
               <a
                 href="https://www.linkedin.com/in/sooyeonp/"
                 target="_blank"
                 rel="noopener noreferrer"
                 data-social-link-trigger
-                className="!text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 active:!text-orange-700 dark:hover:!text-orange-400 dark:active:!text-orange-400 motion-safe:active:scale-[0.97]"
+                className="sm:text-[14px] !text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 active:!text-orange-700 dark:hover:!text-orange-400 dark:active:!text-orange-400 motion-safe:active:scale-[0.97]"
                 style={{
                   transition: 'scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
                 }}
               >
                 LinkedIn
               </a>
+            </div>
+            <div
+              className="text-right text-[15px] sm:text-[14px] text-stone-400 dark:text-zinc-500 font-normal font-sans [text-wrap:nowrap]"
+            >
+              © Sue Park {new Date().getFullYear()}
             </div>
           </div>
         </div>
