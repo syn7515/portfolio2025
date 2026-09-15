@@ -226,7 +226,7 @@ export default function Home() {
               won at 24px against a 20px top margin. */}
           <div
             aria-hidden
-            className={`flex items-center justify-center gap-[8px] my-6 sm:my-5 ${riseClass.trim()}`}
+            className={`flex items-center justify-center gap-[8px] my-5 ${riseClass.trim()}`}
             style={riseDelay(DELAY.chapterBreak)}
           >
             {[0, 1, 2].map(i => (
@@ -245,8 +245,12 @@ export default function Home() {
               distinction: the chapter break, the right-hand column naming the category instead of a
               year — which also explains why the date sequence breaks here — and the row being a
               named product rather than a descriptive project title. Worth revisiting as labelled
-              "Work"/"Personal" groups once there are two or three personal projects to name. */}
-          <div>
+              "Work"/"Personal" groups once there are two or three personal projects to name.
+
+              Carries the same `gap-2 sm:gap-1` as the case-study list above even though it holds a
+              single row today: without it a second personal project would sit 16px from the first
+              (the two rows' own py-2 and nothing else) against the 24px every other pair uses. */}
+          <div className="flex flex-col gap-2 sm:gap-1">
             <ProjectListItem
               title="Been There — Every Place, Stitched"
               dates="Personal, 2026"
@@ -267,9 +271,11 @@ export default function Home() {
           />
         </div>
 
-        {/* On mobile, absorb spare viewport height while preserving at least 64px between the
-            project list and footer when the content needs to scroll. */}
-        <div className="min-h-16 flex-1 sm:hidden" aria-hidden />
+        {/* On mobile, absorb spare viewport height while preserving at least 96px between the
+            project list and footer when the content needs to scroll. On a 375x812 phone the list
+            already overflows the viewport, so flex-1 gets nothing to distribute and this minimum
+            is what actually renders — it is the gap, not a floor that rarely applies. */}
+        <div className="min-h-24 flex-1 sm:hidden" aria-hidden />
 
         <div
           className={`w-full max-w-[560px] mx-auto sm:mt-auto sm:pt-20 lg:pt-24 ${riseClass.trim()}`}
@@ -306,7 +312,7 @@ export default function Home() {
               </a>
             </div>
             <div
-              className="text-right text-[15px] sm:text-[14px] text-stone-400 dark:text-zinc-500 font-normal font-sans [text-wrap:nowrap]"
+              className="text-right text-[14px] text-stone-400 dark:text-zinc-500 font-normal font-sans [text-wrap:nowrap]"
             >
               © Sue Park {new Date().getFullYear()}
             </div>
