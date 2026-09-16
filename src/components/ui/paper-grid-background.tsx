@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 
-// No width clause: two grids want this pointer position and they live on opposite sides of 1280px
+// No width clause: two grids want this pointer position and they live on opposite sides of 1200px
 // — this component's own layer above it, and the paper's bottom-edge grid (.paper-grid-bottom)
 // below it. Each is display-gated by its own media query in globals.css, so at any given width only
 // one of them can actually light up and the other reads its variables harmlessly.

@@ -137,15 +137,15 @@ export default function Home() {
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-4 focus:left-4 focus:px-4 focus:py-2 focus:bg-white focus:text-stone-800 focus:rounded focus:shadow">Skip to content</a>
       <main id="main" className="w-full flex-1 flex flex-col relative">
         <PaperGridBackground />
-        {/* paper-grid-bottom: below 1280px the paper is full-bleed, so PaperGridBackground has
+        {/* paper-grid-bottom: below 1200px the paper is full-bleed, so PaperGridBackground has
             nothing left to peek out of — the same grid is composited into this element's own
             background instead, under a diagonal fade. See globals.css. */}
         <div
-          className={`paper-grid-bottom relative z-10 w-full flex-1 flex flex-col min-[1280px]:mt-[100px] overflow-x-clip${paperClass}`}
+          className={`paper-grid-bottom relative z-10 w-full flex-1 flex flex-col paper:mt-[100px] overflow-x-clip${paperClass}`}
           style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}
         >
-        <div className="flex-1 flex flex-col pt-16 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] min-[1280px]:pt-[clamp(6.25rem,calc(18.182vw_-_8.295rem),8.75rem)] pb-5 min-[640px]:pb-8 min-[1280px]:pb-10">
-        <div className="flex-1 flex flex-col px-6 min-[1280px]:px-0 min-[1280px]:ml-[calc(50vw_-_280px_-_var(--sidebar-w))] min-[1280px]:w-[560px]">
+        <div className="flex-1 flex flex-col pt-16 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] paper:pt-[clamp(6.25rem,calc(18.182vw_-_8.295rem),8.75rem)] pb-5 min-[640px]:pb-8 paper:pb-10">
+        <div className="flex-1 flex flex-col px-6 paper:px-0 paper:ml-[calc(50vw_-_280px_-_var(--sidebar-w))] paper:w-[560px]">
         <div className="max-w-[560px] mx-auto" data-inline-link-preview-boundary>
           {/* Left column: name */}
           <div>
@@ -330,7 +330,7 @@ export default function Home() {
         {exitEntrance && !exitDone && (
           <motion.div
             aria-hidden
-            className="absolute inset-0 min-[1280px]:top-[100px] overflow-x-clip pointer-events-none z-[55]"
+            className="absolute inset-0 paper:top-[100px] overflow-x-clip pointer-events-none z-[55]"
             style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)', transformOrigin: PAPER_EXIT_TRANSFORM_ORIGIN }}
             initial={PAPER_EXIT_REST}
             animate={PAPER_EXIT_OFFSCREEN}

@@ -1,6 +1,12 @@
 import type { CSSProperties, RefObject } from "react";
 import { useState, useEffect } from "react";
 
+import {
+  PAPER_BREAKPOINT,
+  SIDEBAR_SETTLED_BREAKPOINT,
+  sidebarWidthAt,
+} from "@/lib/breakpoints";
+
 export const FALLBACK_ITEMS = ["Dean", "Lil B", "Lazer", "Simz", "Bladee"];
 
 // How far ahead of the viewport a card starts fetching its media. Roughly one viewport of runway,
@@ -232,8 +238,11 @@ export function calculateImagePosition(
   return style;
 }
 
-// Minimum gap kept between a card's left edge and the paper's left edge at ≥1280px,
-// where the paper is inset by --sidebar-w but cards center on the viewport.
+// Minimum gap kept between a card's left edge and the paper's left edge above the paper
+// breakpoint, where the paper is inset by --sidebar-w. Holding that gap is what pushes the whole
+// content column off the viewport's centre — --paper-center-offset in globals.css does the pushing
+// and repeats this 48px, so the two have to agree. All that's left here is the defensive width
+// clamp for a paper too narrow to hold the card at all.
 const CARD_EDGE_GAP = 48;
 
 export function useResponsiveSizing(
@@ -245,7 +254,6 @@ export function useResponsiveSizing(
     cardWidth: explicitWidth ?? 0,
     cardHeight: explicitHeight ?? 0,
     gap: explicitGap ?? 0,
-    offsetX: 0,
   }));
 
   useEffect(() => {
@@ -258,7 +266,6 @@ export function useResponsiveSizing(
         cardWidth: explicitWidth,
         cardHeight: explicitHeight,
         gap: explicitGap,
-        offsetX: 0,
       });
       return;
     }
@@ -273,34 +280,35 @@ export function useResponsiveSizing(
       if (w < 640) {
         const width = Math.max(120, w - 40);
         const height = Math.round((width * 9) / 16);
-        setSize({ cardWidth: width, cardHeight: height, gap: 8, offsetX: 0 });
+        setSize({ cardWidth: width, cardHeight: height, gap: 8 });
       } else if (w < 768) {
         const width = Math.max(
           600,
           Math.min(640, Math.round(600 + ((w - 640) / (768 - 640)) * 40))
         );
         const height = Math.round((width * 9) / 16);
-        setSize({ cardWidth: width, cardHeight: height, gap: 12, offsetX: 0 });
+        setSize({ cardWidth: width, cardHeight: height, gap: 12 });
       } else if (w < 1024) {
         const width = 640;
         const height = 360;
-        setSize({ cardWidth: width, cardHeight: height, gap: 16, offsetX: 0 });
-      } else if (w < 1280) {
-        setSize({ cardWidth: 840, cardHeight: 473, gap: 36, offsetX: 0 });
+        setSize({ cardWidth: width, cardHeight: height, gap: 16 });
+      } else if (w < PAPER_BREAKPOINT) {
+        setSize({ cardWidth: 840, cardHeight: 473, gap: 36 });
       } else {
-        const t = Math.min(1, (w - 1280) / 220); // 0 at 1280px → 1 at 1500px+
+        // 0 where the paper first becomes a sheet → 1 once --sidebar-w has stopped growing.
+        const t = Math.min(
+          1,
+          (w - PAPER_BREAKPOINT) / (SIDEBAR_SETTLED_BREAKPOINT - PAPER_BREAKPOINT)
+        );
         const idealWidth = Math.round(720 + t * 240); // 720px → 960px
-        // The paper surface is inset from the left by --sidebar-w (see globals.css:
-        // clamp(240px, 27.273vw - 109.09px, 300px)) while cards center on the viewport,
-        // so a wide card can run off the paper's left edge. Keep the card full-size and
-        // shift it right (offsetX) just enough to hold CARD_EDGE_GAP from that edge;
-        // only shrink if the paper itself is too narrow (defensive — doesn't happen at
-        // these breakpoints).
-        const sidebarW = Math.min(300, Math.max(240, 0.27273 * w - 109.09));
+        // Cards centre on the column they sit in, which already rides --paper-center-offset and is
+        // therefore far enough from the paper's left edge — nothing to shift here. Only shrink if
+        // the paper itself is too narrow to hold the card with its gaps (defensive — doesn't
+        // happen at these breakpoints).
+        const sidebarW = sidebarWidthAt(w);
         const cardWidth = Math.min(idealWidth, Math.floor(w - sidebarW - CARD_EDGE_GAP * 2));
         const cardHeight = Math.round(cardWidth * 9 / 16);
-        const offsetX = Math.max(0, Math.round(sidebarW + CARD_EDGE_GAP - (w - cardWidth) / 2));
-        setSize({ cardWidth, cardHeight, gap: 40, offsetX });
+        setSize({ cardWidth, cardHeight, gap: 40 });
       }
     };
 

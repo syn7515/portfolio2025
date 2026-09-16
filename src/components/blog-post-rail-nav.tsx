@@ -20,7 +20,7 @@ interface BlogPostRailNavProps {
 }
 
 // Section labels keep the TOC's own Crimson Pro. The Home tooltip deliberately does *not* use this
-// — it mirrors the ≥1280px sidebar's Home link instead (sans, text-sm, font-[460]), so the same
+// — it mirrors the ≥1200px sidebar's Home link instead (sans, text-sm, font-[460]), so the same
 // control reads the same way at every width.
 const TOC_LABEL_STYLE: React.CSSProperties = {
   fontFamily: 'var(--font-crimson-pro), serif',
@@ -33,9 +33,9 @@ const RAIL_EXIT_MS = 180
 const TITLE_HOVER_SESSION_MS = 2500
 
 /**
- * Home + table of contents for 820–1280px.
+ * Home + table of contents for 820–1200px.
  *
- * At ≥1280px this is the fixed text sidebar; below 820px it's the hamburger overlay. In between,
+ * At ≥1200px this is the fixed text sidebar; below 820px it's the hamburger overlay. In between,
  * --sidebar-w collapses to 0px and the paper runs edge to edge, so there is no gutter to put a
  * text rail in — the outline collapses to tick marks that expand on hover, and Home becomes a ghost
  * icon button sitting above them.
@@ -152,10 +152,10 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
       className={cn(
         styles.railNav,
         showTitlesInstantly && styles.titlesInstant,
-        'hidden min-[820px]:flex min-[1280px]:hidden',
+        'hidden min-[820px]:flex paper:hidden',
         // Vertically centred so the cluster stays reachable at any scroll position without being
         // fixed to an edge. The left offset opens up as the gutter does: at 820px space remains
-        // tight between the viewport edge and text column, while at 1200px there is ~300px.
+        // tight between the viewport edge and text column, while at the top of the band there is ~300px.
         'fixed left-2 min-[820px]:left-6 min-[1024px]:left-10 top-1/2 -translate-y-1/2 z-60',
         'flex-col items-start gap-5'
       )}
@@ -173,7 +173,7 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
         className={cn(
           styles.homeButton,
           'relative flex h-8 w-14 items-center rounded-full pl-2',
-          // Type and colour copied from the ≥1280px sidebar Home link so the two are the same
+          // Type and colour copied from the ≥1200px sidebar Home link so the two are the same
           // control. No hover background: the label below is the hover affordance, and it and the
           // icon both take the orange together — a tint behind the icon on top of that read as two
           // competing signals for one state.

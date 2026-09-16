@@ -4,11 +4,13 @@ import type { ReactNode } from 'react'
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
+import { PAPER_BREAKPOINT } from '@/lib/breakpoints'
 import { cn } from '@/lib/utils'
 import { DescriptionBackdrop } from '@/components/ui/description-backdrop'
 
 const HOVER_DELAY_MS = 150
-const SIDE_RAIL_BREAKPOINT = 1280
+// The rail lives in the margin the floating paper leaves, so it exists exactly where the paper does.
+const SIDE_RAIL_BREAKPOINT = PAPER_BREAKPOINT
 const SIDE_RAIL_GAP = 32
 const SIDE_RAIL_MAX_WIDTH = 320
 const VIEWPORT_EDGE_GAP = 24

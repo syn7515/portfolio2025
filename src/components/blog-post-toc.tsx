@@ -10,7 +10,7 @@ interface BlogPostTocProps {
 }
 
 /**
- * The sidebar's text table of contents, shown at ≥1280px where the rail has room for full labels.
+ * The sidebar's text table of contents, shown at ≥1200px where the rail has room for full labels.
  * Below that width the same entries are rendered as tick marks by blog-post-rail-nav.
  */
 export default function BlogPostToc({ contentSelector, className }: BlogPostTocProps) {

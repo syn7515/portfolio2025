@@ -257,13 +257,13 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
         }}
       />
 
-      {/* Compact rail: Home + tick-mark TOC, for the 820–1280px band where the paper is full-bleed
+      {/* Compact rail: Home + tick-mark TOC, for the 820–1200px band where the paper is full-bleed
           and there is no gutter for the text sidebar below. */}
       <BlogPostRailNav />
 
       {/* Fixed side nav: back + TOC; visible only on lg+ */}
       <aside
-        className="hidden min-[1280px]:block fixed left-0 top-0 bottom-0 z-60 pointer-events-none"
+        className="hidden paper:block fixed left-0 top-0 bottom-0 z-60 pointer-events-none"
         aria-label="Post navigation"
       >
         {/* Background layer at 10% opacity */}
@@ -299,7 +299,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           type="button"
           onClick={handleBackToTop}
           className={cn(
-            'absolute bottom-20 min-[1280px]:bottom-[120px] mb-[120px] left-14 flex items-center gap-2 w-fit whitespace-nowrap text-sm font-[460] text-stone-400 dark:text-zinc-400 hover:text-orange-700 dark:hover:text-orange-400 motion-safe:active:scale-[0.97] cursor-pointer pointer-events-auto px-3 py-2 -mx-3 -my-2 rounded',
+            'absolute bottom-20 paper:bottom-[120px] mb-[120px] left-14 flex items-center gap-2 w-fit whitespace-nowrap text-sm font-[460] text-stone-400 dark:text-zinc-400 hover:text-orange-700 dark:hover:text-orange-400 motion-safe:active:scale-[0.97] cursor-pointer pointer-events-auto px-3 py-2 -mx-3 -my-2 rounded',
             showBackToTop && viewportTall
               ? 'opacity-100 blur-none'
               : 'opacity-0 blur-[4px] pointer-events-none'
@@ -333,7 +333,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
             blog-post.module.css (.paperUnderlay), keyed off the same 450ms landing frame. */}
         <div
           aria-hidden
-          className={cn('absolute inset-0 min-[1280px]:top-[100px]', styles.paperUnderlay)}
+          className={cn('absolute inset-0 paper:top-[100px]', styles.paperUnderlay)}
           style={{
             backgroundColor: 'var(--paper-bg)',
             boxShadow: 'var(--paper-box-shadow)',
@@ -350,17 +350,20 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
             This element is never hidden: it and its text are what FCP and LCP are measured on, so
             anything that withheld them until JS ran would be measuring the bundle, not the page.
             paper-grid-bottom composites the drafting grid into this element's own background below
-            1280px, where the full-bleed paper leaves PaperGridBackground nothing to peek out of. It
+            1200px, where the full-bleed paper leaves PaperGridBackground nothing to peek out of. It
             has to be a background rather than a child layer precisely because this element isn't a
             stacking context — see globals.css. */}
         <div
-          className="paper-grid-bottom flex-1 min-[1280px]:mt-[100px] overflow-x-clip relative"
+          className="paper-grid-bottom flex-1 paper:mt-[100px] overflow-x-clip relative"
           style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}
         >
           <div
-            className="pt-20 xs:pt-20 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] min-[1280px]:pt-[clamp(6.25rem,calc(18.182vw_-_8.295rem),8.75rem)]"
+            className="pt-20 xs:pt-20 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] paper:pt-[clamp(6.25rem,calc(18.182vw_-_8.295rem),8.75rem)]"
           >
-              <div className="px-6 min-[1280px]:px-0 min-[1280px]:ml-[calc(50vw_-_280px_-_var(--sidebar-w))] min-[1280px]:w-[560px]">
+              {/* --paper-center-offset (globals.css) is what keeps this column on the carousel's
+                  centre line rather than the viewport's; without it the cards' bleed is lopsided,
+                  reaching further past one side of the text than the other. */}
+              <div className="px-6 paper:px-0 paper:ml-[calc(50vw_-_280px_-_var(--sidebar-w)_+_var(--paper-center-offset))] paper:w-[560px]">
                 {/* Header: title, subtitle */}
                 <div className={styles.contentBlurRevealItem}>
                   <BlogPostHeader slug={slug} title={title} subtitle={subtitle} />
@@ -383,15 +386,15 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                 {(previousProject || nextProject) ? (
                   <div
                     className={cn(
-                      // Below 1280px the divider is gone, so the gap does the separating on its own
+                      // Below 1200px the divider is gone, so the gap does the separating on its own
                       // and gets a little more room. The old split (96px on phones, 64px from 640px
                       // up) existed because the divider's my-4 pair added ~33px on top of the 64 —
                       // the two were tuned to land in the same place, so one value now covers both.
-                      'max-w-[560px] mx-auto min-[1280px]:max-w-none mt-28 min-[1280px]:mt-32 pb-[28px] min-[640px]:pb-16 min-[1280px]:pb-[120px] overflow-x-visible',
+                      'max-w-[560px] mx-auto paper:max-w-none mt-28 paper:mt-32 pb-[28px] min-[640px]:pb-16 paper:pb-[120px] overflow-x-visible',
                       styles.contentBlurRevealItem
                     )}
                   >
-                    {/* ≥1280px only. Below that the paper is full-bleed and carries the drafting
+                    {/* ≥1200px only. Below that the paper is full-bleed and carries the drafting
                         grid along its bottom edge (paper-grid-bottom), which already separates the
                         footer nav from the article — a rule on top of it just reads as clutter.
                         Phone widths never showed it in the first place. */}
@@ -399,9 +402,9 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                       variant="default"
                       color="stone"
                       spacing="md"
-                      className="hidden min-[1280px]:block min-[1280px]:w-full min-[1280px]:mx-0"
+                      className="hidden paper:block paper:w-full paper:mx-0"
                     />
-                    <div className="flex justify-between items-start mt-4 min-[1280px]:mt-12 gap-8">
+                    <div className="flex justify-between items-start mt-4 paper:mt-12 gap-8">
                       {/* Previous Project */}
                       {previousProject ? (
                         <Link
@@ -472,7 +475,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                     </div>
                   </div>
                 ) : (
-                  <div className="pb-12 min-[1280px]:pb-[148px]" aria-hidden />
+                  <div className="pb-12 paper:pb-[148px]" aria-hidden />
                 )}
               </div>
           </div>
@@ -489,7 +492,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
         <div
           aria-hidden
           className={cn(
-            'absolute inset-0 min-[1280px]:top-[100px] overflow-x-clip pointer-events-none',
+            'absolute inset-0 paper:top-[100px] overflow-x-clip pointer-events-none',
             styles.paperEntranceOverlay
           )}
           style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}
@@ -505,7 +508,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
         {exitEntrance && !exitDone && (
           <motion.div
             aria-hidden
-            className="absolute inset-0 min-[1280px]:top-[100px] overflow-x-clip pointer-events-none z-[55]"
+            className="absolute inset-0 paper:top-[100px] overflow-x-clip pointer-events-none z-[55]"
             style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)', transformOrigin: PAPER_EXIT_TRANSFORM_ORIGIN }}
             initial={PAPER_EXIT_REST}
             animate={PAPER_EXIT_OFFSCREEN}

@@ -26,7 +26,7 @@ function slugify(text: string): string {
 /**
  * Reads the post's headings out of the rendered DOM and tracks which one is currently in view.
  *
- * Shared by the sidebar list (≥1280px) and the compact rail (820–1280px) so both render the same
+ * Shared by the sidebar list (≥1200px) and the compact rail (820–1200px) so both render the same
  * entries and agree on the active one. Both are mounted at every width — only one is ever displayed
  * — so this deliberately stays cheap: one observer per instance over a handful of headings.
  */
