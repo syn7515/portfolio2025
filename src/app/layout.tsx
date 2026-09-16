@@ -7,12 +7,8 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import MotionProvider from "@/components/motion-provider";
 import BlogPostMobileMenu from "@/components/blog-post-mobile-menu";
 import BlogPostTransitionMask from "@/components/blog-post-transition-mask";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL, socialCard } from "@/lib/site-metadata";
 import "./globals.css";
-
-// X and other social crawlers cache card images by URL. Use a content-versioned
-// filename so replacing the image always produces a new crawler cache key.
-const OG_IMAGE_URL =
-  "https://suepark.xyz/og-image-cd63c326.png";
 
 const inter = localFont({
   src: [
@@ -69,42 +65,19 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Sue Park",
-  description: "Sue Park — Portfolio",
+  // `default` is what Home and anything without its own title get; `template` is what the case
+  // studies fill in, so a tab reads "Aniai | Sue Park". The social card carries the same string,
+  // but spelled out by socialCard rather than templated — the template only ever reaches `title`.
+  title: {
+    default: SITE_NAME,
+    template: `%s | ${SITE_NAME}`,
+  },
+  description: SITE_DESCRIPTION,
   icons: {
     icon: '/favicon.svg',
   },
-  metadataBase: new URL("https://suepark.xyz"),
-  openGraph: {
-    title: "Sue Park",
-    description: "Sue Park — Portfolio",
-    url: "https://suepark.xyz",
-    siteName: "Sue Park",
-    images: [
-      {
-        url: OG_IMAGE_URL,
-        width: 1200,
-        height: 630,
-        type: "image/png",
-        alt: "Sue Park Portfolio Open Graph Image",
-      },
-    ],
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Sue Park",
-    description: "Sue Park — Portfolio",
-    images: [
-      {
-        url: OG_IMAGE_URL,
-        width: 1200,
-        height: 630,
-        type: "image/png",
-        alt: "Sue Park Portfolio Open Graph Image",
-      },
-    ],
-  },
+  metadataBase: new URL(SITE_URL),
+  ...socialCard({ title: SITE_NAME }),
 };
 
 export default function RootLayout({
