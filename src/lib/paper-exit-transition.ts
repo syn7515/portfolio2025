@@ -144,6 +144,29 @@ export function clearPaperBackNav() {
   document.documentElement.removeAttribute(PAPER_BACK_NAV_ATTR)
 }
 
+// A full-document reload keeps the reader where they were — the UA's own scroll restoration is
+// deliberately left on for that one navigation type (see the inline script in app/layout.tsx). A
+// sheet flying in over content that is already scrolled halfway down reads as a glitch rather than
+// an arrival, and a reload isn't an arrival, so the entrances sit this one out.
+//
+// Same pre-paint contract as the direction signal above, and for the same reason: both entrances
+// are CSS, so they start on the first painted frame and the answer has to be there before it. The
+// attribute is set by that inline script; the page then captures it into its durable no-entrance
+// class and calls clearPageReload, because leaving it on <html> would suppress the *next* route's
+// entrance too.
+export const PAGE_RELOAD_ATTR = 'data-page-reload'
+
+export function isPageReload() {
+  return (
+    typeof document !== 'undefined' &&
+    document.documentElement.hasAttribute(PAGE_RELOAD_ATTR)
+  )
+}
+
+export function clearPageReload() {
+  document.documentElement.removeAttribute(PAGE_RELOAD_ATTR)
+}
+
 export function clearPaperHomeForwardNav() {
   try {
     if (sessionStorage.getItem(PAPER_BACK_NAV_FLAG) === PAPER_HOME_FORWARD_NAV_VALUE) {

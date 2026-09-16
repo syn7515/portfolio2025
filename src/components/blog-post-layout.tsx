@@ -26,6 +26,8 @@ import {
   markPaperBackNav,
   isPaperBackNav,
   clearPaperBackNav,
+  isPageReload,
+  clearPageReload,
   shouldSkipPaperPageTransition,
 } from '@/lib/paper-exit-transition'
 
@@ -163,6 +165,10 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
   const [exitEntrance, setExitEntrance] = useState(false)
   const [exitDone, setExitDone] = useState(false)
   const [maskSuppressedSlug, setMaskSuppressedSlug] = useState<string | null>(null)
+  // Refresh: the reader is put back where they were, so the entrance sits the load out. Keyed by
+  // slug for the same reason maskSuppressedSlug is — this only describes the document's first
+  // route, and a later client-side navigation out of it should animate normally.
+  const [reloadSuppressedSlug, setReloadSuppressedSlug] = useState<string | null>(null)
   // Keyed by slug for the same reason maskSuppressedSlug is: this component survives client-side
   // navigation between posts, so a bare boolean would carry one post's settled state into the next
   // one and suppress its entrance. On a slug change the comparison below fails on the first render,
@@ -172,6 +178,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
 
   useEffect(() => {
     if (isPaperBackNav()) setExitEntrance(true)
+    if (isPageReload()) setReloadSuppressedSlug(slug ?? null)
     if (isBlogPostMaskNavigation()) setMaskSuppressedSlug(slug ?? null)
   }, [slug])
 
@@ -184,6 +191,13 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
   useEffect(() => {
     if (exitEntrance) clearPaperBackNav()
   }, [exitEntrance])
+
+  // Same handoff for the reload attribute, and it matters more here: it is set on <html> by an
+  // inline script that only runs on a full document load, so nothing else would ever take it off
+  // and the next post reached from this one would inherit the suppression.
+  useEffect(() => {
+    if (reloadSuppressedSlug !== null) clearPageReload()
+  }, [reloadSuppressedSlug])
 
   // See ENTRANCE_TOTAL_MS: retire the entrance classes once they've played, so a later viewport
   // change across 640px can't re-arm them. A timer rather than an animationend listener because the
@@ -317,7 +331,10 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
       <div
         className={cn(
           'w-full min-h-screen overflow-x-clip flex flex-col relative',
-          (exitEntrance || maskSuppressedSlug === slug || settledSlug === (slug ?? null)) &&
+          (exitEntrance ||
+            maskSuppressedSlug === slug ||
+            reloadSuppressedSlug === slug ||
+            settledSlug === (slug ?? null)) &&
             styles.paperNoEntrance,
           maskSuppressedSlug === slug && styles.maskContentEntrance
         )}

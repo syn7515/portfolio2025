@@ -170,6 +170,10 @@
    already in the DOM by then, so the computed value stays `none` across the handoff and nothing
    restarts.
 
+   `html[data-page-reload]` joins them on a refresh, for the same pre-paint reason and with the same
+   handoff: a reload restores the reader's scroll position, so there is nothing for a sheet to
+   arrive on top of. See isPageReload in src/lib/paper-exit-transition.ts.
+
    The layout also applies .paperNoEntrance once the entrance has finished playing
    (ENTRANCE_TOTAL_MS in blog-post-layout.tsx). Same failure mode from a third direction: the phone
    block above sets `animation: none`, so resizing back up past 640px re-armed everything and
@@ -188,6 +192,12 @@
 .contentBlurReveal > :not(:has([data-carousel])),
 .contentBlurReveal > * > :not(:has([data-carousel])),
 .contentBlurReveal [data-carousel-layer]),
+:global(html[data-page-reload]) :is(.paperEntranceOverlay,
+.paperUnderlay,
+.contentBlurRevealItem,
+.contentBlurReveal > :not(:has([data-carousel])),
+.contentBlurReveal > * > :not(:has([data-carousel])),
+.contentBlurReveal [data-carousel-layer]),
 .paperNoEntrance :is(.paperEntranceOverlay,
 .paperUnderlay,
 .contentBlurRevealItem,
@@ -199,12 +209,14 @@
 
 :global(html[data-paper-nav='back']) .paperEntranceOverlay,
 :global(html[data-blog-mask-nav]) .paperEntranceOverlay,
+:global(html[data-page-reload]) .paperEntranceOverlay,
 .paperNoEntrance .paperEntranceOverlay {
     display: none;
 }
 
 :global(html[data-paper-nav='back']) .paperUnderlay,
 :global(html[data-blog-mask-nav]) .paperUnderlay,
+:global(html[data-page-reload]) .paperUnderlay,
 .paperNoEntrance .paperUnderlay {
     opacity: 0;
 }

@@ -15,6 +15,8 @@ import {
   PAPER_EXIT_TRANSFORM_ORIGIN,
   isPaperBackNav,
   clearPaperBackNav,
+  isPageReload,
+  clearPageReload,
 } from '@/lib/paper-exit-transition';
 
 // Persists across client-side navigation (back button) but resets on full page load
@@ -87,9 +89,14 @@ export default function Home() {
   // Starts false on both the server and the first client render (shouldAnimate is only ever false
   // after a client-side visit, which can't happen before hydration), so there's no mismatch.
   const [entranceSettled, setEntranceSettled] = useState(false);
+  // Refresh: the reader is put back where they were, so the entrance sits the load out. A plain
+  // boolean is enough here — unlike the case-study layout, this component unmounts on every
+  // navigation away, so it can't carry the flag into another route.
+  const [reloadSuppressed, setReloadSuppressed] = useState(false);
 
   useEffect(() => {
     if (isPaperBackNav()) setExitEntrance(true);
+    if (isPageReload()) setReloadSuppressed(true);
     hasVisitedHome = true;
   }, []);
 
@@ -110,6 +117,12 @@ export default function Home() {
     if (exitEntrance) clearPaperBackNav();
   }, [exitEntrance]);
 
+  // Same handoff for the reload attribute. Nothing else clears it — the inline script that sets it
+  // only runs on a full document load — so a case study opened from here would inherit it.
+  useEffect(() => {
+    if (reloadSuppressed) clearPageReload();
+  }, [reloadSuppressed]);
+
   const shouldReduceMotion = useReducedMotion();
   const exitTransition = shouldReduceMotion ? PAPER_EXIT_TRANSITION_REDUCED : PAPER_EXIT_TRANSITION;
 
@@ -123,7 +136,7 @@ export default function Home() {
   return (
 
 
-    <div className={`font-sans w-full min-h-[100dvh] min-[640px]:min-h-screen overflow-x-clip flex flex-col${exitEntrance || entranceSettled ? ` ${styles.noEntrance}` : ''}`}>
+    <div className={`font-sans w-full min-h-[100dvh] min-[640px]:min-h-screen overflow-x-clip flex flex-col${exitEntrance || reloadSuppressed || entranceSettled ? ` ${styles.noEntrance}` : ''}`}>
       {/* Top-edge fade overlay */}
       <div
         aria-hidden

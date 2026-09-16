@@ -149,13 +149,73 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       <body
         className={`${inter.variable} ${biroScript.variable} ${geistSans.variable} ${geistMono.variable} ${libreCaslonText.variable} ${crimsonPro.variable} antialiased`}
       >
+        {/* Where a document starts, decided before the first frame. Two cases, pulling opposite
+            ways:
+
+              - Browser back/forward lands on the top of the destination rather than wherever that
+                entry was last scrolled to. The App Router only scrolls to the top for pushed
+                navigations — on popstate it renders the restored tree and leaves the scroll
+                position to the UA — so `scrollRestoration` goes to 'manual' and the jump is done
+                by hand.
+              - A reload keeps the reader exactly where they were.
+
+            The UA cannot be left to do the second one, even though it is the case it gets right:
+            the mode is read off the session history entry when a navigation *starts*, so an entry
+            has one setting for both, and that setting is needed at 'manual' for the back button.
+            Handing it back at parse time on a refresh is too late, and leaving it at 'auto' loses
+            the back button — its restore lands a frame *after* popstate and overwrites the jump.
+            So the position is saved on the way out and re-applied here, on the first frame the
+            document is tall enough to hold it, and abandoned the moment the reader scrolls for
+            themselves.
+
+            `data-page-reload` marks that refresh for both entrances, which then sit the load out
+            (see isPageReload in src/lib/paper-exit-transition.ts): putting someone back in the
+            middle of a post and flying a fresh sheet in over it reads as a glitch rather than an
+            arrival, and a refresh isn't an arrival. Nothing else is suppressed — every real
+            navigation still animates.
+
+            Inline and pre-paint because none of it can wait for the bundle: a back press can land
+            before hydration, and the entrances are CSS animations that start on the first painted
+            frame. `pageshow` covers the bfcache case, where the document is handed back intact and
+            this script never re-runs. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{
+var key=function(){return 'scroll-position:'+location.pathname;};
+var entry=performance.getEntriesByType('navigation')[0];
+if('scrollRestoration' in history)history.scrollRestoration='manual';
+var toTop=function(){window.scrollTo({top:0,left:0,behavior:'auto'});};
+addEventListener('popstate',toTop);
+addEventListener('pageshow',function(e){if(e.persisted)toTop();});
+var save=function(){try{sessionStorage.setItem(key(),String(Math.round(window.scrollY)));}catch(e){}};
+addEventListener('pagehide',save);
+addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')save();});
+if(!entry||entry.type!=='reload')return;
+document.documentElement.setAttribute('data-page-reload','');
+var target=0;try{target=parseInt(sessionStorage.getItem(key()),10)||0;}catch(e){}
+if(target<=0)return;
+var settled=false,giveUp=function(){settled=true;};
+['wheel','touchstart','keydown','pointerdown'].forEach(function(type){addEventListener(type,giveUp,{once:true,passive:true});});
+var deadline=Date.now()+5000;
+var restore=function(){
+if(settled)return;
+if(document.documentElement.scrollHeight-window.innerHeight>=target){window.scrollTo(0,target);settled=true;return;}
+if(Date.now()<deadline)requestAnimationFrame(restore);
+};
+requestAnimationFrame(restore);
+}catch(e){}})();`,
+          }}
+        />
         {/* Restores the one-navigation direction/origin signal after a full document load, before
             anything paints. Both the paper's backwards branch and the responsive rail's Home-origin
             entrance are CSS-driven, so their condition has to be readable on the first frame. On
-            client-side navigation the departing link sets the attribute directly. */}
+            client-side navigation the departing link sets the attribute directly.
+            A reload is not a navigation, so it drops the signal instead of promoting it — left in
+            place, the direction that brought the reader here would replay its transition (the
+            backwards one being a whole sheet sliding out) on every refresh. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{if(window.matchMedia('(max-width: 639.98px)').matches){sessionStorage.removeItem('paper-direction');document.documentElement.removeAttribute('data-paper-nav');return;}var v=sessionStorage.getItem('paper-direction');if(v==='back'||v==='home'){document.documentElement.setAttribute('data-paper-nav',v);}}catch(e){}})();`,
+            __html: `(function(){try{if(window.matchMedia('(max-width: 639.98px)').matches||document.documentElement.hasAttribute('data-page-reload')){sessionStorage.removeItem('paper-direction');document.documentElement.removeAttribute('data-paper-nav');return;}var v=sessionStorage.getItem('paper-direction');if(v==='back'||v==='home'){document.documentElement.setAttribute('data-paper-nav',v);}}catch(e){}})();`,
           }}
         />
         <script
