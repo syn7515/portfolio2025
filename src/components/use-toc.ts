@@ -36,14 +36,12 @@ export function useToc(contentSelector: string = CONTENT_SELECTOR) {
   const lastClickTimeRef = React.useRef<number>(0)
 
   React.useEffect(() => {
-    let rafId: number
-
     const extractHeadings = () => {
       const container = document.querySelector(contentSelector)
-      if (!container) return
+      if (!container) return false
 
       const headingEls = container.querySelectorAll(HEADING_SELECTOR)
-      if (headingEls.length === 0) return
+      if (headingEls.length === 0) return false
 
       const list: TocItem[] = []
       headingEls.forEach((el) => {
@@ -53,20 +51,21 @@ export function useToc(contentSelector: string = CONTENT_SELECTOR) {
         if (text) list.push({ id, text })
       })
       setItems(list)
+      return true
     }
 
-    const schedule = () => {
-      rafId = requestAnimationFrame(extractHeadings)
-    }
-
-    // Once immediately, once after the entrance has settled — MDX content can still be mounting on
-    // the first pass.
-    schedule()
-    const timer = setTimeout(schedule, 300)
+    // Read the DOM directly rather than from inside requestAnimationFrame. The headings are
+    // server-rendered, so the commit that mounted this hook has already put them in the document —
+    // a frame's wait bought nothing and quietly tied the outline to the page being painted. rAF
+    // callbacks are suspended while visibilityState is 'hidden', so a post opened in a background
+    // tab built no outline at all until that tab was first brought forward.
+    // The retry is insurance for MDX that is somehow still mounting; once headings are found there
+    // is nothing left to wait for, and posts with no headings at all (athenahealth) stop after it.
+    const found = extractHeadings()
+    const timer = found ? undefined : window.setTimeout(extractHeadings, 300)
 
     return () => {
-      clearTimeout(timer)
-      cancelAnimationFrame(rafId)
+      if (timer !== undefined) window.clearTimeout(timer)
     }
   }, [contentSelector])
 
