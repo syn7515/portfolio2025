@@ -27,19 +27,18 @@ export const PAPER_EXIT_OFFSCREEN = {
   opacity: 0,
 }
 
-// Match the entrance's decisive ease-out: the sheet launches immediately, then sheds velocity
-// smoothly as it clears the viewport instead of starting slowly and accelerating away.
-const EXIT_EASE: [number, number, number, number] = [0.23, 1, 0.32, 1]
+// Launch the slide/rotate/blur decisively, then let the motion settle over the remaining duration.
+const EXIT_EASE: [number, number, number, number] = [0.16, 1, 0.3, 1]
+// Drop opacity decisively as soon as the fade starts, then ease out the remaining transparency.
+const EXIT_OPACITY_EASE: [number, number, number, number] = [0.16, 1, 0.3, 1]
 const EXIT_DURATION = 0.7
-// Opacity gets a head-start delay so the sheet stays visibly solid while the slide/rotate/blur are
-// just getting going, rather than dissolving from the very first frame. The fade then compresses
-// into the remaining time so it still finishes exactly when the rest of the animation does.
+// Keep the sheet solid briefly, then fade over the remaining 500ms of the departure.
 const EXIT_OPACITY_DELAY = 0.2
 
 const EXIT_TRANSITION_FULL = { duration: EXIT_DURATION, ease: EXIT_EASE }
 const EXIT_OPACITY_TRANSITION_FULL = {
   duration: EXIT_DURATION - EXIT_OPACITY_DELAY,
-  ease: EXIT_EASE,
+  ease: EXIT_OPACITY_EASE,
   delay: EXIT_OPACITY_DELAY,
 }
 const EXIT_TRANSITION_REDUCED = { duration: 0 }
