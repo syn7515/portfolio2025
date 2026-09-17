@@ -143,7 +143,7 @@ export default function BlogPostMobileMenu() {
                   'text-[20px] font-[460] tracking-[-0.01em] !not-italic transition-colors duration-300 ease-out px-3 py-1 rounded',
                   isCurrent
                     ? '!text-stone-700 dark:!text-zinc-200'
-                    : '!text-stone-500 dark:!text-zinc-400 !no-underline hover:!text-orange-700 active:!text-orange-700 dark:hover:!text-orange-200 dark:active:!text-orange-200'
+                    : '!text-stone-500 dark:!text-zinc-400 !no-underline hover:!text-rose-700 active:!text-rose-700 dark:hover:!text-rose-200 dark:active:!text-rose-200'
                 )}
                 tabIndex={menuOpen ? undefined : -1}
               >

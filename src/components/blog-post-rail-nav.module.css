@@ -98,13 +98,13 @@
 }
 
 .tickRow:hover .tick {
-    background-color: rgb(194 65 12);
-    /* orange-700 */
+    background-color: rgb(190 18 60);
+    /* rose-700 */
 }
 
 .tickRow:hover .reveal {
-    color: rgb(194 65 12);
-    /* orange-700 */
+    color: rgb(190 18 60);
+    /* rose-700 */
 }
 
 /* While the rail is hovered the lengths fan out around the pointer: longest directly under it,
@@ -146,13 +146,13 @@
     }
 
     .tickRow:hover .tick {
-        background-color: rgb(251 146 60);
-        /* orange-400 */
+        background-color: rgb(251 113 133);
+        /* rose-400 */
     }
 
     .tickRow:hover .reveal {
-        color: rgb(251 146 60);
-        /* orange-400 */
+        color: rgb(251 113 133);
+        /* rose-400 */
     }
 }
 

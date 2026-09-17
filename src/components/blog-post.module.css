@@ -593,7 +593,7 @@
 
 @media (prefers-color-scheme: dark) {
     .project-nav-description {
-        color: rgb(251 146 60) !important;
-        /* orange-400 for dark mode */
+        color: rgb(251 113 133) !important;
+        /* rose-400 for dark mode */
     }
 }

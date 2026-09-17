@@ -296,7 +296,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
         <div className="relative flex flex-col gap-6 pt-[240px] pl-14 pointer-events-auto">
           <Link
             href="/"
-            className="flex items-center gap-2 w-fit text-sm font-[460] !not-italic !no-underline !text-stone-400 dark:!text-zinc-400 hover:!text-orange-700 dark:hover:!text-orange-400 motion-safe:active:scale-[0.97] px-3 py-2 -mx-3 -my-2 rounded"
+            className="flex items-center gap-2 w-fit text-sm font-[460] !not-italic !no-underline !text-stone-400 dark:!text-zinc-400 hover:!text-rose-700 dark:hover:!text-rose-400 motion-safe:active:scale-[0.97] px-3 py-2 -mx-3 -my-2 rounded"
             style={{
               transition: 'color 300ms ease-out, scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
             }}
@@ -312,7 +312,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           type="button"
           onClick={handleBackToTop}
           className={cn(
-            'absolute bottom-20 paper:bottom-[120px] mb-[120px] left-14 flex items-center gap-2 w-fit whitespace-nowrap text-sm font-[460] text-stone-400 dark:text-zinc-400 hover:text-orange-700 dark:hover:text-orange-400 motion-safe:active:scale-[0.97] cursor-pointer pointer-events-auto px-3 py-2 -mx-3 -my-2 rounded',
+            'absolute bottom-20 paper:bottom-[120px] mb-[120px] left-14 flex items-center gap-2 w-fit whitespace-nowrap text-sm font-[460] text-stone-400 dark:text-zinc-400 hover:text-rose-700 dark:hover:text-rose-400 motion-safe:active:scale-[0.97] cursor-pointer pointer-events-auto px-3 py-2 -mx-3 -my-2 rounded',
             showBackToTop && viewportTall
               ? 'opacity-100 blur-none'
               : 'opacity-0 blur-[4px] pointer-events-none'
@@ -425,7 +425,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                             'previous'
                           )}
                         >
-                          <div className="text-[14px] text-stone-500 dark:text-zinc-400 group-hover:!text-orange-700 group-active:!text-orange-700 dark:group-hover:!text-orange-400 dark:group-active:!text-orange-400 transition-colors duration-150 font-[400] sm:font-normal not-italic mb-0 sm:mb-1.5 opacity-80 font-sans">
+                          <div className="text-[14px] text-stone-500 dark:text-zinc-400 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 transition-colors duration-150 font-[400] sm:font-normal not-italic mb-0 sm:mb-1.5 opacity-80 font-sans">
                             <span className="relative inline-flex items-center -translate-x-3 sm:translate-x-0">
                               <ChevronLeft
                                 className="absolute left-0 size-4 sm:size-3.5 text-stone-400 dark:text-zinc-500 opacity-100 sm:opacity-0 blur-none sm:blur-[1px] motion-safe:transition-[opacity,filter] motion-safe:duration-300 motion-safe:ease-out sm:group-hover:opacity-100 sm:group-hover:blur-none sm:group-active:opacity-100 sm:group-active:blur-none sm:group-focus-visible:opacity-100 sm:group-focus-visible:blur-none motion-reduce:opacity-100 motion-reduce:blur-none"
@@ -437,7 +437,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                             </span>
                           </div>
                           <p
-                            className="hidden sm:block mt-0 not-italic project-nav-description transition-colors duration-150 group-hover:!text-orange-700 group-active:!text-orange-700 dark:group-hover:!text-orange-400 dark:group-active:!text-orange-400"
+                            className="hidden sm:block mt-0 not-italic project-nav-description transition-colors duration-150 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400"
                             style={{ fontFamily: 'var(--font-crimson-pro), serif', fontSize: '19px', fontWeight: 450, lineHeight: '130%', letterSpacing: '-0.02em', textWrap: 'balance' }}
                           >
                             {preventWidow(previousProject.description)}
@@ -459,7 +459,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                             'next'
                           )}
                         >
-                          <div className="text-[14px] text-stone-500 dark:text-zinc-400 group-hover:!text-orange-700 group-active:!text-orange-700 dark:group-hover:!text-orange-400 dark:group-active:!text-orange-400 transition-colors duration-150 font-[400] sm:font-normal not-italic mb-0 sm:mb-1.5 opacity-80 font-sans">
+                          <div className="text-[14px] text-stone-500 dark:text-zinc-400 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 transition-colors duration-150 font-[400] sm:font-normal not-italic mb-0 sm:mb-1.5 opacity-80 font-sans">
                             <span className="relative inline-flex items-center justify-end translate-x-3 sm:translate-x-0">
                               <ChevronRight
                                 className="absolute right-0 size-4 sm:size-3.5 text-stone-400 dark:text-zinc-500 opacity-100 sm:opacity-0 blur-none sm:blur-[1px] motion-safe:transition-[opacity,filter] motion-safe:duration-300 motion-safe:ease-out sm:group-hover:opacity-100 sm:group-hover:blur-none sm:group-active:opacity-100 sm:group-active:blur-none sm:group-focus-visible:opacity-100 sm:group-focus-visible:blur-none motion-reduce:opacity-100 motion-reduce:blur-none"
@@ -471,7 +471,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                             </span>
                           </div>
                           <p
-                            className="hidden sm:block mt-0 not-italic project-nav-description transition-colors duration-150 group-hover:!text-orange-700 group-active:!text-orange-700 dark:group-hover:!text-orange-400 dark:group-active:!text-orange-400"
+                            className="hidden sm:block mt-0 not-italic project-nav-description transition-colors duration-150 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400"
                             style={{ fontFamily: 'var(--font-crimson-pro), serif', fontSize: '19px', fontWeight: 450, lineHeight: '130%', letterSpacing: '-0.02em', textWrap: 'balance' }}
                           >
                             {preventWidow(nextProject.description)}

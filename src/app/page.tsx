@@ -303,7 +303,7 @@ export default function Home() {
                 target="_blank"
                 rel="noopener noreferrer"
                 data-social-link-trigger
-                className="sm:text-[14px] !text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 active:!text-orange-700 dark:hover:!text-orange-400 dark:active:!text-orange-400 motion-safe:active:scale-[0.97]"
+                className="sm:text-[14px] !text-stone-500 dark:!text-zinc-400 hover:!text-rose-700 active:!text-rose-700 dark:hover:!text-rose-400 dark:active:!text-rose-400 motion-safe:active:scale-[0.97]"
                 style={{
                   transition: 'scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
                 }}
@@ -316,7 +316,7 @@ export default function Home() {
                 target="_blank"
                 rel="noopener noreferrer"
                 data-social-link-trigger
-                className="sm:text-[14px] !text-stone-500 dark:!text-zinc-400 hover:!text-orange-700 active:!text-orange-700 dark:hover:!text-orange-400 dark:active:!text-orange-400 motion-safe:active:scale-[0.97]"
+                className="sm:text-[14px] !text-stone-500 dark:!text-zinc-400 hover:!text-rose-700 active:!text-rose-700 dark:hover:!text-rose-400 dark:active:!text-rose-400 motion-safe:active:scale-[0.97]"
                 style={{
                   transition: 'scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
                 }}

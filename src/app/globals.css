@@ -11,8 +11,8 @@
   --inline-link-underline-offset: 0.025em;
   --dotted-divider-dot-radius: 0.75px;
   --dotted-divider-height: 1.5px;
-  --intro-trigger-decoration-hover: rgb(194 65 12);
-  /* orange-700 - shared inline-preview highlight */
+  --intro-trigger-decoration-hover: rgb(190 18 60);
+  /* rose-700 - shared inline-preview highlight */
   --scrollbar-thumb: rgb(168 162 158 / 0.6);
   /* stone-400 */
   --scrollbar-thumb-hover: rgb(120 113 108 / 0.8);
@@ -54,8 +54,8 @@
     --foreground: #ededed;
     --intro-trigger-decoration: rgb(113 113 122);
     /* zinc-500 - underline color for intro/link preview triggers */
-    --intro-trigger-decoration-hover: rgb(251 146 60);
-    /* orange-400 - shared inline-preview highlight */
+    --intro-trigger-decoration-hover: rgb(251 113 133);
+    /* rose-400 - shared inline-preview highlight */
     --scrollbar-thumb: rgb(82 82 91 / 0.6);
     /* zinc-600 */
     --scrollbar-thumb-hover: rgb(113 113 122 / 0.8);
@@ -153,10 +153,10 @@ html:hover::-webkit-scrollbar-thumb:hover {
 }
 
 ::selection {
-  background-color: rgb(255 247 237) !important;
-  /* orange-50 */
-  color: rgb(194 65 12) !important;
-  /* orange-700 */
+  background-color: rgb(255 241 242) !important;
+  /* rose-50 */
+  color: rgb(190 18 60) !important;
+  /* rose-700 */
   opacity: 1 !important;
 }
 
@@ -166,7 +166,7 @@ html:hover::-webkit-scrollbar-thumb:hover {
 }
 
 :focus-visible {
-  @apply ring-2 ring-orange-600/60 ring-offset-1 ring-offset-background;
+  @apply ring-2 ring-rose-600/60 ring-offset-1 ring-offset-background;
 }
 
 a:focus-visible {
@@ -175,14 +175,14 @@ a:focus-visible {
 
 @media (prefers-color-scheme: dark) {
   :focus-visible {
-    @apply ring-orange-300/60;
+    @apply ring-rose-300/60;
   }
 
   ::selection {
-    background-color: rgb(249 115 22 / 0.15) !important;
-    /* orange-500 / 15% */
-    color: rgb(254 215 170) !important;
-    /* orange-200 */
+    background-color: rgb(244 63 94 / 0.15) !important;
+    /* rose-500 / 15% */
+    color: rgb(254 205 211) !important;
+    /* rose-200 */
     opacity: 1 !important;
   }
 }
@@ -488,8 +488,8 @@ li {
 }
 
 blockquote {
-  border-left: 4px solid rgb(234 88 12);
-  /* orange-600 */
+  border-left: 4px solid rgb(225 29 72);
+  /* rose-600 */
   padding-left: 1rem;
   font-style: italic;
   margin: 1.5rem 0;
@@ -566,8 +566,8 @@ pre code {
 }
 
 .prose blockquote {
-  border-left: 4px solid rgb(234 88 12);
-  /* orange-600 */
+  border-left: 4px solid rgb(225 29 72);
+  /* rose-600 */
   padding-left: 1rem;
   font-style: italic;
   margin: 1.5rem 0;
@@ -598,8 +598,8 @@ pre code {
 }
 
 .prose a:is(:hover, :focus-visible) {
-  color: rgb(194 65 12);
-  /* orange-700 */
+  color: rgb(190 18 60);
+  /* rose-700 */
 }
 
 /* Dark mode styles */
@@ -627,8 +627,8 @@ pre code {
   }
 
   a:is(:hover, :focus-visible) {
-    color: rgb(254 215 170);
-    /* orange-200 */
+    color: rgb(254 205 211);
+    /* rose-200 */
   }
 
   ul, ol {
@@ -638,8 +638,8 @@ pre code {
   blockquote,
   .prose blockquote {
     color: rgb(209 213 219);
-    border-color: rgb(251 146 60);
-    /* orange-400 */
+    border-color: rgb(251 113 133);
+    /* rose-400 */
   }
 
   code {
@@ -666,8 +666,8 @@ pre code {
   }
 
   .prose a:is(:hover, :focus-visible) {
-    color: rgb(254 215 170);
-    /* orange-200 */
+    color: rgb(254 205 211);
+    /* rose-200 */
   }
 }
 
@@ -702,9 +702,9 @@ pre code {
 }
 
 .intro-link:is(:hover, :focus-visible) {
-  color: rgb(194 65 12) !important;
-  /* orange-700 */
-  text-decoration-color: rgb(194 65 12) !important;
+  color: rgb(190 18 60) !important;
+  /* rose-700 */
+  text-decoration-color: rgb(190 18 60) !important;
 }
 
 /* Inline link preview trigger: same as .intro-link (underline, italic, decoration color) */
@@ -747,7 +747,7 @@ a[data-social-link-trigger] {
 
 a[data-social-link-trigger]:is(:hover, :active, :focus-visible) {
   text-decoration-color: var(--intro-trigger-decoration-hover) !important;
-  /* orange-700 */
+  /* rose-700 */
 }
 
 /* Mobile menu current-post link: same dotted underline as intro links, but not italic.
@@ -774,9 +774,9 @@ a[data-mobile-menu-current] {
   }
 
   .intro-link:is(:hover, :focus-visible) {
-    color: rgb(254 215 170) !important;
-    /* orange-200 */
-    text-decoration-color: rgb(254 215 170) !important;
+    color: rgb(254 205 211) !important;
+    /* rose-200 */
+    text-decoration-color: rgb(254 205 211) !important;
     opacity: 1;
   }
 
@@ -801,7 +801,7 @@ a[data-mobile-menu-current] {
 
   a[data-social-link-trigger]:is(:hover, :active, :focus-visible) {
     text-decoration-color: var(--intro-trigger-decoration-hover) !important;
-    /* orange-400 */
+    /* rose-400 */
   }
 
 }

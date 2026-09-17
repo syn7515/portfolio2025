@@ -175,12 +175,12 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
           'relative flex h-8 w-14 items-center rounded-full pl-2',
           // Type and colour copied from the ≥1200px sidebar Home link so the two are the same
           // control. No hover background: the label below is the hover affordance, and it and the
-          // icon both take the orange together — a tint behind the icon on top of that read as two
+          // icon both take the rose together — a tint behind the icon on top of that read as two
           // competing signals for one state.
           'text-sm font-[460] !not-italic !no-underline !text-stone-400 dark:!text-zinc-400',
-          'hover:!text-orange-700 dark:hover:!text-orange-400',
+          'hover:!text-rose-700 dark:hover:!text-rose-400',
           'motion-safe:active:scale-[0.97]',
-          'focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-600/60 dark:focus-visible:ring-orange-300/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background'
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-600/60 dark:focus-visible:ring-rose-300/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background'
         )}
         style={{
           transition: 'color 300ms ease-out, scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
@@ -190,7 +190,7 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
         {/* No -translate-y-1/2 here: Tailwind v4 compiles it to the `translate` property that
             styles.reveal already drives, so it would be overwritten and the label would hang half
             its height too low. The centring lives in that class instead.
-            No colour of its own either — inheriting from the link is what lets it turn orange with
+            No colour of its own either — inheriting from the link is what lets it turn rose with
             the icon on hover. */}
         <span
           aria-hidden
@@ -233,7 +233,7 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
                   // hover widths expand rightward. The label stays at the former 44px edge. A 14px
                   // height fills the complete row pitch, so neighboring targets remain contiguous.
                   'relative -ml-2 flex h-[14px] w-14 cursor-pointer items-center rounded-sm',
-                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-600/60 dark:focus-visible:ring-orange-300/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-600/60 dark:focus-visible:ring-rose-300/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
                   'motion-safe:active:scale-[0.97]'
                 )}
               >
