@@ -5,7 +5,6 @@ import { cn, scrollBehavior } from '@/lib/utils'
 import Link from 'next/link'
 import { ArrowUp, ChevronLeft, ChevronRight, Undo2 } from 'lucide-react'
 import { motion, useReducedMotion } from 'framer-motion'
-import { Divider } from '@/components/ui/divider'
 import styles from './blog-post.module.css'
 import BlogPostHeader from '@/components/blog-post-header'
 import BlogPostToc from '@/components/blog-post-toc'
@@ -403,25 +402,17 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                 {(previousProject || nextProject) ? (
                   <div
                     className={cn(
-                      // Below 1200px the divider is gone, so the gap does the separating on its own
-                      // and gets a little more room. The old split (96px on phones, 64px from 640px
-                      // up) existed because the divider's my-4 pair added ~33px on top of the 64 —
-                      // the two were tuned to land in the same place, so one value now covers both.
-                      'max-w-[560px] mx-auto paper:max-w-none mt-28 paper:mt-32 pb-[28px] min-[640px]:pb-16 paper:pb-[120px] overflow-x-visible',
+                      // Space alone separates the footer nav from the article. Below 1200px the
+                      // full-bleed paper carries the drafting grid along its bottom edge
+                      // (paper-grid-bottom), which does that job on its own; at paper width there is
+                      // nothing but the gap, so it is the larger of the two.
+                      // Both values are the whole gap: the children's own top margins collapse into
+                      // this one, which is why neither row below sets a margin of its own.
+                      'max-w-[560px] mx-auto paper:max-w-none mt-28 paper:mt-44 pb-[28px] min-[640px]:pb-16 paper:pb-[120px] overflow-x-visible',
                       styles.contentBlurRevealItem
                     )}
                   >
-                    {/* ≥1200px only. Below that the paper is full-bleed and carries the drafting
-                        grid along its bottom edge (paper-grid-bottom), which already separates the
-                        footer nav from the article — a rule on top of it just reads as clutter.
-                        Phone widths never showed it in the first place. */}
-                    <Divider
-                      variant="default"
-                      color="stone"
-                      spacing="md"
-                      className="hidden paper:block paper:w-full paper:mx-0"
-                    />
-                    <div className="flex justify-between items-start mt-4 paper:mt-12 gap-8">
+                    <div className="flex justify-between items-start gap-8">
                       {/* Previous Project */}
                       {previousProject ? (
                         <Link
