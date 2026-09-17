@@ -24,12 +24,12 @@ export function DescriptionBackdrop() {
     <>
       <span
         aria-hidden
-        className="pointer-events-none absolute -inset-x-10 -inset-y-7 z-0 rounded-[44px] blur-[18px]"
+        className="pointer-events-none absolute -inset-x-10 -inset-y-7 z-0 rounded-[44px] blur-[20px]"
         style={{ background: 'color-mix(in srgb, var(--background) 30%, transparent)' }}
       />
       <span
         aria-hidden
-        className="pointer-events-none absolute -inset-x-5 -inset-y-[14px] z-0 rounded-[28px] blur-[9px]"
+        className="pointer-events-none absolute -inset-x-6 -inset-y-4 z-0 rounded-[30px] blur-[12px]"
         style={{ background: 'color-mix(in srgb, var(--background) 48%, transparent)' }}
       />
     </>
