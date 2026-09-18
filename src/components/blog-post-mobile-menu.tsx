@@ -169,19 +169,26 @@ export default function BlogPostMobileMenu() {
           tabIndex={!isProjectRoute || leaving ? -1 : undefined}
           onClick={(e) => handleLinkClick(e, '/', false)}
           className={cn(
-            'inline-flex h-9 translate-y-[3px] items-center rounded !text-stone-700 dark:!text-zinc-200 !no-underline motion-safe:active:scale-[0.97]',
+            'inline-flex h-9 items-center rounded !no-underline motion-safe:active:scale-[0.97]',
             isProjectRoute && !leaving ? 'pointer-events-auto' : 'pointer-events-none'
           )}
-          style={{
-            fontFamily: 'var(--font-biro-script), "Segoe Print", "Bradley Hand", cursive',
-            fontSize: '28px',
-            lineHeight: '120%',
-            letterSpacing: '-0.03em',
-            fontWeight: 360,
-            transition: 'scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
-          }}
+          style={{ transition: 'scale 150ms cubic-bezier(0.23, 1, 0.32, 1)' }}
         >
-          Sue Park
+          {/* The same portrait the tab icon uses, so the mark is one asset in both places. Its
+              squircle is baked into the PNG as transparent corners — a border-radius here would
+              only round an already-rounded shape and clip the edge twice. The link carries the
+              name, so the image itself is decorative. The old `translate-y-[3px]` went with it: it
+              was nudging a script baseline that no longer exists, and the image centres on its
+              own. */}
+          <img
+            src="/favicon.svg"
+            alt=""
+            aria-hidden
+            width={28}
+            height={28}
+            draggable={false}
+            className="size-7 select-none"
+          />
         </Link>
 
         <button
