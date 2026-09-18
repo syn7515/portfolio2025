@@ -166,18 +166,20 @@ export default function Home() {
         <div className="flex-1 flex flex-col px-6 paper:px-0 paper:ml-[calc(50vw_-_280px_-_var(--sidebar-w))] paper:w-[560px]">
         <div className="max-w-[560px] mx-auto" data-inline-link-preview-boundary>
           {/* Left column: name */}
-          {/* Below the paper breakpoint the name tracks the viewport: 40px where the sheet appears at
-              1200px, sliding to the 32px phone size by 640px and holding there. Both ends land on
-              existing breakpoints, so there is no step at 640px (it used to drop 40 -> 32 there) and
-              no change at 1200px when the paper comes in. Slope is 8px over 560px = 1.4286vw; the
-              intercept is 32px - 640px * 0.014286 = 22.857px. */}
+          {/* Below the paper breakpoint the name tracks the viewport: 32px where the sheet appears at
+              1200px, sliding to the 26px phone size by 640px and holding there. Both ends land on
+              existing breakpoints, so there is no step at 640px and no change at 1200px when the
+              paper comes in. Slope is 6px over 560px = 1.0714vw; the intercept is
+              26px - 640px * 0.010714 = 19.143px. Crimson Pro carries a far larger x-height than the
+              Biro Script it replaced, so it runs ~0.8x the old 32-40px ramp to hold the same
+              optical size. */}
           <div>
             <h1
-              className={`!mt-0 !text-[clamp(32px,calc(1.4286vw_+_22.857px),40px)] !text-stone-700 dark:!text-zinc-200 !mb-0 md:!mb-0${riseClass}`}
+              className={`!mt-0 !text-[clamp(26px,calc(1.0714vw_+_19.143px),32px)] !text-stone-700 dark:!text-zinc-200 !mb-0 md:!mb-0${riseClass}`}
               style={{
-                fontFamily: 'var(--font-biro-script), "Segoe Print", "Bradley Hand", cursive',
+                fontFamily: 'var(--font-crimson-pro), serif',
                 lineHeight: '120%',
-                letterSpacing: '-0.03em',
+                letterSpacing: '-0.75px',
                 fontWeight: 360,
                 textWrap: 'balance',
                 ...riseDelay(DELAY.name),
