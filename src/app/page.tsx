@@ -286,6 +286,19 @@ export default function Home() {
         >
           {/* One baseline row at every width: socials left, copyright right. They sit in DOM order,
               which also reads correctly — the footer's navigation before its legal line. */}
+          {/* The two links carry `px-2 py-3` cancelled by an equal negative margin. Padding grows
+              the hit area, the negative margin takes the growth back out of the layout, so the
+              margin boxes — and therefore the text, the 8px flex gaps and the row's own height —
+              are exactly where they were. Only what responds to a tap changes.
+
+              "X" is a one-character link: it was 9.6 x 21px, well under the 24x24 WCAG 2.2 asks
+              for and a genuinely hard thing to hit on a phone. This takes both links to 45px tall
+              and "X" to 25.6px wide.
+
+              8px a side is the most the horizontal padding can be. The links sit 8px from the "·"
+              between them, so at 8px each hit area reaches exactly that separator's edge and stops:
+              one more pixel and the two links would start overlapping each other, with whichever
+              paints on top quietly swallowing taps meant for the other. */}
           <div className="flex items-baseline justify-between gap-4">
             <div className={`${styles.socialLinks} intro-text flex gap-2 w-fit`}>
               <a
@@ -293,7 +306,7 @@ export default function Home() {
                 target="_blank"
                 rel="noopener noreferrer"
                 data-social-link-trigger
-                className="sm:text-[14px] !text-stone-500 dark:!text-zinc-400 hover:!text-rose-700 active:!text-rose-700 dark:hover:!text-rose-400 dark:active:!text-rose-400 motion-safe:active:scale-[0.97]"
+                className="sm:text-[14px] px-2 py-3 -mx-2 -my-3 !text-stone-500 dark:!text-zinc-400 hover:!text-rose-700 active:!text-rose-700 dark:hover:!text-rose-400 dark:active:!text-rose-400 motion-safe:active:scale-[0.97]"
                 style={{
                   transition: 'scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
                 }}
@@ -306,7 +319,7 @@ export default function Home() {
                 target="_blank"
                 rel="noopener noreferrer"
                 data-social-link-trigger
-                className="sm:text-[14px] !text-stone-500 dark:!text-zinc-400 hover:!text-rose-700 active:!text-rose-700 dark:hover:!text-rose-400 dark:active:!text-rose-400 motion-safe:active:scale-[0.97]"
+                className="sm:text-[14px] px-2 py-3 -mx-2 -my-3 !text-stone-500 dark:!text-zinc-400 hover:!text-rose-700 active:!text-rose-700 dark:hover:!text-rose-400 dark:active:!text-rose-400 motion-safe:active:scale-[0.97]"
                 style={{
                   transition: 'scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
                 }}
