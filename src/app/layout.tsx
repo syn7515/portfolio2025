@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Libre_Caslon_Text, Crimson_Pro } from "next/font/google";
+import { Geist, Geist_Mono, Crimson_Pro } from "next/font/google";
 import localFont from "next/font/local";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/react";
@@ -24,31 +24,36 @@ const inter = localFont({
   variable: "--font-inter",
 });
 
+// Not preloaded: nothing paints in this face on arrival. Its only remaining use is the hover card
+// in ui/inline-link-preview.tsx, so the browser was fetching it up front and then reporting it
+// unused. preload only drops the <link rel=preload> — the face still loads the moment a popover
+// asks for it.
 const biroScript = localFont({
   src: "../../public/fonts/BiroScript.ttf",
   variable: "--font-biro-script",
   display: "swap",
-  preload: true,
+  preload: false,
   adjustFontFallback: false,
   fallback: ["Segoe Print", "Bradley Hand", "Comic Sans MS", "cursive"],
   weight: "400",
   style: "normal",
 });
 
+// Both are declared but never render, so they are kept out of the preload list. Geist Sans only
+// ever appears *after* var(--font-inter) in a stack, which means it is a fallback for a font that
+// is itself preloaded and does not fail; Geist Mono backs --font-mono, which nothing consumes.
+// Each was costing a blocking font fetch on first paint and drawing a "preloaded but not used"
+// warning for it.
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  preload: false,
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
-});
-
-const libreCaslonText = Libre_Caslon_Text({
-  weight: "400",
-  subsets: ["latin"],
-  variable: "--font-libre-caslon",
+  preload: false,
 });
 
 const crimsonPro = Crimson_Pro({
@@ -126,7 +131,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       />
       {/* End Google Tag Manager */}
       <body
-        className={`${inter.variable} ${biroScript.variable} ${geistSans.variable} ${geistMono.variable} ${libreCaslonText.variable} ${crimsonPro.variable} antialiased`}
+        className={`${inter.variable} ${biroScript.variable} ${geistSans.variable} ${geistMono.variable} ${crimsonPro.variable} antialiased`}
       >
         {/* Where a document starts, decided before the first frame. Two cases, pulling opposite
             ways:
