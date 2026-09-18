@@ -222,16 +222,21 @@ export default function Home() {
 
               A 1px rule has almost no height of its own, so the whole break is the margins — and
               because there is no glyph to fill it, the space reads looser here than the same
-              measure did around the dinkus this replaced. 16px a side lands the block at 33px,
-              against the 4px the case-study rows sit apart: still unmistakably a section break,
-              without the gap the dinkus's own 20px margins would leave around a hairline.
+              measure did around the dinkus this replaced.
+
+              The two widths need different numbers because the list around the rule changes shape.
+              On desktop each row is one 41px line and rows sit 4px apart, so 16px a side (a 33px
+              block) is the smallest gap that still separates. On a phone the rows stack date over
+              title, growing to 60px and 8px apart, and the same 16px read as a hole in a column of
+              much taller items — 12px a side (25px) keeps the break proportional to what surrounds
+              it there.
 
               The space before the interpolation is load-bearing: Tailwind's scanner reads the
               source text, and a utility glued directly to `${'${'}` is not extracted. Written as
-              `my-4${'${'}riseClass}` the class silently never reaches the stylesheet. */}
+              `sm:my-4${'${'}riseClass}` the class silently never reaches the stylesheet. */}
           <div
             aria-hidden
-            className={`h-px w-4 bg-stone-400/50 dark:bg-zinc-600/50 my-4 ${riseClass.trim()}`}
+            className={`h-px w-4 bg-stone-400/50 dark:bg-zinc-600/50 my-3 sm:my-4 ${riseClass.trim()}`}
             style={riseDelay(DELAY.chapterBreak)}
           />
 
