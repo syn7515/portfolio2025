@@ -7,7 +7,7 @@ export const SITE_URL = 'https://suepark.xyz'
 // X and other social crawlers cache card images by URL. Use a content-versioned
 // filename so replacing the image always produces a new crawler cache key.
 const OG_IMAGE = {
-  url: `${SITE_URL}/og-image-cd63c326.png`,
+  url: `${SITE_URL}/og-image-adb5b512.png`,
   width: 1200,
   height: 630,
   type: 'image/png',
