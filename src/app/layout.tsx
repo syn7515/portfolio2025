@@ -86,7 +86,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    /* The pre-paint scripts in <body> below set `data-page-reload` and `data-paper-nav` on
+       documentElement before React hydrates — that is the whole point of them, since the CSS
+       entrances they gate have to be decided on the first painted frame. React sees attributes on
+       <html> it did not render and reports a hydration mismatch, so the warning is suppressed
+       here. It only covers this element's own attributes and text, not the tree below it, which is
+       exactly the scope of the mismatch. */
+    <html lang="en" suppressHydrationWarning>
       <link rel="preconnect" href="https://f5uskgwhyu2fi170.public.blob.vercel-storage.com" />
       {/* Google tag (gtag.js) */}
       <Script
