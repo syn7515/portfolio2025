@@ -374,7 +374,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}
         >
           <div
-            className="pt-20 xs:pt-20 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] paper:pt-[clamp(6.25rem,calc(18.182vw_-_8.295rem),8.75rem)]"
+            className="pt-20 xs:pt-20 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] paper:pt-[clamp(6.25rem,calc(13.333vw_-_3.75rem),8.75rem)]"
           >
               {/* --paper-center-offset (globals.css) is what keeps this column on the carousel's
                   centre line rather than the viewport's; without it the cards' bleed is lopsided,

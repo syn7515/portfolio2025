@@ -157,13 +157,23 @@ export default function Home() {
           className={`paper-grid-bottom relative z-10 w-full flex-1 flex flex-col paper:mt-[100px] overflow-x-clip${paperClass}`}
           style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}
         >
-        <div className="flex-1 flex flex-col pt-16 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] paper:pt-[clamp(6.25rem,calc(18.182vw_-_8.295rem),8.75rem)] pb-5 min-[640px]:pb-8 paper:pb-10">
+        {/* Top padding on the paper: 100px where the sheet first appears at 1200px, ramping to 140px
+            by 1500px where --sidebar-w settles (40px over 300px = 13.333vw; intercept 100px - 160px =
+            -3.75rem). The ramp used to start at the old 1280px breakpoint, which left it flat across
+            1200-1280 once the breakpoint moved. Kept identical to the case-study paper in
+            blog-post-layout.tsx so the two sheets hand off at the same height. */}
+        <div className="flex-1 flex flex-col pt-16 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] paper:pt-[clamp(6.25rem,calc(13.333vw_-_3.75rem),8.75rem)] pb-5 min-[640px]:pb-8 paper:pb-10">
         <div className="flex-1 flex flex-col px-6 paper:px-0 paper:ml-[calc(50vw_-_280px_-_var(--sidebar-w))] paper:w-[560px]">
         <div className="max-w-[560px] mx-auto" data-inline-link-preview-boundary>
           {/* Left column: name */}
+          {/* Below the paper breakpoint the name tracks the viewport: 40px where the sheet appears at
+              1200px, sliding to the 32px phone size by 640px and holding there. Both ends land on
+              existing breakpoints, so there is no step at 640px (it used to drop 40 -> 32 there) and
+              no change at 1200px when the paper comes in. Slope is 8px over 560px = 1.4286vw; the
+              intercept is 32px - 640px * 0.014286 = 22.857px. */}
           <div>
             <h1
-              className={`!mt-0 !text-[32px] sm:!text-[40px] !text-stone-700 dark:!text-zinc-200 !mb-0 md:!mb-0${riseClass}`}
+              className={`!mt-0 !text-[clamp(32px,calc(1.4286vw_+_22.857px),40px)] !text-stone-700 dark:!text-zinc-200 !mb-0 md:!mb-0${riseClass}`}
               style={{
                 fontFamily: 'var(--font-biro-script), "Segoe Print", "Bradley Hand", cursive',
                 lineHeight: '120%',
