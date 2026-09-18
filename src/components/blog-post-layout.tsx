@@ -10,6 +10,7 @@ import BlogPostHeader from '@/components/blog-post-header'
 import BlogPostToc from '@/components/blog-post-toc'
 import BlogPostRailNav from '@/components/blog-post-rail-nav'
 import PaperGridBackground from '@/components/ui/paper-grid-background'
+import Dinkus from '@/components/ui/dinkus'
 import { PROJECTS } from '@/lib/projects'
 import {
   isBlogPostMaskNavigation,
@@ -398,17 +399,31 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                   {children}
                 </div>
 
+                {/* End-of-content mark closing the article. It belongs to the text, not to the
+                    navigation: the gap above it is half the one below, so it reads as the article
+                    signing off rather than as a heading for the rows that follow. Sitting outside
+                    the block below also means it still renders when there is no previous or next
+                    project to show.
+
+                    Shown at every width, unlike the home page's, where the footer follows a short
+                    list closely enough to close it on its own. Here the reader has just come off a
+                    long article and the mark is what says it has ended. */}
+                <Dinkus className={cn('mt-10 paper:mt-14', styles.contentBlurRevealItem)} />
+
                 {/* Project Navigation Footer — inside paper */}
                 {(previousProject || nextProject) ? (
                   <div
                     className={cn(
-                      // Space alone separates the footer nav from the article. Below 1200px the
-                      // full-bleed paper carries the drafting grid along its bottom edge
-                      // (paper-grid-bottom), which does that job on its own; at paper width there is
-                      // nothing but the gap, so it is the larger of the two.
+                      // The dinkus above closes the article; this margin is the space between it
+                      // and the navigation, and is deliberately twice the one above the dinkus so
+                      // the mark sits with the text it ends rather than heading these rows. At
+                      // paper width it is the larger of the two values: below 1200px the full-bleed
+                      // paper carries the drafting grid along its bottom edge (paper-grid-bottom),
+                      // which helps separate the two, while at paper width there is nothing but the
+                      // gap.
                       // Both values are the whole gap: the children's own top margins collapse into
                       // this one, which is why neither row below sets a margin of its own.
-                      'max-w-[560px] mx-auto paper:max-w-none mt-28 paper:mt-44 pb-[28px] min-[640px]:pb-16 paper:pb-[120px] overflow-x-visible',
+                      'max-w-[560px] mx-auto paper:max-w-none mt-20 paper:mt-32 pb-[28px] min-[640px]:pb-16 paper:pb-[120px] overflow-x-visible',
                       styles.contentBlurRevealItem
                     )}
                   >

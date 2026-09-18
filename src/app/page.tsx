@@ -1,9 +1,9 @@
 "use client";
 
-import type { CSSProperties } from 'react';
 import { useEffect, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import ProjectListItem from '@/components/ui/project-list-item';
+import Dinkus from '@/components/ui/dinkus';
 import InlineLinkPreview from '@/components/ui/inline-link-preview';
 import PaperGridBackground from '@/components/ui/paper-grid-background';
 import styles from './page.module.css';
@@ -54,27 +54,6 @@ const DELAY = {
 // resize past 640px, so once this timer fires the page pins itself into the settled state.
 const CONTENT_RISE_DURATION_MS = 500;
 const ENTRANCE_TOTAL_MS = CONTENT_BASE_DELAY_MS + DELAY.footer + CONTENT_RISE_DURATION_MS;
-
-// Chapter-break dinkus. Set in the title serif at the size of the metadata column, so it reads as a
-// typographic mark in the page's own voice rather than a widget.
-const DINKUS_FONT_SIZE_PX = 16;
-// Traditional dinkus spacing is roughly an em between marks. Crimson Pro's asterisk advances
-// ~0.43em, so an 8px flex gap puts glyph centres just under an em apart at this size.
-// This is deliberately the container's gap rather than letter-spacing on the glyphs: each span
-// holds a single character, so letter-spacing would only pad its right-hand side, adding a trailing
-// space that pushes the group off centre without separating anything.
-// The asterisk's ink hangs high in the em box. Measured on the rendered glyph in Crimson Pro: the
-// ink spans 0.342em to 0.682em above the baseline, putting its centre 0.512em up while the line
-// box's own centre (at line-height 1) sits lower. Translating down by the difference lands the ink
-// on the block's optical centre, so the symmetric margins above and below read as symmetric.
-// Re-measure if the display face ever changes.
-const DINKUS_INK_OFFSET_EM = 0.178;
-const DINKUS_STYLE: CSSProperties = {
-  fontFamily: 'var(--font-crimson-pro), serif',
-  fontSize: `${DINKUS_FONT_SIZE_PX}px`,
-  lineHeight: 1,
-  transform: `translateY(${DINKUS_INK_OFFSET_EM}em)`,
-};
 
 export default function Home() {
   const shouldAnimate = !hasVisitedHome;
@@ -277,34 +256,17 @@ export default function Home() {
           </div>
         </div>
 
-        {/* End-of-content mark closing the project list, without which the column just stops. Set
-            in the title serif, since a dinkus is a typographic mark and not a piece of UI chrome.
-            Desktop only — on phones the footer follows close enough to do the job.
+        {/* End-of-content mark closing the project list, without which the column just stops. The
+            mark and its optical centring live in ui/dinkus; only the slot is set here.
 
-            An asterisk's ink sits high in its em box — it hangs off the cap line rather than
-            straddling the baseline — so `items-center` centres the line box while the glyphs
-            themselves ride visibly above centre, which would eat into the space above and leave a
-            gap below. DINKUS_INK_OFFSET_EM pushes them back down onto the block's optical centre;
-            see the constant for how it is derived.
+            Desktop only, unlike the one on a case study, which shows at every width: there the
+            reader has just come off a long article and the mark tells them it has ended, whereas
+            here the list is short enough that the footer follows close behind and does that job.
 
-            No margin of its own: the wrapper above already carries the offset from the list, and
-            the footer's own top padding provides the space below. */}
+            No margin on the mark itself: this wrapper carries the offset from the list, and the
+            footer's own top padding provides the space below. */}
         <div className="hidden max-w-[560px] mx-auto w-full mt-8 sm:mt-12 lg:mt-14 sm:block">
-          <div
-            aria-hidden
-            className={`flex items-center justify-center gap-[8px] ${riseClass.trim()}`}
-            style={riseDelay(DELAY.endMark)}
-          >
-            {[0, 1, 2].map(i => (
-              <span
-                key={i}
-                className="text-stone-400 dark:text-zinc-600 select-none"
-                style={DINKUS_STYLE}
-              >
-                *
-              </span>
-            ))}
-          </div>
+          <Dinkus className={riseClass.trim()} style={riseDelay(DELAY.endMark)} />
         </div>
 
         {/* On mobile, absorb spare viewport height while preserving at least 96px between the
