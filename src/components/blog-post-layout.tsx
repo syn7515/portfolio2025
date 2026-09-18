@@ -42,8 +42,8 @@ const ENTRANCE_TOTAL_MS = 950
 interface BlogPostLayoutProps {
   children: React.ReactNode
   slug?: string
-  title: string
   subtitle?: string
+  title: string
 }
 
 interface ProjectNavigation {
@@ -380,9 +380,9 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                   centre line rather than the viewport's; without it the cards' bleed is lopsided,
                   reaching further past one side of the text than the other. */}
               <div className="px-6 paper:px-0 paper:ml-[calc(50vw_-_280px_-_var(--sidebar-w)_+_var(--paper-center-offset))] paper:w-[560px]">
-                {/* Header: title, subtitle */}
+                {/* Header: title, then client and dates */}
                 <div className={styles.contentBlurRevealItem}>
-                  <BlogPostHeader slug={slug} title={title} subtitle={subtitle} />
+                  <BlogPostHeader title={title} subtitle={subtitle} />
                 </div>
 
                 {/* Content */}
