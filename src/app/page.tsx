@@ -43,7 +43,7 @@ const DELAY = {
   projectThird: 480,
   chapterBreak: 520,
   projectPersonal: 560,
-  divider: 600,
+  endMark: 600,
   footer: 640,
 } as const;
 
@@ -236,34 +236,25 @@ export default function Home() {
             />
           </div>
 
-          {/* Chapter break, in the sense a book uses one: a centred dinkus rather than a rule, so it
-              reads as "new section" without introducing a heading level to a page that has none. Set
-              in the title serif, since a dinkus is a typographic mark and not a piece of UI chrome.
+          {/* Chapter break: a short rule on the left margin, marking "new section" without adding a
+              heading level to a page that has none. It holds at every width — this is the cue that
+              carries the work/personal distinction, and dropping it on phones would leave the two
+              lists running together.
 
-              An asterisk's ink sits high in its em box — it hangs off the cap line rather than
-              straddling the baseline — so `items-center` centres the line box while the glyphs
-              themselves ride visibly above centre, which would eat into the space above and leave a
-              gap below. DINKUS_INK_OFFSET_EM pushes them back down onto the block's optical centre;
-              see the constant for how it is derived. */}
-          {/* The space before the interpolation is load-bearing: Tailwind's scanner reads the source
-              text, and a utility glued directly to `${'${'}` is not extracted. Written as
-              `sm:mb-5${'${'}riseClass}` the class silently never reached the stylesheet, and `mb-6`
-              won at 24px against a 20px top margin. */}
+              A 1px rule has almost no height of its own, so the whole break is the margins — and
+              because there is no glyph to fill it, the space reads looser here than the same
+              measure did around the dinkus this replaced. 16px a side lands the block at 33px,
+              against the 4px the case-study rows sit apart: still unmistakably a section break,
+              without the gap the dinkus's own 20px margins would leave around a hairline.
+
+              The space before the interpolation is load-bearing: Tailwind's scanner reads the
+              source text, and a utility glued directly to `${'${'}` is not extracted. Written as
+              `my-4${'${'}riseClass}` the class silently never reaches the stylesheet. */}
           <div
             aria-hidden
-            className={`flex items-center justify-center gap-[8px] my-5 ${riseClass.trim()}`}
+            className={`h-px w-4 bg-stone-400/50 dark:bg-zinc-600/50 my-4 ${riseClass.trim()}`}
             style={riseDelay(DELAY.chapterBreak)}
-          >
-            {[0, 1, 2].map(i => (
-              <span
-                key={i}
-                className="text-stone-400 dark:text-zinc-600 select-none"
-                style={DINKUS_STYLE}
-              >
-                *
-              </span>
-            ))}
-          </div>
+          />
 
           {/* Personal work, set apart from the case studies above. The page has no headings of its
               own, so rather than introducing a section layer for a single row, three cues carry the
@@ -286,14 +277,34 @@ export default function Home() {
           </div>
         </div>
 
-        {/* End-of-content mark closing the project list. It used to sit above the social links,
-            which have since moved into the footer; the rule stays because without it the column
-            just stops. Desktop only — on phones the footer follows close enough to do the job. */}
+        {/* End-of-content mark closing the project list, without which the column just stops. Set
+            in the title serif, since a dinkus is a typographic mark and not a piece of UI chrome.
+            Desktop only — on phones the footer follows close enough to do the job.
+
+            An asterisk's ink sits high in its em box — it hangs off the cap line rather than
+            straddling the baseline — so `items-center` centres the line box while the glyphs
+            themselves ride visibly above centre, which would eat into the space above and leave a
+            gap below. DINKUS_INK_OFFSET_EM pushes them back down onto the block's optical centre;
+            see the constant for how it is derived.
+
+            No margin of its own: the wrapper above already carries the offset from the list, and
+            the footer's own top padding provides the space below. */}
         <div className="hidden max-w-[560px] mx-auto w-full mt-8 sm:mt-12 lg:mt-14 sm:block">
           <div
-            className={`h-px w-4 bg-stone-400/50 dark:bg-zinc-600/50 ${riseClass.trim()}`}
-            style={riseDelay(DELAY.divider)}
-          />
+            aria-hidden
+            className={`flex items-center justify-center gap-[8px] ${riseClass.trim()}`}
+            style={riseDelay(DELAY.endMark)}
+          >
+            {[0, 1, 2].map(i => (
+              <span
+                key={i}
+                className="text-stone-400 dark:text-zinc-600 select-none"
+                style={DINKUS_STYLE}
+              >
+                *
+              </span>
+            ))}
+          </div>
         </div>
 
         {/* On mobile, absorb spare viewport height while preserving at least 96px between the
