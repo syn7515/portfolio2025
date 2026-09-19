@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 
 interface DividerProps {
   className?: string;
-  variant?: 'default' | 'thick' | 'dashed' | 'dotted' | 'gradient';
+  variant?: 'default' | 'thick' | 'dashed' | 'dotted' | 'gradient' | 'rule';
   color?: 'gray' | 'stone' | 'slate' | 'zinc';
   spacing?: 'sm' | 'md' | 'lg' | 'xl' | '3xl';
   orientation?: 'horizontal' | 'vertical';
@@ -26,6 +26,10 @@ export function Divider({
     dashed: 'border-t border-dashed',
     dotted: 'border-t border-dotted',
     gradient: 'border-0 h-px bg-gradient-to-r from-stone-300/30 via-stone-300/70 to-stone-300/30',
+    // The home page's section break reused in prose: a short rule on the left margin rather than a
+    // line across the column. Kept identical to the chapter break in app/page.tsx — change one,
+    // change both.
+    rule: 'h-px w-4 bg-stone-400/50 dark:bg-zinc-600/50',
   };
   
   const colorClasses = {
@@ -56,6 +60,23 @@ export function Divider({
     vertical: 'h-full border-l border-t-0',
   };
   
+  // The rule is a fixed 16px mark, so it takes neither the full-width class nor the border colours
+  // the other variants are built from — its colour is part of the mark itself, which is why `color`
+  // does not apply to it.
+  if (variant === 'rule') {
+    return (
+      <hr
+        className={cn(
+          baseClasses,
+          variantClasses.rule,
+          spacingClasses[spacing],
+          className
+        )}
+        {...props}
+      />
+    );
+  }
+
   // For gradient variant, we need special handling
   if (variant === 'gradient') {
     const gradientColorClasses = {
