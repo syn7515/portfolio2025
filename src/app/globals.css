@@ -11,8 +11,11 @@
   --inline-link-underline-offset: 0.025em;
   --dotted-divider-dot-radius: 0.75px;
   --dotted-divider-height: 1.5px;
-  --intro-trigger-decoration-hover: rgb(190 18 60);
-  /* rose-700 - shared inline-preview highlight */
+  --intro-trigger-decoration-hover: var(--color-rose-700);
+  /* Shared inline-preview highlight. Points at Tailwind's own token rather than repeating a hex:
+     this was rgb(190 18 60), the sRGB rose-700 of Tailwind v3, while every component reaching for
+     rose through a utility class gets v4's wider-gamut one — rgb(199 0 54) once clipped. A link
+     and the external-link arrow inside it therefore hovered to two slightly different reds. */
   --scrollbar-thumb: rgb(168 162 158 / 0.6);
   /* stone-400 */
   --scrollbar-thumb-hover: rgb(120 113 108 / 0.8);
@@ -54,8 +57,8 @@
     --foreground: #ededed;
     --intro-trigger-decoration: rgb(113 113 122);
     /* zinc-500 - underline color for intro/link preview triggers */
-    --intro-trigger-decoration-hover: rgb(251 113 133);
-    /* rose-400 - shared inline-preview highlight */
+    --intro-trigger-decoration-hover: var(--color-rose-400);
+    /* Same token swap as the light value above. */
     --scrollbar-thumb: rgb(82 82 91 / 0.6);
     /* zinc-600 */
     --scrollbar-thumb-hover: rgb(113 113 122 / 0.8);
@@ -702,9 +705,11 @@ pre code {
 }
 
 .intro-link:is(:hover, :focus-visible) {
-  color: rgb(190 18 60) !important;
-  /* rose-700 */
-  text-decoration-color: rgb(190 18 60) !important;
+  /* Through the variable rather than a literal, which is what the dark rule below already does.
+     Hardcoding it here meant this rule did not follow the token, so a link and the arrow inside it
+     hovered to two different reds. */
+  color: var(--intro-trigger-decoration-hover) !important;
+  text-decoration-color: var(--intro-trigger-decoration-hover) !important;
 }
 
 /* Inline link preview trigger: same as .intro-link (underline, italic, decoration color) */
