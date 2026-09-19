@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { PAPER_BREAKPOINT } from '@/lib/breakpoints'
 import { cn } from '@/lib/utils'
 import { DescriptionBackdrop } from '@/components/ui/description-backdrop'
+import ExternalArrow from '@/components/ui/external-arrow'
 
 const HOVER_DELAY_MS = 150
 // The rail lives in the margin the floating paper leaves, so it exists exactly where the paper does.
@@ -160,7 +161,7 @@ export function InlineLinkPreview({
           onBlur={hideExplanation}
           className={cn(
             'intro-link',
-            'relative inline-block align-baseline focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-600/60 dark:focus-visible:ring-rose-300/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background rounded motion-safe:active:scale-[0.97]',
+            'group relative inline-block align-baseline focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-600/60 dark:focus-visible:ring-rose-300/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background rounded motion-safe:active:scale-[0.97]',
             className
           )}
           style={{
@@ -174,6 +175,7 @@ export function InlineLinkPreview({
             className="pointer-events-auto absolute inset-x-[-4px] inset-y-[-5px]"
           />
           {children}
+          <ExternalArrow />
         </a>
 
         {explanation && <span id={descriptionId} className="sr-only">{explanation}</span>}
