@@ -97,14 +97,15 @@
     /* stone-700 */
 }
 
+/* The rail's hover highlight is the same rose the links and the external-link arrow use, so it
+   reads from Tailwind's token rather than repeating the hex. Custom properties are not scoped by
+   CSS Modules — only class names are — so the :root definition reaches here. */
 .tickRow:hover .tick {
-    background-color: rgb(190 18 60);
-    /* rose-700 */
+    background-color: var(--color-rose-700);
 }
 
 .tickRow:hover .reveal {
-    color: rgb(190 18 60);
-    /* rose-700 */
+    color: var(--color-rose-700);
 }
 
 /* While the rail is hovered the lengths fan out around the pointer: longest directly under it,
@@ -146,13 +147,11 @@
     }
 
     .tickRow:hover .tick {
-        background-color: rgb(251 113 133);
-        /* rose-400 */
+        background-color: var(--color-rose-400);
     }
 
     .tickRow:hover .reveal {
-        color: rgb(251 113 133);
-        /* rose-400 */
+        color: var(--color-rose-400);
     }
 }
 

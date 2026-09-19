@@ -156,10 +156,13 @@ html:hover::-webkit-scrollbar-thumb:hover {
 }
 
 ::selection {
+  /* The tint stays a literal: Tailwind only emits theme variables for shades something actually
+     uses, and nothing here reaches for rose-50, so --color-rose-50 does not exist — referencing it
+     would resolve to nothing and drop the background entirely. The foreground can use the token,
+     and does, so the selected text is the same rose as every other rose on the site. */
   background-color: rgb(255 241 242) !important;
   /* rose-50 */
-  color: rgb(190 18 60) !important;
-  /* rose-700 */
+  color: var(--color-rose-700) !important;
   opacity: 1 !important;
 }
 
@@ -182,10 +185,10 @@ a:focus-visible {
   }
 
   ::selection {
+    /* Same split as the light rule: rose-500 has no token emitted, the foreground does. */
     background-color: rgb(244 63 94 / 0.15) !important;
     /* rose-500 / 15% */
-    color: rgb(254 205 211) !important;
-    /* rose-200 */
+    color: var(--color-rose-200) !important;
     opacity: 1 !important;
   }
 }
