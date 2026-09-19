@@ -415,15 +415,15 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                   <div
                     className={cn(
                       // The dinkus above closes the article; this margin is the space between it
-                      // and the navigation, and is deliberately twice the one above the dinkus so
-                      // the mark sits with the text it ends rather than heading these rows. At
-                      // paper width it is the larger of the two values: below 1200px the full-bleed
-                      // paper carries the drafting grid along its bottom edge (paper-grid-bottom),
-                      // which helps separate the two, while at paper width there is nothing but the
-                      // gap.
+                      // and the navigation, and is exactly twice the one above the dinkus at both
+                      // widths (40/80 and 56/112) so the mark sits with the text it ends rather
+                      // than heading these rows. Paper width still gets the larger pair: below
+                      // 1200px the full-bleed paper carries the drafting grid along its bottom edge
+                      // (paper-grid-bottom), which helps separate the two, while at paper width
+                      // there is nothing but the gap.
                       // Both values are the whole gap: the children's own top margins collapse into
                       // this one, which is why neither row below sets a margin of its own.
-                      'max-w-[560px] mx-auto paper:max-w-none mt-20 paper:mt-32 pb-[28px] min-[640px]:pb-16 paper:pb-[120px] overflow-x-visible',
+                      'max-w-[560px] mx-auto paper:max-w-none mt-20 paper:mt-28 pb-[28px] min-[640px]:pb-16 paper:pb-[120px] overflow-x-visible',
                       styles.contentBlurRevealItem
                     )}
                   >
