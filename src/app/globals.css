@@ -1,4 +1,8 @@
 @import "tailwindcss";
+/* Stacked smooth shadows + the hairline ring baked into the shadow's final layer, so an elevated
+   surface reads as one continuous edge instead of a border sitting beside a shadow. The ring flips
+   to white in dark mode off the `color-scheme: light dark` declared below. */
+@import "shadow-plugin";
 @config "../../tailwind.config.js";
 
 :root {

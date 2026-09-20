@@ -10,11 +10,15 @@ import {
   type CarouselItem,
 } from "./hooks";
 import { GrillLines } from "./grill-lines";
-import { CARD_LIGHT_SHADOW } from "@/components/ui/card-shadow";
 import { renderCaptionWithBadges } from "@/components/ui/sup-caption-badge";
 
+/* The nav buttons float over the backdrop, so their edge comes from the shadow's own hairline ring
+   (smooth-shadow-ring) rather than a border or a blurred 1px layer standing in for one — a separate
+   edge reads as a second, greyer line just outside the first. The light ring is tinted up from the
+   plugin's 5% default: these sit on a near-white stone-100/85 backdrop, where 5% black leaves a
+   white button barely detached from it. Dark mode keeps the plugin's white hairline. */
 const NAV_BUTTON_MOTION_CLASS =
-  "rounded-full p-2 sm:p-3 pointer-events-auto transition-[scale,background-color] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-safe:enabled:active:scale-[0.97] motion-reduce:transition-[background-color]";
+  "rounded-full p-2 sm:p-3 pointer-events-auto smooth-shadow-ring-sm smooth-ring-black/10 dark:smooth-ring-white/18 transition-[scale,background-color] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-safe:enabled:active:scale-[0.97] motion-reduce:transition-[background-color]";
 
 export type TransformSnapshot = {
   x: number;
@@ -492,9 +496,6 @@ export function Lightbox({
                         backgroundColor: isDarkMode
                           ? isPrevHovered && !isPrevDisabled ? '#202023' : '#18181b'
                           : isPrevHovered && !isPrevDisabled ? '#f4f4f4' : '#ffffff',
-                        boxShadow: isDarkMode
-                          ? 'inset 0 1px 0 0 rgba(255,255,255,0.03), inset 0 0 0 1px rgba(255,255,255,0.03), 0px 2px 8px rgba(0,0,0,0.35)'
-                          : '0px 0px 1px 0px rgba(0,0,0,0.3), 0px 2px 8px 0px rgba(0,0,0,0.08)',
                       }}
                       aria-label="Previous"
                     >
@@ -520,9 +521,6 @@ export function Lightbox({
                         backgroundColor: isDarkMode
                           ? isNextHovered && !isNextDisabled ? '#202023' : '#18181b'
                           : isNextHovered && !isNextDisabled ? '#f4f4f4' : '#ffffff',
-                        boxShadow: isDarkMode
-                          ? 'inset 0 1px 0 0 rgba(255,255,255,0.03), inset 0 0 0 1px rgba(255,255,255,0.03), 0px 2px 8px rgba(0,0,0,0.35)'
-                          : '0px 0px 1px 0px rgba(0,0,0,0.3), 0px 2px 8px 0px rgba(0,0,0,0.08)',
                       }}
                       aria-label="Next"
                     >
