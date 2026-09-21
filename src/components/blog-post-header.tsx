@@ -9,17 +9,27 @@ interface BlogPostHeaderProps {
 export default function BlogPostHeader({ title, subtitle }: BlogPostHeaderProps) {
   return (
     <header className="max-w-[560px] mx-auto pt-4 sm:pt-0 mb-14 sm:mb-20 lg:mb-[100px] text-left">
-      {/* Title. Size, tracking, weight and leading are kept identical to the name on the home page
-          (see the h1 in app/page.tsx) so a reader arriving from there sees the same voice at the
-          same scale — the two are a matched pair, and the ramp below is that one verbatim: 26px up
-          to 640px, sliding to 32px by 1200px. Because the sizes now agree exactly, the tracking can
-          be the same absolute -0.75px rather than a converted em value. Change one, change both. */}
+      {/* Title. Two sizes, split at the paper breakpoint.
+
+          Below 1200px it keeps the name on the home page verbatim (see the h1 in app/page.tsx):
+          26px up to 640px, sliding to 32px by 1200px, tracked a flat -0.75px. There the paper is
+          full-bleed and the column *is* the viewport, so a reader arriving from home meets the
+          same voice at the same scale. Change one, change both.
+
+          From 1200px up the sheet lifts off the page and this goes back to the 40px display size
+          it carried before the two were matched. That width is where the case study stops being a
+          column and becomes a sheet with a margin around it, and where the title is the only thing
+          on it above the fold — the home name never is, which is why it does not follow. The step
+          at the breakpoint is 32 to 40px, landing with everything else that changes there.
+
+          Tracking moves with the size and so has to leave the inline style, which no media query
+          can reach: -0.03em is -1.2px at 40px, where the flat -0.75px would read as -0.019em and
+          noticeably loose. An inline letterSpacing would outrank both utilities. */}
       <h1
-        className="!mt-0 !text-[clamp(26px,calc(1.0714vw_+_19.143px),32px)] !text-stone-700 dark:!text-zinc-200 !mb-0 whitespace-pre-line"
+        className="!mt-0 !text-[clamp(26px,calc(1.0714vw_+_19.143px),32px)] paper:!text-[2.5rem] !tracking-[-0.75px] paper:!tracking-[-0.03em] !text-stone-700 dark:!text-zinc-200 !mb-0 whitespace-pre-line"
         style={{
           fontFamily: 'var(--font-crimson-pro), serif',
           lineHeight: '120%',
-          letterSpacing: '-0.75px',
           fontWeight: 360,
           textWrap: 'balance',
         }}
