@@ -141,8 +141,28 @@ export default function Home() {
             -3.75rem). The ramp used to start at the old 1280px breakpoint, which left it flat across
             1200-1280 once the breakpoint moved. Kept identical to the case-study paper in
             blog-post-layout.tsx so the two sheets hand off at the same height. */}
-        <div className="flex-1 flex flex-col pt-16 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] paper:pt-[clamp(6.25rem,calc(13.333vw_-_3.75rem),8.75rem)] pb-5 min-[640px]:pb-8 paper:pb-10">
-        <div className="flex-1 flex flex-col px-6 paper:px-0 paper:ml-[calc(50vw_-_280px_-_var(--sidebar-w))] paper:w-[560px]">
+        {/* Below the paper breakpoint this is also the centring context: the column below sizes to
+            its content (no `flex-1`) and `justify-center` puts the leftover viewport height half
+            above it and half below. The paddings on this element stop being the content's offset
+            from the top and become the *minimum* margins — once the content is taller than the
+            space between them there is no leftover to share, the column pins to the top padding
+            and the page scrolls as before. That is also why the whole chain up to the root stays
+            min-height rather than height: nothing here can ever centre content out of reach above
+            the scroll origin.
+
+            The bottom minimum matches the top one below 1200px, which it did not when the content
+            hung from the top edge (it was 20/32px against 64/96/120px). Centring splits the
+            leftover evenly, so any difference between the two is a constant offset on top of that
+            split — the old pair would have left the column sitting 44px below the middle of a tall
+            viewport, which is the one thing this is meant to stop doing. Above the breakpoint the
+            old `pb-10` stands, since nothing is being centred there.
+
+            At 1200px and up the sheet arrives and the layout goes back to what it was: content
+            hanging from the paper's top edge with the footer pushed to the bottom. The centred
+            reading works because below that width the paper is the viewport; on the floating sheet
+            the top edge is the thing content should align to. */}
+        <div className="flex-1 flex flex-col justify-center paper:justify-start pt-16 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] paper:pt-[clamp(6.25rem,calc(13.333vw_-_3.75rem),8.75rem)] pb-16 min-[640px]:pb-24 min-[1024px]:pb-[7.5rem] paper:pb-10">
+        <div className="flex flex-col paper:flex-1 px-6 paper:px-0 paper:ml-[calc(50vw_-_280px_-_var(--sidebar-w))] paper:w-[560px]">
         <div className="max-w-[560px] mx-auto" data-inline-link-preview-boundary>
           {/* Left column: name */}
           {/* Below the paper breakpoint the name tracks the viewport: 32px where the sheet appears at
@@ -274,14 +294,14 @@ export default function Home() {
           <Dinkus className={riseClass.trim()} style={riseDelay(DELAY.endMark)} />
         </div>
 
-        {/* On mobile, absorb spare viewport height while preserving at least 96px between the
-            project list and footer when the content needs to scroll. On a 375x812 phone the list
-            already overflows the viewport, so flex-1 gets nothing to distribute and this minimum
-            is what actually renders — it is the gap, not a floor that rarely applies. */}
-        <div className="min-h-24 flex-1 sm:hidden" aria-hidden />
+        {/* The phone's gap between the project list and the footer, standing in for the `sm:pt-20`
+            the footer carries from 640px up. A plain 96px spacer: the column is centred as a whole
+            below 1200px, so there is no spare height here to absorb — the block that used to grow
+            into it is the centring itself. */}
+        <div className="min-h-24 sm:hidden" aria-hidden />
 
         <div
-          className={`w-full max-w-[560px] mx-auto sm:mt-auto sm:pt-20 lg:pt-24 ${riseClass.trim()}`}
+          className={`w-full max-w-[560px] mx-auto paper:mt-auto sm:pt-20 lg:pt-24 ${riseClass.trim()}`}
           style={riseDelay(DELAY.footer)}
         >
           {/* One baseline row at every width: socials left, copyright right. They sit in DOM order,
