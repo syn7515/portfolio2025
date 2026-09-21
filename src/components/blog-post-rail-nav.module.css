@@ -55,9 +55,7 @@
    need to see where they are. */
 .rail:not(:hover):has(:focus-visible) .tickRowActive .reveal,
 .tickRow:hover .reveal,
-.tickRow:focus-visible .reveal,
-.homeButton:hover .reveal,
-.homeButton:focus-visible .reveal {
+.tickRow:focus-visible .reveal {
     opacity: 1;
     translate: 0 -50%;
     filter: blur(0);
@@ -68,10 +66,11 @@
         translate 180ms cubic-bezier(0.25, 0.1, 0.25, 1) 150ms;
 }
 
-/* The first title in a shared Home/TOC hover session keeps the intentional reveal above. Follow-up
-   titles behave like adjacent tooltips: both the previous title's exit and the next title's entrance
-   are instant. React keeps this session warm briefly across the physical gap between Home and rail. */
-.railNav.titlesInstant :is(.homeButton, .tickRow) .reveal {
+/* The first title of a hover session keeps the intentional reveal above. Follow-up titles behave
+   like adjacent tooltips: both the previous title's exit and the next title's entrance are instant.
+   React keeps the session warm briefly after the pointer leaves the rail, so a glance away and back
+   doesn't restart it. */
+.railNav.titlesInstant .tickRow .reveal {
     transition: none;
 }
 
@@ -165,9 +164,7 @@
 
     .rail:not(:hover):has(:focus-visible) .tickRowActive .reveal,
     .tickRow:hover .reveal,
-    .tickRow:focus-visible .reveal,
-    .homeButton:hover .reveal,
-    .homeButton:focus-visible .reveal {
+    .tickRow:focus-visible .reveal {
         translate: 0 -50%;
         filter: none;
         transition: opacity 120ms ease-out;

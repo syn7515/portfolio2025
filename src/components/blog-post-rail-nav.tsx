@@ -19,9 +19,8 @@ interface BlogPostRailNavProps {
   contentSelector?: string
 }
 
-// Section labels keep the TOC's own Crimson Pro. The Home tooltip deliberately does *not* use this
-// — it mirrors the ≥1200px sidebar's Home link instead (sans, text-sm, font-[460]), so the same
-// control reads the same way at every width.
+// Section labels keep the TOC's own Crimson Pro. They are the only labels in the rail — Home is a
+// bare icon here, so nothing else needs this.
 const TOC_LABEL_STYLE: React.CSSProperties = {
   fontFamily: 'var(--font-crimson-pro), serif',
   fontSize: '18px',
@@ -122,6 +121,9 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
     exitTimerRef.current = window.setTimeout(navigateHome, RAIL_EXIT_MS + 100)
   }
 
+  // The rail's titles share one reveal session: the first costs the full intentional reveal, the
+  // rest behave like adjacent tooltips. Home used to prime this, back when it revealed a label of
+  // its own. It no longer does, so it no longer opens a session the reader has seen nothing of.
   const handleTitleMouseEnter = () => {
     if (titleHoverSessionTimerRef.current) {
       window.clearTimeout(titleHoverSessionTimerRef.current)
@@ -167,17 +169,13 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
       <Link
         href="/"
         onClick={handleHomeClick}
-        onMouseEnter={handleTitleMouseEnter}
-        onMouseLeave={handleTitleMouseLeave}
         aria-label="Back to home"
         className={cn(
-          styles.homeButton,
-          'relative flex h-8 w-14 items-center rounded-full pl-2',
-          // Type and colour copied from the ≥1200px sidebar Home link so the two are the same
-          // control. No hover background: the label below is the hover affordance, and it and the
-          // icon both take the rose together — a tint behind the icon on top of that read as two
-          // competing signals for one state.
-          'text-sm font-[460] !not-italic !no-underline !text-stone-400 dark:!text-zinc-400',
+          'flex h-8 w-14 items-center rounded-full pl-2',
+          // Colour copied from the ≥1200px sidebar Home link so the two read as one control. The
+          // glyph carries the hover by itself; no hover background behind it, since a tint under a
+          // 16px mark and the mark's own colour change are two signals for one state.
+          '!not-italic !no-underline !text-stone-400 dark:!text-zinc-400',
           'hover:!text-rose-700 dark:hover:!text-rose-400',
           'motion-safe:active:scale-[0.97]',
           'focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-600/60 dark:focus-visible:ring-rose-300/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background'
@@ -186,22 +184,9 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
           transition: 'color 300ms ease-out, scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
         }}
       >
+        {/* The 56x32 box is hit area, not a drawn shape — the same width the tick rows use, so the
+            whole cluster answers to one reach. */}
         <Undo2 className="size-4 flex-shrink-0 -translate-y-px" aria-hidden />
-        {/* No -translate-y-1/2 here: Tailwind v4 compiles it to the `translate` property that
-            styles.reveal already drives, so it would be overwritten and the label would hang half
-            its height too low. The centring lives in that class instead.
-            No colour of its own either — inheriting from the link is what lets it turn rose with
-            the icon on hover. */}
-        <span
-          aria-hidden
-          className={cn(
-            styles.reveal,
-            'absolute left-[calc(2rem+10px)] top-1/2 isolate whitespace-nowrap'
-          )}
-        >
-          <DescriptionBackdrop />
-          <span className="relative z-10">Home</span>
-        </span>
       </Link>
 
       {/* A continuous 14px row pitch keeps the ticks reading as one dense stroke pattern. Each row
