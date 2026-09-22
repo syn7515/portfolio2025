@@ -7,6 +7,7 @@ import Dinkus from '@/components/ui/dinkus';
 import InlineLinkPreview from '@/components/ui/inline-link-preview';
 import PaperGridBackground from '@/components/ui/paper-grid-background';
 import styles from './page.module.css';
+import { trackOutboundClick } from '@/lib/analytics';
 import {
   PAPER_EXIT_REST,
   PAPER_EXIT_OFFSCREEN,
@@ -326,6 +327,7 @@ export default function Home() {
                 target="_blank"
                 rel="noopener noreferrer"
                 data-social-link-trigger
+                onClick={() => trackOutboundClick("https://x.com/sue_park__", "X")}
                 className="sm:text-[14px] px-2 py-3 -mx-2 -my-3 !text-stone-500 dark:!text-zinc-400 hover:!text-rose-700 active:!text-rose-700 dark:hover:!text-rose-400 dark:active:!text-rose-400 motion-safe:active:scale-[0.97]"
                 style={{
                   transition: 'scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
@@ -339,6 +341,7 @@ export default function Home() {
                 target="_blank"
                 rel="noopener noreferrer"
                 data-social-link-trigger
+                onClick={() => trackOutboundClick("https://www.linkedin.com/in/sooyeonp/", "LinkedIn")}
                 className="sm:text-[14px] px-2 py-3 -mx-2 -my-3 !text-stone-500 dark:!text-zinc-400 hover:!text-rose-700 active:!text-rose-700 dark:hover:!text-rose-400 dark:active:!text-rose-400 motion-safe:active:scale-[0.97]"
                 style={{
                   transition: 'scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',

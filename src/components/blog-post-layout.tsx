@@ -9,6 +9,7 @@ import styles from './blog-post.module.css'
 import BlogPostHeader from '@/components/blog-post-header'
 import BlogPostToc from '@/components/blog-post-toc'
 import BlogPostRailNav from '@/components/blog-post-rail-nav'
+import useScrollDepth from '@/components/use-scroll-depth'
 import PaperGridBackground from '@/components/ui/paper-grid-background'
 import Dinkus from '@/components/ui/dinkus'
 import { PROJECTS } from '@/lib/projects'
@@ -175,6 +176,10 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
   // before the effect has even re-armed the timer.
   const [settledSlug, setSettledSlug] = useState<string | null>(null)
   const cancelBackToTopRef = useRef<(() => void) | null>(null)
+
+  // Reports each quarter of the study the reader reaches, once per document. Keyed on slug, so a
+  // client-side navigation to the next post starts its own count rather than continuing this one's.
+  useScrollDepth(slug)
 
   useEffect(() => {
     if (isPaperBackNav()) setExitEntrance(true)

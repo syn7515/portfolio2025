@@ -4,6 +4,7 @@ import type { CSSProperties, MouseEvent } from 'react';
 import Link from 'next/link';
 import { markPaperHomeForwardNav } from '@/lib/paper-exit-transition';
 import ExternalArrow from '@/components/ui/external-arrow';
+import { trackCaseStudyOpen, trackOutboundClick } from '@/lib/analytics';
 
 interface ProjectListItemProps {
   title: string;
@@ -50,10 +51,23 @@ export default function ProjectListItem({
   const isExternal = /^https?:\/\//i.test(href);
 
   const handleNavigation = (event: MouseEvent<HTMLAnchorElement>) => {
+    // Recorded before the guard below, not after it: a cmd-click opens the study in a new tab, so
+    // it is every bit as much an open as a plain one, and only the paper transition cares about
+    // the difference. href is a bare in-site path for this branch, which is the slug the dashboard
+    // groups by.
+    trackCaseStudyOpen(href.replace(/^\//, ''));
+
     // Modified clicks open another browsing context; don't leave the current Home document carrying
     // an origin signal for a navigation that did not occur there.
     if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     markPaperHomeForwardNav();
+  };
+
+  // The off-site rows are personal projects rather than case studies, so they report as outbound
+  // alongside the footer's socials. Modified clicks are still real visits here — the destination
+  // opens in another tab either way — so unlike the branch above they are not filtered out.
+  const handleExternalNavigation = () => {
+    trackOutboundClick(href, title);
   };
 
   const icon = isExternal ? <ExternalArrow className={externalIconClassName} /> : null;
@@ -90,6 +104,7 @@ export default function ProjectListItem({
           href={href}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={handleExternalNavigation}
           className={linkClassName}
           style={linkStyle}
         >
