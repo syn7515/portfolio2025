@@ -263,10 +263,15 @@ export default function Home() {
 
           {/* Personal work, set apart from the case studies above. The page has no headings of its
               own, so rather than introducing a section layer for a single row, three cues carry the
-              distinction: the chapter break, the right-hand column naming the category instead of a
+              distinction: the chapter break, the right-hand column naming the category alongside the
               year — which also explains why the date sequence breaks here — and the row being a
               named product rather than a descriptive project title. Worth revisiting as labelled
               "Work"/"Personal" groups once there are two or three personal projects to name.
+
+              The two orderings are deliberate. On desktop that column is right-aligned at the end of
+              a dotted rule, where "Personal, 2026" puts the word that marks the break nearest the
+              title; on phones it stacks above the title in the same place every case study shows a
+              year, so it leads with the year instead.
 
               Carries the same `gap-2 sm:gap-1` as the case-study list above even though it holds a
               single row today: without it a second personal project would sit 16px from the first
@@ -275,6 +280,7 @@ export default function Home() {
             <ProjectListItem
               title="Been There — Every Place, Stitched"
               dates="Personal, 2026"
+              datesMobile="2026, Personal"
               href="https://been-there.suepark.xyz"
               className={riseClass.trim() || undefined}
               style={riseDelay(DELAY.projectPersonal)}

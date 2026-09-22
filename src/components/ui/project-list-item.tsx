@@ -12,6 +12,11 @@ interface ProjectListItemProps {
   // use their year range, personal work names its category ("Personal, 2026"). On phones this column
   // renders above the title, so a category reads there as an eyebrow.
   dates: string;
+  // Phone-only wording for that same column. On phones it stacks above the title, where it lines up
+  // under the year every case-study row leads with, so a label that opens with a category on desktop
+  // ("Personal, 2026") is given here with the year first ("2026, Personal") to keep that column
+  // reading as a date. Falls back to `dates` when a row has nothing to vary.
+  datesMobile?: string;
   href: string;
   // The home page's entrance is CSS-driven so it can run before hydration; these carry that
   // animation's class and its per-item delay rather than a Framer transition.
@@ -40,6 +45,7 @@ const linkStyle: CSSProperties = { textDecoration: 'none' };
 export default function ProjectListItem({
   title,
   dates,
+  datesMobile,
   href,
   className,
   style,
@@ -76,7 +82,7 @@ export default function ProjectListItem({
     <>
       {/* Mobile: dates lead into the title on separate lines, with no divider. */}
       <div className="flex sm:hidden flex-col gap-0 not-italic">
-        <span className={datesClassName}>{dates}</span>
+        <span className={datesClassName}>{datesMobile ?? dates}</span>
         <span className={titleClassName} style={titleStyle}>{title}{icon}</span>
       </div>
 
