@@ -32,12 +32,14 @@ const RAIL_EXIT_MS = 180
 const TITLE_HOVER_SESSION_MS = 2500
 
 /**
- * Home + table of contents for 820–1200px.
+ * Home + table of contents for 820–1024px and 1100–1280px.
  *
- * At ≥1200px this is the fixed text sidebar; below 820px it's the hamburger overlay. In between,
- * --sidebar-w collapses to 0px and the paper runs edge to edge, so there is no gutter to put a
- * text rail in — the outline collapses to tick marks that expand on hover, and Home becomes a ghost
- * icon button sitting above them.
+ * At ≥1280px this is the fixed text sidebar; below 820px it's the hamburger overlay. In between,
+ * --sidebar-w collapses to 0px, so there is no gutter wide enough for a text rail — the outline
+ * collapses to tick marks that expand on hover, and Home becomes a ghost icon button sitting above
+ * them. Up to 1024px it floats over the full-bleed paper; from there it sits on the drafting grid in
+ * the sheet's left margin, and between 1024 and 1100px, where that margin is too narrow to hold it
+ * (RAIL_BREAKPOINT below), it is not shown at all.
  *
  * Everything floats over body copy, which is why the labels carry DescriptionBackdrop.
  */
@@ -154,11 +156,15 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
       className={cn(
         styles.railNav,
         showTitlesInstantly && styles.titlesInstant,
-        'hidden min-[820px]:flex paper:hidden',
+        // RAIL_BREAKPOINT: 24px in, the rail's 56px hit area needs the sheet's left margin to be
+        // at least 80px, which it reaches at ~1081px (70.3125vw - 680px, globals.css). 1100 leaves
+        // it ~13px clear of the sheet edge. Below that, within the sheet band, it steps aside.
+        // Repeated in the entrance media query in blog-post-rail-nav.module.css.
+        'hidden min-[820px]:flex sheet:hidden min-[1100px]:flex paper:hidden',
         // Vertically centred so the cluster stays reachable at any scroll position without being
-        // fixed to an edge. The left offset opens up as the gutter does: at 820px space remains
-        // tight between the viewport edge and text column, while at the top of the band there is ~300px.
-        'fixed left-2 min-[820px]:left-6 min-[1024px]:left-10 top-1/2 -translate-y-1/2 z-60',
+        // fixed to an edge. 24px from the viewport edge throughout: over the full-bleed paper
+        // below 1024px, and on the grid in the sheet's left margin from 1100px.
+        'fixed left-2 min-[820px]:left-6 top-1/2 -translate-y-1/2 z-60',
         'flex-col items-start gap-5'
       )}
       aria-label="Post navigation"
@@ -172,7 +178,7 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
         aria-label="Back to home"
         className={cn(
           'flex h-8 w-14 items-center rounded-full pl-2',
-          // Colour copied from the ≥1200px sidebar Home link so the two read as one control. The
+          // Colour copied from the ≥1280px sidebar Home link so the two read as one control. The
           // glyph carries the hover by itself; no hover background behind it, since a tint under a
           // 16px mark and the mark's own colour change are two signals for one state.
           '!not-italic !no-underline !text-stone-400 dark:!text-zinc-400',

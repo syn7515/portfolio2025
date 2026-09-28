@@ -276,13 +276,16 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
         }}
       />
 
-      {/* Compact rail: Home + tick-mark TOC, for the 820–1200px band where the paper is full-bleed
-          and there is no gutter for the text sidebar below. */}
+      {/* Compact rail: Home + tick-mark TOC, for 820–1024px and 1100–1280px, where there is no
+          gutter for the text sidebar below. Hidden between 1024 and 1100px, where the sheet's
+          left margin can't hold even the rail — see blog-post-rail-nav.tsx. */}
       <BlogPostRailNav />
 
-      {/* Fixed side nav: back + TOC; visible only on lg+ */}
+      {/* Fixed side nav: back + TOC, from the paper breakpoint up. Its box is the --sidebar-w strip
+          just left of the sheet, which is the viewport's left edge until wide screens centre the
+          sheet (globals.css) — from there it travels with the sheet instead of staying behind. */}
       <aside
-        className="hidden paper:block fixed left-0 top-0 bottom-0 z-60 pointer-events-none"
+        className="hidden paper:block fixed left-[calc(var(--paper-left)_-_var(--sidebar-w))] top-0 bottom-0 z-60 pointer-events-none"
         aria-label="Post navigation"
       >
         {/* Background layer at 10% opacity */}
@@ -355,11 +358,12 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
             blog-post.module.css (.paperUnderlay), keyed off the same 450ms landing frame. */}
         <div
           aria-hidden
-          className={cn('absolute inset-0 paper:top-[100px]', styles.paperUnderlay)}
+          className={cn('absolute inset-0 sheet:top-[100px]', styles.paperUnderlay)}
           style={{
             backgroundColor: 'var(--paper-bg)',
             boxShadow: 'var(--paper-box-shadow)',
-            marginLeft: 'var(--sidebar-w)',
+            marginLeft: 'var(--paper-left)',
+            maxWidth: 'var(--paper-max-w)',
           }}
         />
 
@@ -372,20 +376,22 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
             This element is never hidden: it and its text are what FCP and LCP are measured on, so
             anything that withheld them until JS ran would be measuring the bundle, not the page.
             paper-grid-bottom composites the drafting grid into this element's own background below
-            1200px, where the full-bleed paper leaves PaperGridBackground nothing to peek out of. It
+            1024px, where the full-bleed paper leaves PaperGridBackground nothing to peek out of. It
             has to be a background rather than a child layer precisely because this element isn't a
             stacking context — see globals.css. */}
         <div
-          className="paper-grid-bottom flex-1 paper:mt-[100px] overflow-x-clip relative"
-          style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}
+          className="paper-grid-bottom flex-1 sheet:mt-[100px] overflow-x-clip relative"
+          style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--paper-left)', maxWidth: 'var(--paper-max-w)' }}
         >
           <div
-            className="pt-20 xs:pt-20 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] paper:pt-[clamp(6.25rem,calc(13.333vw_-_3.75rem),8.75rem)]"
+            className="pt-20 xs:pt-20 min-[640px]:pt-24 sheet:pt-[110.67px] paper:pt-[clamp(6.25rem,calc(13.333vw_-_3.75rem),8.75rem)]"
           >
               {/* --paper-center-offset (globals.css) is what keeps this column on the carousel's
                   centre line rather than the viewport's; without it the cards' bleed is lopsided,
-                  reaching further past one side of the text than the other. */}
-              <div className="px-6 paper:px-0 paper:ml-[calc(50vw_-_280px_-_var(--sidebar-w)_+_var(--paper-center-offset))] paper:w-[560px]">
+                  reaching further past one side of the text than the other. Across the sheet band
+                  the column holds its 1280px inset (140px + the 20px offset there), so the sheet
+                  slides left without its contents moving on it. */}
+              <div className="px-6 sheet:px-0 sheet:ml-[calc(140px_+_var(--paper-center-offset))] paper:ml-[calc(50vw_-_var(--content-w)_/_2_-_var(--paper-left)_+_var(--paper-center-offset))] sheet:w-[var(--content-w)]">
                 {/* Header: title, then client and dates */}
                 <div className={styles.contentBlurRevealItem}>
                   <BlogPostHeader title={title} subtitle={subtitle} />
@@ -395,7 +401,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                 <div
                   className={cn(
                     styles.mdxContent,
-                    'max-w-[560px] mx-auto',
+                    'max-w-[var(--content-w)] mx-auto',
                     styles.contentBlurReveal
                   )}
                   data-blog-content
@@ -413,7 +419,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                     Shown at every width, unlike the home page's, where the footer follows a short
                     list closely enough to close it on its own. Here the reader has just come off a
                     long article and the mark is what says it has ended. */}
-                <Dinkus className={cn('mt-10 paper:mt-14', styles.contentBlurRevealItem)} />
+                <Dinkus className={cn('mt-10 sheet:mt-14', styles.contentBlurRevealItem)} />
 
                 {/* Project Navigation Footer — inside paper */}
                 {(previousProject || nextProject) ? (
@@ -422,13 +428,13 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                       // The dinkus above closes the article; this margin is the space between it
                       // and the navigation, and is exactly twice the one above the dinkus at both
                       // widths (40/80 and 56/112) so the mark sits with the text it ends rather
-                      // than heading these rows. Paper width still gets the larger pair: below
-                      // 1200px the full-bleed paper carries the drafting grid along its bottom edge
-                      // (paper-grid-bottom), which helps separate the two, while at paper width
+                      // than heading these rows. The sheet still gets the larger pair: below
+                      // 1024px the full-bleed paper carries the drafting grid along its bottom edge
+                      // (paper-grid-bottom), which helps separate the two, while on the sheet
                       // there is nothing but the gap.
                       // Both values are the whole gap: the children's own top margins collapse into
                       // this one, which is why neither row below sets a margin of its own.
-                      'max-w-[560px] mx-auto paper:max-w-none mt-20 paper:mt-28 pb-[28px] min-[640px]:pb-16 paper:pb-[120px] overflow-x-visible',
+                      'max-w-[var(--content-w)] mx-auto sheet:max-w-none mt-20 sheet:mt-28 pb-[28px] min-[640px]:pb-16 sheet:pb-[120px] overflow-x-visible',
                       styles.contentBlurRevealItem
                     )}
                   >
@@ -503,7 +509,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                     </div>
                   </div>
                 ) : (
-                  <div className="pb-12 paper:pb-[148px]" aria-hidden />
+                  <div className="pb-12 sheet:pb-[148px]" aria-hidden />
                 )}
               </div>
           </div>
@@ -520,10 +526,10 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
         <div
           aria-hidden
           className={cn(
-            'absolute inset-0 paper:top-[100px] overflow-x-clip pointer-events-none',
+            'absolute inset-0 sheet:top-[100px] overflow-x-clip pointer-events-none',
             styles.paperEntranceOverlay
           )}
-          style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}
+          style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--paper-left)', maxWidth: 'var(--paper-max-w)' }}
         />
 
         {/* Departing-sheet overlay (backwards navigation): the inverse of the entrance above. The
@@ -536,8 +542,8 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
         {exitEntrance && !exitDone && (
           <motion.div
             aria-hidden
-            className="absolute inset-0 paper:top-[100px] overflow-x-clip pointer-events-none z-[55]"
-            style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)', transformOrigin: PAPER_EXIT_TRANSFORM_ORIGIN }}
+            className="absolute inset-0 sheet:top-[100px] overflow-x-clip pointer-events-none z-[55]"
+            style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--paper-left)', maxWidth: 'var(--paper-max-w)', transformOrigin: PAPER_EXIT_TRANSFORM_ORIGIN }}
             initial={PAPER_EXIT_REST}
             animate={PAPER_EXIT_OFFSCREEN}
             transition={exitTransition}

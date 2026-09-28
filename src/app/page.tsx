@@ -130,17 +130,17 @@ export default function Home() {
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-4 focus:left-4 focus:px-4 focus:py-2 focus:bg-white focus:text-stone-800 focus:rounded focus:shadow">Skip to content</a>
       <main id="main" className="w-full flex-1 flex flex-col relative">
         <PaperGridBackground />
-        {/* paper-grid-bottom: below 1200px the paper is full-bleed, so PaperGridBackground has
+        {/* paper-grid-bottom: below 1024px the paper is full-bleed, so PaperGridBackground has
             nothing left to peek out of — the same grid is composited into this element's own
             background instead, under a diagonal fade. See globals.css. */}
         <div
-          className={`paper-grid-bottom relative z-10 w-full flex-1 flex flex-col paper:mt-[100px] overflow-x-clip${paperClass}`}
-          style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)' }}
+          className={`paper-grid-bottom relative z-10 w-full flex-1 flex flex-col sheet:mt-[100px] overflow-x-clip${paperClass}`}
+          style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--paper-left)', maxWidth: 'var(--paper-max-w)' }}
         >
-        {/* Top padding on the paper: 100px where the sheet first appears at 1200px, ramping to 140px
-            by 1500px where --sidebar-w settles (40px over 300px = 13.333vw; intercept 100px - 160px =
-            -3.75rem). The ramp used to start at the old 1280px breakpoint, which left it flat across
-            1200-1280 once the breakpoint moved. Kept identical to the case-study paper in
+        {/* Top padding on the paper: a ramp from 100px at 1200 to 140px by 1500px where --sidebar-w
+            settles (40px over 300px = 13.333vw; intercept 100px - 160px = -3.75rem). It runs from the
+            paper breakpoint up; across the sheet band it holds its 1280px value, 110.67px, with the
+            rest of the sheet's insets. Kept identical to the case-study paper in
             blog-post-layout.tsx so the two sheets hand off at the same height. */}
         {/* Below the paper breakpoint this is also the centring context: the column below sizes to
             its content (no `flex-1`) and `justify-center` puts the leftover viewport height half
@@ -151,31 +151,33 @@ export default function Home() {
             min-height rather than height: nothing here can ever centre content out of reach above
             the scroll origin.
 
-            The bottom minimum matches the top one below 1200px, which it did not when the content
+            The bottom minimum matches the top one below 1024px, which it did not when the content
             hung from the top edge (it was 20/32px against 64/96/120px). Centring splits the
             leftover evenly, so any difference between the two is a constant offset on top of that
             split — the old pair would have left the column sitting 44px below the middle of a tall
             viewport, which is the one thing this is meant to stop doing. Above the breakpoint the
             old `pb-10` stands, since nothing is being centred there.
 
-            At 1200px and up the sheet arrives and the layout goes back to what it was: content
+            At 1024px and up the sheet arrives and the layout goes back to what it was: content
             hanging from the paper's top edge with the footer pushed to the bottom. The centred
             reading works because below that width the paper is the viewport; on the floating sheet
             the top edge is the thing content should align to. */}
-        <div className="flex-1 flex flex-col justify-center paper:justify-start pt-16 min-[640px]:pt-24 min-[1024px]:pt-[7.5rem] paper:pt-[clamp(6.25rem,calc(13.333vw_-_3.75rem),8.75rem)] pb-16 min-[640px]:pb-24 min-[1024px]:pb-[7.5rem] paper:pb-10">
-        <div className="flex flex-col paper:flex-1 px-6 paper:px-0 paper:ml-[calc(50vw_-_280px_-_var(--sidebar-w))] paper:w-[560px]">
-        <div className="max-w-[560px] mx-auto" data-inline-link-preview-boundary>
+        <div className="flex-1 flex flex-col justify-center sheet:justify-start pt-16 min-[640px]:pt-24 sheet:pt-[110.67px] paper:pt-[clamp(6.25rem,calc(13.333vw_-_3.75rem),8.75rem)] pb-16 min-[640px]:pb-24 sheet:pb-10">
+        {/* 140px is this column's inset from the paper edge at 1280px (50vw - 280px - 220px there),
+            held across the sheet band so the sheet slides left without its contents moving on it. */}
+        <div className="flex flex-col sheet:flex-1 px-6 sheet:px-0 sheet:ml-[140px] paper:ml-[calc(50vw_-_var(--content-w)_/_2_-_var(--paper-left))] sheet:w-[var(--content-w)]">
+        <div className="max-w-[var(--content-w)] mx-auto" data-inline-link-preview-boundary>
           {/* Left column: name */}
-          {/* Below the paper breakpoint the name tracks the viewport: 32px where the sheet appears at
-              1200px, sliding to the 26px phone size by 640px and holding there. Both ends land on
-              existing breakpoints, so there is no step at 640px and no change at 1200px when the
-              paper comes in. Slope is 6px over 560px = 1.0714vw; the intercept is
-              26px - 640px * 0.010714 = 19.143px. Crimson Pro carries a far larger x-height than the
+          {/* Below the sheet breakpoint the name tracks the viewport: 32px where the sheet appears at
+              1024px, sliding to the 26px phone size by 640px and holding there. Both ends land on
+              existing breakpoints, so there is no step at 640px and no change at 1024px when the
+              sheet comes in. Slope is 6px over 384px = 1.5625vw; the intercept is
+              26px - 640px * 0.015625 = 16px. Crimson Pro carries a far larger x-height than the
               Biro Script it replaced, so it runs ~0.8x the old 32-40px ramp to hold the same
               optical size. */}
           <div>
             <h1
-              className={`!mt-0 !text-[clamp(26px,calc(1.0714vw_+_19.143px),32px)] !text-stone-700 dark:!text-zinc-200 !mb-0 md:!mb-0${riseClass}`}
+              className={`!mt-0 !text-[clamp(26px,calc(1.5625vw_+_16px),32px)] !text-stone-700 dark:!text-zinc-200 !mb-0 md:!mb-0${riseClass}`}
               style={{
                 fontFamily: 'var(--font-crimson-pro), serif',
                 lineHeight: '120%',
@@ -211,7 +213,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="max-w-[560px] mx-auto w-full mt-12 sm:mt-14 lg:mt-16">
+        <div className="max-w-[var(--content-w)] mx-auto w-full mt-12 sm:mt-14 lg:mt-16">
           <div className="flex flex-col gap-2 sm:gap-1">
             <ProjectListItem
               title="Robot Interface for Collaboration in Kitchen"
@@ -297,18 +299,18 @@ export default function Home() {
 
             No margin on the mark itself: this wrapper carries the offset from the list, and the
             footer's own top padding provides the space below. */}
-        <div className="hidden max-w-[560px] mx-auto w-full mt-8 sm:mt-12 lg:mt-14 sm:block">
+        <div className="hidden max-w-[var(--content-w)] mx-auto w-full mt-8 sm:mt-12 lg:mt-14 sm:block">
           <Dinkus className={riseClass.trim()} style={riseDelay(DELAY.endMark)} />
         </div>
 
         {/* The phone's gap between the project list and the footer, standing in for the `sm:pt-20`
             the footer carries from 640px up. A plain 96px spacer: the column is centred as a whole
-            below 1200px, so there is no spare height here to absorb — the block that used to grow
+            below 1024px, so there is no spare height here to absorb — the block that used to grow
             into it is the centring itself. */}
         <div className="min-h-24 sm:hidden" aria-hidden />
 
         <div
-          className={`w-full max-w-[560px] mx-auto paper:mt-auto sm:pt-20 lg:pt-24 ${riseClass.trim()}`}
+          className={`w-full max-w-[var(--content-w)] mx-auto sheet:mt-auto sm:pt-20 lg:pt-24 ${riseClass.trim()}`}
           style={riseDelay(DELAY.footer)}
         >
           {/* One baseline row at every width: socials left, copyright right. They sit in DOM order,
@@ -375,8 +377,8 @@ export default function Home() {
         {exitEntrance && !exitDone && (
           <motion.div
             aria-hidden
-            className="absolute inset-0 paper:top-[100px] overflow-x-clip pointer-events-none z-[55]"
-            style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--sidebar-w)', transformOrigin: PAPER_EXIT_TRANSFORM_ORIGIN }}
+            className="absolute inset-0 sheet:top-[100px] overflow-x-clip pointer-events-none z-[55]"
+            style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--paper-left)', maxWidth: 'var(--paper-max-w)', transformOrigin: PAPER_EXIT_TRANSFORM_ORIGIN }}
             initial={PAPER_EXIT_REST}
             animate={PAPER_EXIT_OFFSCREEN}
             transition={exitTransition}

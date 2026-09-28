@@ -40,8 +40,16 @@
      every page. 50vh is what Home was already effectively using, so it stays as it was. */
   --paper-swing-origin: 50% 50vh;
   --sidebar-w: 0px;
+  /* The paper's left edge, its widest size and the margin it leaves on the right. The paper is
+     full-bleed until the sheet and paper blocks below say otherwise. */
+  --paper-left: 0px;
+  --paper-max-w: none;
+  --paper-right: 0px;
   /* Full-bleed paper needs no nudge — see the paper breakpoint block below. */
   --paper-center-offset: 0px;
+  /* Width of the reading column: text, header, lists and footer all cap at it. 560px everywhere
+     but wide screens — see the paper breakpoint block below. */
+  --content-w: 560px;
   --paper-grid-minor: rgb(120 113 108 / 0.1);
   --paper-grid-major: rgb(120 113 108 / 0.12);
   --paper-grid-hover-minor: rgb(120 113 108 / 0.12);
@@ -82,33 +90,65 @@
   }
 }
 
-/* The paper breakpoint. A media query can't read a custom property, so this literal is the CSS
-   half of PAPER_BREAKPOINT in src/lib/breakpoints.ts — see there before changing it. */
-@media (min-width: 1200px) {
+/* The sheet breakpoint (SHEET_BREAKPOINT in src/lib/breakpoints.ts). From here the paper lifts off
+   the page as a floating sheet. Up to the paper breakpoint it is the 1280px sheet slid left: the
+   text sidebar is gone (the compact rail stands in for it) and the left margin shrinks linearly
+   from 220px at 1280 to 40px here — 180px over 256px, so 70.3125vw - 680px. Everything on the sheet
+   keeps the inset it had at 1280: the columns pin to it in page.tsx and blog-post-layout.tsx, the
+   carousel holds its 784px card (carousel/hooks.ts), and the offset below is the 20px the formula
+   in the paper block works out to at 1280. Only the empty right side of the sheet gives up width. */
+@media (min-width: 1024px) {
   :root {
     --paper-box-shadow: inset 0 0 0 0.5px var(--paper-inset-shadow), 0 30px 60px 0 var(--paper-drop-shadow);
+    --paper-left: calc(70.3125vw - 680px);
+    --paper-center-offset: 20px;
+  }
+}
+
+/* The paper breakpoint. A media query can't read a custom property, so this literal is the CSS
+   half of PAPER_BREAKPOINT in src/lib/breakpoints.ts — see there before changing it. */
+@media (min-width: 1280px) {
+  :root {
     --sidebar-w: clamp(220px, calc(27.273vw - 129.09px), 280px);
 
-    /* Mirror of the card width useResponsiveSizing computes (carousel/hooks.ts): 720px where the
-       sheet first appears, ramping to 960px by the width at which --sidebar-w settles, and never
+    /* Wide screens (PAPER_MAX_WIDTH in src/lib/breakpoints.ts): the sheet stops growing at 1200px,
+       which it reaches at ~1475px; from there the extra width opens up a right margin while the
+       left one holds at --sidebar-w, and once the two are equal — 280px each at 1760px — the sheet
+       centres on the viewport and both grow together. Nothing steps: the paper's width, both its
+       margins and everything on it move continuously through the whole range.
+       The column formulas in page.tsx and blog-post-layout.tsx centre on the viewport measured
+       from --paper-left, so once the sheet is centred they resolve to a fixed inset on it with no
+       change of their own. The text sidebar is placed against --paper-left too, so it stays
+       beside the sheet rather than at the viewport's edge. */
+    --paper-max-w: 1200px;
+    --paper-left: max(var(--sidebar-w), calc((100vw - var(--paper-max-w)) / 2));
+    --paper-right: max(0px, calc(100vw - var(--paper-left) - var(--paper-max-w)));
+
+    /* On the wide sheet 560px of text starts to look narrow on it, so the column opens up with the
+       sheet: 560px here, 640px by 1760px where the sheet centres, and fixed from there with the
+       rest of its insets. 80px over 480px = 16.667vw; intercept 560px - 213.33px = 346.67px. */
+    --content-w: clamp(560px, calc(16.6667vw + 346.667px), 640px);
+
+    /* Mirror of the card width useResponsiveSizing computes (carousel/hooks.ts): a ramp anchored at
+       720px at 1200 — 784px by the time it starts here — capped at 880px from 1400px, and never
        wider than the paper minus a gap on each side. */
     --carousel-card-w: min(
-      clamp(720px, calc(720px + (100vw - 1200px) * 0.8), 960px),
-      calc(100vw - var(--sidebar-w) - 96px)
+      clamp(720px, calc(720px + (100vw - 1200px) * 0.8), 880px),
+      calc(100vw - var(--paper-left) - var(--paper-right) - 96px)
     );
 
-    /* Cards centre on the viewport, but the paper's left edge is inset by --sidebar-w, so a card
+    /* Cards centre on the viewport, but the paper's left edge is inset by --paper-left, so a card
        that centred naively would hang off the sheet. The carousel pushes itself right by whatever
        it takes to keep 48px (CARD_EDGE_GAP) from that edge, which leaves the text column — centred
-       on the viewport — sitting off that axis by the same amount: 28px at 1200px, 58px at 1500px,
-       nothing once the viewport is wide enough (~1616px) that a centred card already clears the
+       on the viewport — sitting off that axis by the same amount: 20px at 1280px, ~41px at 1400px,
+       nothing once the viewport is wide enough (~1536px) that a centred card already clears the
        edge. The text rides the same offset so body, header and cards share one centre line.
 
        The one place this can't follow is Home: it has no carousel, so its column stays on the
        viewport's centre. */
     --paper-center-offset: max(
       0px,
-      calc(var(--sidebar-w) + 48px - (100vw - var(--carousel-card-w)) / 2)
+      calc(var(--paper-left) + 48px - (100vw - var(--carousel-card-w)) / 2)
     );
   }
 }
@@ -211,7 +251,7 @@ body {
   display: none;
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 1024px) {
   .paper-grid-background {
     display: block;
     position: absolute;
@@ -225,18 +265,26 @@ body {
     /* Center the 1px grid strokes on the paper boundary. Without the half-pixel
        offset, gradients paint right/down from the shared origin and make the
        corner look misaligned against the paper's inset edge. */
-    background-position: calc(var(--sidebar-w) - 0.5px) 99.5px;
+    background-position: calc(var(--paper-left) - 0.5px) 99.5px;
     background-size:
       100px 100px,
       100px 100px,
       20px 20px,
       20px 20px;
+    /* The left fade has to finish a pixel short of the paper: the grid line on the paper's edge is
+       the sheet's left border, and in the sheet band — where the margin narrows to 40px — a fade
+       still running at that edge would wash the border out with it. The 25% stop scales with the
+       margin for the same reason, and holds its 80px from ~200px of margin up. */
+    /* The right fade mirrors it for the margin wide screens open up on that side. While there is
+       no right margin its stops all collapse onto the edge and it masks nothing. */
     -webkit-mask-image:
-      linear-gradient(to right, transparent 0, rgb(0 0 0 / 0.25) 80px, black var(--sidebar-w)),
+      linear-gradient(to right, transparent 0, rgb(0 0 0 / 0.25) min(80px, calc(var(--paper-left) * 0.4)), black calc(var(--paper-left) - 1px)),
+      linear-gradient(to left, transparent 0, rgb(0 0 0 / 0.25) min(80px, calc(var(--paper-right) * 0.4)), black calc(var(--paper-right) - 1px)),
       linear-gradient(to bottom, transparent 0, rgb(0 0 0 / 0.25) 35px, black 100px);
     -webkit-mask-composite: source-in;
     mask-image:
-      linear-gradient(to right, transparent 0, rgb(0 0 0 / 0.25) 80px, black var(--sidebar-w)),
+      linear-gradient(to right, transparent 0, rgb(0 0 0 / 0.25) min(80px, calc(var(--paper-left) * 0.4)), black calc(var(--paper-left) - 1px)),
+      linear-gradient(to left, transparent 0, rgb(0 0 0 / 0.25) min(80px, calc(var(--paper-right) * 0.4)), black calc(var(--paper-right) - 1px)),
       linear-gradient(to bottom, transparent 0, rgb(0 0 0 / 0.25) 35px, black 100px);
     mask-composite: intersect;
   }
@@ -252,7 +300,7 @@ body {
         linear-gradient(to bottom, var(--paper-grid-hover-major) 1px, transparent 1px),
         linear-gradient(to right, var(--paper-grid-hover-minor) 1px, transparent 1px),
         linear-gradient(to bottom, var(--paper-grid-hover-minor) 1px, transparent 1px);
-      background-position: calc(var(--sidebar-w) - 0.5px) 99.5px;
+      background-position: calc(var(--paper-left) - 0.5px) 99.5px;
       background-size:
         100px 100px,
         100px 100px,
@@ -290,7 +338,7 @@ body {
 }
 
 /* Same drafting grid as .paper-grid-background, this time composited into the bottom of the paper
-   itself, everywhere below 1200px. That's where --sidebar-w collapses to 0 and the paper goes
+   itself, everywhere below 1024px. That's where the sheet's insets collapse to 0 and the paper goes
    full-bleed, so the layer underneath has no margin left to show through.
 
    Applied as background layers on the paper rather than as an overlay element on purpose. A child
@@ -306,10 +354,10 @@ body {
    — deliberately shallower than a 45° corner-to-corner fade. Since this can't use a mask (that
    would apply to the paper's text too), the topmost layer is a paper-coloured eraser painting the
    inverse: transparent over the corner, opaque everywhere the grid should be gone. */
-@media (max-width: 1199.98px) {
+@media (max-width: 1023.98px) {
   .paper-grid-bottom {
     /* Stops are lengths, not percentages: the gradient line grows with the viewport, so percentage
-       stops would stretch the wedge wider on a 1199px screen than on a 640px one. In pixels the
+       stops would stretch the wedge wider on a 1023px screen than on a 640px one. In pixels the
        fade reaches --grid-fade-end / cos(22°) up the left edge and --grid-fade-end / sin(22°)
        along the bottom — ~450px and ~1120px at the 420px ceiling. Absolute stops also keep the
        wedge hugging the bottom-left corner on a blog post's very tall paper, where a percentage

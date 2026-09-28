@@ -8,25 +8,23 @@ interface BlogPostHeaderProps {
 
 export default function BlogPostHeader({ title, subtitle }: BlogPostHeaderProps) {
   return (
-    <header className="max-w-[560px] mx-auto pt-4 sm:pt-0 mb-14 sm:mb-20 lg:mb-[100px] text-left">
-      {/* Title. Two sizes, split at the paper breakpoint.
+    <header className="max-w-[var(--content-w)] mx-auto pt-4 sm:pt-0 mb-14 sm:mb-20 lg:mb-[100px] text-left">
+      {/* Title. 40px on the sheet (1024px up) — the display size, since that is where the case
+          study becomes a sheet with a margin around it and the title is the only thing on it above
+          the fold. Below the sheet it slides from 36px at 1024px to the 26px phone size by 640px
+          and holds there, leaving a small 36-to-40px step for the sheet's arrival. Slope is 10px
+          over 384px = 2.6042vw; the intercept is 26px - 640px * 0.026042 = 9.333px.
 
-          Below 1200px it keeps the name on the home page verbatim (see the h1 in app/page.tsx):
-          26px up to 640px, sliding to 32px by 1200px, tracked a flat -0.75px. There the paper is
-          full-bleed and the column *is* the viewport, so a reader arriving from home meets the
-          same voice at the same scale. Change one, change both.
+          It ends where the home name does (26px at 640px, see the h1 in app/page.tsx), so on a
+          phone a reader arriving from home meets the same voice at the same scale; above that the
+          title runs larger than the name, which never has the page to itself.
 
-          From 1200px up the sheet lifts off the page and this goes back to the 40px display size
-          it carried before the two were matched. That width is where the case study stops being a
-          column and becomes a sheet with a margin around it, and where the title is the only thing
-          on it above the fold — the home name never is, which is why it does not follow. The step
-          at the breakpoint is 32 to 40px, landing with everything else that changes there.
-
-          Tracking moves with the size and so has to leave the inline style, which no media query
-          can reach: -0.03em is -1.2px at 40px, where the flat -0.75px would read as -0.019em and
-          noticeably loose. An inline letterSpacing would outrank both utilities. */}
+          Tracking is -0.03em at every size: -1.2px at 40px, -0.78px at 26px, which is where the
+          home name's flat -0.75px sits. A flat px value would read noticeably loose at the top of
+          the ramp. It lives on the utility rather than the inline style only to keep the type
+          settings in one place. */}
       <h1
-        className="!mt-0 !text-[clamp(26px,calc(1.0714vw_+_19.143px),32px)] paper:!text-[2.5rem] !tracking-[-0.75px] paper:!tracking-[-0.03em] !text-stone-700 dark:!text-zinc-200 !mb-0 whitespace-pre-line"
+        className="!mt-0 !text-[clamp(26px,calc(2.6042vw_+_9.333px),36px)] sheet:!text-[2.5rem] !tracking-[-0.03em] !text-stone-700 dark:!text-zinc-200 !mb-0 whitespace-pre-line"
         style={{
           fontFamily: 'var(--font-crimson-pro), serif',
           lineHeight: '120%',

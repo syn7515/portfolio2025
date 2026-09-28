@@ -9,10 +9,13 @@ module.exports = {
     extend: {
       screens: {
         xs: '475px',
-        /* The width at which the paper becomes a floating sheet and the text sidebar appears.
+        /* The width at which the paper becomes a floating sheet. Kept in step with
+           SHEET_BREAKPOINT in src/lib/breakpoints.ts. */
+        sheet: '1024px',
+        /* The width at which the text sidebar appears and the sheet shifts right to make room.
            Kept in step with PAPER_BREAKPOINT in src/lib/breakpoints.ts, which explains the value
            and lists the other places it is written out. */
-        paper: '1200px',
+        paper: '1280px',
       },
       keyframes: {
         shimmer: {

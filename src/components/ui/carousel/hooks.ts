@@ -3,8 +3,8 @@ import { useState, useEffect } from "react";
 
 import {
   PAPER_BREAKPOINT,
-  SIDEBAR_SETTLED_BREAKPOINT,
-  sidebarWidthAt,
+  SHEET_BREAKPOINT,
+  paperWidthAt,
 } from "@/lib/breakpoints";
 
 export const FALLBACK_ITEMS = ["Dean", "Lil B", "Lazer", "Simz", "Bladee"];
@@ -245,6 +245,13 @@ export function calculateImagePosition(
 // clamp for a paper too narrow to hold the card at all.
 const CARD_EDGE_GAP = 48;
 
+// Where the card ramp sits at 720px. It predates the paper breakpoint moving to 1280, and is kept
+// here so card sizes from 1280 up are unchanged.
+const CARD_RAMP_START = 1200;
+
+// The widest a card gets. Mirrored by the clamp in --carousel-card-w (globals.css).
+const CARD_MAX_WIDTH = 880;
+
 export function useResponsiveSizing(
   explicitWidth?: number,
   explicitHeight?: number,
@@ -288,25 +295,23 @@ export function useResponsiveSizing(
         );
         const height = Math.round((width * 9) / 16);
         setSize({ cardWidth: width, cardHeight: height, gap: 12 });
-      } else if (w < 1024) {
+      } else if (w < SHEET_BREAKPOINT) {
         const width = 640;
         const height = 360;
         setSize({ cardWidth: width, cardHeight: height, gap: 16 });
-      } else if (w < PAPER_BREAKPOINT) {
-        setSize({ cardWidth: 840, cardHeight: 473, gap: 36 });
       } else {
-        // 0 where the paper first becomes a sheet → 1 once --sidebar-w has stopped growing.
-        const t = Math.min(
-          1,
-          (w - PAPER_BREAKPOINT) / (SIDEBAR_SETTLED_BREAKPOINT - PAPER_BREAKPOINT)
+        // A ramp anchored at 720px at 1200, rising 0.8px per px of viewport to CARD_MAX_WIDTH at
+        // 1400px, and held at its 1280px value (784px) across the sheet band so the card keeps its
+        // place on the sheet as it slides. --carousel-card-w in globals.css mirrors this.
+        const rampW = Math.max(w, PAPER_BREAKPOINT);
+        const idealWidth = Math.round(
+          Math.min(CARD_MAX_WIDTH, 720 + (rampW - CARD_RAMP_START) * 0.8)
         );
-        const idealWidth = Math.round(720 + t * 240); // 720px → 960px
         // Cards centre on the column they sit in, which already rides --paper-center-offset and is
         // therefore far enough from the paper's left edge — nothing to shift here. Only shrink if
         // the paper itself is too narrow to hold the card with its gaps (defensive — doesn't
         // happen at these breakpoints).
-        const sidebarW = sidebarWidthAt(w);
-        const cardWidth = Math.min(idealWidth, Math.floor(w - sidebarW - CARD_EDGE_GAP * 2));
+        const cardWidth = Math.min(idealWidth, Math.floor(paperWidthAt(w) - CARD_EDGE_GAP * 2));
         const cardHeight = Math.round(cardWidth * 9 / 16);
         setSize({ cardWidth, cardHeight, gap: 40 });
       }

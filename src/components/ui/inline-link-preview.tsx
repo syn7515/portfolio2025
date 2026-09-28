@@ -4,14 +4,17 @@ import type { ReactNode } from 'react'
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { PAPER_BREAKPOINT } from '@/lib/breakpoints'
+import { SHEET_BREAKPOINT } from '@/lib/breakpoints'
 import { cn } from '@/lib/utils'
 import { DescriptionBackdrop } from '@/components/ui/description-backdrop'
 import ExternalArrow from '@/components/ui/external-arrow'
 
 const HOVER_DELAY_MS = 150
-// The rail lives in the margin the floating paper leaves, so it exists exactly where the paper does.
-const SIDE_RAIL_BREAKPOINT = PAPER_BREAKPOINT
+// The rail lives in the room the floating sheet leaves right of the column, so it exists exactly
+// where the sheet does. Across the sheet band that room narrows with the sheet, and below ~1065px
+// it drops under SIDE_RAIL_MIN_WIDTH on a case study, where the preview falls back to its local
+// placement.
+const SIDE_RAIL_BREAKPOINT = SHEET_BREAKPOINT
 const SIDE_RAIL_GAP = 32
 const SIDE_RAIL_MAX_WIDTH = 320
 const VIEWPORT_EDGE_GAP = 24
@@ -73,7 +76,10 @@ export function InlineLinkPreview({
       const boundary = anchor.closest('[data-inline-link-preview-boundary]') as HTMLElement | null
       if (boundary) {
         const left = boundary.getBoundingClientRect().right + SIDE_RAIL_GAP
-        const width = Math.min(SIDE_RAIL_MAX_WIDTH, window.innerWidth - left - VIEWPORT_EDGE_GAP)
+        // The rail stays on the sheet: on wide screens its right edge comes in from the viewport's.
+        const paper = anchor.closest('.paper-grid-bottom')
+        const rightEdge = Math.min(window.innerWidth, paper?.getBoundingClientRect().right ?? Infinity)
+        const width = Math.min(SIDE_RAIL_MAX_WIDTH, rightEdge - left - VIEWPORT_EDGE_GAP)
 
         if (width >= SIDE_RAIL_MIN_WIDTH) {
           // Clamped against the viewport once, then stored in document space.
