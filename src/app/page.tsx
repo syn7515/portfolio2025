@@ -299,18 +299,18 @@ export default function Home() {
 
             No margin on the mark itself: this wrapper carries the offset from the list, and the
             footer's own top padding provides the space below. */}
-        <div className="hidden max-w-[var(--content-w)] mx-auto w-full mt-8 sm:mt-12 lg:mt-14 sm:block">
+        <div className="hidden max-w-[var(--content-w)] mx-auto w-full mt-8 sm:mt-10 lg:mt-12 sm:block">
           <Dinkus className={riseClass.trim()} style={riseDelay(DELAY.endMark)} />
         </div>
 
-        {/* The phone's gap between the project list and the footer, standing in for the `sm:pt-20`
+        {/* The phone's gap between the project list and the footer, standing in for the `sm:pt-18`
             the footer carries from 640px up. A plain 96px spacer: the column is centred as a whole
             below 1024px, so there is no spare height here to absorb — the block that used to grow
             into it is the centring itself. */}
         <div className="min-h-24 sm:hidden" aria-hidden />
 
         <div
-          className={`w-full max-w-[var(--content-w)] mx-auto sheet:mt-auto sm:pt-20 lg:pt-24 ${riseClass.trim()}`}
+          className={`w-full max-w-[var(--content-w)] mx-auto sheet:mt-auto sm:pt-18 lg:pt-22 ${riseClass.trim()}`}
           style={riseDelay(DELAY.footer)}
         >
           {/* One baseline row at every width: socials left, copyright right. They sit in DOM order,
