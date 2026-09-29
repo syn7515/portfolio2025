@@ -252,6 +252,11 @@ const CARD_RAMP_START = 1200;
 // The widest a card gets. Mirrored by the clamp in --carousel-card-w (globals.css).
 const CARD_MAX_WIDTH = 880;
 
+// Below the sheet, how far a card keeps from the viewport's edges: the compact rail from 820px
+// sits 24px in with a 56px hit area, so its reach ends at 80px; 8px past that keeps the two apart.
+// Mirrored by the md: fallback width in label_indicator_carousel.jsx.
+const RAIL_CLEARANCE = 88;
+
 export function useResponsiveSizing(
   explicitWidth?: number,
   explicitHeight?: number,
@@ -296,8 +301,11 @@ export function useResponsiveSizing(
         const height = Math.round((width * 9) / 16);
         setSize({ cardWidth: width, cardHeight: height, gap: 12 });
       } else if (w < SHEET_BREAKPOINT) {
-        const width = 640;
-        const height = 360;
+        // Grows with the viewport while keeping RAIL_CLEARANCE from each edge, from 640px (~816px)
+        // up to the sheet band's 784px (by 960px), so the card is the same size either side of
+        // 1024 and only its position changes when the sheet arrives.
+        const width = Math.min(784, Math.max(640, w - RAIL_CLEARANCE * 2));
+        const height = Math.round((width * 9) / 16);
         setSize({ cardWidth: width, cardHeight: height, gap: 16 });
       } else {
         // A ramp anchored at 720px at 1200, rising 0.8px per px of viewport to CARD_MAX_WIDTH at

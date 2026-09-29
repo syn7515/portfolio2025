@@ -468,8 +468,10 @@ export default function LabelIndicatorCarousel({
         >
           {normalized.map((item, i) => (
             <div key={i} data-carousel-item={i} className="w-full flex flex-col items-center px-4">
+              {/* The class widths hold the card until useResponsiveSizing (carousel/hooks.ts) has
+                  measured, and follow its sizes so the card doesn't jump when it takes over. */}
               <div
-                className="w-full max-w-[calc(100vw-40px)] sm:max-w-[640px] md:max-w-[640px] lg:max-w-[840px] min-[1280px]:max-w-[960px]"
+                className="w-full max-w-[calc(100vw-40px)] sm:max-w-[640px] md:max-w-[clamp(640px,calc(100vw-176px),784px)] lg:max-w-[784px] min-[1280px]:max-w-[var(--carousel-card-w)]"
                 style={effWidth > 0 ? { maxWidth: effWidth } : undefined}
               >
                 <CarouselCard
