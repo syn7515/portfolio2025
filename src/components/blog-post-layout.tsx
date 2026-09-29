@@ -438,12 +438,17 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                       styles.contentBlurRevealItem
                     )}
                   >
+                    {/* Below 640px each link is just its one-line label, a 21px-tall target. Each
+                        carries py-3 there, cancelled by an equal negative margin, which takes the
+                        target to 45px without moving the label or the rows around it — the same
+                        trade the home footer's social links make. From 640px the description
+                        joins the link and makes the target tall enough on its own. */}
                     <div className="flex justify-between items-start gap-8">
                       {/* Previous Project */}
                       {previousProject ? (
                         <Link
                           href={`/${previousProject.slug}`}
-                          className="flex-1 group cursor-pointer"
+                          className="flex-1 group cursor-pointer py-3 -my-3 sm:py-0 sm:my-0"
                           style={{ textDecoration: 'none' }}
                           onClick={(event) => handleProjectNavigation(
                             event,
@@ -477,7 +482,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                       {nextProject ? (
                         <Link
                           href={`/${nextProject.slug}`}
-                          className="flex-1 text-right group cursor-pointer"
+                          className="flex-1 text-right group cursor-pointer py-3 -my-3 sm:py-0 sm:my-0"
                           style={{ textDecoration: 'none' }}
                           onClick={(event) => handleProjectNavigation(
                             event,
