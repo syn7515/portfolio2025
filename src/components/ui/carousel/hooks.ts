@@ -306,7 +306,11 @@ export function useResponsiveSizing(
         // 1024 and only its position changes when the sheet arrives.
         const width = Math.min(784, Math.max(640, w - RAIL_CLEARANCE * 2));
         const height = Math.round((width * 9) / 16);
-        setSize({ cardWidth: width, cardHeight: height, gap: 16 });
+        // The stack's row gap is twice this. It grows with the card, from 28px (the 56px row gap
+        // every card up to 640px gets) to the sheet band's 40px (80px) at 784px, so the spacing
+        // keeps pace with the cards rather than tightening as they widen.
+        const gap = Math.round(28 + ((width - 640) / (784 - 640)) * 12);
+        setSize({ cardWidth: width, cardHeight: height, gap });
       } else {
         // A ramp anchored at 720px at 1200, rising 0.8px per px of viewport to CARD_MAX_WIDTH at
         // 1400px, and held at its 1280px value (784px) across the sheet band so the card keeps its
