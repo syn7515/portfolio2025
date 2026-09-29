@@ -347,11 +347,25 @@ export function useResponsiveSizing(
 const LIGHTBOX_OUTER_PADDING = 16;
 const LIGHTBOX_BUTTON_DIAMETER = 48;
 
-export function getLightboxMaxWidth(viewportWidth: number): number {
-  const isLgOrAbove = viewportWidth >= 1024;
-  const buttonGap = isLgOrAbove ? 16 : 4;
-  const reserved = (LIGHTBOX_OUTER_PADDING + buttonGap + LIGHTBOX_BUTTON_DIAMETER) * 2;
-  return Math.min(1280, viewportWidth - reserved);
+// Below this width the lightbox drops its prev/next buttons (lightbox.tsx) and gives their room to
+// the media: at 136px they left it no bigger than the card it opened from. Tapping either half of
+// the media still steps through, as do the arrow keys. 820 is where the site's compact layout ends
+// (hamburger below, rail above); the lightbox itself only opens from 768.
+export const LIGHTBOX_NAV_BREAKPOINT = 820;
+
+// Room kept above and below the media: the outer padding, then the caption under it — a 16px gap
+// and one line of text-sm. The media is centred, so the caption's share is kept on both sides.
+const LIGHTBOX_VERTICAL_RESERVE = (LIGHTBOX_OUTER_PADDING + 16 + 24) * 2;
+
+export function getLightboxMaxWidth(viewportWidth: number, viewportHeight = Infinity): number {
+  const reservedX =
+    viewportWidth < LIGHTBOX_NAV_BREAKPOINT
+      ? LIGHTBOX_OUTER_PADDING * 2
+      : (LIGHTBOX_OUTER_PADDING + (viewportWidth >= 1024 ? 16 : 4) + LIGHTBOX_BUTTON_DIAMETER) * 2;
+  // The frame is 16:9 off this width, so it is held to the height too: on a short viewport — a
+  // phone on its side — width alone would push the frame and its caption off the screen.
+  const heightBound = ((viewportHeight - LIGHTBOX_VERTICAL_RESERVE) * 16) / 9;
+  return Math.max(0, Math.min(1280, viewportWidth - reservedX, heightBound));
 }
 
 export function useLightboxDimensions() {
@@ -361,8 +375,7 @@ export function useLightboxDimensions() {
     if (typeof window === "undefined") return;
 
     const handleResize = () => {
-      const viewportWidth = window.innerWidth;
-      const containerWidth = getLightboxMaxWidth(viewportWidth);
+      const containerWidth = getLightboxMaxWidth(window.innerWidth, window.innerHeight);
       const containerHeight = (containerWidth * 9) / 16;
 
       setDimensions({ width: containerWidth, height: containerHeight });

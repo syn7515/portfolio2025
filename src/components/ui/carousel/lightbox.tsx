@@ -474,11 +474,13 @@ export function Lightbox({
                 );
               })()}
 
-              {/* Prev/Next buttons - only when more than one item */}
+              {/* Prev/Next buttons - only when more than one item, and only from
+                  LIGHTBOX_NAV_BREAKPOINT (820px) up: below it the media takes their room and the
+                  halves of the media do the stepping. */}
               {!exitTransform && normalizedItems.length > 1 && (
                 <>
                   <div
-                    className="absolute z-20 pointer-events-none"
+                    className="absolute z-20 pointer-events-none max-[820px]:hidden"
                     style={{
                       left: `calc(50% - ${dimensions.width / 2}px - ${isLgOrAbove ? 16 : 4}px)`,
                       top: '50%',
@@ -503,7 +505,7 @@ export function Lightbox({
                     </button>
                   </div>
                   <div
-                    className="absolute z-20 pointer-events-none"
+                    className="absolute z-20 pointer-events-none max-[820px]:hidden"
                     style={{
                       left: `calc(50% + ${dimensions.width / 2}px + ${isLgOrAbove ? 16 : 4}px)`,
                       top: '50%',

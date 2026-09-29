@@ -168,7 +168,7 @@ export default function LabelIndicatorCarousel({
     
     if (hasPositionedMedia) {
       // For positioned images, animate the container size
-      const maxFinalWidth = getLightboxMaxWidth(viewportWidth);
+      const maxFinalWidth = getLightboxMaxWidth(viewportWidth, viewportHeight);
       // Calculate dimensions to maintain 16:9 aspect ratio
       const finalWidth = maxFinalWidth;
       const finalHeight = finalWidth * 9 / 16;
@@ -187,9 +187,9 @@ export default function LabelIndicatorCarousel({
 
     // Calculate scale factors
     // Final size: max-w-7xl (1280px), reserving space for the prev/next buttons
-    const maxFinalWidth = getLightboxMaxWidth(viewportWidth);
+    const maxFinalWidth = getLightboxMaxWidth(viewportWidth, viewportHeight);
 
-    // Width is always the limiting factor (no height constraint)
+    // The width already carries the height limit (getLightboxMaxWidth)
     const finalRenderedWidth = maxFinalWidth;
     const finalRenderedHeight = finalRenderedWidth / mediaAspectRatio;
     
