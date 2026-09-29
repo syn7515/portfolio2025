@@ -214,7 +214,7 @@ export default function Home() {
         </div>
 
         <div className="max-w-[var(--content-w)] mx-auto w-full mt-12 sm:mt-14 lg:mt-16">
-          <div className="flex flex-col gap-2 sm:gap-1">
+          <div className="flex flex-col gap-2 sm:gap-0.5">
             <ProjectListItem
               title="Robot Interface for Collaboration in Kitchen"
               dates="2026 – Ongoing"
@@ -248,7 +248,7 @@ export default function Home() {
               measure did around the dinkus this replaced.
 
               The two widths need different numbers because the list around the rule changes shape.
-              On desktop each row is one 41px line and rows sit 4px apart, so 16px a side (a 33px
+              On desktop each row is one 41px line and rows sit 2px apart, so 16px a side (a 33px
               block) is the smallest gap that still separates. On a phone the rows stack date over
               title, growing to 60px and 8px apart, and the same 16px read as a hole in a column of
               much taller items — 12px a side (25px) keeps the break proportional to what surrounds
@@ -275,10 +275,10 @@ export default function Home() {
               title; on phones it stacks above the title in the same place every case study shows a
               year, so it leads with the year instead.
 
-              Carries the same `gap-2 sm:gap-1` as the case-study list above even though it holds a
+              Carries the same `gap-2 sm:gap-0.5` as the case-study list above even though it holds a
               single row today: without it a second personal project would sit 16px from the first
               (the two rows' own py-2 and nothing else) against the 24px every other pair uses. */}
-          <div className="flex flex-col gap-2 sm:gap-1">
+          <div className="flex flex-col gap-2 sm:gap-0.5">
             <ProjectListItem
               title="Been There — Every Place, Stitched"
               dates="Personal, 2026"
