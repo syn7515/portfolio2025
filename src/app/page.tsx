@@ -191,7 +191,7 @@ export default function Home() {
             </h1>
           </div>
           {/* Right column: bio + social links */}
-          <div className="mt-12 flex flex-col gap-5 md:mt-14 lg:mt-16">
+          <div className="mt-14 flex flex-col gap-5 md:mt-16 lg:mt-18">
             <p
               className={`${styles.introParagraph} !text-stone-500 dark:!text-zinc-400 !mb-0${riseClass}`}
               style={riseDelay(DELAY.bioFirst)}
@@ -213,7 +213,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="max-w-[var(--content-w)] mx-auto w-full mt-12 sm:mt-14 lg:mt-16">
+        <div className="max-w-[var(--content-w)] mx-auto w-full mt-10 sm:mt-12 lg:mt-14">
           <div className="flex flex-col gap-2 sm:gap-0.5">
             <ProjectListItem
               title="Robot Interface for Collaboration in Kitchen"
