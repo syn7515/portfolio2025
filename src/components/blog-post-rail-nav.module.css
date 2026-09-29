@@ -137,8 +137,8 @@
 
 @media (prefers-color-scheme: dark) {
     .tick {
-        background-color: rgb(63 63 70);
-        /* zinc-700 */
+        background-color: rgb(82 82 91);
+        /* zinc-600 */
     }
 
     .tickActive {
