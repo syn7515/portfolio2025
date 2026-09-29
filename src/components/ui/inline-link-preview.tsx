@@ -181,7 +181,10 @@ export function InlineLinkPreview({
             className="pointer-events-auto absolute inset-x-[-4px] inset-y-[-5px]"
           />
           {children}
-          <ExternalArrow />
+          {/* No lead-in padding here, unlike the project list's serif titles. These links are Inter
+              italic, whose last glyph already leans toward the raised arrow, and the arrow's own
+              ~1.2px side bearing is gap enough — the extra 2px left it floating off the word. */}
+          <ExternalArrow className="pl-0" />
         </a>
 
         {explanation && <span id={descriptionId} className="sr-only">{explanation}</span>}
