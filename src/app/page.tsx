@@ -298,19 +298,26 @@ export default function Home() {
             here the list is short enough that the footer follows close behind and does that job.
 
             No margin on the mark itself: this wrapper carries the offset from the list, and the
-            footer's own top padding provides the space below. */}
+            footer's own top padding provides the space below.
+
+            The two are set so the mark sits optically midway, measured ink to ink: from the last
+            row's baseline down to the asterisks, and from the asterisks down to the footer's cap
+            height. Above, the gap is this margin plus 19.6px (the asterisk's ink hangs well below
+            the top of its line box); below, it is the footer's padding plus 10.4px (the air over
+            its capitals). So the padding is this margin plus 9px: 40/49px, then 48/57px from lg,
+            which leaves 59.6/59.4px and 67.6/67.4px either side. */}
         <div className="hidden max-w-[var(--content-w)] mx-auto w-full mt-8 sm:mt-10 lg:mt-12 sm:block">
           <Dinkus className={riseClass.trim()} style={riseDelay(DELAY.endMark)} />
         </div>
 
-        {/* The phone's gap between the project list and the footer, standing in for the `sm:pt-18`
+        {/* The phone's gap between the project list and the footer, standing in for the `sm:pt-[49px]`
             the footer carries from 640px up. A plain 96px spacer: the column is centred as a whole
             below 1024px, so there is no spare height here to absorb — the block that used to grow
             into it is the centring itself. */}
         <div className="min-h-24 sm:hidden" aria-hidden />
 
         <div
-          className={`w-full max-w-[var(--content-w)] mx-auto sheet:mt-auto sm:pt-18 lg:pt-22 ${riseClass.trim()}`}
+          className={`w-full max-w-[var(--content-w)] mx-auto sheet:mt-auto sm:pt-[49px] lg:pt-[57px] ${riseClass.trim()}`}
           style={riseDelay(DELAY.footer)}
         >
           {/* One baseline row at every width: socials left, copyright right. They sit in DOM order,
