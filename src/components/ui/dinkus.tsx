@@ -43,7 +43,7 @@ export default function Dinkus({ className, style }: DinkusProps) {
       {[0, 1, 2].map(i => (
         <span
           key={i}
-          className="text-stone-400 dark:text-zinc-600 select-none"
+          className="text-stone-400 dark:text-zinc-500 select-none"
           style={DINKUS_STYLE}
         >
           *
