@@ -191,7 +191,10 @@ export default function Home() {
             </h1>
           </div>
           {/* Right column: bio + social links */}
-          <div className="mt-14 flex flex-col gap-5 md:mt-16 lg:mt-18">
+          {/* Steps at 640 and 1024 with the rest of the column's spacing. It used to step at 768
+              instead, which left one extra narrowing of the gap partway between the phone and
+              the sheet. */}
+          <div className="mt-14 flex flex-col gap-5 sm:mt-16 lg:mt-18">
             <p
               className={`${styles.introParagraph} !text-stone-500 dark:!text-zinc-400 !mb-0${riseClass}`}
               style={riseDelay(DELAY.bioFirst)}
