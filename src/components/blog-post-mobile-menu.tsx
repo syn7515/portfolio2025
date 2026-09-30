@@ -107,10 +107,14 @@ export default function BlogPostMobileMenu() {
 
   return (
     <div className="min-[820px]:hidden">
-      {/* Blurred full-viewport overlay */}
+      {/* Blurred full-viewport overlay. The links form one full-width band across its middle; a tap
+          on the scrim above or below that band closes the menu. */}
       <div
         id="mobile-menu"
         aria-hidden={!menuOpen}
+        onClick={(e) => {
+          if (e.target === e.currentTarget && !leaving) setOpen(false)
+        }}
         className={cn(
           'fixed inset-0 z-[65] flex items-center justify-center transition-[opacity,visibility,background-color] duration-250 ease-out motion-reduce:transition-none',
           menuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'
@@ -126,7 +130,7 @@ export default function BlogPostMobileMenu() {
         <nav
           aria-label="Mobile"
           className={cn(
-            'flex flex-col items-center gap-5 text-center transition-[opacity,filter] duration-250 ease-out',
+            'flex w-full flex-col text-center transition-[opacity,filter] duration-250 ease-out',
             leaving && 'opacity-0 blur-[3px] pointer-events-none'
           )}
         >
@@ -139,8 +143,12 @@ export default function BlogPostMobileMenu() {
                 onClick={(e) => handleLinkClick(e, item.href, isCurrent)}
                 aria-current={isCurrent ? 'page' : undefined}
                 data-mobile-menu-current={isCurrent ? '' : undefined}
+                // Each row spans the viewport and carries half the old 20px gap on top of its own
+                // 4px padding, so the rows meet with no dead strip between them while each label
+                // sits exactly where it did. The grey tap flash is off because across a full-width
+                // row it reads as a slab; the label's colour change is the press feedback.
                 className={cn(
-                  'text-[20px] font-[460] tracking-[-0.01em] !not-italic transition-colors duration-300 ease-out px-3 py-1 rounded',
+                  'block w-full py-[14px] text-[20px] font-[460] tracking-[-0.01em] !not-italic transition-colors duration-300 ease-out [-webkit-tap-highlight-color:transparent]',
                   isCurrent
                     ? '!text-stone-700 dark:!text-zinc-200'
                     : '!text-stone-500 dark:!text-zinc-400 !no-underline hover:!text-rose-700 active:!text-rose-700 dark:hover:!text-rose-200 dark:active:!text-rose-200'
