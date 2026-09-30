@@ -656,8 +656,7 @@ pre code {
 }
 
 .prose a:is(:hover, :focus-visible) {
-  color: rgb(190 18 60);
-  /* rose-700 */
+  color: var(--color-rose-700);
 }
 
 /* Dark mode styles */
@@ -685,8 +684,7 @@ pre code {
   }
 
   a:is(:hover, :focus-visible) {
-    color: rgb(254 205 211);
-    /* rose-200 */
+    color: var(--color-rose-400);
   }
 
   ul, ol {
@@ -724,8 +722,7 @@ pre code {
   }
 
   .prose a:is(:hover, :focus-visible) {
-    color: rgb(254 205 211);
-    /* rose-200 */
+    color: var(--color-rose-400);
   }
 }
 
@@ -834,9 +831,8 @@ a[data-mobile-menu-current] {
   }
 
   .intro-link:is(:hover, :focus-visible) {
-    color: rgb(254 205 211) !important;
-    /* rose-200 */
-    text-decoration-color: rgb(254 205 211) !important;
+    color: var(--intro-trigger-decoration-hover) !important;
+    text-decoration-color: var(--intro-trigger-decoration-hover) !important;
     opacity: 1;
   }
 

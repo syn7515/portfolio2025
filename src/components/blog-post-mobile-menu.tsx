@@ -151,7 +151,7 @@ export default function BlogPostMobileMenu() {
                   'block w-full py-[14px] text-[20px] font-[460] tracking-[-0.01em] !not-italic transition-colors duration-300 ease-out [-webkit-tap-highlight-color:transparent]',
                   isCurrent
                     ? '!text-stone-700 dark:!text-zinc-200'
-                    : '!text-stone-500 dark:!text-zinc-400 !no-underline hover:!text-rose-700 active:!text-rose-700 dark:hover:!text-rose-200 dark:active:!text-rose-200'
+                    : '!text-stone-500 dark:!text-zinc-400 !no-underline hover:!text-rose-700 active:!text-rose-700 dark:hover:!text-rose-400 dark:active:!text-rose-400'
                 )}
                 tabIndex={menuOpen ? undefined : -1}
               >
