@@ -217,7 +217,7 @@ export default function Home() {
         </div>
 
         <div className="max-w-[var(--content-w)] mx-auto w-full mt-10 sm:mt-12 lg:mt-14">
-          <div className="flex flex-col gap-2 sm:gap-0.5">
+          <div className="flex flex-col gap-0 sm:gap-0.5">
             <ProjectListItem
               title="Robot Interface for Collaboration in Kitchen"
               dates="2026 – Ongoing"
@@ -278,10 +278,11 @@ export default function Home() {
               title; on phones it stacks above the title in the same place every case study shows a
               year, so it leads with the year instead.
 
-              Carries the same `gap-2 sm:gap-0.5` as the case-study list above even though it holds a
+              Carries the same `gap-0 sm:gap-0.5` as the case-study list above even though it holds a
               single row today: without it a second personal project would sit 16px from the first
-              (the two rows' own py-2 and nothing else) against the 24px every other pair uses. */}
-          <div className="flex flex-col gap-2 sm:gap-0.5">
+              (the two rows' own py-2 and nothing else) against the 18px every other pair uses from
+              640px. */}
+          <div className="flex flex-col gap-0 sm:gap-0.5">
             <ProjectListItem
               title="Been There — Every Place, Stitched"
               dates="Personal, 2026"
@@ -307,20 +308,20 @@ export default function Home() {
             row's baseline down to the asterisks, and from the asterisks down to the footer's cap
             height. Above, the gap is this margin plus 19.6px (the asterisk's ink hangs well below
             the top of its line box); below, it is the footer's padding plus 10.4px (the air over
-            its capitals). So the padding is this margin plus 9px: 40/49px, then 48/57px from lg,
-            which leaves 59.6/59.4px and 67.6/67.4px either side. */}
-        <div className="hidden max-w-[var(--content-w)] mx-auto w-full mt-8 sm:mt-10 lg:mt-12 sm:block">
+            its capitals). So the padding is this margin plus 9px: 32/41px, then 48/57px from lg,
+            which leaves 51.6/51.4px and 67.6/67.4px either side. */}
+        <div className="hidden max-w-[var(--content-w)] mx-auto w-full mt-8 lg:mt-12 sm:block">
           <Dinkus className={riseClass.trim()} style={riseDelay(DELAY.endMark)} />
         </div>
 
-        {/* The phone's gap between the project list and the footer, standing in for the `sm:pt-[49px]`
-            the footer carries from 640px up. A plain 96px spacer: the column is centred as a whole
+        {/* The phone's gap between the project list and the footer, standing in for the `sm:pt-[41px]`
+            the footer carries from 640px up. A plain 64px spacer: the column is centred as a whole
             below 1024px, so there is no spare height here to absorb — the block that used to grow
             into it is the centring itself. */}
-        <div className="min-h-24 sm:hidden" aria-hidden />
+        <div className="min-h-16 sm:hidden" aria-hidden />
 
         <div
-          className={`w-full max-w-[var(--content-w)] mx-auto sheet:mt-auto sm:pt-[49px] lg:pt-[57px] ${riseClass.trim()}`}
+          className={`w-full max-w-[var(--content-w)] mx-auto sheet:mt-auto sm:pt-[41px] lg:pt-[57px] ${riseClass.trim()}`}
           style={riseDelay(DELAY.footer)}
         >
           {/* One baseline row at every width: socials left, copyright right. They sit in DOM order,
