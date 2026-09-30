@@ -459,10 +459,10 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                           <div className="text-[14px] text-stone-500 dark:text-zinc-400 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 transition-colors duration-150 font-[400] sm:font-normal not-italic mb-0 sm:mb-1.5 opacity-80 font-sans">
                             <span className="relative inline-flex items-center -translate-x-3 sm:translate-x-0">
                               <ChevronLeft
-                                className="absolute left-0 size-4 sm:size-3.5 text-stone-400 dark:text-zinc-500 opacity-100 sm:opacity-0 blur-none sm:blur-[1px] motion-safe:transition-[opacity,filter] motion-safe:duration-300 motion-safe:ease-out sm:group-hover:opacity-100 sm:group-hover:blur-none sm:group-active:opacity-100 sm:group-active:blur-none sm:group-focus-visible:opacity-100 sm:group-focus-visible:blur-none motion-reduce:opacity-100 motion-reduce:blur-none"
+                                className="absolute left-0 sm:-left-4 size-4 sm:size-3.5 text-stone-400 dark:text-zinc-500 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 opacity-100 sm:opacity-0 blur-none sm:blur-[1px] sm:translate-x-1 transition-colors duration-150 motion-safe:transition-[color,opacity,filter,translate] motion-safe:duration-[150ms,300ms,300ms,300ms] motion-safe:ease-out sm:group-hover:opacity-100 sm:group-hover:blur-none sm:group-hover:translate-x-0 sm:group-active:opacity-100 sm:group-active:blur-none sm:group-active:translate-x-0 sm:group-focus-visible:opacity-100 sm:group-focus-visible:blur-none sm:group-focus-visible:translate-x-0 sm:motion-reduce:opacity-100 sm:motion-reduce:blur-none sm:motion-reduce:translate-x-0"
                                 aria-hidden
                               />
-                              <span className="relative z-10 translate-x-5 sm:translate-x-0 motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out sm:group-hover:translate-x-4 sm:group-active:translate-x-4 sm:group-focus-visible:translate-x-4 sm:motion-reduce:translate-x-4">
+                              <span className="relative z-10 translate-x-5 sm:translate-x-0">
                                 Previous
                               </span>
                             </span>
@@ -493,10 +493,10 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                           <div className="text-[14px] text-stone-500 dark:text-zinc-400 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 transition-colors duration-150 font-[400] sm:font-normal not-italic mb-0 sm:mb-1.5 opacity-80 font-sans">
                             <span className="relative inline-flex items-center justify-end translate-x-3 sm:translate-x-0">
                               <ChevronRight
-                                className="absolute right-0 size-4 sm:size-3.5 text-stone-400 dark:text-zinc-500 opacity-100 sm:opacity-0 blur-none sm:blur-[1px] motion-safe:transition-[opacity,filter] motion-safe:duration-300 motion-safe:ease-out sm:group-hover:opacity-100 sm:group-hover:blur-none sm:group-active:opacity-100 sm:group-active:blur-none sm:group-focus-visible:opacity-100 sm:group-focus-visible:blur-none motion-reduce:opacity-100 motion-reduce:blur-none"
+                                className="absolute right-0 sm:-right-4 size-4 sm:size-3.5 text-stone-400 dark:text-zinc-500 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 opacity-100 sm:opacity-0 blur-none sm:blur-[1px] sm:-translate-x-1 transition-colors duration-150 motion-safe:transition-[color,opacity,filter,translate] motion-safe:duration-[150ms,300ms,300ms,300ms] motion-safe:ease-out sm:group-hover:opacity-100 sm:group-hover:blur-none sm:group-hover:translate-x-0 sm:group-active:opacity-100 sm:group-active:blur-none sm:group-active:translate-x-0 sm:group-focus-visible:opacity-100 sm:group-focus-visible:blur-none sm:group-focus-visible:translate-x-0 sm:motion-reduce:opacity-100 sm:motion-reduce:blur-none sm:motion-reduce:translate-x-0"
                                 aria-hidden
                               />
-                              <span className="relative z-10 -translate-x-5 sm:translate-x-0 motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out sm:group-hover:-translate-x-4 sm:group-active:-translate-x-4 sm:group-focus-visible:-translate-x-4 sm:motion-reduce:-translate-x-4">
+                              <span className="relative z-10 -translate-x-5 sm:translate-x-0">
                                 Next
                               </span>
                             </span>
