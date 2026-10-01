@@ -9,14 +9,9 @@ import { trackCaseStudyOpen, trackOutboundClick } from '@/lib/analytics';
 interface ProjectListItemProps {
   title: string;
   // The right-hand column carries whatever context the row needs, not strictly a date: case studies
-  // use their year range, personal work names its category ("Personal, 2026"). On phones this column
-  // renders above the title, so a category reads there as an eyebrow.
+  // use their year, personal work names its category ("Personal, 2026"). On phones it trails the
+  // title inline instead of sitting in its own column.
   dates: string;
-  // Phone-only wording for that same column. On phones it stacks above the title, where it lines up
-  // under the year every case-study row leads with, so a label that opens with a category on desktop
-  // ("Personal, 2026") is given here with the year first ("2026, Personal") to keep that column
-  // reading as a date. Falls back to `dates` when a row has nothing to vary.
-  datesMobile?: string;
   href: string;
   // The home page's entrance is CSS-driven so it can run before hydration; these carry that
   // animation's class and its per-item delay rather than a Framer transition.
@@ -45,7 +40,6 @@ const linkStyle: CSSProperties = { textDecoration: 'none' };
 export default function ProjectListItem({
   title,
   dates,
-  datesMobile,
   href,
   className,
   style,
@@ -76,14 +70,23 @@ export default function ProjectListItem({
     trackOutboundClick(href, title);
   };
 
+  const lastSpace = title.lastIndexOf(' ');
+  const titleHead = title.slice(0, lastSpace + 1);
+  const titleTail = title.slice(lastSpace + 1);
+
   const icon = isExternal ? <ExternalArrow className={externalIconClassName} /> : null;
 
   const content = (
     <>
-      {/* Mobile: dates lead into the title on separate lines, with no divider. */}
-      <div className="flex sm:hidden flex-col gap-0 not-italic">
-        <span className={datesClassName}>{datesMobile ?? dates}</span>
-        <span className={titleClassName} style={titleStyle}>{title}{icon}</span>
+      {/* Mobile: dates trail the title inline with no divider. The title's last word, the arrow and
+          the dates sit in one nowrap run, so a wrap carries that word down with them instead of
+          stranding the dates (or the arrow) on a line of their own. */}
+      <div className="sm:hidden not-italic">
+        <span className={titleClassName} style={titleStyle}>{titleHead}</span>
+        <span className="whitespace-nowrap">
+          <span className={`${titleClassName} !text-nowrap`} style={titleStyle}>{titleTail}{icon}</span>
+          <span className={`${datesClassName} ml-2`}>{dates}</span>
+        </span>
       </div>
 
       {/* Desktop: title, dotted divider, and dates on a single row */}

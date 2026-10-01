@@ -217,7 +217,7 @@ export default function Home() {
         </div>
 
         <div className="max-w-[var(--content-w)] mx-auto w-full mt-10 sm:mt-12 lg:mt-14">
-          <div className="flex flex-col gap-2 sm:gap-0.5">
+          <div className="flex flex-col gap-0.5">
             <ProjectListItem
               title="Robot Interface for Collaboration in Kitchen"
               dates="2026"
@@ -282,11 +282,10 @@ export default function Home() {
               single row today, so a second personal project would get the same spacing as every other
               pair: 24px on phones, where each row stacks into two lines and needs more air between
               rows than the rows' own py-2 gives, and 18px from 640px. */}
-          <div className="flex flex-col gap-2 sm:gap-0.5">
+          <div className="flex flex-col gap-0.5">
             <ProjectListItem
               title="Been There — Every Place, Stitched"
               dates="Personal, 2026"
-              datesMobile="2026, Personal"
               href="https://been-there.suepark.xyz"
               className={riseClass.trim() || undefined}
               style={riseDelay(DELAY.projectPersonal)}
