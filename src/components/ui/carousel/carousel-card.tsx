@@ -4,7 +4,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { useState, useEffect, useRef } from "react";
 import { motion, type Transition } from "framer-motion";
-import { calculateImagePosition, useNearViewport, type CarouselItem } from "./hooks";
+import { calculateImagePosition, useIsCompact, useNearViewport, type CarouselItem } from "./hooks";
 import { GrillLines } from "./grill-lines";
 import { CARD_LIGHT_SHADOW } from "@/components/ui/card-shadow";
 import { renderCaptionWithBadges } from "@/components/ui/sup-caption-badge";
@@ -33,6 +33,7 @@ interface CarouselCardProps {
   hiddenCardIndex?: number | null;
   disableCursor?: boolean;
   forceActive?: boolean;
+  mobileAspect?: "16/9" | "4/3";
 }
 
 export function CarouselCard({
@@ -53,9 +54,13 @@ export function CarouselCard({
   transition,
   hiddenCardIndex,
   disableCursor = false,
-  forceActive = false
+  forceActive = false,
+  mobileAspect = "16/9"
 }: CarouselCardProps) {
-  const { label, caption, imageUrl, videoUrl, alt, imageSizePercent, imagePosition, videoAutoplay, videoLoop, videoMuted, videoControls, cardVariant, backgroundLines, fetchPriority, withInsetShadow } = item;
+  const { label, caption, imageUrl, videoUrl, alt, videoAutoplay, videoLoop, videoMuted, videoControls, cardVariant, backgroundLines, fetchPriority, withInsetShadow } = item;
+  const isCompact = useIsCompact();
+  const imageSizePercent = (isCompact ? item.mobileImageSizePercent : null) ?? item.imageSizePercent;
+  const imagePosition = (isCompact ? item.mobileImagePosition : null) ?? item.imagePosition;
   const hasMedia = !!(imageUrl || videoUrl);
   const [isMediaLoading, setIsMediaLoading] = useState(hasMedia);
   const [isHovered, setIsHovered] = useState(false);
@@ -141,7 +146,7 @@ export function CarouselCard({
         }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className={`group relative ${backgroundClass} transition-all duration-150 ${
+        className={`group relative ${mobileAspect === "4/3" ? "aspect-[4/3] sm:aspect-video" : "aspect-video"} ${backgroundClass} transition-all duration-150 ${
           disableCursor ? 'cursor-default'
             : isActive
             ? canOpenLightboxFromCard ? 'cursor-zoom-in' : 'cursor-default'
@@ -149,7 +154,6 @@ export function CarouselCard({
         } focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-600/60 dark:focus-visible:ring-rose-300/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background ${!disableCursor && !isActive ? 'hover:opacity-70' : ''}`}
         style={{
           width: "100%",
-          aspectRatio: '16/9',
           boxSizing: 'border-box',
           borderRadius: '4px',
           // eslint-disable-next-line @typescript-eslint/no-explicit-any

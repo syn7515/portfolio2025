@@ -79,6 +79,22 @@ export function useNearViewport(ref: RefObject<Element | null>): boolean {
   return isNear;
 }
 
+const COMPACT_QUERY = "(max-width: 639.98px)";
+
+// True below the sm breakpoint, where cards are 4:3. False on the server and first render; carousel
+// media is gated until it nears the viewport anyway, so nothing visibly jumps.
+export function useIsCompact(): boolean {
+  const [isCompact, setIsCompact] = useState(false);
+  useEffect(() => {
+    const mql = window.matchMedia(COMPACT_QUERY);
+    const update = () => setIsCompact(mql.matches);
+    update();
+    mql.addEventListener("change", update);
+    return () => mql.removeEventListener("change", update);
+  }, []);
+  return isCompact;
+}
+
 export type ImagePosition = {
   top?: number | "center";
   left?: number | "center";
@@ -94,6 +110,10 @@ export type CarouselItem = {
   alt: string;
   imageSizePercent: number | null;
   imagePosition: ImagePosition | null;
+  // Phone-only (<640px) overrides. The card turns 4:3 there, so the inset that frames a screenshot
+  // on a 16:9 card mostly wastes height; these let a card fill more of it. Unset falls back.
+  mobileImageSizePercent: number | null;
+  mobileImagePosition: ImagePosition | null;
   videoAutoplay: boolean;
   videoLoop: boolean;
   videoMuted: boolean;
@@ -116,6 +136,8 @@ const DEFAULT_ITEM: CarouselItem = {
   alt: "",
   imageSizePercent: null,
   imagePosition: null,
+  mobileImageSizePercent: null,
+  mobileImagePosition: null,
   videoAutoplay: true,
   videoLoop: true,
   videoMuted: true,
@@ -160,6 +182,12 @@ export function normalizeItem(item: Normalizable): CarouselItem {
             : null,
         imagePosition:
           (item.imagePosition as ImagePosition | null | undefined) ?? null,
+        mobileImageSizePercent:
+          typeof item.mobileImageSizePercent === "number"
+            ? item.mobileImageSizePercent
+            : null,
+        mobileImagePosition:
+          (item.mobileImagePosition as ImagePosition | null | undefined) ?? null,
         videoAutoplay:
           typeof item.videoAutoplay === "boolean"
             ? item.videoAutoplay
@@ -260,7 +288,8 @@ const RAIL_CLEARANCE = 88;
 export function useResponsiveSizing(
   explicitWidth?: number,
   explicitHeight?: number,
-  explicitGap?: number
+  explicitGap?: number,
+  mobileAspect: "16/9" | "4/3" = "16/9"
 ) {
   const [size, setSize] = useState(() => ({
     cardWidth: explicitWidth ?? 0,
@@ -290,8 +319,10 @@ export function useResponsiveSizing(
       );
 
       if (w < 640) {
+        // Carousels of portrait screens opt into 4:3 here — 16:9 at this width leaves them too
+        // short to read. Mirrored by the aspect classes on the card (carousel-card.tsx).
         const width = Math.max(120, w - 40);
-        const height = Math.round((width * 9) / 16);
+        const height = Math.round(mobileAspect === "4/3" ? (width * 3) / 4 : (width * 9) / 16);
         setSize({ cardWidth: width, cardHeight: height, gap: 8 });
       } else if (w < 768) {
         const width = Math.max(
@@ -334,7 +365,7 @@ export function useResponsiveSizing(
       window.addEventListener("resize", compute);
       return () => window.removeEventListener("resize", compute);
     }
-  }, [explicitWidth, explicitHeight, explicitGap]);
+  }, [explicitWidth, explicitHeight, explicitGap, mobileAspect]);
 
   return size;
 }

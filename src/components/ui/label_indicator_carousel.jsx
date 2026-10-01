@@ -51,6 +51,9 @@ export default function LabelIndicatorCarousel({
   openLightboxOnCardClick = true,
   // Sup navigation: maps supId (number) → cardIndex
   supCardMap,
+  // Card ratio below 640px. "4/3" suits portrait screens, which 16:9 leaves too short to read;
+  // landscape screenshots are width-bound there, so they stay 16:9.
+  mobileAspect = "16/9",
 } = {}) {
   const sourceItems = items ?? FALLBACK_ITEMS;
   const normalized = useMemo(() => sourceItems.map(normalizeItem), [sourceItems]);
@@ -211,7 +214,8 @@ export default function LabelIndicatorCarousel({
   const { cardWidth: effWidth, cardHeight: effHeight, gap: effGap } = useResponsiveSizing(
     cardWidth,
     cardHeight,
-    gap
+    gap,
+    mobileAspect
   );
 
   const setIndex = useCallback(
@@ -486,6 +490,7 @@ export default function LabelIndicatorCarousel({
                   openLightbox={openLightbox}
                   setIndex={setIndex}
                   forceActive={true}
+                  mobileAspect={mobileAspect}
                   cardRef={(el) => {
                     if (effectiveLightboxEnabled && (item.imageUrl || item.videoUrl)) {
                       cardRefs.current[i] = el;

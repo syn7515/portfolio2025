@@ -13,6 +13,8 @@ export type CarouselItem = string | {
   imageUrl?: string;
   imageSizePercent?: number;
   imagePosition?: ImagePosition;
+  mobileImageSizePercent?: number;
+  mobileImagePosition?: ImagePosition;
   withInsetShadow?: boolean;
 };
 
@@ -38,6 +40,7 @@ export interface LabelIndicatorCarouselProps {
   enableLightbox?: boolean;
   openLightboxOnCardClick?: boolean;
   supCardMap?: Record<number, number>;
+  mobileAspect?: '16/9' | '4/3';
 }
 
 declare const LabelIndicatorCarousel: React.FC<LabelIndicatorCarouselProps>;
