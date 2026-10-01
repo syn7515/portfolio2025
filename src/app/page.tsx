@@ -286,6 +286,7 @@ export default function Home() {
             <ProjectListItem
               title="Been There — Every Place, Stitched"
               dates="Personal, 2026"
+              datesMobile="2026"
               href="https://been-there.suepark.xyz"
               className={riseClass.trim() || undefined}
               style={riseDelay(DELAY.projectPersonal)}

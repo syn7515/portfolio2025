@@ -12,6 +12,10 @@ interface ProjectListItemProps {
   // use their year, personal work names its category ("Personal, 2026"). On phones it trails the
   // title inline instead of sitting in its own column.
   dates: string;
+  // Phone-only wording for that same column. There it trails the title inline, where a category
+  // would push the row onto a second line, so a personal row drops it and keeps just the year.
+  // Falls back to `dates`.
+  datesMobile?: string;
   href: string;
   // The home page's entrance is CSS-driven so it can run before hydration; these carry that
   // animation's class and its per-item delay rather than a Framer transition.
@@ -40,6 +44,7 @@ const linkStyle: CSSProperties = { textDecoration: 'none' };
 export default function ProjectListItem({
   title,
   dates,
+  datesMobile,
   href,
   className,
   style,
@@ -85,7 +90,7 @@ export default function ProjectListItem({
         <span className={titleClassName} style={titleStyle}>{titleHead}</span>
         <span className="whitespace-nowrap">
           <span className={`${titleClassName} !text-nowrap`} style={titleStyle}>{titleTail}{icon}</span>
-          <span className={`${datesClassName} ml-2`}>{dates}</span>
+          <span className={`${datesClassName} ml-2`}>{datesMobile ?? dates}</span>
         </span>
       </div>
 
