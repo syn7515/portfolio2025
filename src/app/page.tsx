@@ -220,14 +220,14 @@ export default function Home() {
           <div className="flex flex-col gap-2 sm:gap-0.5">
             <ProjectListItem
               title="Robot Interface for Collaboration in Kitchen"
-              dates="2026 – Ongoing"
+              dates="2026"
               href="/alphagrill"
               className={riseClass.trim() || undefined}
               style={riseDelay(DELAY.projectFirst)}
             />
             <ProjectListItem
               title="Building the Tools Behind Smarter Robots"
-              dates="2024 – 2025"
+              dates="2025"
               href="/aniai"
               className={riseClass.trim() || undefined}
               style={riseDelay(DELAY.projectSecond)}
