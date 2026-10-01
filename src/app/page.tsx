@@ -217,7 +217,7 @@ export default function Home() {
         </div>
 
         <div className="max-w-[var(--content-w)] mx-auto w-full mt-10 sm:mt-12 lg:mt-14">
-          <div className="flex flex-col gap-0 sm:gap-0.5">
+          <div className="flex flex-col gap-2 sm:gap-0.5">
             <ProjectListItem
               title="Robot Interface for Collaboration in Kitchen"
               dates="2026 – Ongoing"
@@ -278,11 +278,11 @@ export default function Home() {
               title; on phones it stacks above the title in the same place every case study shows a
               year, so it leads with the year instead.
 
-              Carries the same `gap-0 sm:gap-0.5` as the case-study list above even though it holds a
-              single row today: without it a second personal project would sit 16px from the first
-              (the two rows' own py-2 and nothing else) against the 18px every other pair uses from
-              640px. */}
-          <div className="flex flex-col gap-0 sm:gap-0.5">
+              Carries the same `gap-2 sm:gap-0.5` as the case-study list above even though it holds a
+              single row today, so a second personal project would get the same spacing as every other
+              pair: 24px on phones, where each row stacks into two lines and needs more air between
+              rows than the rows' own py-2 gives, and 18px from 640px. */}
+          <div className="flex flex-col gap-2 sm:gap-0.5">
             <ProjectListItem
               title="Been There — Every Place, Stitched"
               dates="Personal, 2026"
