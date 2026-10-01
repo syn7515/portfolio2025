@@ -109,30 +109,35 @@
 }
 
 /* While the rail is hovered the lengths fan out around the pointer: longest directly under it,
-   tapering with sibling distance. This is driven purely by position relative to the *hovered* row —
-   the active section has no say in it, so the shape always points at the cursor rather than fighting
-   the current-section marker for attention.
+   tapering with sibling distance, and the taper keeps going past the resting length so the far
+   ticks end up shorter than they are at rest. This is driven purely by position relative to the
+   *hovered* row — the active section has no say in it, so the shape always points at the cursor
+   rather than fighting the current-section marker for attention.
    Each distance needs two selectors because CSS has no previous-sibling combinator: `+` walks
    forward from the hovered row, `:has(+ …)` reaches backward to it. Distances are mutually
    exclusive, so the rising specificity down this list never causes a conflict. Beyond ±3 a tick
-   keeps its resting length. */
+   drops to the shortest length. */
+.rail:hover .tickRow .tick {
+    width: 6px;
+}
+
 .rail:hover .tickRow:hover .tick {
     width: 22px;
 }
 
 .rail:hover .tickRow:hover + .tickRow .tick,
 .rail:hover .tickRow:has(+ .tickRow:hover) .tick {
-    width: 18px;
+    width: 17px;
 }
 
 .rail:hover .tickRow:hover + .tickRow + .tickRow .tick,
 .rail:hover .tickRow:has(+ .tickRow + .tickRow:hover) .tick {
-    width: 15px;
+    width: 12px;
 }
 
 .rail:hover .tickRow:hover + .tickRow + .tickRow + .tickRow .tick,
 .rail:hover .tickRow:has(+ .tickRow + .tickRow + .tickRow:hover) .tick {
-    width: 13px;
+    width: 8px;
 }
 
 @media (prefers-color-scheme: dark) {
