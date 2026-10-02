@@ -13,6 +13,20 @@ const BAR_CLASS = 'absolute left-[8px] right-[8px] h-[1.5px] rounded-none bg-sto
 const LEAVE_FADE_MS = 300
 const OVERLAY_REVEAL_MS = 250
 
+// Items rise and sharpen in on open with the same curve, distance and 40ms step as home's project
+// rows (home-content-rise in app/page.module.css). Closing drops the stagger and the delay so the
+// whole list leaves with the overlay instead of lingering row by row.
+const ITEM_RISE_EASE = 'cubic-bezier(0.23, 1, 0.32, 1)'
+const ITEM_RISE_MS = 500
+const ITEM_BASE_DELAY_MS = 60
+const ITEM_STAGGER_MS = 40
+
+const riseTransition = (delayMs: number) =>
+  ['opacity', 'transform', 'filter']
+    .map(prop => `${prop} ${ITEM_RISE_MS}ms ${ITEM_RISE_EASE} ${delayMs}ms`)
+    .concat('color 300ms ease-out')
+    .join(', ')
+
 export default function BlogPostMobileMenu() {
   const router = useRouter()
   const pathname = usePathname()
@@ -134,7 +148,7 @@ export default function BlogPostMobileMenu() {
             leaving && 'opacity-0 blur-[3px] pointer-events-none'
           )}
         >
-          {items.map(item => {
+          {items.map((item, index) => {
             const isCurrent = item.slug !== undefined && item.slug === slug
             return (
               <Link
@@ -148,12 +162,21 @@ export default function BlogPostMobileMenu() {
                 // sits exactly where it did. The grey tap flash is off because across a full-width
                 // row it reads as a slab; the label's colour change is the press feedback.
                 className={cn(
-                  'block w-full py-[14px] text-[20px] font-[460] tracking-[-0.01em] !not-italic transition-colors duration-300 ease-out [-webkit-tap-highlight-color:transparent]',
+                  'block w-full py-[14px] text-[20px] font-[460] tracking-[-0.01em] !not-italic motion-reduce:!transform-none motion-reduce:!filter-none [-webkit-tap-highlight-color:transparent]',
                   isCurrent
                     ? '!text-stone-700 dark:!text-zinc-200'
                     : '!text-stone-500 dark:!text-zinc-400 !no-underline hover:!text-rose-700 active:!text-rose-700 dark:hover:!text-rose-400 dark:active:!text-rose-400'
                 )}
                 tabIndex={menuOpen ? undefined : -1}
+                style={{
+                  opacity: menuOpen ? 1 : 0,
+                  transform: menuOpen ? 'translateY(0)' : 'translateY(20px)',
+                  filter: menuOpen ? 'blur(0)' : 'blur(1.5px)',
+                  // Delay is held in the shorthand, not transitionDelay: React warns on mixing the two.
+                  transition: menuOpen
+                    ? riseTransition(ITEM_BASE_DELAY_MS + index * ITEM_STAGGER_MS)
+                    : 'color 300ms ease-out, opacity 200ms ease-out, filter 200ms ease-out, transform 0ms linear 250ms',
+                }}
               >
                 {item.label}
               </Link>

@@ -242,6 +242,8 @@ body {
   color: var(--foreground);
   font-family: 'Inter var', var(--font-inter), var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   font-feature-settings: "ss01", "ss07", "cv01", "cv08";
+  /* Inherited, so every block avoids orphans by default; text-balance / [text-wrap:*] still win. */
+  text-wrap: pretty;
 }
 
 /* Drafting grid beneath each paper surface. Minor cells are 20px; every fifth
