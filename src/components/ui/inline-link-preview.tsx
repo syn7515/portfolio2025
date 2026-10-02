@@ -21,6 +21,17 @@ const VIEWPORT_EDGE_GAP = 24
 const SIDE_RAIL_MIN_WIDTH = 220
 const LOCAL_DESCRIPTION_MAX_WIDTH = 480
 
+// Biro Script is deliberately not preloaded (see app/layout.tsx), so left alone the browser only
+// fetches it when the first preview paints — which then renders in the fallback face and swaps
+// mid-fade. Warm it once the page is idle instead, so the first hover already has the real face.
+let biroScriptWarmed = false
+function warmBiroScript() {
+  if (biroScriptWarmed || typeof document === 'undefined' || !document.fonts) return
+  biroScriptWarmed = true
+  const family = getComputedStyle(document.body).getPropertyValue('--font-biro-script').trim()
+  if (family) document.fonts.load(`400 20px ${family}`).catch(() => {})
+}
+
 /** Document-space coordinates so the rail scrolls natively with the page. */
 interface SideRailPosition {
   left: number
@@ -113,6 +124,7 @@ export function InlineLinkPreview({
   }, [updateSideRailPosition])
 
   const handleMouseEnter = useCallback(() => {
+    warmBiroScript()
     clearHoverDelay()
     hoverDelayRef.current = setTimeout(() => {
       revealExplanation()
@@ -128,6 +140,15 @@ export function InlineLinkPreview({
   }, [clearHoverDelay])
 
   useEffect(() => clearHoverDelay, [clearHoverDelay])
+
+  useEffect(() => {
+    if (typeof window.requestIdleCallback === 'function') {
+      const id = window.requestIdleCallback(warmBiroScript, { timeout: 2000 })
+      return () => window.cancelIdleCallback(id)
+    }
+    const id = setTimeout(warmBiroScript, 1000)
+    return () => clearTimeout(id)
+  }, [])
 
   useEffect(() => {
     if (!showExplanation) return
