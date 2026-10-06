@@ -1122,10 +1122,11 @@ a.inline-flex.items-center {
     --ds-btn-bg: #27272a !important; /* zinc-800 */
     --ds-btn-border: #3f3f46 !important; /* zinc-700 */
     --ds-btn-text: #d4d4d8 !important; /* zinc-300 */
-    --ds-btn-ghost-text: rgb(255 255 255 / 0.12) !important;
-    --ds-pad-outer: rgb(248 113 113 / 0.5) !important;
-    --ds-pad-inner: rgb(248 113 113 / 0.28) !important;
-    --ds-pad-stripe: rgb(248 113 113 / 0.7) !important;
-    --ds-pad-stripe-light: rgb(248 113 113 / 0.4) !important;
+    --ds-btn-ghost-text: rgb(251 113 133 / 0.3) !important; /* rose-400 */
+    --ds-pad-border: rgb(159 18 57 / 0.25) !important; /* rose-800 */
+    --ds-pad-outer: rgb(159 18 57 / 0.45) !important; /* rose-800 */
+    --ds-pad-inner: rgb(159 18 57 / 0.24) !important;
+    --ds-pad-stripe: rgb(225 29 72 / 0.55) !important;
+    --ds-pad-stripe-light: rgb(225 29 72 / 0.32) !important;
   }
 }

@@ -1,4 +1,3 @@
-import { Plus } from "lucide-react";
 import type { CSSProperties, ReactNode } from "react";
 
 /* Live recreation of the "ds-2" Figma frame: the button with and without an icon, each beside a
@@ -10,13 +9,25 @@ import type { CSSProperties, ReactNode } from "react";
 const vars = {
   "--ds-btn-bg": "#ffffff",
   "--ds-btn-border": "#e7e5e4", // stone-200
+  // The annotated copies sit back a step, so their outline is lighter than the real buttons'.
+  "--ds-pad-border": "rgb(253 164 175 / 0.45)", // rose-300
   "--ds-btn-text": "#57534e", // stone-600
-  "--ds-btn-ghost-text": "rgb(28 25 23 / 0.1)",
-  "--ds-pad-outer": "rgb(255 0 0 / 0.3)",
-  "--ds-pad-inner": "rgb(255 0 0 / 0.15)",
-  "--ds-pad-stripe": "rgb(255 0 0 / 0.35)",
-  "--ds-pad-stripe-light": "rgb(255 0 0 / 0.18)",
+  "--ds-btn-ghost-text": "rgb(244 63 94 / 0.3)", // rose-500
+  "--ds-pad-outer": "rgb(244 63 94 / 0.3)",
+  "--ds-pad-inner": "rgb(244 63 94 / 0.15)",
+  "--ds-pad-stripe": "rgb(225 29 72 / 0.35)",
+  "--ds-pad-stripe-light": "rgb(225 29 72 / 0.18)",
 } as CSSProperties;
+
+// Lucide's plus drawn as one path: lucide-react draws it as two, so with a translucent stroke the
+// centre where they cross was painted twice and showed darker. A single path's stroke paints once.
+function Plus({ style, strokeWidth = 2 }: { style?: CSSProperties; strokeWidth?: number; "aria-hidden"?: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" style={style} aria-hidden>
+      <path d="M5 12h14M12 5v14" />
+    </svg>
+  );
+}
 
 const frame = "inline-flex items-center justify-center overflow-hidden border-solid";
 const frameStyle: CSSProperties = {
@@ -65,7 +76,7 @@ function AnnotatedButton({ icon }: { icon?: boolean }) {
     </span>
   );
   return (
-    <span className={frame} style={{ ...frameStyle, borderColor: "var(--ds-btn-border)" }}>
+    <span className={frame} style={{ ...frameStyle, borderColor: "var(--ds-pad-border)" }}>
       <span className="flex items-center" style={{ paddingInline: "0.5714em", ...hatch("var(--ds-pad-outer)") }}>
         <span className="flex items-center" style={{ background: "var(--ds-btn-bg)" }}>
           {icon && (
