@@ -305,7 +305,7 @@ export function CarouselCard({
         )}
 
         {/* Border layer on top */}
-        {(imageUrl || videoUrl) && (
+        {(imageUrl || videoUrl || content) && (
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
