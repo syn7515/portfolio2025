@@ -118,7 +118,7 @@ export function CarouselCard({
   return (
     <div
       ref={mediaGateRef}
-      className={`flex flex-col items-center${isHiddenByLightbox ? " opacity-0 pointer-events-none" : ""}`}
+      className="flex flex-col items-center"
       style={{ width: effWidth > 0 ? effWidth : "100%" }}
     >
       <motion.div
@@ -155,6 +155,9 @@ export function CarouselCard({
         style={{
           width: "100%",
           boxSizing: 'border-box',
+          // Only the card hides while the lightbox shows its copy; the caption below stays put.
+          // No transition, so the swap with the lightbox's FLIP animation is instant.
+          ...(isHiddenByLightbox ? { opacity: 0, pointerEvents: 'none', transition: 'none' } : {}),
           borderRadius: '4px',
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ['cornerShape' as any]: 'squircle',
