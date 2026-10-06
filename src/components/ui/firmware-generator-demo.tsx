@@ -1,4 +1,6 @@
-import type { CSSProperties } from "react";
+"use client";
+
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 
 /* Live firmware-generator prototype (public/prototypes/firmware-generator.html) in place of the
    screenshot + recording a carousel card used to show. The page is framed rather than ported so the
@@ -16,15 +18,42 @@ const SCENES = {
   build: { frame: { left: "-23.75%", width: "100cqw", height: `${(100 * 865) / 1314}cqw`, top: `calc(75cqh - ${(50 * 865) / 1314}cqw)` } },
 } satisfies Record<string, { frame: CSSProperties }>;
 
+// A fresh iframe paints blank for a few frames before the page loads and catches up with the loop,
+// so the frame stays invisible until the page posts "fwproto:ready". The root carries
+// data-content-pending until then and fires a bubbling "contentready" event, so a container (the
+// lightbox) can keep showing what's underneath instead of flashing an empty box.
 export default function FirmwareGeneratorDemo({ scene = "edit" }: { scene?: keyof typeof SCENES }) {
   const { frame } = SCENES[scene];
+  const rootRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  // Keyed to the scene: the lightbox reuses this component when stepping between cards, and the
+  // iframe navigating to another scene is blank again until that page reports ready.
+  const [readyScene, setReadyScene] = useState<string | null>(null);
+  const ready = readyScene === scene;
+
+  useEffect(() => {
+    const onMessage = (e: MessageEvent) => {
+      if (e.data !== "fwproto:ready" || e.source !== iframeRef.current?.contentWindow) return;
+      setReadyScene(scene);
+      rootRef.current?.dispatchEvent(new Event("contentready", { bubbles: true }));
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, [scene]);
+
   return (
-    <div className="relative w-full h-full overflow-hidden [container-type:size]" aria-hidden>
+    <div
+      ref={rootRef}
+      className="relative w-full h-full overflow-hidden [container-type:size]"
+      data-content-pending={ready ? undefined : ""}
+      aria-hidden
+    >
       <div
         className="absolute overflow-hidden shadow-[0px_1px_1px_-0.5px_rgba(0,0,0,0.10),0px_3px_3px_-1.5px_rgba(0,0,0,0.10)] dark:shadow-[0px_2px_4px_rgba(0,0,0,0.25)]"
-        style={frame}
+        style={{ ...frame, opacity: ready ? 1 : 0 }}
       >
         <iframe
+          ref={iframeRef}
           src={`/prototypes/firmware-generator.html?embed&theme=dark&scene=${scene}`}
           title="Firmware generator prototype"
           loading="lazy"

@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client"
 
-import { useRef, useState, type CSSProperties } from "react";
+import { useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
@@ -43,6 +43,7 @@ interface LightboxProps {
   isDarkMode: boolean;
   isLgOrAbove: boolean;
   onExitComplete?: () => void;
+  onContentReady?: () => void;
 }
 
 interface LightboxContentProps {
@@ -52,6 +53,7 @@ interface LightboxContentProps {
   exitDuration: number;
   isDarkMode: boolean;
   dimensions: { width: number; height: number };
+  onContentReady?: () => void;
 }
 
 interface LightboxVideoProps {
@@ -128,6 +130,7 @@ function LightboxContent({
   exitDuration,
   isDarkMode,
   dimensions,
+  onContentReady,
 }: LightboxContentProps) {
   const hasPositionedImage = currentItem?.imageSizePercent != null && currentItem?.imageUrl;
   const hasPositionedVideo = currentItem?.imageSizePercent != null && currentItem?.videoUrl;
@@ -150,9 +153,40 @@ function LightboxContent({
     scaleX: t.width / baseWidth,
     scaleY: t.height / baseHeight,
   });
+  // Live markup that loads asynchronously (an iframe) marks itself data-content-pending until it
+  // fires "contentready". Until then this copy stays transparent so the carousel card underneath
+  // keeps showing, and the card only hides (onContentReady) in the same commit the copy appears.
+  const isContentItem = !!currentItem?.content && !currentItem.imageUrl && !currentItem.videoUrl;
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [isContentReady, setIsContentReady] = useState(false);
+  // Only the opening entrance holds for readiness; stepping to another card later must not snap the
+  // box back to where the first card was.
+  const hasEnteredRef = useRef(!isContentItem);
+  useLayoutEffect(() => {
+    const el = contentRef.current;
+    if (!isContentItem || !el) return;
+    const markReady = () => {
+      hasEnteredRef.current = true;
+      setIsContentReady(true);
+      onContentReady?.();
+    };
+    if (!el.querySelector("[data-content-pending]")) {
+      markReady();
+      return;
+    }
+    setIsContentReady(false);
+    el.addEventListener("contentready", markReady);
+    return () => el.removeEventListener("contentready", markReady);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isContentItem, currentItem]);
+
   const motionProps = {
     initial: initialTransform ? toScale(initialTransform) : (false as const),
-    animate: { x: 0, y: 0, scaleX: 1, scaleY: 1 },
+    // A pending live-content copy holds on the card until it's ready, so it takes over from the card
+    // in exactly the card's place and only then grows into the lightbox.
+    animate: isContentItem && !isContentReady && !hasEnteredRef.current && initialTransform
+      ? toScale(initialTransform)
+      : { x: 0, y: 0, scaleX: 1, scaleY: 1 },
     exit: exitTransform ? toScale(exitTransform) : {},
     transition: {
       duration: exitTransform ? exitDuration : 0.4,
@@ -167,7 +201,7 @@ function LightboxContent({
     willChange: 'transform',
   };
   
-  if (currentItem?.content && !currentItem.imageUrl && !currentItem.videoUrl) {
+  if (isContentItem) {
     // Live markup: laid out at the final 16:9 size like everything else, so its cqw/em sizing
     // resolves once against the lightbox box and the FLIP scale carries it to and from the card.
     return (
@@ -177,14 +211,16 @@ function LightboxContent({
         style={{ ...motionStyle, aspectRatio: '16/9', boxSizing: 'border-box' }}
       >
         <div
+          ref={contentRef}
           className="absolute inset-0 overflow-hidden rounded-[4px]"
-          style={{ backgroundColor: isDarkMode ? '#232326' : '#fafafa' }}
+          style={{ backgroundColor: isDarkMode ? '#232326' : '#fafafa', opacity: isContentReady ? 1 : 0 }}
         >
           {currentItem.content}
         </div>
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
+            opacity: isContentReady ? 1 : 0,
             boxShadow: isDarkMode
               ? 'inset 0 1px 0 0 rgba(255,255,255,0.03), inset 0 0 0 1px rgba(255,255,255,0.03), 0px 4px 12px rgba(0,0,0,0.4)'
               : '0px 0px 1px 0px rgba(0,0,0,0.4), 0px 4px 8px 0px rgba(0,0,0,0.08)',
@@ -380,6 +416,7 @@ export function Lightbox({
   isDarkMode,
   isLgOrAbove,
   onExitComplete,
+  onContentReady,
 }: LightboxProps) {
   const dimensions = useLightboxDimensions();
   const isPrevDisabled = lightboxIndex === 0;
@@ -479,6 +516,7 @@ export function Lightbox({
                   exitDuration={exitDuration}
                   isDarkMode={isDarkMode}
                   dimensions={dimensions}
+                  onContentReady={onContentReady}
                 />
               </div>
 

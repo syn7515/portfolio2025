@@ -402,12 +402,19 @@ export default function LabelIndicatorCarousel({
     lockedScrollYRef.current = scrollY;
     document.documentElement.setAttribute('data-lightbox-open', '');
     
-    // Step 5: Open lightbox with pre-calculated transform, and hide source card — all in one render
-    setHiddenCardIndex(pendingLightboxIndex);
+    // Step 5: Open lightbox with pre-calculated transform, and hide source card — all in one render.
+    // A live-content card stays visible until its lightbox copy reports ready (handleLightboxContentReady):
+    // the copy may need a few frames to load, and hiding the card first would flash an empty box.
+    if (!normalized[pendingLightboxIndex]?.content) setHiddenCardIndex(pendingLightboxIndex);
     setInitialTransform(transform);
     setLightboxOpen(true);
     setPendingLightboxIndex(null);
-  }, [pendingLightboxIndex, calculateCardTransform]);
+  }, [pendingLightboxIndex, calculateCardTransform, normalized]);
+
+  const handleLightboxContentReady = useCallback(() => {
+    if (isLightboxClosingRef.current) return;
+    setHiddenCardIndex(lightboxIndex);
+  }, [lightboxIndex]);
 
   // Never leave the page locked if the carousel unmounts mid-lightbox
   useEffect(() => releaseScrollLock, [releaseScrollLock]);
@@ -508,6 +515,7 @@ export default function LabelIndicatorCarousel({
         isDarkMode={isDarkMode}
         isLgOrAbove={isLgOrAbove}
         onExitComplete={handleLightboxExitComplete}
+        onContentReady={handleLightboxContentReady}
       />
     </div>
   );

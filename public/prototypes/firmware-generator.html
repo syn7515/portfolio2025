@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="no-anim">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -177,6 +177,9 @@
      sub-pixel, and a see-through gap there reads as a bright hairline. */
   .embed, .embed body { background: var(--bg); }
   .embed #hud { display: none; }
+  /* Until the first catch-up has painted, state lands without transitions: a copy joining the
+     loop mid-way should appear already in place, not fade the popover or panel in. */
+  .no-anim, .no-anim * { transition: none !important; }
   /* recording controls (hidden while playing) */
   #hud { position: fixed; left: 16px; bottom: 16px; font: 12px/1.4 var(--sans); color: var(--stone-500); opacity: .8; transition: opacity 300ms; }
   body.playing #hud { opacity: 0; }
@@ -305,7 +308,8 @@ function renderPanel(el) {
       ${info.desc ? `<div class="p-desc">${info.desc.map(p => `<p>${p}</p>`).join('')}</div>` : ''}
     </div>
     <div class="p-editor"><div class="p-label">Editor</div><div class="p-val" id="pv">${el.dataset.value}</div></div>`;
-  requestAnimationFrame(() => panel.classList.add('on'));
+  // Skipped if the selection moved on before the frame (a dry or fast-forwarded run).
+  requestAnimationFrame(() => { if (active === el) panel.classList.add('on'); });
 }
 
 function select(name) {
@@ -333,20 +337,39 @@ function commit(valid) {
 const SCENE = new URLSearchParams(location.search).get('scene') || 'edit';
 document.documentElement.classList.add('scene-' + SCENE);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+// Waits are scheduled against the wall clock rather than chained timeouts: step n of the loop
+// lands at loopStart + (sum of waits up to n). Embedded copies also derive loopStart from
+// Date.now(), so the carousel card and its lightbox copy always show the same moment and the
+// swap between them doesn't jump. A wait whose time has already passed returns at once, which is
+// how a copy that starts mid-loop catches up.
 let paused = false, runId = 0;
+let loopStart = 0, vt = 0, dry = false;
+// The first real wait is the first moment the screen is in its proper place in the loop. Once that
+// has painted, transitions come back and an embedding page is told the frame is ready to show.
+let caughtUp = false;
+function markCaughtUp() {
+  caughtUp = true;
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    document.documentElement.classList.remove('no-anim');
+    if (parent !== window) parent.postMessage('fwproto:ready', location.origin);
+  }));
+}
 async function wait(ms, id) {
-  const end = performance.now() + ms; let left = ms;
-  while (left > 0) {
-    if (id !== runId) throw 'abort';
-    if (paused) { await sleep(50); continue; }
-    const step = Math.min(left, 30); await sleep(step); left -= step;
-  }
   if (id !== runId) throw 'abort';
+  vt += ms;
+  if (dry) return;
+  while (true) {
+    if (id !== runId) throw 'abort';
+    if (paused) { const t = Date.now(); await sleep(50); loopStart += Date.now() - t; continue; }
+    const left = loopStart + vt - Date.now();
+    if (left <= 0) return;
+    if (!caughtUp) markCaughtUp();
+    await sleep(Math.min(left, 30));
+  }
 }
 async function key(fn, id, ms = 140) {
   caret.classList.add('typing'); fn(); await wait(ms, id); caret.classList.remove('typing');
 }
-const jitter = (b) => b + Math.round(Math.random() * 60);
 
 async function play(id) {
   build(); select(null);
@@ -355,8 +378,8 @@ async function play(id) {
   // 1. SNR lower limit: 10 → 15
   select('CONFIG_RTD_SNR_LOWER_LIMIT');
   await wait(1100, id);
-  await key(() => setVal('1'), id, jitter(220));
-  await key(() => setVal('15'), id, jitter(160));
+  await key(() => setVal('1'), id, 250);
+  await key(() => setVal('15'), id, 190);
   await wait(450, id);
   commit(true);
   await wait(550, id);
@@ -368,13 +391,13 @@ async function play(id) {
   // 3. PCB version: v1.2.2 → v1.2.3 (invalid) → v1.2.0
   select('ENV_PCB_VERSION');
   await wait(1100, id);
-  await key(() => setVal('v1.2.'), id, jitter(200));
-  await key(() => setVal('v1.2.3'), id, jitter(160));
+  await key(() => setVal('v1.2.'), id, 230);
+  await key(() => setVal('v1.2.3'), id, 190);
   await wait(380, id);
   commit(false);
   await wait(1500, id);
-  await key(() => setVal('v1.2.'), id, jitter(200));
-  await key(() => setVal('v1.2.0'), id, jitter(160));
+  await key(() => setVal('v1.2.'), id, 230);
+  await key(() => setVal('v1.2.0'), id, 190);
   await wait(420, id);
   commit(true);
   await wait(1100, id);
@@ -486,7 +509,18 @@ async function loop() {
   const id = ++runId;
   document.body.classList.add('playing');
   const scene = SCENE === 'build' ? playBuild : play;
-  try { while (true) await scene(id); } catch (e) { if (e !== 'abort') throw e; }
+  const synced = root.classList.contains('embed');
+  try {
+    // Measure the loop with a dry run (every wait returns at once), so a synced copy can find its place in it.
+    dry = true; vt = 0; await scene(id); dry = false;
+    const length = vt;
+    while (true) {
+      const now = Date.now();
+      loopStart = synced ? now - (now % length) : now;
+      vt = 0;
+      await scene(id);
+    }
+  } catch (e) { dry = false; if (e !== 'abort') throw e; }
 }
 
 function fit() {

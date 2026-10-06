@@ -121,77 +121,115 @@ export function CarouselCard({
       className="flex flex-col items-center"
       style={{ width: effWidth > 0 ? effWidth : "100%" }}
     >
-      <motion.div
-        ref={cardRef}
-        initial={false}
-        role="button"
-        tabIndex={0}
-        aria-label={`Select card ${index + 1}${label ? `: ${label}` : ""}`}
-        onClick={() => {
-          if (isActive) {
-            if (openLightboxOnCardClick && effectiveLightboxEnabled) openLightbox(index);
-          } else {
-            setIndex(index);
-          }
-        }}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
+      {/* Only the card hides while the lightbox shows its copy; the caption below stays put. The
+          hide sits on this transition-free wrapper so it flips in the same frame the copy unmounts:
+          on the card itself, its transition-all would fade it back in, which flickers. */}
+      <div className={`w-full${isHiddenByLightbox ? " opacity-0 pointer-events-none" : ""}`}>
+        <motion.div
+          ref={cardRef}
+          initial={false}
+          role="button"
+          tabIndex={0}
+          aria-label={`Select card ${index + 1}${label ? `: ${label}` : ""}`}
+          onClick={() => {
             if (isActive) {
               if (openLightboxOnCardClick && effectiveLightboxEnabled) openLightbox(index);
             } else {
               setIndex(index);
             }
-          }
-        }}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        className={`group relative ${mobileAspect === "4/3" ? "aspect-[4/3] sm:aspect-video" : "aspect-video"} ${backgroundClass} transition-all duration-150 ${
-          disableCursor ? 'cursor-default'
-            : isActive
-            ? canOpenLightboxFromCard ? 'cursor-zoom-in' : 'cursor-default'
-            : index < currentIndex ? 'cursor-[w-resize]' : 'cursor-[e-resize]'
-        } focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-600/60 dark:focus-visible:ring-rose-300/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background ${!disableCursor && !isActive ? 'hover:opacity-70' : ''}`}
-        style={{
-          width: "100%",
-          boxSizing: 'border-box',
-          // Only the card hides while the lightbox shows its copy; the caption below stays put.
-          // No transition, so the swap with the lightbox's FLIP animation is instant.
-          ...(isHiddenByLightbox ? { opacity: 0, pointerEvents: 'none', transition: 'none' } : {}),
-          borderRadius: '4px',
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ['cornerShape' as any]: 'squircle',
-        }}
-        transition={transition}
-        whileTap={{ scale: 0.98 }}
-      >
-        {renderCard ? renderCard(index, isActive, item) : (
-          <div
-            className="w-full h-full relative overflow-hidden"
-            style={{
-              borderRadius: '4px',
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              ['cornerShape' as any]: 'squircle',
-            }}
-          >
-            {withBackgroundLines ? (
-              <>
-                {/* Transparent so card background (and hover) show through */}
-                <div className="absolute inset-0 bg-transparent" aria-hidden />
-                {/* Theme-responsive line art behind video */}
-                {backgroundLines === "grill" && (
-                  <div className="absolute inset-0 pointer-events-none z-0 text-stone-300 dark:text-zinc-700" aria-hidden>
-                    <GrillLines className="w-full h-full" />
-                  </div>
-                )}
-                {/* Video on top */}
-                {hasVideo && (
-                  hasPositionedVideo ? (
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              if (isActive) {
+                if (openLightboxOnCardClick && effectiveLightboxEnabled) openLightbox(index);
+              } else {
+                setIndex(index);
+              }
+            }
+          }}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          className={`group relative ${mobileAspect === "4/3" ? "aspect-[4/3] sm:aspect-video" : "aspect-video"} ${backgroundClass} transition-all duration-150 ${
+            disableCursor ? 'cursor-default'
+              : isActive
+              ? canOpenLightboxFromCard ? 'cursor-zoom-in' : 'cursor-default'
+              : index < currentIndex ? 'cursor-[w-resize]' : 'cursor-[e-resize]'
+          } focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-600/60 dark:focus-visible:ring-rose-300/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background ${!disableCursor && !isActive ? 'hover:opacity-70' : ''}`}
+          style={{
+            width: "100%",
+            boxSizing: 'border-box',
+            borderRadius: '4px',
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            ['cornerShape' as any]: 'squircle',
+          }}
+          transition={transition}
+          whileTap={{ scale: 0.98 }}
+        >
+          {renderCard ? renderCard(index, isActive, item) : (
+            <div
+              className="w-full h-full relative overflow-hidden"
+              style={{
+                borderRadius: '4px',
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                ['cornerShape' as any]: 'squircle',
+              }}
+            >
+              {withBackgroundLines ? (
+                <>
+                  {/* Transparent so card background (and hover) show through */}
+                  <div className="absolute inset-0 bg-transparent" aria-hidden />
+                  {/* Theme-responsive line art behind video */}
+                  {backgroundLines === "grill" && (
+                    <div className="absolute inset-0 pointer-events-none z-0 text-stone-300 dark:text-zinc-700" aria-hidden>
+                      <GrillLines className="w-full h-full" />
+                    </div>
+                  )}
+                  {/* Video on top */}
+                  {hasVideo && (
+                    hasPositionedVideo ? (
+                      <video
+                        src={videoSrc}
+                        autoPlay={videoAutoplay}
+                        poster={videoPoster}
+                        className="absolute object-contain z-[1]"
+                        loop={videoLoop}
+                        muted={videoMuted}
+                        controls={videoControls}
+                        playsInline
+                        preload="none"
+                        onCanPlay={() => setIsMediaLoading(false)}
+                        style={{
+                          height: `${imageSizePercent}%`,
+                          width: "auto",
+                          ...calculateImagePosition(imagePosition),
+                        }}
+                      />
+                    ) : (
+                      <video
+                        src={videoSrc}
+                        autoPlay={videoAutoplay}
+                        poster={videoPoster}
+                        className="absolute inset-0 w-full h-full object-cover z-[1]"
+                        loop={videoLoop}
+                        muted={videoMuted}
+                        controls={videoControls}
+                        playsInline
+                        preload="none"
+                        onCanPlay={() => setIsMediaLoading(false)}
+                      />
+                    )
+                  )}
+                </>
+              ) : (
+                <>
+                  {hasVideo ? (
+                    hasPositionedVideo ? (
                     <video
                       src={videoSrc}
                       autoPlay={videoAutoplay}
                       poster={videoPoster}
-                      className="absolute object-contain z-[1]"
+                      className="absolute object-contain"
                       loop={videoLoop}
                       muted={videoMuted}
                       controls={videoControls}
@@ -200,8 +238,13 @@ export function CarouselCard({
                       onCanPlay={() => setIsMediaLoading(false)}
                       style={{
                         height: `${imageSizePercent}%`,
-                        width: "auto",
+                        width: 'auto',
                         ...calculateImagePosition(imagePosition),
+                        ...(withInsetShadow && isHydrated ? {
+                          boxShadow: isDarkMode
+                            ? 'inset 0 1px 0 0 rgba(255,255,255,0.10), inset 0 0 0 1px rgba(255,255,255,0.08), 0px 0px 0px 1px rgba(0,0,0,0.20), 0px 2px 4px rgba(0,0,0,0.25)'
+                            : '0px 0px 0px 1px rgba(0,0,0,0.10), 0px 1px 1px -0.5px rgba(0,0,0,0.10), 0px 3px 3px -1.5px rgba(0,0,0,0.10)'
+                        } : {})
                       }}
                     />
                   ) : (
@@ -209,7 +252,7 @@ export function CarouselCard({
                       src={videoSrc}
                       autoPlay={videoAutoplay}
                       poster={videoPoster}
-                      className="absolute inset-0 w-full h-full object-cover z-[1]"
+                      className="w-full h-full object-cover"
                       loop={videoLoop}
                       muted={videoMuted}
                       controls={videoControls}
@@ -218,116 +261,75 @@ export function CarouselCard({
                       onCanPlay={() => setIsMediaLoading(false)}
                     />
                   )
+                ) : imageUrl ? (
+                  hasPositionedImage ? (
+                    <img
+                      src={imageUrl}
+                      alt={alt ?? label}
+                      className="absolute object-contain"
+                      fetchPriority={fetchPriority}
+                      loading={imageLoading}
+                      decoding="async"
+                      ref={(el) => { if (el?.complete) setIsMediaLoading(false); }}
+                      onLoad={() => setIsMediaLoading(false)}
+                      style={{
+                        height: `${imageSizePercent}%`,
+                        width: 'auto',
+                        ...calculateImagePosition(imagePosition)
+                      }}
+                    />
+                  ) : (
+                    <img
+                      src={imageUrl}
+                      alt={alt ?? label}
+                      className="w-full h-full object-cover"
+                      fetchPriority={fetchPriority}
+                      loading={imageLoading}
+                      decoding="async"
+                      ref={(el) => { if (el?.complete) setIsMediaLoading(false); }}
+                      onLoad={() => setIsMediaLoading(false)}
+                    />
+                  )
+                ) : content ? (
+                  content
+                ) : (
+                  <div className="w-full h-full bg-stone-200/60 dark:bg-stone-800 flex items-center justify-center">
+                    <span className="text-stone-500 text-sm">{label}</span>
+                  </div>
                 )}
-              </>
-            ) : (
-              <>
-                {hasVideo ? (
-                  hasPositionedVideo ? (
-                  <video
-                    src={videoSrc}
-                    autoPlay={videoAutoplay}
-                    poster={videoPoster}
-                    className="absolute object-contain"
-                    loop={videoLoop}
-                    muted={videoMuted}
-                    controls={videoControls}
-                    playsInline
-                    preload="none"
-                    onCanPlay={() => setIsMediaLoading(false)}
-                    style={{
-                      height: `${imageSizePercent}%`,
-                      width: 'auto',
-                      ...calculateImagePosition(imagePosition),
-                      ...(withInsetShadow && isHydrated ? {
-                        boxShadow: isDarkMode
-                          ? 'inset 0 1px 0 0 rgba(255,255,255,0.10), inset 0 0 0 1px rgba(255,255,255,0.08), 0px 0px 0px 1px rgba(0,0,0,0.20), 0px 2px 4px rgba(0,0,0,0.25)'
-                          : '0px 0px 0px 1px rgba(0,0,0,0.10), 0px 1px 1px -0.5px rgba(0,0,0,0.10), 0px 3px 3px -1.5px rgba(0,0,0,0.10)'
-                      } : {})
-                    }}
-                  />
-                ) : (
-                  <video
-                    src={videoSrc}
-                    autoPlay={videoAutoplay}
-                    poster={videoPoster}
-                    className="w-full h-full object-cover"
-                    loop={videoLoop}
-                    muted={videoMuted}
-                    controls={videoControls}
-                    playsInline
-                    preload="none"
-                    onCanPlay={() => setIsMediaLoading(false)}
-                  />
-                )
-              ) : imageUrl ? (
-                hasPositionedImage ? (
-                  <img
-                    src={imageUrl}
-                    alt={alt ?? label}
-                    className="absolute object-contain"
-                    fetchPriority={fetchPriority}
-                    loading={imageLoading}
-                    decoding="async"
-                    ref={(el) => { if (el?.complete) setIsMediaLoading(false); }}
-                    onLoad={() => setIsMediaLoading(false)}
-                    style={{
-                      height: `${imageSizePercent}%`,
-                      width: 'auto',
-                      ...calculateImagePosition(imagePosition)
-                    }}
-                  />
-                ) : (
-                  <img
-                    src={imageUrl}
-                    alt={alt ?? label}
-                    className="w-full h-full object-cover"
-                    fetchPriority={fetchPriority}
-                    loading={imageLoading}
-                    decoding="async"
-                    ref={(el) => { if (el?.complete) setIsMediaLoading(false); }}
-                    onLoad={() => setIsMediaLoading(false)}
-                  />
-                )
-              ) : content ? (
-                content
-              ) : (
-                <div className="w-full h-full bg-stone-200/60 dark:bg-stone-800 flex items-center justify-center">
-                  <span className="text-stone-500 text-sm">{label}</span>
-                </div>
+                </>
               )}
-              </>
-            )}
-          </div>
-        )}
-        {/* Loading spinner */}
-        {showSpinner && (
-          <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
-            <div className="w-6 h-6 rounded-full border-2 border-stone-300 dark:border-zinc-600 border-t-stone-500 dark:border-t-zinc-400 animate-spin" />
-          </div>
-        )}
+            </div>
+          )}
+          {/* Loading spinner */}
+          {showSpinner && (
+            <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+              <div className="w-6 h-6 rounded-full border-2 border-stone-300 dark:border-zinc-600 border-t-stone-500 dark:border-t-zinc-400 animate-spin" />
+            </div>
+          )}
 
-        {/* Border layer on top */}
-        {(imageUrl || videoUrl || content) && (
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              boxShadow: isHydrated
-                ? isDarkMode
-                  ? 'inset 0 1px 0 0 rgba(255,255,255,0.02), inset 0 0 0 1px rgba(255,255,255,0.02), 0 1px 1px -0.5px rgba(0,0,0,0.18)'
-                  : isHovered ? CARD_LIGHT_SHADOW.hover : CARD_LIGHT_SHADOW.default
-                : 'none',
-              transition: `box-shadow ${isHovered ? '150ms' : '0ms'} ease-out`,
-              boxSizing: 'border-box',
-              borderRadius: '4px',
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              ['cornerShape' as any]: 'squircle',
-              zIndex: 10
-            }}
-          />
-        )}
+          {/* Border layer on top */}
+          {(imageUrl || videoUrl || content) && (
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                boxShadow: isHydrated
+                  ? isDarkMode
+                    ? 'inset 0 1px 0 0 rgba(255,255,255,0.02), inset 0 0 0 1px rgba(255,255,255,0.02), 0 1px 1px -0.5px rgba(0,0,0,0.18)'
+                    : isHovered ? CARD_LIGHT_SHADOW.hover : CARD_LIGHT_SHADOW.default
+                  : 'none',
+                transition: `box-shadow ${isHovered ? '150ms' : '0ms'} ease-out`,
+                boxSizing: 'border-box',
+                borderRadius: '4px',
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                ['cornerShape' as any]: 'squircle',
+                zIndex: 10
+              }}
+            />
+          )}
 
-      </motion.div>
+        </motion.div>
+      </div>
 
       {caption != null && caption !== "" ? (
         renderCaption ? (
