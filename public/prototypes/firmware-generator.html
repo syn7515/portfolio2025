@@ -678,8 +678,14 @@ async function playBuild(id) {
   await wait(2000, id);
 
   // close
+  // Head for the close button. The pointer is off the retried row within the first ~90ms of the
+  // move, so its hover scrim goes then rather than lingering until the popover closes.
   const close = stageBox($('popClose'));
-  await moveTo(close.cx, close.cy + 1, id, 620, true);
+  cursor().style.transform = `translate(${close.cx}px, ${close.cy + 1}px)`;
+  await wait(90, id);
+  hover(null);
+  await wait(530, id);
+  cursor().classList.add('hand');
   await click($('popClose'), id);
   $('pop').classList.remove('on'); $('dim').classList.remove('on');
   await moveTo(980, 330, id, 700);
