@@ -149,6 +149,11 @@
   .bi { display: flex; align-items: center; gap: 20px; height: 32px; margin-bottom: 2px; padding: 0 16px; border-radius: 6px; overflow: hidden; font-size: 14px; line-height: 20px;
         transition: height 240ms cubic-bezier(0.2, 0.8, 0.2, 1), margin 240ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 180ms ease; }
   .bi.out { height: 0; margin-bottom: 0; opacity: 0; }
+  /* A building row's own scrim is its progress bar: it fills left to right with the percentage. */
+  .bi { position: relative; }
+  .bi > :not(.bi-fill) { position: relative; }
+  .bi-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: rgba(68, 64, 60, 0.35); pointer-events: none; }
+  .bi-pct { font-variant-numeric: tabular-nums; }
   .bi-name { width: 158px; flex-shrink: 0; font-weight: 500; color: var(--fg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .bi-status { width: 198px; display: flex; align-items: center; gap: 8px; color: var(--stone-500); white-space: nowrap; }
   .bi.recent .bi-status { color: var(--fg-light); }
@@ -563,7 +568,9 @@ function buildItem([name, status, recent]) {
   el.className = 'bi' + (recent || status === 'building' ? ' recent' : '');
   const act = status === 'complete' ? `<div class="bi-act bi-arrow">${ICON.arrow}</div>`
             : status === 'failure' ? '<div class="bi-act bi-try">Try again</div>' : '';
-  el.innerHTML = `<div class="bi-name">${name}</div><div class="bi-status">${STATUS[status][0]}<span class="bi-label">${STATUS[status][1]}</span>${act}</div>`;
+  const fill = status === 'building' ? '<div class="bi-fill"></div>' : '';
+  const label = status === 'building' ? `${STATUS[status][1]} <span class="bi-pct">0%</span>` : STATUS[status][1];
+  el.innerHTML = `${fill}<div class="bi-name">${name}</div><div class="bi-status">${STATUS[status][0]}<span class="bi-label">${label}</span>${act}</div>`;
   return el;
 }
 const $ = id => document.getElementById(id);
@@ -574,10 +581,47 @@ function stageBox(el) {
   return { left: (b.left - s.left) / k, top: (b.top - s.top) / k, right: (b.right - s.left) / k, bottom: (b.bottom - s.top) / k,
            cx: ((b.left + b.right) / 2 - s.left) / k, cy: ((b.top + b.bottom) / 2 - s.top) / k };
 }
+// Build progress runs on the loop clock (like every step here), so the carousel card and its
+// lightbox copy fill to the same percentage. A real build doesn't fill at one rate: it jumps in
+// bursts as steps finish, and between them it creeps along slowly while a long step (compiling,
+// linking) runs. Each row follows a schedule of [ms after t0, %] points: a short segment is a burst
+// that eases out, a long one is a steady creep.
+const progress = new Map();
+function showProgress(row, { points, t0 }) {
+  const p = progressAt(points, Date.now() - loopStart - t0);
+  row.querySelector('.bi-fill').style.width = `${p}%`;
+  row.querySelector('.bi-pct').textContent = `${Math.floor(p)}%`;
+}
+const track = (row, points, t0) => { progress.set(row, { points, t0 }); showProgress(row, { points, t0 }); };
+const easeOut = x => 1 - (1 - x) ** 3;
+function progressAt(points, t) {
+  if (t <= points[0][0]) return points[0][1];
+  for (let i = 1; i < points.length; i++) {
+    const [ta, pa] = points[i - 1], [tb, pb] = points[i];
+    if (t < tb) {
+      const x = (t - ta) / (tb - ta);
+      return pa + (pb - pa) * (tb - ta < 400 ? easeOut(x) : x);
+    }
+  }
+  return points[points.length - 1][1];
+}
+(function tickProgress() {
+  if (SCENE !== 'build') return;
+  for (const [row, track] of progress) showProgress(row, track);
+  requestAnimationFrame(tickProgress);
+})();
+// teflonS is mid-build: creeping, a small burst, a long slow stretch, then bigger bursts.
+const TEFLON_S = [[0, 38], [2000, 39.5], [2180, 42], [2900, 43], [3080, 47.5], [3200, 48],
+  [4600, 50], [4780, 54], [4900, 55], [5700, 56.5], [5880, 60.5], [7300, 62], [7480, 65.5], [7620, 66], [9800, 67.5]];
+// The retry queues for a moment (no movement), starts with a few quick steps, then settles into compiling.
+const RETRY = [[0, 0], [520, 0], [680, 2.5], [1050, 3.5], [1220, 7.5], [1340, 9], [2500, 10.5],
+  [2680, 14], [3500, 15], [3680, 18.5], [5000, 19.5]];
 function resetBuild() {
   // The popover opens from the build button, its right edge flush with the button's (align end).
   $('pop').style.left = `${stageBox($('buildBtn')).right - $('pop').offsetWidth}px`;
   $('builds').replaceChildren(...BUILDS.map(buildItem));
+  progress.clear();
+  track($('builds').children[0], TEFLON_S, 0);
   $('dot').classList.add('on');
   $('pop').classList.remove('on'); $('dim').classList.remove('on');
 }
@@ -628,6 +672,7 @@ async function playBuild(id) {
   // the retried teflon3 starts building again where it is
   const retried = buildItem(['v1.1h-teflon3', 'building']);
   rows[2].replaceWith(retried);
+  track(retried, RETRY, vt);
   // still under the pointer, but a building row has nothing to click
   hover(retried); cursor().classList.remove('hand');
   await wait(2000, id);
