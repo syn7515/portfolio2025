@@ -1,0 +1,516 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Firmware generator — recording prototype</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+<style>
+  :root {
+    --bg: #1c1917;
+    --fg: #d6d3d1;
+    --fg-light: #a8a29e;
+    --stone-500: #78716c;
+    --divider: #44403c;
+    --border: rgba(68, 64, 60, 0.5);
+    --editor-bg: rgba(41, 37, 36, 0.45);
+    --muted: rgba(41, 37, 36, 0.5);
+    --row-active: rgba(41, 37, 36, 0.8);
+    --accent: #292524;
+    --v-bool: rgba(216, 180, 254, 0.9);
+    --v-int: rgba(147, 197, 253, 0.9);
+    --v-num: rgba(165, 243, 252, 0.8);
+    --v-str: rgba(253, 186, 116, 0.9);
+    --v-err: rgba(255, 82, 82, 0.8);
+    --page: #0c0a09;
+    --sidebar-bg: #1c1917;
+    --scroll: rgba(87, 83, 78, 0.3);
+    --tag-purple: #c084fc; --tag-purple-bg: rgba(147, 51, 234, 0.2);
+    --tag-blue: #60a5fa; --tag-blue-bg: rgba(37, 99, 235, 0.2);
+    --tag-orange: rgba(253, 186, 116, 0.9); --tag-orange-bg: rgba(124, 45, 18, 0.2);
+    --err-fill: #dc2626;
+    --mono: "SF Mono", ui-monospace, Menlo, monospace;
+    --sans: "Pretendard Variable", Pretendard, -apple-system, sans-serif;
+  }
+  /* light mode: ?theme=light or press T */
+  :root[data-theme="light"] {
+    --bg: #ffffff;
+    --page: #ffffff;
+    --fg: #1c1917;
+    --fg-light: #57534e;
+    --stone-500: #a8a29e;
+    --divider: #e7e5e4;
+    --border: #e7e5e4;
+    --editor-bg: #ffffff;
+    --sidebar-bg: #f5f5f4;
+    --muted: rgba(231, 229, 228, 0.5);
+    --row-active: rgba(231, 229, 228, 0.8);
+    --accent: #e7e5e4;
+    --v-bool: #9333ea;
+    --v-int: #2563eb;
+    --v-num: #0891b2;
+    --v-str: #c2410c;
+    --v-err: #dc2626;
+    --scroll: rgba(168, 162, 158, 0.35);
+    --tag-purple: #9333ea; --tag-purple-bg: rgba(147, 51, 234, 0.1);
+    --tag-blue: #2563eb; --tag-blue-bg: rgba(37, 99, 235, 0.1);
+    --tag-orange: #c2410c; --tag-orange-bg: rgba(234, 88, 12, 0.1);
+    --err-fill: #dc2626;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: var(--page); overflow: hidden; }
+  body { font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+
+  #stage { width: 1314px; height: 820px; position: absolute; left: 50%; top: 50%; margin: -410px 0 0 -657px; background: var(--bg); overflow: hidden; transform-origin: center; display: flex; color: var(--fg); }
+
+  /* sidebar */
+  .sidebar { width: 48px; background: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding-top: 14px; gap: 6px; flex-shrink: 0; }
+  .sidebar .logo { width: 32px; height: 32px; display: grid; place-items: center; margin-bottom: 40px; color: var(--fg-light); }
+  .nav { width: 32px; height: 32px; border-radius: 6px; display: grid; place-items: center; color: var(--fg-light); }
+  .nav.on { background: var(--accent); color: var(--fg); }
+  svg { display: block; }
+
+  .content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  .topbar { height: 48px; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 32px; justify-content: space-between; flex-shrink: 0; }
+  .crumb { display: flex; align-items: center; gap: 10px; font-size: 14px; line-height: 20px; }
+  .crumb .p { color: var(--fg-light); }
+  .crumb .c { color: var(--fg); }
+  .actions { display: flex; gap: 8px; align-items: center; }
+  .icon-btn { width: 32px; height: 32px; border: 1px solid var(--divider); border-radius: 6px; display: grid; place-items: center; color: var(--fg); }
+  .create { height: 32px; padding: 0 10px 0 12px; border-radius: 6px; background: var(--fg); color: var(--bg); font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+
+  .main { flex: 1; display: flex; min-height: 0; }
+  .editor { width: 946px; position: relative; overflow: hidden; background: var(--editor-bg); border-right: 1px solid var(--border); }
+  .scroll { position: absolute; right: 5px; top: 2px; width: 6px; height: 118px; border-radius: 3px; background: var(--scroll); }
+  .list { padding: 39px 0 0 77px; width: 870px; }
+  .section { color: var(--fg-light); font-size: 14px; line-height: 20px; padding: 0 0 13px 16px; }
+  .section:not(:first-child) { margin-top: 34px; }
+  .row { height: 28px; display: flex; align-items: center; position: relative; border-radius: 2px; font-family: var(--mono); font-size: 14px; line-height: 20px; transition: background-color 90ms ease; }
+  .row.edited { background: var(--muted); }
+  .row.active { background: var(--row-active); }
+  .tag { width: 44px; margin-left: 12px; font-size: 12px; line-height: 16px; color: var(--stone-500); }
+  .tag span { display: inline-block; min-width: 18px; text-align: center; padding: 1px 4px; border-radius: 4px; background: var(--muted); transition: background-color 90ms ease, color 90ms ease; }
+  .row.active .tag span { color: var(--tc); background: var(--tb); }
+  .name { color: var(--fg-light); width: 552px; white-space: nowrap; transition: color 90ms ease; }
+  .row.active .name { color: var(--fg); }
+  .val { color: var(--vc); position: relative; white-space: pre; }
+  .row.active .val { color: var(--fg); }
+  .err { position: absolute; left: -22px; top: 2px; width: 16px; height: 16px; opacity: 0; }
+  .err.on { opacity: 1; }
+  .caret { display: inline-block; width: 1px; height: 18px; background: var(--fg); vertical-align: -4px; margin-left: 1px; animation: blink 1s steps(1) infinite; }
+  .caret.typing { animation: none; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .t-bool { --tc: var(--tag-purple); --tb: var(--tag-purple-bg); --vc: var(--v-bool); }
+  .t-int  { --tc: var(--tag-blue); --tb: var(--tag-blue-bg); --vc: var(--v-int); }
+  .t-num  { --tc: var(--tag-blue); --tb: var(--tag-blue-bg); --vc: var(--v-num); }
+  .t-str  { --tc: var(--tag-orange); --tb: var(--tag-orange-bg); --vc: var(--v-str); }
+
+  /* info panel */
+  .panel { flex: 1; position: relative; }
+  .panel-inner { position: absolute; inset: 0; display: flex; flex-direction: column; opacity: 0; transition: opacity 100ms ease; }
+  .panel-inner.on { opacity: 1; }
+  .p-top { padding: 24px 24px 0 24px; flex: 1; }
+  .p-tag { font-family: var(--mono); font-size: 12px; line-height: 16px; }
+  .p-tag span { display: inline-block; padding: 1px 4px; border-radius: 4px; color: var(--tc); background: var(--tb); }
+  .p-name { font-family: var(--mono); font-size: 14px; line-height: 20px; margin-top: 8px; word-break: break-all; max-width: 270px; }
+  .p-grid { display: flex; margin-top: 28px; }
+  .p-grid > div { width: 148px; }
+  .p-label { font-size: 12px; line-height: 16px; color: var(--fg-light); margin-bottom: 6px; }
+  .p-val { font-family: var(--mono); font-size: 14px; line-height: 22px; color: var(--vc); }
+  .p-desc { margin-top: 28px; font-size: 12px; line-height: 20px; color: var(--fg-light); }
+  .p-desc p + p { margin-top: 20px; }
+  .p-editor { border-top: 1px solid var(--border); padding: 22px 24px 25px; }
+    .p-editor .p-val.bad { color: var(--v-err); }
+
+
+  /* ---------- scene: build progress (?scene=build) ---------- */
+  .scene-build #stage { height: 865px; margin-top: -432.5px; }
+  .sidebar .me { display: none; margin-top: auto; margin-bottom: 8px; width: 32px; height: 32px; border-radius: 6px; background: var(--accent); flex-shrink: 0; }
+  .scene-build .sidebar .me { display: block; }
+  .icon-btn { position: relative; transition: background-color 90ms ease; }
+  .icon-btn.pressed, .pop-close.pressed { background: var(--accent); }
+  .dot { position: absolute; top: -3px; right: -3px; width: 10px; height: 10px; border-radius: 50%; background: #991b1b; display: none; }
+  .dot.on { display: block; }
+  .main { position: relative; }
+  .dim { position: absolute; inset: 0; z-index: 5; background: rgba(28, 25, 23, 0.8); opacity: 0; pointer-events: none; transition: opacity 150ms ease; }
+  .dim.on { opacity: 1; }
+  .pop { position: absolute; left: 769px; top: 44px; width: 424px; z-index: 10; background: var(--bg); border: 1px solid var(--divider); border-radius: 8px; overflow: hidden;
+         box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+         opacity: 0; transform: scale(0.96); transform-origin: calc(100% - 16px) -8px; transition: opacity 150ms ease, transform 150ms cubic-bezier(0.2, 0.9, 0.3, 1); }
+  .pop.on { opacity: 1; transform: none; }
+  .pop-head { display: flex; justify-content: space-between; align-items: flex-start; padding: 12px 24px 8px; border-bottom: 1px solid var(--divider); }
+  .pop-title { font-size: 14px; line-height: 24px; font-weight: 500; color: #fafaf9; }
+  :root[data-theme="light"] .pop-title { color: var(--fg); }
+  .pop-close { padding: 6px; margin: -4px -6px 0 0; border-radius: 4px; color: var(--fg); transition: background-color 90ms ease; }
+  .pop-body { padding: 8px 24px 0; }
+  .pop-scroll { margin: 0 -16px; height: 388px; overflow: hidden; }
+  .bi { display: flex; align-items: center; gap: 20px; height: 32px; margin-bottom: 2px; padding: 0 16px; border-radius: 6px; overflow: hidden; font-size: 14px; line-height: 20px;
+        transition: height 240ms cubic-bezier(0.2, 0.8, 0.2, 1), margin 240ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 180ms ease; }
+  .bi.out { height: 0; margin-bottom: 0; opacity: 0; }
+  .bi-name { width: 158px; flex-shrink: 0; font-weight: 500; color: var(--fg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bi-status { width: 198px; display: flex; align-items: center; gap: 8px; color: var(--stone-500); white-space: nowrap; }
+  .bi.recent .bi-status { color: var(--fg-light); }
+  .spin { width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0; background: conic-gradient(from 20deg, rgba(255, 255, 255, 0.05) 10%, #999 96%);
+          -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 1.5px), #000 calc(100% - 1.5px)); mask: radial-gradient(farthest-side, transparent calc(100% - 1.5px), #000 calc(100% - 1.5px));
+          animation: spin 0.9s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  /* row hover: complete rows reveal an open (→) button, failed rows a "Try again" text button */
+  .bi.hover { background: var(--muted); }
+  .bi-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .bi-act { display: none; flex-shrink: 0; }
+  .bi.hover .bi-act { display: flex; }
+  .bi-arrow { padding: 8px; margin: -6px -8px -6px 0; border-radius: 6px; color: var(--fg-light); }
+  .bi-try { color: var(--stone-500); transition: color 90ms ease; }
+  .bi-try.hl { text-decoration: underline; text-underline-offset: 3px; }
+  .bi-try.pressed { color: var(--fg); }
+  .cursor { position: absolute; z-index: 20; left: 0; top: 0; width: 18px; height: 18px; pointer-events: none; opacity: 0;
+            transition: transform 520ms cubic-bezier(0.4, 0, 0.2, 1), opacity 200ms ease; }
+  .cursor.on { opacity: 1; }
+  .cursor svg { position: absolute; left: 0; top: 0; }
+  .cursor .c-hand { display: none; left: -7px; top: -1px; }
+  .cursor.hand .c-arrow { display: none; }
+  .cursor.hand .c-hand { display: block; }
+  .cursor.down svg { transform: scale(0.9); transform-origin: 2px 2px; }
+
+  /* Fill with the app colour, not transparent: the scaled stage can miss the frame edge by a
+     sub-pixel, and a see-through gap there reads as a bright hairline. */
+  .embed, .embed body { background: var(--bg); }
+  .embed #hud { display: none; }
+  /* recording controls (hidden while playing) */
+  #hud { position: fixed; left: 16px; bottom: 16px; font: 12px/1.4 var(--sans); color: var(--stone-500); opacity: .8; transition: opacity 300ms; }
+  body.playing #hud { opacity: 0; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <aside class="sidebar">
+    <div class="logo"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8.00033 1.33167C11.2213 1.3319 13.8334 3.81802 13.9935 6.92346L14.0013 7.2262V14.6676H13.0531V7.89124H13.054V7.2262C13.054 4.46418 10.781 2.24304 8.00033 2.2428C5.21947 2.2428 2.94564 4.46374 2.94564 7.2262L2.95247 7.48401C3.08884 10.1253 5.30643 12.2096 8.00033 12.2096H8.9056L9.19857 13.1198H8.00033C6.48344 13.1198 5.10166 12.5652 4.04525 11.6539L2.94564 10.7057V14.6686H1.99837V7.2262L2.00619 6.92346C2.1663 3.81784 4.7792 1.33167 8.00033 1.33167Z" stroke="currentColor" stroke-width="1.33"/></svg></div>
+    <div class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
+    <div class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12h.01"/><path d="M16 12h.01"/><path d="m17 7 5 5-5 5"/><path d="m7 7-5 5 5 5"/><path d="M8 12h.01"/></svg></div>
+    <div class="nav on"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2"/><path d="M6.453 15h11.094"/><path d="M8.5 2h7"/></svg></div>
+    <div class="me"></div>
+  </aside>
+  <div class="content">
+    <header class="topbar">
+      <div class="crumb"><span class="p">Test bed</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--fg-light)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg><span class="c">Firmware generator</span></div>
+      <div class="actions">
+        <div class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.226 20.925A2 2 0 0 0 6 22h12a2 2 0 0 0 2-2V8a2.4 2.4 0 0 0-.706-1.706l-3.588-3.588A2.4 2.4 0 0 0 14 2H6a2 2 0 0 0-2 2v3.127"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="m5 11-3 3"/><path d="m5 17-3-3h10"/></svg></div>
+        <div class="icon-btn" id="buildBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 1 7.38 16.75"/><path d="m16 12-4-4-4 4"/><path d="M12 16V8"/><path d="M2.5 8.875a10 10 0 0 0-.5 3"/><path d="M2.83 16a10 10 0 0 0 2.43 3.4"/><path d="M4.636 5.235a10 10 0 0 1 .891-.857"/><path d="M8.644 21.42a10 10 0 0 0 7.631-.38"/></svg><span class="dot" id="dot"></span></div>
+        <div class="create">Create <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div>
+      </div>
+    </header>
+    <div class="main">
+      <div class="editor"><div class="scroll"></div><div class="list" id="list"></div></div>
+      <div class="panel"><div class="panel-inner" id="panel"></div></div>
+      <div class="dim" id="dim"></div>
+    </div>
+  </div>
+  <div class="pop" id="pop">
+    <div class="pop-head"><div class="pop-title">Build progress</div>
+      <div class="pop-close" id="popClose"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>
+    </div>
+    <div class="pop-body"><div class="pop-scroll" id="builds"></div></div>
+  </div>
+  <div class="cursor" id="cursor">
+    <svg class="c-arrow" width="18" height="18" viewBox="0 0 24 24"><path d="M5 2.5v17.2l4.6-4.4 2.9 6.6 2.9-1.3-2.9-6.5h6.4z" fill="#fff" stroke="#000" stroke-width="1.4" stroke-linejoin="round"/></svg>
+    <svg class="c-hand" width="20" height="20" viewBox="0 0 24 24"><path d="M9.2 13V4.6a1.6 1.6 0 0 1 3.2 0V11l.2-1.3a1.5 1.5 0 0 1 3 .2v1.4l.2-.8a1.5 1.5 0 0 1 2.9.5v1.2l.2-.4a1.4 1.4 0 0 1 2.6.8v4.2c0 3.3-2.5 5.9-5.6 5.9h-2.3c-2 0-3.4-.8-4.6-2.4l-3.6-5a1.6 1.6 0 0 1 2.4-2.1z" fill="#fff" stroke="#000" stroke-width="1.3" stroke-linejoin="round"/><path d="M12.4 11.2v3.6M15.6 11.6v3.2M18.7 12.2v2.6" stroke="#000" stroke-width="1.1" stroke-linecap="round"/></svg>
+  </div>
+</div>
+<div id="hud">Space: play / pause · R: restart · T: light / dark · loops automatically</div>
+
+<script>
+const ROWS = [
+  ['#', 'Basic properties'],
+  ['bool','CONFIG_ALPHAGRILL_CURTAIN_ACTIVE_HIGH','false'],
+  ['bool','CONFIG_ALPHAGRILL_POWER_RELAY_ACTIVE_HIGH','true'],
+  ['int','CONFIG_ALPHAGRILL_POWER_RELAY_RISE_TIME','1000'],
+  ['int','CONFIG_ALPHAGRILL_POWER_RELAY_DISCHARGE_TIME_MS','8000'],
+  ['bool','CONFIG_HOTGUIDE_ALARM_ACTIVE_HIGH','true'],
+  ['bool','CONFIG_HOTSPATULA_ALARM_ACTIVE_HIGH','true'],
+  ['bool','CONFIG_XAXIS_ALARM_ACTIVE_HIGH','true'],
+  ['bool','CONFIG_ZAXIS_ALARM_ACTIVE_HIGH','true'],
+  ['int','CONFIG_RTD_PROBE_EXTENSION','1'],
+  ['int','CONFIG_RTD_ADC_CHANNEL_SIZE','12'],
+  ['int','CONFIG_RTD_ADC_MUX_REFERENCE_CHANNEL','9'],
+  ['num','CONFIG_RTD_SNR_LOWER_LIMIT','10'],
+  ['bool','CONFIG_ALPHAGRILL_RESET_SEQUENCE','true'],
+  ['str','ENV_PCB_VERSION','v1.2.2'],
+  ['str','ENV_TARGET_MCU','STM32F767ZITx'],
+  ['#', 'Spatular related properties'],
+  ['bool','CONFIG_ALPHAGRILL_UNIT_INVERTED_0','false'],
+  ['bool','CONFIG_ALPHAGRILL_UNIT_INVERTED_1','false'],
+  ['int','CONFIG_ROW_PER_GRILL','2'],
+  ['int','CONFIG_COLUMN_PER_GRILL','2'],
+  ['int','CONFIG_HOTGUIDE_ZEROING_MARGIN','336'],
+  ['int','CONFIG_HOTSPATULA_ZEROING_MARGIN','336'],
+  ['int','CONFIG_HOTGUIDE_SENSOR_WIDTH','16'],
+  ['int','CONFIG_HOTSPATULA_SENSOR_WIDTH','16'],
+  ['int','CONFIG_XAXIS_MAX_POS','4272'],
+];
+
+const INFO = {
+  CONFIG_RTD_SNR_LOWER_LIMIT: {
+    def: '—', defMuted: true,
+    desc: ['SNR lower limit of an RTD sensor — the minimum signal-to-noise ratio required for the temperature reading to be considered reliable.',
+           'If the SNR falls below this threshold, noise dominates the signal and the measurement may be inaccurate or unusable.'],
+  },
+  CONFIG_ALPHAGRILL_RESET_SEQUENCE: {
+    name: 'CONFIG_ALPHAGRILL_RESET_<br>SEQUENCE', def: 'false',
+    desc: ['Indicates whether the device can use the reset sequence.',
+           'This feature is only available on E-Box version 1.0.5 or later and PCB version 1.1 or later.'],
+  },
+  ENV_PCB_VERSION: {
+    def: 'v1.0.1', allowed: ['v1.0.1','v1.0.2','v1.1.2','v1.1.8','v1.2.0','v1.2.2'],
+  },
+};
+
+const list = document.getElementById('list');
+const panel = document.getElementById('panel');
+const rowEls = {};
+const ERR_SVG = '<svg class="err" viewBox="0 0 256 256" fill="var(--err-fill)"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm-8,56a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm8,104a12,12,0,1,1,12-12A12,12,0,0,1,128,184Z"/></svg>';
+
+function build() {
+  list.innerHTML = '';
+  for (const r of ROWS) {
+    if (r[0] === '#') { const s = document.createElement('div'); s.className = 'section'; s.textContent = r[1]; list.appendChild(s); continue; }
+    const [type, name, value] = r;
+    const el = document.createElement('div');
+    el.className = `row t-${type}`;
+    el.innerHTML = `<div class="tag"><span>${type}</span></div><div class="name">${name}</div><div class="val">${ERR_SVG}<span class="txt">${value}</span></div>`;
+    el.dataset.type = type; el.dataset.name = name; el.dataset.value = value;
+    list.appendChild(el);
+    rowEls[name] = el;
+  }
+}
+
+let active = null;
+let caret = document.createElement('span'); caret.className = 'caret';
+
+function txt(el) { return el.querySelector('.txt'); }
+
+function renderPanel(el) {
+  if (!el) { panel.classList.remove('on'); return; }
+  const { type, name } = el.dataset;
+  const info = INFO[name] || {};
+  const tc = `t-${type}`;
+  let grid = `<div><div class="p-label">Default</div><div class="p-val" style="${info.defMuted ? 'color:var(--fg-light)' : ''}">${info.def ?? '—'}</div></div>`;
+  if (info.allowed) grid += `<div><div class="p-label">Allowed values</div>${info.allowed.map(v => `<div class="p-val">${v}</div>`).join('')}</div>`;
+  panel.className = `panel-inner ${tc}`;
+  panel.innerHTML = `
+    <div class="p-top">
+      <div class="p-tag"><span>${type}</span></div>
+      <div class="p-name">${info.name || name}</div>
+      <div class="p-grid">${grid}</div>
+      ${info.desc ? `<div class="p-desc">${info.desc.map(p => `<p>${p}</p>`).join('')}</div>` : ''}
+    </div>
+    <div class="p-editor"><div class="p-label">Editor</div><div class="p-val" id="pv">${el.dataset.value}</div></div>`;
+  requestAnimationFrame(() => panel.classList.add('on'));
+}
+
+function select(name) {
+  if (active) active.classList.remove('active');
+  caret.remove();
+  active = name ? rowEls[name] : null;
+  if (active) {
+    active.classList.add('active');
+    txt(active).after(caret);
+  }
+  renderPanel(active);
+}
+
+function setVal(v) { txt(active).textContent = v; }
+function commit(valid) {
+  const pv = document.getElementById('pv');
+  active.dataset.value = txt(active).textContent;
+  pv.textContent = active.dataset.value;
+  pv.classList.toggle('bad', !valid);
+  active.querySelector('.err').classList.toggle('on', !valid);
+  active.classList.add('edited');
+}
+
+/* ---------- timeline ---------- */
+const SCENE = new URLSearchParams(location.search).get('scene') || 'edit';
+document.documentElement.classList.add('scene-' + SCENE);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+let paused = false, runId = 0;
+async function wait(ms, id) {
+  const end = performance.now() + ms; let left = ms;
+  while (left > 0) {
+    if (id !== runId) throw 'abort';
+    if (paused) { await sleep(50); continue; }
+    const step = Math.min(left, 30); await sleep(step); left -= step;
+  }
+  if (id !== runId) throw 'abort';
+}
+async function key(fn, id, ms = 140) {
+  caret.classList.add('typing'); fn(); await wait(ms, id); caret.classList.remove('typing');
+}
+const jitter = (b) => b + Math.round(Math.random() * 60);
+
+async function play(id) {
+  build(); select(null);
+  await wait(900, id);
+
+  // 1. SNR lower limit: 10 → 15
+  select('CONFIG_RTD_SNR_LOWER_LIMIT');
+  await wait(1100, id);
+  await key(() => setVal('1'), id, jitter(220));
+  await key(() => setVal('15'), id, jitter(160));
+  await wait(450, id);
+  commit(true);
+  await wait(550, id);
+
+  // 2. Reset sequence (inspect info)
+  select('CONFIG_ALPHAGRILL_RESET_SEQUENCE');
+  await wait(800, id);
+
+  // 3. PCB version: v1.2.2 → v1.2.3 (invalid) → v1.2.0
+  select('ENV_PCB_VERSION');
+  await wait(1100, id);
+  await key(() => setVal('v1.2.'), id, jitter(200));
+  await key(() => setVal('v1.2.3'), id, jitter(160));
+  await wait(380, id);
+  commit(false);
+  await wait(1500, id);
+  await key(() => setVal('v1.2.'), id, jitter(200));
+  await key(() => setVal('v1.2.0'), id, jitter(160));
+  await wait(420, id);
+  commit(true);
+  await wait(1100, id);
+
+  // 4. Deselect
+  select(null);
+  await wait(2200, id);
+}
+
+
+/* ---------- scene: build progress ---------- */
+const BUILDS = [
+  ['v1.1h-teflonS', 'building'],
+  ['v1.1h-teflon3', 'complete', true],
+  ['v1.1h-teflon3', 'failure', true],
+  ['v1.1h-teflon2', 'complete'],
+  ['v1.1h-temp test', 'complete'],
+  ['v1.1h-teflon_temp test', 'complete'],
+  ['v1.1h', 'complete'],
+  ['v1.0.5b @ 3.6.1-rc.1', 'complete'],
+  ['v1.0.3c-mcu_lc_noX', 'complete'],
+  ['v1.0.3c-lc @ 3.6.1-rc1', 'complete'],
+  ['v1.0.3c-mcu_lc @ 3.6.1-rc.1', 'complete'],
+  ['v1.0.3c-mcu @ 3.6.1-rc.1', 'complete'],
+  ['20호기에서 샌드박스 최초 테스트', 'github'],
+];
+const ICON = {
+  check: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+  arrow: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>',
+  x: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',
+};
+const STATUS = {
+  building: ['<span class="spin"></span>', 'Building...'],
+  complete: [ICON.check, 'Complete'],
+  failure: [ICON.x, 'Server failure'],
+  github: [ICON.x, 'Github failure'],
+};
+function buildItem([name, status, recent]) {
+  const el = document.createElement('div');
+  el.className = 'bi' + (recent || status === 'building' ? ' recent' : '');
+  const act = status === 'complete' ? `<div class="bi-act bi-arrow">${ICON.arrow}</div>`
+            : status === 'failure' ? '<div class="bi-act bi-try">Try again</div>' : '';
+  el.innerHTML = `<div class="bi-name">${name}</div><div class="bi-status">${STATUS[status][0]}<span class="bi-label">${STATUS[status][1]}</span>${act}</div>`;
+  return el;
+}
+const $ = id => document.getElementById(id);
+function resetBuild() {
+  $('builds').replaceChildren(...BUILDS.map(buildItem));
+  $('dot').classList.add('on');
+  $('pop').classList.remove('on'); $('dim').classList.remove('on');
+}
+async function press(el, id) { el.classList.add('pressed'); await wait(130, id); el.classList.remove('pressed'); }
+
+// Pointer positions in stage px. Rows start 97px down the stage and step 34px (32px row + 2px gap).
+const ROW_Y = i => 97 + 34 * i + 16;
+const cursor = () => $('cursor');
+async function moveTo(x, y, id, ms = 560, hand = false) {
+  cursor().classList.remove('hand');
+  cursor().style.transform = `translate(${x}px, ${y}px)`;
+  await wait(ms, id);
+  cursor().classList.toggle('hand', hand);
+}
+async function click(el, id) {
+  cursor().classList.add('down'); el?.classList.add('pressed'); await wait(130, id);
+  cursor().classList.remove('down'); el?.classList.remove('pressed');
+}
+const hover = row => [...$('builds').children].forEach(r => r.classList.toggle('hover', r === row));
+
+async function playBuild(id) {
+  build(); select(null); resetBuild();
+  cursor().style.transition = 'none'; cursor().style.transform = 'translate(980px, 330px)';
+  cursor().offsetHeight; cursor().style.transition = ''; cursor().classList.add('on');
+  await wait(900, id);
+
+  // open the build-progress popover from the notifying button
+  await moveTo(1180, 26, id, 650, true);
+  await click($('buildBtn'), id);
+  $('dot').classList.remove('on');
+  $('pop').classList.add('on'); $('dim').classList.add('on');
+  await wait(700, id);
+
+  // skim the list: a complete build offers →, the failed one offers "Try again"
+  const rows = $('builds').children;
+  await moveTo(1150, ROW_Y(1), id, 520, true); hover(rows[1]);
+  await wait(900, id);
+  await moveTo(1090, ROW_Y(2), id, 260); hover(rows[2]);
+  await wait(500, id);
+  await moveTo(1132, ROW_Y(2) + 2, id, 320, true);
+  rows[2].querySelector('.bi-try').classList.add('hl');
+  await wait(250, id);
+  await click(rows[2].querySelector('.bi-try'), id);
+
+  // the retried teflon3 starts building again where it is
+  const retried = buildItem(['v1.1h-teflon3', 'building']);
+  rows[2].replaceWith(retried);
+  // still under the pointer, but a building row has nothing to click
+  hover(retried); cursor().classList.remove('hand');
+  await wait(2000, id);
+
+  // close
+  await moveTo(1160, 68, id, 620, true);
+  await click($('popClose'), id);
+  $('pop').classList.remove('on'); $('dim').classList.remove('on');
+  await moveTo(980, 330, id, 700);
+  await wait(1000, id);
+}
+
+async function loop() {
+  const id = ++runId;
+  document.body.classList.add('playing');
+  const scene = SCENE === 'build' ? playBuild : play;
+  try { while (true) await scene(id); } catch (e) { if (e !== 'abort') throw e; }
+}
+
+function fit() {
+  const st = document.getElementById('stage');
+  const s = Math.min(innerWidth / 1314, innerHeight / st.offsetHeight);
+  document.getElementById('stage').style.transform = `scale(${s})`;
+}
+addEventListener('resize', fit); fit();
+const root = document.documentElement;
+const params = new URLSearchParams(location.search);
+// ?embed: framed inside the portfolio carousel — transparent page, no HUD, theme follows the OS
+// (the same prefers-color-scheme the site itself themes off) unless ?theme pins it.
+if (params.has('embed')) root.classList.add('embed');
+const pinned = params.get('theme');
+const scheme = matchMedia('(prefers-color-scheme: dark)');
+const applyScheme = () => { root.dataset.theme = pinned || (scheme.matches ? 'dark' : 'light'); };
+applyScheme();
+scheme.addEventListener('change', applyScheme);
+addEventListener('keydown', e => {
+  if (e.key === 't' || e.key === 'T') root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light';
+  if (e.code === 'Space') { e.preventDefault(); paused = !paused; document.body.classList.toggle('playing', !paused); }
+  if (e.key === 'r' || e.key === 'R') { paused = false; loop(); }
+});
+document.fonts.ready.then(loop);
+</script>
+</body>
+</html>

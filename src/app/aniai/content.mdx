@@ -4,6 +4,7 @@ import Heading from '@/components/ui/heading'
 import InlineLinkPreview from '@/components/ui/inline-link-preview'
 import SupRef from '@/components/ui/sup-ref'
 import DsButtonPadding from '@/components/ui/ds-button-padding'
+import FirmwareGeneratorDemo from '@/components/ui/firmware-generator-demo'
 
 <div className="max-w-[var(--content-w)] mx-auto">
 
@@ -25,11 +26,7 @@ Testing requires firmware configured for specific test conditions. Creating this
       {
         label: "Edit",
         caption: "Fine-tuning robot behavior by editing key firmware parameters<sup>1</sup>",
-        imageUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/generator-4.png",
-        videoUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/generator-demo.mov",
-        imageSizePercent: 98,
-        imagePosition: { top: 12, left: 'center' },
-        fetchPriority: 'high'
+        content: <FirmwareGeneratorDemo />
       },
       { 
         label: "Create", 
@@ -41,10 +38,7 @@ Testing requires firmware configured for specific test conditions. Creating this
       { 
         label: "Review", 
         caption: "Tracking firmware build progress",
-        imageUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/generator-6.png",
-        videoUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/generator-demo-2.mov",
-        imageSizePercent: 240,
-        imagePosition: { top: -45, right: 23.75 }
+        content: <FirmwareGeneratorDemo scene="build" />
       },
     ]}
   />
