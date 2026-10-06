@@ -138,11 +138,13 @@ export default function LabelIndicatorCarousel({
     const imageElement = cardElement.querySelector('img');
     const videoElement = cardElement.querySelector('video');
     const mediaElement = imageElement || videoElement;
-    if (!mediaElement) return null;
+    // A live-markup card has no media; it animates as its whole 16:9 card box instead.
+    const isContentCard = !mediaElement && !!normalized[cardIndex]?.content;
+    if (!mediaElement && !isContentCard) return null;
 
     // Get bounding rect of the container (card element) for animation
     const containerRect = cardElement.getBoundingClientRect();
-    const mediaRect = mediaElement.getBoundingClientRect();
+    const mediaRect = (mediaElement ?? cardElement).getBoundingClientRect();
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
 
@@ -183,7 +185,7 @@ export default function LabelIndicatorCarousel({
     const currentItem = normalized[cardIndex];
     const hasPositionedImage = currentItem?.imageSizePercent != null && currentItem?.imageUrl;
     const hasPositionedVideo = currentItem?.imageSizePercent != null && currentItem?.videoUrl;
-    const hasPositionedMedia = hasPositionedImage || hasPositionedVideo;
+    const hasPositionedMedia = hasPositionedImage || hasPositionedVideo || isContentCard;
     
     if (hasPositionedMedia) {
       // For positioned images, animate the container size
@@ -476,7 +478,7 @@ export default function LabelIndicatorCarousel({
                   forceActive={true}
                   mobileAspect={mobileAspect}
                   cardRef={(el) => {
-                    if (effectiveLightboxEnabled && (item.imageUrl || item.videoUrl)) {
+                    if (effectiveLightboxEnabled && (item.imageUrl || item.videoUrl || item.content)) {
                       cardRefs.current[i] = el;
                     }
                   }}

@@ -57,7 +57,7 @@ export function CarouselCard({
   forceActive = false,
   mobileAspect = "16/9"
 }: CarouselCardProps) {
-  const { label, caption, imageUrl, videoUrl, alt, videoAutoplay, videoLoop, videoMuted, videoControls, cardVariant, backgroundLines, fetchPriority, withInsetShadow } = item;
+  const { label, caption, imageUrl, videoUrl, alt, videoAutoplay, videoLoop, videoMuted, videoControls, cardVariant, backgroundLines, fetchPriority, withInsetShadow, content } = item;
   const isCompact = useIsCompact();
   const imageSizePercent = (isCompact ? item.mobileImageSizePercent : null) ?? item.imageSizePercent;
   const imagePosition = (isCompact ? item.mobileImagePosition : null) ?? item.imagePosition;
@@ -111,7 +111,7 @@ export function CarouselCard({
     hasPositionedMedia || withBackgroundLines
       ? `bg-stone-200/20 dark:bg-zinc-800/70 ${isActive ? "hover:bg-stone-200/60 dark:hover:bg-zinc-800" : ""}`
       : `bg-stone-200/20 dark:bg-zinc-800/70 ${isActive ? "hover:bg-stone-200/60 dark:hover:bg-zinc-800" : ""}`;
-  const canOpenLightboxFromCard = effectiveLightboxEnabled && openLightboxOnCardClick && (imageUrl || videoUrl);
+  const canOpenLightboxFromCard = effectiveLightboxEnabled && openLightboxOnCardClick && (imageUrl || videoUrl || content);
 
   const isHiddenByLightbox = hiddenCardIndex === index;
 
@@ -286,6 +286,8 @@ export function CarouselCard({
                     onLoad={() => setIsMediaLoading(false)}
                   />
                 )
+              ) : content ? (
+                content
               ) : (
                 <div className="w-full h-full bg-stone-200/60 dark:bg-stone-800 flex items-center justify-center">
                   <span className="text-stone-500 text-sm">{label}</span>

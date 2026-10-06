@@ -167,6 +167,36 @@ function LightboxContent({
     willChange: 'transform',
   };
   
+  if (currentItem?.content && !currentItem.imageUrl && !currentItem.videoUrl) {
+    // Live markup: laid out at the final 16:9 size like everything else, so its cqw/em sizing
+    // resolves once against the lightbox box and the FLIP scale carries it to and from the card.
+    return (
+      <motion.div
+        className="relative pointer-events-auto rounded-[4px]"
+        {...motionProps}
+        style={{ ...motionStyle, aspectRatio: '16/9', boxSizing: 'border-box' }}
+      >
+        <div
+          className="absolute inset-0 overflow-hidden rounded-[4px]"
+          style={{ backgroundColor: isDarkMode ? '#232326' : '#fafafa' }}
+        >
+          {currentItem.content}
+        </div>
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            boxShadow: isDarkMode
+              ? 'inset 0 1px 0 0 rgba(255,255,255,0.03), inset 0 0 0 1px rgba(255,255,255,0.03), 0px 4px 12px rgba(0,0,0,0.4)'
+              : '0px 0px 1px 0px rgba(0,0,0,0.4), 0px 4px 8px 0px rgba(0,0,0,0.08)',
+            boxSizing: 'border-box',
+            borderRadius: '4px',
+            zIndex: 10,
+          }}
+        />
+      </motion.div>
+    );
+  }
+
   if (hasPositionedMedia) {
     // Positioned image or video mode with background layers
     return (

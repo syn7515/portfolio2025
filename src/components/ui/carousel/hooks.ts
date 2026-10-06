@@ -122,6 +122,8 @@ export type CarouselItem = {
   backgroundLines?: string;
   fetchPriority?: 'high' | 'low' | 'auto';
   withInsetShadow?: boolean;
+  // Live markup rendered in place of an image (e.g. HTML/CSS recreations that theme with dark mode).
+  content?: React.ReactNode;
 };
 
 type Normalizable =
@@ -157,7 +159,7 @@ export function normalizeItem(item: Normalizable): CarouselItem {
   }
 
   if (item && typeof item === "object") {
-    if ("label" in item || "imageUrl" in item || "videoUrl" in item) {
+    if ("label" in item || "content" in item || "imageUrl" in item || "videoUrl" in item) {
       const hasVideo = Boolean(item.videoUrl ?? item.video);
       return {
         ...DEFAULT_ITEM,
@@ -209,6 +211,7 @@ export function normalizeItem(item: Normalizable): CarouselItem {
             ? item.fetchPriority
             : 'auto',
         withInsetShadow: item.withInsetShadow === true ? true : undefined,
+        content: (item.content as React.ReactNode) ?? undefined,
       };
     }
 

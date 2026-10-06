@@ -16,6 +16,7 @@ export type CarouselItem = string | {
   mobileImageSizePercent?: number;
   mobileImagePosition?: ImagePosition;
   withInsetShadow?: boolean;
+  content?: React.ReactNode;
 };
 
 export interface LabelIndicatorCarouselProps {

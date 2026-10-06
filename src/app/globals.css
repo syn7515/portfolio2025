@@ -1115,3 +1115,17 @@ a.inline-flex.items-center {
     scroll-behavior: auto !important;
   }
 }
+
+/* Dark palette for the live design-system buttons in the Aniai carousel (ds-button-padding.tsx). */
+@media (prefers-color-scheme: dark) {
+  .ds-button-padding {
+    --ds-btn-bg: #27272a !important; /* zinc-800 */
+    --ds-btn-border: #3f3f46 !important; /* zinc-700 */
+    --ds-btn-text: #d4d4d8 !important; /* zinc-300 */
+    --ds-btn-ghost-text: rgb(255 255 255 / 0.12) !important;
+    --ds-pad-outer: rgb(248 113 113 / 0.5) !important;
+    --ds-pad-inner: rgb(248 113 113 / 0.28) !important;
+    --ds-pad-stripe: rgb(248 113 113 / 0.7) !important;
+    --ds-pad-stripe-light: rgb(248 113 113 / 0.4) !important;
+  }
+}
