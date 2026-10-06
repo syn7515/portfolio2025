@@ -165,14 +165,18 @@
   .bi-try { color: var(--stone-500); transition: color 90ms ease; }
   .bi-try.hl { text-decoration: underline; text-underline-offset: 3px; }
   .bi-try.pressed { color: var(--fg); }
-  .cursor { position: absolute; z-index: 20; left: 0; top: 0; width: 18px; height: 18px; pointer-events: none; opacity: 0;
+  .cursor { position: absolute; z-index: 20; left: 0; top: 0; width: 0; height: 0; pointer-events: none; opacity: 0;
             transition: transform 520ms cubic-bezier(0.4, 0, 0.2, 1), opacity 200ms ease; }
   .cursor.on { opacity: 1; }
-  .cursor svg { position: absolute; left: 0; top: 0; }
-  .cursor .c-hand { display: none; left: -7px; top: -1px; }
+  /* Pointers at macOS size against the 1:1 screen. The hand is Figma's "Cursor / Hand" vector and
+     shadow; the arrow matches it. Each is offset so its hotspot (arrow tip, fingertip) sits on the
+     cursor's point, and presses scale about that hotspot. */
+  .cursor svg { position: absolute; overflow: visible; filter: drop-shadow(-0.67px 0.67px 0.93px rgba(0, 0, 0, 0.6)); }
+  .cursor .c-arrow { left: -5px; top: -2.5px; transform-origin: 5px 2.5px; }
+  .cursor .c-hand { display: none; left: -9.45px; top: -1.6px; transform-origin: 9.45px 1.6px; }
   .cursor.hand .c-arrow { display: none; }
   .cursor.hand .c-hand { display: block; }
-  .cursor.down svg { transform: scale(0.9); transform-origin: 2px 2px; }
+  .cursor.down svg { transform: scale(0.9); }
 
   /* ---------- scene: create from existing parameters (?scene=create) ----------
      The Figma composition: the import dialog and the create dialog side by side with the build
@@ -330,8 +334,8 @@
     </div>
   </div>
   <div class="cursor" id="cursor">
-    <svg class="c-arrow" width="18" height="18" viewBox="0 0 24 24"><path d="M5 2.5v17.2l4.6-4.4 2.9 6.6 2.9-1.3-2.9-6.5h6.4z" fill="#fff" stroke="#000" stroke-width="1.4" stroke-linejoin="round"/></svg>
-    <svg class="c-hand" width="20" height="20" viewBox="0 0 24 24"><path d="M9.2 13V4.6a1.6 1.6 0 0 1 3.2 0V11l.2-1.3a1.5 1.5 0 0 1 3 .2v1.4l.2-.8a1.5 1.5 0 0 1 2.9.5v1.2l.2-.4a1.4 1.4 0 0 1 2.6.8v4.2c0 3.3-2.5 5.9-5.6 5.9h-2.3c-2 0-3.4-.8-4.6-2.4l-3.6-5a1.6 1.6 0 0 1 2.4-2.1z" fill="#fff" stroke="#000" stroke-width="1.3" stroke-linejoin="round"/><path d="M12.4 11.2v3.6M15.6 11.6v3.2M18.7 12.2v2.6" stroke="#000" stroke-width="1.1" stroke-linecap="round"/></svg>
+    <svg class="c-arrow" width="24" height="24" viewBox="0 0 24 24"><path d="M5 2.5v17.2l4.6-4.4 2.9 6.6 2.9-1.3-2.9-6.5h6.4z" fill="#fff" stroke="#000" stroke-width="1.2" stroke-linejoin="round"/></svg>
+    <svg class="c-hand" width="22.07" height="23.87" viewBox="0 0 22.0722 23.8667"><path d="M9.23004 20.9333H13.0479C13.0923 20.9333 13.135 20.9157 13.1664 20.8842L14.2615 19.7892C14.3826 19.668 14.5469 19.6 14.7182 19.6C14.9628 19.6 15.1864 19.7382 15.2958 19.957L15.7594 20.8842C15.7745 20.9143 15.8053 20.9333 15.8389 20.9333H17.4121C17.6175 20.9333 17.784 20.7669 17.784 20.5615C17.784 19.0524 18.1354 17.5639 18.8103 16.2141C19.6749 14.4848 20.7269 12.7343 20.4173 10.7157L20.1746 9.13408C20.0981 8.6351 19.6688 8.26667 19.164 8.26667H18.9801C18.517 8.26667 18.1415 8.64211 18.1415 9.10525V9.76506C18.1415 9.8638 18.0615 9.94384 17.9628 9.94384C17.864 9.94384 17.784 9.8638 17.784 9.76506V8.26667C17.784 7.53029 17.187 6.93333 16.4507 6.93333C15.7143 6.93333 15.1173 7.53029 15.1173 8.26667V9.79389C15.1173 9.97798 14.9681 10.1272 14.784 10.1272C14.5999 10.1272 14.4507 9.97798 14.4507 9.79389V8.26667C14.4507 7.53029 13.8537 6.93333 13.1173 6.93333C12.3809 6.93333 11.784 7.53029 11.784 8.26667V10.188C11.784 10.2397 11.7719 10.2908 11.7488 10.337C11.626 10.5827 11.2754 10.5827 11.1525 10.337C11.1294 10.2908 11.1173 10.2397 11.1173 10.188V3.6C11.1173 2.73102 10.4089 1.6 9.45066 1.6C8.49238 1.6 7.78399 2.73102 7.78399 3.6V11.8438C7.78399 12.0774 7.59468 12.2667 7.36115 12.2667C7.21024 12.2667 7.07115 12.1869 6.99394 12.0572C6.7373 11.6263 6.14026 10.6486 5.78399 10.2667C5.58317 10.0514 5.18052 9.89744 4.78882 9.79214C4.18142 9.62886 3.56494 9.92858 3.21605 10.4519C2.77101 11.1195 2.85902 12.0084 3.42634 12.5757L4.52112 13.6705C4.9132 14.0625 5.20861 14.5405 5.38395 15.0666L5.45066 15.2667C5.66987 15.9243 6.03918 16.5219 6.52934 17.012L8.25422 18.7369C8.80685 19.2895 9.11732 20.0391 9.11732 20.8206C9.11732 20.8829 9.16779 20.9333 9.23004 20.9333Z" fill="#fff" stroke="#000" stroke-width="0.8"/></svg>
   </div>
 </div>
 <div id="hud">Space: play / pause · R: restart · T: light / dark · loops automatically</div>
