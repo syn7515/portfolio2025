@@ -110,6 +110,22 @@ export default function LabelIndicatorCarousel({
   const scrollbarGutterRef = useRef(0); // Store scrollbar gutter for exit animation
   const exitFallbackTimerRef = useRef(null);
   const isLightboxClosingRef = useRef(false);
+  const lockedScrollYRef = useRef(null); // Page scroll held while the body is fixed; null when unlocked
+
+  // Undo the body scroll lock. Runs from the exit's onExitComplete, after the last frame has
+  // painted, so the page's re-layout and scrollTo never land inside the closing animation.
+  const releaseScrollLock = useCallback(() => {
+    if (lockedScrollYRef.current === null) return;
+    const savedScrollY = lockedScrollYRef.current;
+    lockedScrollYRef.current = null;
+    const body = document.body;
+    body.style.position = '';
+    body.style.top = '';
+    body.style.width = '';
+    body.style.overflow = '';
+    document.documentElement.removeAttribute('data-lightbox-open');
+    window.scrollTo(0, savedScrollY);
+  }, []);
   
   // Disable lightbox on sm and below
   const effectiveLightboxEnabled = enableLightbox && !isSmOrBelow;
@@ -299,6 +315,7 @@ export default function LabelIndicatorCarousel({
       exitFallbackTimerRef.current = null;
     }
     isLightboxClosingRef.current = false;
+    releaseScrollLock();
     setInitialTransform(null);
     setExitTransform(null);
     setExitDuration(LIGHTBOX_TRANSITION_DURATION);
@@ -307,7 +324,7 @@ export default function LabelIndicatorCarousel({
     // Reset the presence boundary as well. If Motion ever fails to release an
     // exiting child, changing this key force-unmounts that stale exit tree.
     setLightboxPresenceKey((key) => key + 1);
-  }, []);
+  }, [releaseScrollLock]);
 
   const closeLightbox = useCallback(() => {
     if (!isLightboxOpen || isLightboxClosingRef.current) return;
@@ -380,6 +397,7 @@ export default function LabelIndicatorCarousel({
     body.style.top = `-${scrollY}px`;
     body.style.width = '100%';
     body.style.overflow = 'hidden';
+    lockedScrollYRef.current = scrollY;
     document.documentElement.setAttribute('data-lightbox-open', '');
     
     // Step 5: Open lightbox with pre-calculated transform, and hide source card — all in one render
@@ -389,42 +407,8 @@ export default function LabelIndicatorCarousel({
     setPendingLightboxIndex(null);
   }, [pendingLightboxIndex, calculateCardTransform]);
 
-  // After the entrance animation completes, clear the initial transform so the lightbox can resize responsively
-  useEffect(() => {
-    if (!isLightboxOpen || !initialTransform) return;
-
-    const timer = setTimeout(() => {
-      setInitialTransform(null);
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [isLightboxOpen, initialTransform]);
-
-  // Restore scroll when lightbox closes (scroll lock is applied in pendingLightboxIndex effect)
-  useEffect(() => {
-    if (!effectiveLightboxEnabled) return;
-    
-    // Only handle cleanup - scroll lock is applied when pendingLightboxIndex is set
-    if (isLightboxOpen) {
-      // Capture scroll position from body.style.top
-      const scrollY = parseInt(document.body.style.top || '0', 10) * -1;
-      
-      return () => {
-        // When closing, wait for exit animation to complete before restoring scroll
-        const savedScrollY = scrollY;
-        const animationDuration = exitDurationRef.current * 1000;
-        setTimeout(() => {
-          const body = document.body;
-          body.style.position = '';
-          body.style.top = '';
-          body.style.width = '';
-          body.style.overflow = '';
-          document.documentElement.removeAttribute('data-lightbox-open');
-          window.scrollTo(0, savedScrollY);
-        }, animationDuration);
-      };
-    }
-  }, [effectiveLightboxEnabled, isLightboxOpen]);
+  // Never leave the page locked if the carousel unmounts mid-lightbox
+  useEffect(() => releaseScrollLock, [releaseScrollLock]);
 
   // Keyboard handler for lightbox (defined after callbacks)
   useEffect(() => {

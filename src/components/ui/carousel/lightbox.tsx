@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client"
 
-import { useState, type CSSProperties } from "react";
+import { useRef, useState, type CSSProperties } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
@@ -64,6 +64,8 @@ interface LightboxVideoProps {
   muted: boolean;
   controls: boolean;
   ariaLabel: string;
+  /** False while the open animation runs: the video stays unloaded (poster only) until it settles. */
+  load: boolean;
 }
 
 function LightboxVideo({
@@ -76,6 +78,7 @@ function LightboxVideo({
   muted,
   controls,
   ariaLabel,
+  load,
 }: LightboxVideoProps) {
   const [isReady, setIsReady] = useState(false);
 
@@ -96,7 +99,7 @@ function LightboxVideo({
         />
       )}
       <video
-        src={src}
+        src={load ? src : undefined}
         poster={poster ?? undefined}
         className={className}
         autoPlay={autoPlay}
@@ -131,39 +134,49 @@ function LightboxContent({
   const hasPositionedMedia = hasPositionedImage || hasPositionedVideo;
   const hasVideo = !!currentItem?.videoUrl;
   const withBackgroundLines = currentItem?.cardVariant === "with-background-lines";
+
+  // FLIP: the box is laid out once at its final size and only x/y/scale animate, so the open/close
+  // runs on the compositor instead of re-laying-out, re-clipping and re-painting the media and its
+  // shadows every frame the way a width/height tween does.
+  // The box is always the 16:9 lightbox frame, so the size it opens to is the size it stays at —
+  // no second resize once the entrance finishes.
+  const baseWidth = dimensions.width;
+  const baseHeight = dimensions.height;
+  // Fetching and decoding a video competes with the open animation, so it waits for it to settle.
+  const [isSettled, setIsSettled] = useState(!initialTransform);
+  const toScale = (t: TransformSnapshot) => ({
+    x: t.x,
+    y: t.y,
+    scaleX: t.width / baseWidth,
+    scaleY: t.height / baseHeight,
+  });
+  const motionProps = {
+    initial: initialTransform ? toScale(initialTransform) : (false as const),
+    animate: { x: 0, y: 0, scaleX: 1, scaleY: 1 },
+    exit: exitTransform ? toScale(exitTransform) : {},
+    transition: {
+      duration: exitTransform ? exitDuration : 0.4,
+      ease: [0.77, 0, 0.175, 1] as const,
+    },
+    onAnimationComplete: () => setIsSettled(true),
+  };
+  const motionStyle: CSSProperties = {
+    width: baseWidth,
+    height: baseHeight,
+    transformOrigin: 'center center',
+    willChange: 'transform',
+  };
   
   if (hasPositionedMedia) {
     // Positioned image or video mode with background layers
     return (
       <motion.div
         className="relative pointer-events-auto rounded-[4px]"
-        initial={initialTransform ? {
-          x: initialTransform.x,
-          y: initialTransform.y,
-          width: initialTransform.width,
-          height: initialTransform.height,
-        } : false}
-        animate={{
-          x: 0,
-          y: 0,
-          width: initialTransform ? initialTransform.finalWidth : dimensions.width,
-          height: initialTransform ? initialTransform.finalHeight : dimensions.height,
-        }}
-        exit={exitTransform ? {
-          x: exitTransform.x,
-          y: exitTransform.y,
-          width: exitTransform.width,
-          height: exitTransform.height,
-        } : {}}
-        transition={{
-          duration: exitTransform ? exitDuration : 0.4,
-          ease: [0.77, 0, 0.175, 1]
-        }}
+        {...motionProps}
         style={{
+          ...motionStyle,
           aspectRatio: '16/9',
           boxSizing: 'border-box',
-          width: !initialTransform && !exitTransform ? dimensions.width : undefined,
-          height: !initialTransform && !exitTransform ? dimensions.height : undefined,
         }}
       >
         {/* overflow-hidden scoped to inner div so border overlay shadow is not clipped */}
@@ -187,6 +200,7 @@ function LightboxContent({
                   muted={currentItem.videoMuted ?? true}
                   controls={currentItem.videoControls ?? false}
                   ariaLabel={currentItem.alt || currentItem.label || "Lightbox video"}
+                  load={isSettled}
                   style={{
                     display: 'block',
                     transformOrigin: 'center center',
@@ -214,6 +228,7 @@ function LightboxContent({
                   muted={currentItem.videoMuted ?? true}
                   controls={currentItem.videoControls ?? false}
                   ariaLabel={currentItem.alt || currentItem.label || "Lightbox video"}
+                  load={isSettled}
                   style={{
                     display: 'block',
                     transformOrigin: 'center center',
@@ -269,36 +284,14 @@ function LightboxContent({
     return (
       <motion.div
         className="relative pointer-events-auto rounded-[4px]"
-        initial={initialTransform ? {
-          x: initialTransform.x,
-          y: initialTransform.y,
-          width: initialTransform.width,
-          height: initialTransform.height,
-        } : false}
-        animate={{
-          x: 0,
-          y: 0,
-          width: initialTransform ? initialTransform.finalWidth : dimensions.width,
-          height: initialTransform ? initialTransform.finalHeight : dimensions.height,
-        }}
-        exit={exitTransform ? {
-          x: exitTransform.x,
-          y: exitTransform.y,
-          width: exitTransform.width,
-          height: exitTransform.height,
-        } : {}}
-        transition={{
-          duration: exitTransform ? exitDuration : 0.4,
-          ease: [0.77, 0, 0.175, 1]
-        }}
+        {...motionProps}
         style={{
+          ...motionStyle,
           aspectRatio: '16/9',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           boxSizing: 'border-box',
-          width: !initialTransform && !exitTransform ? dimensions.width : undefined,
-          height: !initialTransform && !exitTransform ? dimensions.height : undefined,
         }}
       >
         {/* overflow-hidden scoped to inner div so border overlay shadow is not clipped */}
@@ -314,6 +307,7 @@ function LightboxContent({
               muted={currentItem.videoMuted ?? true}
               controls={currentItem.videoControls ?? false}
               ariaLabel={currentItem.alt || currentItem.label || "Lightbox video"}
+              load={isSettled}
               style={{ display: 'block', transformOrigin: 'center center' }}
             />
           ) : (
@@ -360,7 +354,13 @@ export function Lightbox({
   const dimensions = useLightboxDimensions();
   const isPrevDisabled = lightboxIndex === 0;
   const isNextDisabled = lightboxIndex >= normalizedItems.length - 1;
-  const [cursorStyle, setCursorStyle] = useState<string>('default');
+  // Written straight to the DOM: the cursor changes on mousemove, which shouldn't re-render the lightbox
+  const hitAreaRef = useRef<HTMLDivElement>(null);
+  const setCursorStyle = (cursor: string) => {
+    if (hitAreaRef.current && hitAreaRef.current.style.cursor !== cursor) {
+      hitAreaRef.current.style.cursor = cursor;
+    }
+  };
   const [isPrevHovered, setIsPrevHovered] = useState(false);
   const [isNextHovered, setIsNextHovered] = useState(false);
 
@@ -414,12 +414,13 @@ export function Lightbox({
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
+            style={{ willChange: 'opacity' }}
             exit={{ opacity: 0 }}
             transition={{
               duration: exitTransform ? exitDuration : 0.4,
               ease: [0.77, 0, 0.175, 1],
             }}
-            className={`fixed inset-0 z-[70] backdrop-blur-[1.5px] cursor-zoom-out ${isDarkMode ? 'bg-black/70' : 'bg-stone-100/85'}`}
+            className={`fixed inset-0 z-[70] cursor-zoom-out ${isDarkMode ? 'bg-black/70' : 'bg-stone-100/85'}`}
             onClick={closeLightbox}
           />
 
@@ -432,8 +433,9 @@ export function Lightbox({
           >
             {/* Image container - positioned absolutely to allow animation without clipping */}
             <div
+              ref={hitAreaRef}
               className="absolute inset-0 pointer-events-auto flex items-center justify-center"
-              style={{ overflow: 'visible', cursor: cursorStyle }}
+              style={{ overflow: 'visible', cursor: 'default' }}
               onClick={handleClick}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
@@ -458,11 +460,11 @@ export function Lightbox({
                   <motion.div
                     className={`fixed left-0 right-0 text-center font-sans text-sm pointer-events-none ${isDarkMode ? '!text-white' : '!text-stone-600'}`}
                     style={{ top: `calc(50% + ${dimensions.height / 2}px + 1rem)` }}
-                    initial={{ opacity: 0, filter: 'blur(2px)' }}
+                    initial={{ opacity: 0, y: 4 }}
                     animate={
                       exitTransform
-                        ? { opacity: 0, filter: 'blur(2px)' }
-                        : { opacity: 1, filter: 'blur(0px)' }
+                        ? { opacity: 0, y: 4 }
+                        : { opacity: 1, y: 0 }
                     }
                     transition={{
                       duration: exitTransform ? exitDuration : 0.4,
