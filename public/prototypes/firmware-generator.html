@@ -77,7 +77,8 @@
   .crumb .c { color: var(--fg); }
   .actions { display: flex; gap: 8px; align-items: center; }
   .icon-btn { width: 32px; height: 32px; border: 1px solid var(--divider); border-radius: 6px; display: grid; place-items: center; color: var(--fg); }
-  .create { height: 32px; padding: 0 10px 0 12px; border-radius: 6px; background: var(--fg); color: var(--bg); font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+  .create { height: 32px; min-width: 63px; padding: 0 8px; border-radius: 6px; background: var(--fg); color: var(--bg); font-size: 14px; font-weight: 500; display: flex; align-items: center; justify-content: center; }
+  .create span { padding: 0 4px; }
 
   .main { flex: 1; display: flex; min-height: 0; }
   .editor { width: 946px; position: relative; overflow: hidden; background: var(--editor-bg); border-right: 1px solid var(--border); }
@@ -135,14 +136,14 @@
   .main { position: relative; }
   .dim { position: absolute; inset: 0; z-index: 5; background: rgba(28, 25, 23, 0.8); opacity: 0; pointer-events: none; transition: opacity 150ms ease; }
   .dim.on { opacity: 1; }
-  .pop { position: absolute; left: 769px; top: 44px; width: 424px; z-index: 10; background: var(--bg); border: 1px solid var(--divider); border-radius: 8px; overflow: hidden;
+  .pop { position: absolute; left: 769px; /* re-anchored to the build button in resetBuild */ top: 44px; width: 424px; z-index: 10; background: var(--bg); border: 1px solid var(--divider); border-radius: 8px; overflow: hidden;
          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
          opacity: 0; transform: scale(0.96); transform-origin: calc(100% - 16px) -8px; transition: opacity 150ms ease, transform 150ms cubic-bezier(0.2, 0.9, 0.3, 1); }
   .pop.on { opacity: 1; transform: none; }
   .pop-head { display: flex; justify-content: space-between; align-items: flex-start; padding: 12px 24px 8px; border-bottom: 1px solid var(--divider); }
   .pop-title { font-size: 14px; line-height: 24px; font-weight: 500; color: #fafaf9; }
   :root[data-theme="light"] .pop-title { color: var(--fg); }
-  .pop-close { padding: 6px; margin: -4px -6px 0 0; border-radius: 4px; color: var(--fg); transition: background-color 90ms ease; }
+  .pop-close { padding: 6px; margin: -4px -10px 0 0; border-radius: 4px; color: var(--fg); transition: background-color 90ms ease; }
   .pop-body { padding: 8px 24px 0; }
   .pop-scroll { margin: 0 -16px; height: 388px; overflow: hidden; }
   .bi { display: flex; align-items: center; gap: 20px; height: 32px; margin-bottom: 2px; padding: 0 16px; border-radius: 6px; overflow: hidden; font-size: 14px; line-height: 20px;
@@ -239,7 +240,8 @@
   .toast.out { opacity: 0; transform: none; transition-duration: 250ms; }
   .toast .msg { flex: 1; display: flex; flex-direction: column; gap: 2px; white-space: nowrap; }
   .toast .msg span + span { color: #a8a29e; opacity: 0.9; }
-  .toast .act { margin: -4px 8px -4px 0; padding: 5px 13px; min-width: 44px; line-height: 24px; border: 1px solid #44403c; border-radius: 6px; background: #292524; color: #d6d3d1; }
+  /* Inset by the same 19px on the right as above and below, so it sits evenly in the toast. */
+  .toast .act { margin: -4px -5px -4px 0; padding: 5px 13px; min-width: 44px; line-height: 24px; border: 1px solid #44403c; border-radius: 6px; background: #292524; color: #d6d3d1; }
 
   /* Fill with the app colour, not transparent: the scaled stage can miss the frame edge by a
      sub-pixel, and a see-through gap there reads as a bright hairline. */
@@ -268,7 +270,7 @@
       <div class="actions">
         <div class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.226 20.925A2 2 0 0 0 6 22h12a2 2 0 0 0 2-2V8a2.4 2.4 0 0 0-.706-1.706l-3.588-3.588A2.4 2.4 0 0 0 14 2H6a2 2 0 0 0-2 2v3.127"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="m5 11-3 3"/><path d="m5 17-3-3h10"/></svg></div>
         <div class="icon-btn" id="buildBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 1 7.38 16.75"/><path d="m16 12-4-4-4 4"/><path d="M12 16V8"/><path d="M2.5 8.875a10 10 0 0 0-.5 3"/><path d="M2.83 16a10 10 0 0 0 2.43 3.4"/><path d="M4.636 5.235a10 10 0 0 1 .891-.857"/><path d="M8.644 21.42a10 10 0 0 0 7.631-.38"/></svg><span class="dot" id="dot"></span></div>
-        <div class="create">Create <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div>
+        <div class="create"><span>Create</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div>
       </div>
     </header>
     <div class="main">
@@ -561,7 +563,16 @@ function buildItem([name, status, recent]) {
   return el;
 }
 const $ = id => document.getElementById(id);
+// Stage-px box of an element (the stage itself is scaled to fit the window).
+function stageBox(el) {
+  const st = document.getElementById('stage'), s = st.getBoundingClientRect(), b = el.getBoundingClientRect();
+  const k = s.width / st.offsetWidth;
+  return { left: (b.left - s.left) / k, top: (b.top - s.top) / k, right: (b.right - s.left) / k, bottom: (b.bottom - s.top) / k,
+           cx: ((b.left + b.right) / 2 - s.left) / k, cy: ((b.top + b.bottom) / 2 - s.top) / k };
+}
 function resetBuild() {
+  // The popover opens from the build button, its right edge flush with the button's (align end).
+  $('pop').style.left = `${stageBox($('buildBtn')).right - $('pop').offsetWidth}px`;
   $('builds').replaceChildren(...BUILDS.map(buildItem));
   $('dot').classList.add('on');
   $('pop').classList.remove('on'); $('dim').classList.remove('on');
@@ -590,7 +601,8 @@ async function playBuild(id) {
   await wait(900, id);
 
   // open the build-progress popover from the notifying button
-  await moveTo(1180, 26, id, 650, true);
+  const btn = stageBox($('buildBtn'));
+  await moveTo(btn.cx + 3, btn.cy + 2, id, 650, true);
   await click($('buildBtn'), id);
   $('dot').classList.remove('on');
   $('pop').classList.add('on'); $('dim').classList.add('on');
@@ -598,11 +610,13 @@ async function playBuild(id) {
 
   // skim the list: a complete build offers →, the failed one offers "Try again"
   const rows = $('builds').children;
-  await moveTo(1150, ROW_Y(1), id, 520, true); hover(rows[1]);
+  // Row targets are measured against the popover's design position (left 769) and follow it.
+  const px = x => x + parseFloat($('pop').style.left) - 769;
+  await moveTo(px(1150), ROW_Y(1), id, 520, true); hover(rows[1]);
   await wait(900, id);
-  await moveTo(1090, ROW_Y(2), id, 260); hover(rows[2]);
+  await moveTo(px(1090), ROW_Y(2), id, 260); hover(rows[2]);
   await wait(500, id);
-  await moveTo(1132, ROW_Y(2) + 2, id, 320, true);
+  await moveTo(px(1132), ROW_Y(2) + 2, id, 320, true);
   rows[2].querySelector('.bi-try').classList.add('hl');
   await wait(250, id);
   await click(rows[2].querySelector('.bi-try'), id);
@@ -615,7 +629,8 @@ async function playBuild(id) {
   await wait(2000, id);
 
   // close
-  await moveTo(1160, 68, id, 620, true);
+  const close = stageBox($('popClose'));
+  await moveTo(close.cx, close.cy + 1, id, 620, true);
   await click($('popClose'), id);
   $('pop').classList.remove('on'); $('dim').classList.remove('on');
   await moveTo(980, 330, id, 700);
