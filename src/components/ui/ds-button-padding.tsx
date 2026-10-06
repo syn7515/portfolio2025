@@ -10,7 +10,7 @@ const vars = {
   "--ds-btn-bg": "#ffffff",
   "--ds-btn-border": "#e7e5e4", // stone-200
   // The annotated copies sit back a step, so their outline is lighter than the real buttons'.
-  "--ds-pad-border": "rgb(253 164 175 / 0.45)", // rose-300
+  "--ds-pad-border": "rgb(253 164 175 / 0.25)", // rose-300
   "--ds-btn-text": "#57534e", // stone-600
   "--ds-btn-ghost-text": "rgb(244 63 94 / 0.3)", // rose-500
   "--ds-pad-outer": "rgb(244 63 94 / 0.3)",
