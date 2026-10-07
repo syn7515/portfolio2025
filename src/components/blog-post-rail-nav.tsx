@@ -32,9 +32,9 @@ const RAIL_EXIT_MS = 180
 const TITLE_HOVER_SESSION_MS = 2500
 
 /**
- * Home + table of contents for 820–1024px and 1100–1280px.
+ * Home + table of contents for 820–1024px and 1100–1200px.
  *
- * At ≥1280px this is the fixed text sidebar; below 820px it's the hamburger overlay. In between,
+ * At ≥1200px this is the fixed text sidebar; below 820px it's the hamburger overlay. In between,
  * --sidebar-w collapses to 0px, so there is no gutter wide enough for a text rail — the outline
  * collapses to tick marks that expand on hover, and Home becomes a ghost icon button sitting above
  * them. Up to 1024px it floats over the full-bleed paper; from there it sits on the drafting grid in
@@ -157,8 +157,8 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
         styles.railNav,
         showTitlesInstantly && styles.titlesInstant,
         // RAIL_BREAKPOINT: 24px in, the rail's 56px hit area needs the sheet's left margin to be
-        // at least 80px, which it reaches at ~1081px (70.3125vw - 680px, globals.css). 1100 leaves
-        // it ~13px clear of the sheet edge. Below that, within the sheet band, it steps aside.
+        // at least 80px, which it reaches at ~1063px (102.273vw - 1007.27px, globals.css). 1100
+        // leaves it ~38px clear of the sheet edge. Below that, within the sheet band, it steps aside.
         // Repeated in the entrance media query in blog-post-rail-nav.module.css.
         'hidden min-[820px]:flex sheet:hidden min-[1100px]:flex paper:hidden',
         // Vertically centred so the cluster stays reachable at any scroll position without being
@@ -178,7 +178,7 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
         aria-label="Back to home"
         className={cn(
           'flex h-8 w-14 items-center rounded-full pl-2',
-          // Colour copied from the ≥1280px sidebar Home link so the two read as one control. The
+          // Colour copied from the ≥1200px sidebar Home link so the two read as one control. The
           // glyph carries the hover by itself; no hover background behind it, since a tint under a
           // 16px mark and the mark's own colour change are two signals for one state.
           '!not-italic !no-underline !text-stone-400 dark:!text-zinc-400',

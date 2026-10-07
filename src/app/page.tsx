@@ -139,7 +139,7 @@ export default function Home() {
         >
         {/* Top padding on the paper: a ramp from 100px at 1200 to 140px by 1500px where --sidebar-w
             settles (40px over 300px = 13.333vw; intercept 100px - 160px = -3.75rem). It runs from the
-            paper breakpoint up; across the sheet band it holds its 1280px value, 110.67px, with the
+            paper breakpoint up; across the sheet band it holds its 1200px value, 100px, with the
             rest of the sheet's insets. Kept identical to the case-study paper in
             blog-post-layout.tsx so the two sheets hand off at the same height. */}
         {/* Below the paper breakpoint this is also the centring context: the column below sizes to
@@ -162,10 +162,10 @@ export default function Home() {
             hanging from the paper's top edge with the footer pushed to the bottom. The centred
             reading works because below that width the paper is the viewport; on the floating sheet
             the top edge is the thing content should align to. */}
-        <div className="flex-1 flex flex-col justify-center sheet:justify-start pt-16 min-[640px]:pt-24 sheet:pt-[110.67px] paper:pt-[clamp(6.25rem,calc(13.333vw_-_3.75rem),8.75rem)] pb-16 min-[640px]:pb-24 sheet:pb-10">
-        {/* 140px is this column's inset from the paper edge at 1280px (50vw - 280px - 220px there),
+        <div className="flex-1 flex flex-col justify-center sheet:justify-start pt-16 min-[640px]:pt-24 sheet:pt-[100px] paper:pt-[clamp(6.25rem,calc(13.333vw_-_3.75rem),8.75rem)] pb-16 min-[640px]:pb-24 sheet:pb-10">
+        {/* 100px is this column's inset from the paper edge at 1200px (50vw - 280px - 220px there),
             held across the sheet band so the sheet slides left without its contents moving on it. */}
-        <div className="flex flex-col sheet:flex-1 px-6 sheet:px-0 sheet:ml-[140px] paper:ml-[calc(50vw_-_var(--content-w)_/_2_-_var(--paper-left))] sheet:w-[var(--content-w)]">
+        <div className="flex flex-col sheet:flex-1 px-6 sheet:px-0 sheet:ml-[100px] paper:ml-[calc(50vw_-_var(--content-w)_/_2_-_var(--paper-left))] sheet:w-[var(--content-w)]">
         <div className="max-w-[var(--content-w)] mx-auto" data-inline-link-preview-boundary>
           {/* Left column: name */}
           {/* Below the sheet breakpoint the name tracks the viewport: 32px where the sheet appears at

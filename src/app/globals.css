@@ -91,56 +91,57 @@
 }
 
 /* The sheet breakpoint (SHEET_BREAKPOINT in src/lib/breakpoints.ts). From here the paper lifts off
-   the page as a floating sheet. Up to the paper breakpoint it is the 1280px sheet slid left: the
+   the page as a floating sheet. Up to the paper breakpoint it is the 1200px sheet slid left: the
    text sidebar is gone (the compact rail stands in for it) and the left margin shrinks linearly
-   from 220px at 1280 to 40px here — 180px over 256px, so 70.3125vw - 680px. Everything on the sheet
-   keeps the inset it had at 1280: the columns pin to it in page.tsx and blog-post-layout.tsx, the
-   carousel holds its 784px card (carousel/hooks.ts), and the offset below is the 20px the formula
-   in the paper block works out to at 1280. Only the empty right side of the sheet gives up width. */
+   from 220px at 1200 to 40px here — 180px over 176px, so 102.273vw - 1007.27px. Everything on the
+   sheet keeps the inset it had at 1200: the columns pin to it in page.tsx and blog-post-layout.tsx,
+   the carousel holds its 784px card (carousel/hooks.ts), and the offset below is the 60px the
+   formula in the paper block works out to at 1200. Only the empty right side of the sheet gives up
+   width. */
 @media (min-width: 1024px) {
   :root {
     --paper-box-shadow: inset 0 0 0 0.5px var(--paper-inset-shadow), 0 30px 60px 0 var(--paper-drop-shadow);
-    --paper-left: calc(70.3125vw - 680px);
-    --paper-center-offset: 20px;
+    --paper-left: calc(102.273vw - 1007.27px);
+    --paper-center-offset: 60px;
   }
 }
 
 /* The paper breakpoint. A media query can't read a custom property, so this literal is the CSS
    half of PAPER_BREAKPOINT in src/lib/breakpoints.ts — see there before changing it. */
-@media (min-width: 1280px) {
+@media (min-width: 1200px) {
   :root {
     --sidebar-w: clamp(220px, calc(27.273vw - 129.09px), 280px);
 
-    /* Wide screens (PAPER_MAX_WIDTH in src/lib/breakpoints.ts): the sheet stops growing at 1200px,
-       which it reaches at ~1475px; from there the extra width opens up a right margin while the
-       left one holds at --sidebar-w, and once the two are equal — 280px each at 1760px — the sheet
+    /* Wide screens (PAPER_MAX_WIDTH in src/lib/breakpoints.ts): the sheet stops growing at 1120px,
+       which it reaches at ~1365px; from there the extra width opens up a right margin while the
+       left one holds at --sidebar-w, and once the two are equal — 280px each at 1680px — the sheet
        centres on the viewport and both grow together. Nothing steps: the paper's width, both its
        margins and everything on it move continuously through the whole range.
        The column formulas in page.tsx and blog-post-layout.tsx centre on the viewport measured
        from --paper-left, so once the sheet is centred they resolve to a fixed inset on it with no
        change of their own. The text sidebar is placed against --paper-left too, so it stays
        beside the sheet rather than at the viewport's edge. */
-    --paper-max-w: 1200px;
+    --paper-max-w: 1120px;
     --paper-left: max(var(--sidebar-w), calc((100vw - var(--paper-max-w)) / 2));
     --paper-right: max(0px, calc(100vw - var(--paper-left) - var(--paper-max-w)));
 
     /* On the wide sheet 560px of text starts to look narrow on it, so the column opens up with the
-       sheet: 560px here, 640px by 1760px where the sheet centres, and fixed from there with the
-       rest of its insets. 80px over 480px = 16.667vw; intercept 560px - 213.33px = 346.67px. */
-    --content-w: clamp(560px, calc(16.6667vw + 346.667px), 640px);
+       sheet: 560px up to 1280px, 640px by 1680px where the sheet centres, and fixed from there
+       with the rest of its insets. 80px over 400px = 20vw; intercept 560px - 256px = 304px. */
+    --content-w: clamp(560px, calc(20vw + 304px), 640px);
 
-    /* Mirror of the card width useResponsiveSizing computes (carousel/hooks.ts): a ramp anchored at
-       720px at 1200 — 784px by the time it starts here — capped at 880px from 1400px, and never
-       wider than the paper minus a gap on each side. */
+    /* Mirror of the card width useResponsiveSizing computes (carousel/hooks.ts): a ramp from the
+       sheet band's 784px here, rising 0.8px per px of viewport, capped at 880px from 1320px, and
+       never wider than the paper minus a gap on each side. */
     --carousel-card-w: min(
-      clamp(720px, calc(720px + (100vw - 1200px) * 0.8), 880px),
+      clamp(784px, calc(784px + (100vw - 1200px) * 0.8), 880px),
       calc(100vw - var(--paper-left) - var(--paper-right) - 96px)
     );
 
     /* Cards centre on the viewport, but the paper's left edge is inset by --paper-left, so a card
        that centred naively would hang off the sheet. The carousel pushes itself right by whatever
        it takes to keep 48px (CARD_EDGE_GAP) from that edge, which leaves the text column — centred
-       on the viewport — sitting off that axis by the same amount: 20px at 1280px, ~41px at 1400px,
+       on the viewport — sitting off that axis by the same amount: 60px at 1200px, ~41px at 1400px,
        nothing once the viewport is wide enough (~1536px) that a centred card already clears the
        edge. The text rides the same offset so body, header and cards share one centre line.
 

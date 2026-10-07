@@ -15,7 +15,7 @@ module.exports = {
         /* The width at which the text sidebar appears and the sheet shifts right to make room.
            Kept in step with PAPER_BREAKPOINT in src/lib/breakpoints.ts, which explains the value
            and lists the other places it is written out. */
-        paper: '1280px',
+        paper: '1200px',
       },
       keyframes: {
         shimmer: {

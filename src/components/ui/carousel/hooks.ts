@@ -276,9 +276,8 @@ export function calculateImagePosition(
 // clamp for a paper too narrow to hold the card at all.
 const CARD_EDGE_GAP = 48;
 
-// Where the card ramp sits at 720px. It predates the paper breakpoint moving to 1280, and is kept
-// here so card sizes from 1280 up are unchanged.
-const CARD_RAMP_START = 1200;
+// The card across the sheet band, and where the ramp above the paper breakpoint starts from.
+const CARD_BAND_WIDTH = 784;
 
 // The widest a card gets. Mirrored by the clamp in --carousel-card-w (globals.css).
 const CARD_MAX_WIDTH = 880;
@@ -346,12 +345,12 @@ export function useResponsiveSizing(
         const gap = Math.round(28 + ((width - 640) / (784 - 640)) * 12);
         setSize({ cardWidth: width, cardHeight: height, gap });
       } else {
-        // A ramp anchored at 720px at 1200, rising 0.8px per px of viewport to CARD_MAX_WIDTH at
-        // 1400px, and held at its 1280px value (784px) across the sheet band so the card keeps its
-        // place on the sheet as it slides. --carousel-card-w in globals.css mirrors this.
+        // A ramp from CARD_BAND_WIDTH at the paper breakpoint, rising 0.8px per px of viewport to
+        // CARD_MAX_WIDTH at 1320px, and held at that 784px across the sheet band so the card keeps
+        // its place on the sheet as it slides. --carousel-card-w in globals.css mirrors this.
         const rampW = Math.max(w, PAPER_BREAKPOINT);
         const idealWidth = Math.round(
-          Math.min(CARD_MAX_WIDTH, 720 + (rampW - CARD_RAMP_START) * 0.8)
+          Math.min(CARD_MAX_WIDTH, CARD_BAND_WIDTH + (rampW - PAPER_BREAKPOINT) * 0.8)
         );
         // Cards centre on the column they sit in, which already rides --paper-center-offset and is
         // therefore far enough from the paper's left edge — nothing to shift here. Only shrink if
