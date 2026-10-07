@@ -7,6 +7,7 @@ import DsButtonPadding from '@/components/ui/ds-button-padding'
 import DesignSystemDemo from '@/components/ui/design-system-demo'
 import UpdateManagerDemo from '@/components/ui/update-manager-demo'
 import UpdatePackageDemo from '@/components/ui/update-package-demo'
+import UpdateHistoryDemo from '@/components/ui/update-history-demo'
 import FirmwareGeneratorDemo from '@/components/ui/firmware-generator-demo'
 
 <div className="max-w-[var(--content-w)] mx-auto">
@@ -77,9 +78,7 @@ Managing updates at the level of individual robots did not scale. With the new u
       { 
         label: "Review", 
         caption: "Software update history of robot groups<sup>2</sup>",
-        imageUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/manager-6.png",
-        imageSizePercent: 95,
-        imagePosition: { top: 10, left: 'center' }
+        content: <UpdateHistoryDemo />
       },
     ]}
   />

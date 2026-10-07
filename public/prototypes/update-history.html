@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en" class="no-anim">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Update history — prototype</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+<style>
+  /* The "manager-6" Figma frame: the release center's update history, service groups down the side
+     and one column per released firmware, scrolled to the latest two. Figma draws it at 0.8749×
+     (1055×659 with a 1px outline around it, the 1057×661 the old image covered); this page is built
+     at the base size it stands for (14px body text, 40px rows) and the stage scales to fit. */
+  :root {
+    --bg: #ffffff;
+    --fg: #1c1917;
+    --muted-fg: #78716c;
+    --border: #e7e5e4;
+    --soft-border: rgba(231, 229, 228, 0.5);
+    --secondary: #f5f5f4;
+    --primary: #57534e;
+    --tint: rgba(245, 245, 244, 0.4);
+    --mono: "SF Mono", ui-monospace, Menlo, monospace;
+    --sans: "Pretendard Variable", Pretendard, -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: #e7e5e4; overflow: hidden; }
+  /* Embedded, the outline around the frame sits on the carousel card itself. */
+  .embed, .embed body { background: transparent; }
+  body { font-family: var(--sans); font-size: 14px; line-height: 20px; color: var(--fg); -webkit-font-smoothing: antialiased; }
+  svg { display: block; }
+  .ic { width: 16px; height: 16px; flex-shrink: 0; }
+
+  #stage { position: absolute; left: 50%; top: 50%; width: 1208.2px; height: 755.55px; margin: -377.78px 0 0 -604.1px; transform-origin: center; }
+  /* Figma's 1px outline (1.143px at this size) sits outside the frame */
+  .frame { position: absolute; left: 1.143px; top: 1.143px; width: 1205.91px; height: 753.27px; display: flex; overflow: hidden; background: var(--bg);
+           box-shadow: 0 0 0 1.143px rgba(0, 0, 0, 0.1); }
+
+  /* sidebar */
+  .sidebar { width: 48px; flex-shrink: 0; background: var(--secondary); border-right: 1px solid var(--soft-border); display: flex; flex-direction: column; }
+  .sb-head { padding: 14px 8px 36px; }
+  .sb-list { padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+  .sb-btn { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 6px; color: var(--primary); transition: background-color 90ms ease; }
+  .sb-btn.on { background: var(--border); color: var(--fg); }
+
+  .content { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .topnav { height: 48px; flex-shrink: 0; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; }
+  .btns { display: flex; gap: 8px; }
+  .btn { height: 32.57px; min-width: 64px; padding: 0 12px; display: flex; align-items: center; gap: 4px; border-radius: 6px; font-weight: 500; transition: background-color 90ms ease, opacity 90ms ease, filter 90ms ease; }
+  .btn.outline { border: 1px solid var(--border); padding: 0 11px; background: var(--bg); color: var(--primary); }
+  .btn.solid { gap: 0; padding: 0 8px; background: var(--primary); color: #fafaf9; }
+
+  /* ---------- history table ----------
+     Every row is 40px with its rules drawn inside it, as Figma does: a full rule under the header,
+     soft ones between the groups and a full one under the last. The group column stays put while
+     the firmware columns scroll beneath its edge shadow; a white fade covers the right edge. */
+  .table { position: relative; flex: 1; min-height: 0; display: flex; }
+  .sg { position: relative; z-index: 2; width: 216px; flex-shrink: 0; background: var(--bg); border-right: 1px solid var(--soft-border); }
+  .sg::after { content: ""; position: absolute; top: 0; bottom: 0; left: 100%; width: 17px; pointer-events: none;
+               background: linear-gradient(to right, rgba(0, 0, 0, 0.026), rgba(0, 0, 0, 0.012) 30%, rgba(0, 0, 0, 0.004) 65%, transparent);
+               opacity: 0; transition: opacity 150ms ease; }
+  .scrolled .sg::after { opacity: 1; }
+  .hd, .r, .cell { height: 40px; display: flex; align-items: center; padding: 0 32px; box-shadow: inset 0 -1px 0 var(--soft-border); transition: background-color 60ms ease; }
+  .hd { background: var(--tint); box-shadow: inset 0 1px 0 var(--border), inset 0 -1px 0 var(--border); }
+  .last { box-shadow: inset 0 -1px 0 var(--border); }
+  .r { color: var(--muted-fg); white-space: nowrap; }
+  .r .indent { padding-right: 8px; font-weight: 500; opacity: 0.3; }
+
+  .plans { flex: 1; min-width: 0; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
+  .plans::-webkit-scrollbar { display: none; }
+  .track { display: flex; width: max-content; height: 100%; }
+  .plan { width: 480px; flex-shrink: 0; }
+  .plan .hd { gap: 24px; padding-right: 0; }
+  .plan .hd .t { flex: 1; min-width: 0; font-weight: 500; line-height: 24px; color: var(--muted-fg); white-space: pre; overflow: hidden; text-overflow: ellipsis; }
+  /* the arrow to the next release straddles the column edge (Figma pads it -8px past the column) */
+  .plan .hd .ic { margin-right: -8px; color: var(--muted-fg); opacity: 0.4; }
+  .cell { gap: 12px; white-space: nowrap; }
+  .badge { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; padding: 1px 4.3px; border-radius: 4px; font-family: var(--mono); font-size: 12px; line-height: 16px; }
+  /* the HMI badge's stroke sits outside its box, as Figma draws it */
+  .badge.hmi { box-shadow: 0 0 0 1px var(--border); color: var(--fg); }
+  .badge.mcu { padding: 1px 3.3px; background: var(--secondary); color: var(--primary); }
+  /* Figma's separator is a zero-width box whose stroke falls just left of it */
+  .sep { width: 1px; height: 12px; margin-left: -1px; background: var(--soft-border); }
+  .fw { display: flex; align-items: center; gap: 2px; color: var(--muted-fg); }
+  /* Figma's text boxes run a hair past the glyphs, which sets where the "@" and the MCU badge land */
+  .fw .ver { padding-right: 0.4px; }
+  .fw .at { padding-right: 0.5px; opacity: 0.5; }
+  .fade { position: absolute; z-index: 3; top: 0; right: 0; bottom: 0; width: 150.88px; pointer-events: none;
+          background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.7)); transition: opacity 150ms ease; }
+  .at-end .fade { opacity: 0; }
+
+  /* hovering a cell lights its row across the table and its release down the column, the cell
+     where they cross a step darker, as Figma's hover frame shows */
+  .hr { background: var(--tint); }
+  .plan.hc .hd { background: rgba(245, 245, 244, 0.8); }
+  .plan.hc .cell { background: var(--tint); }
+  .plan.hc .cell.hr { background: var(--secondary); }
+
+  /* ---------- real pointer input ----------
+     In the lightbox the page takes real hover and clicks (on the carousel card it's inert): the
+     table lights the hovered row and release, a firmware name underlines like the link it is, the
+     releases scroll sideways (a vertical wheel scrolls them too), and the buttons show hover and
+     press. Text doesn't select. */
+  html { -webkit-user-select: none; user-select: none; cursor: default; }
+  .ver { cursor: pointer; text-underline-offset: 1.5px; text-decoration-thickness: 1px; }
+  .ver:active { opacity: 0.7; }
+  /* Hover only where a pointer can hover: on a touch screen a tap would leave it stuck on. */
+  @media (hover: hover) and (pointer: fine) {
+    .ver:hover { text-decoration-line: underline; }
+    .sb-btn:not(.on):hover { background: var(--border); }
+    .btn.outline:hover { background: var(--secondary); }
+    .btn.solid:hover { opacity: 0.9; }
+  }
+  .sb-btn:active, .btn:active { filter: brightness(0.92); }
+  .no-anim, .no-anim * { transition: none !important; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="frame">
+    <aside class="sidebar">
+      <div class="sb-head"><div class="sb-btn"><svg class="ic" viewBox="0 0 21.3333 21.3333"><path d="M10.6664 1.77561C15.096 1.77561 18.6613 5.30172 18.6674 9.62326V19.5578H17.4047V10.5207H17.4057V9.63401C17.4054 5.95134 14.3741 2.99045 10.6664 2.99045C6.95882 2.99047 3.92843 5.95097 3.92817 9.63401V9.63498C3.92858 13.3178 6.9586 16.2795 10.6664 16.2795H11.8745L12.2651 17.4934H10.6664C8.64409 17.4934 6.80249 16.7541 5.39399 15.5393L3.92817 14.2746V19.5578H2.6645V9.63401C2.66476 5.30753 6.23327 1.77563 10.6664 1.77561Z" stroke="#57534E" stroke-width="1.77333" fill="none"/></svg></div></div>
+      <div class="sb-list">
+        <div class="sb-btn"><i data-icon="house"></i></div>
+        <div class="sb-btn on"><i data-icon="chevrons-left-right-ellipsis"></i></div>
+        <div class="sb-btn"><i data-icon="flask-conical"></i></div>
+      </div>
+    </aside>
+    <div class="content">
+      <div class="topnav">
+        <span>Release center</span>
+        <div class="btns"><div class="btn outline">Field config</div><div class="btn solid"><i data-icon="plus"></i><span style="padding: 0 4px">New release</span></div></div>
+      </div>
+      <div class="table" id="table">
+        <div class="sg" id="sg"></div>
+        <div class="plans" id="plans"><div class="track" id="track"></div></div>
+        <div class="fade"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------- icons (Lucide at 16px) ---------- */
+const ICONS = {
+  'house': '<path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+  'chevrons-left-right-ellipsis': '<path d="M12 12h.01"/><path d="M16 12h.01"/><path d="m17 7 5 5-5 5"/><path d="m7 7-5 5 5 5"/><path d="M8 12h.01"/>',
+  'flask-conical': '<path d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2"/><path d="M6.453 15h11.094"/><path d="M8.5 2h7"/>',
+  'arrow-right': '<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
+  'plus': '<path d="M5 12h14"/><path d="M12 5v14"/>',
+};
+const icon = name => `<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[name]}</svg>`;
+const $ = id => document.getElementById(id);
+
+/* ---------- history ----------
+   Service groups, indented where one inherits from the group above, and the three releases Figma
+   fills in (its older columns are placeholder copies), each giving every group an MCU firmware and
+   the config it was built against. The HMI app is 3.5.8 throughout. */
+const GROUPS = [['AG1.0', false], ['AG 1.0.5', true], ['AG 1.0.6', false], ['AG 1.1', false], ['AG 1.1_KR', true], ['AG 1.1_US', true], ['AG 1.1_EU', true]];
+const PLANS = [
+  ['FW 3.5.11', [['v1.0.2', '3.5.11'], ['v1.0.3a-no_corr', '3.5.11-bas'], ['v1.0.5a', '3.5.11-bas'], ['v1.1g', '3.5.11'], ['v1.1g', '3.5.11-bas'], ['v1.1g-lotteria', '3.5.11'], ['v1.1gMoms', '3.5.11']]],
+  ['FW 3.5.12', [['v1.0.2', '3.5.12'], ['v1.0.3a-no_corr', '3.5.12'], ['v1.0.5a', '3.5.12'], ['v1.1g', '3.5.12'], ['v1.1g-KR', '3.5.12'], ['v1.1g-US', '3.5.12'], ['v1.1g-EU', '3.5.12']]],
+  // Figma's label carries a leading space
+  [' FW 3.6.0', [['v1.0.2', '3.6.0'], ['v1.0.3a-no_corr', '3.6.0-bas'], ['v1.0.5a', '3.6.0-bas'], ['v1.1g', '3.6.0'], ['v1.1g', '3.6.0-bas'], ['v1.1g-lotteria', '3.6.0'], ['v1.1g-moms', '3.6.0']]],
+];
+const last = i => (i === GROUPS.length - 1 ? ' last' : '');
+$('sg').innerHTML = '<div class="hd"></div>' + GROUPS.map(([name, indent], i) =>
+  `<div class="r${last(i)}" data-r="${i}">${indent ? '<span class="indent">↪</span>' : ''}${name}</div>`).join('');
+$('track').innerHTML = PLANS.map(([label, rows], c) => `
+  <div class="plan" data-c="${c}">
+    <div class="hd"><span class="t">${label}</span>${c < PLANS.length - 1 ? icon('arrow-right') : ''}</div>
+    ${rows.map(([fw, cfg], i) => `<div class="cell${last(i)}" data-r="${i}"><span class="badge hmi">3.5.8</span><span class="sep"></span><span class="fw"><span class="ver">${fw}</span><span class="at">@</span><span class="badge mcu">${cfg}</span></span></div>`).join('')}
+  </div>`).join('');
+document.querySelectorAll('i[data-icon]').forEach(i => { i.outerHTML = icon(i.dataset.icon); });
+
+// Scrolled as in Figma: FW 3.5.12 sits 119px into the scroll area, FW 3.5.11 mostly off to the left.
+const table = $('table'), plans = $('plans');
+plans.scrollLeft = 360.92;
+const edges = () => {
+  table.classList.toggle('scrolled', plans.scrollLeft > 0.5);
+  table.classList.toggle('at-end', plans.scrollLeft >= plans.scrollWidth - plans.clientWidth - 0.5);
+};
+plans.addEventListener('scroll', edges, { passive: true });
+edges();
+// Nothing here scrolls vertically, so a vertical wheel moves the releases sideways.
+plans.addEventListener('wheel', e => {
+  if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+  e.preventDefault();
+  plans.scrollLeft += e.deltaY;
+}, { passive: false });
+
+let lit = { r: null, c: null };
+function light(r, c) {
+  if (r === lit.r && c === lit.c) return;
+  document.querySelectorAll('.hr').forEach(el => el.classList.remove('hr'));
+  document.querySelectorAll('.hc').forEach(el => el.classList.remove('hc'));
+  if (r != null) document.querySelectorAll(`[data-r="${r}"]`).forEach(el => el.classList.add('hr'));
+  if (c != null) document.querySelector(`.plan[data-c="${c}"]`).classList.add('hc');
+  lit = { r, c };
+}
+table.addEventListener('pointerover', e => {
+  if (e.pointerType === 'touch') return;
+  const r = e.target.closest('[data-r]')?.dataset.r ?? null;
+  const c = e.target.closest('.plan')?.dataset.c ?? null;
+  light(r, c);
+});
+table.addEventListener('pointerleave', () => light(null, null));
+
+/* ---------- embedding ----------
+   Same handshake as the other prototypes: once the first frame has painted, transitions come back
+   and an embedding page is told this one is ready to show (and told again if it asks with
+   "proto:ping", in case it only started listening after the page had loaded). */
+const SCENE = 'history';
+const root = document.documentElement;
+if (new URLSearchParams(location.search).has('embed')) root.classList.add('embed');
+let shown = false;
+const announce = () => { if (parent !== window) parent.postMessage({ type: 'proto:ready', scene: SCENE }, location.origin); };
+addEventListener('message', e => { if (e.origin === location.origin && e.data === 'proto:ping' && shown) announce(); });
+document.fonts.ready.then(() => requestAnimationFrame(() => requestAnimationFrame(() => {
+  root.classList.remove('no-anim');
+  shown = true;
+  announce();
+})));
+
+function fit() {
+  const st = $('stage');
+  st.style.transform = `scale(${Math.min(innerWidth / st.offsetWidth, innerHeight / st.offsetHeight)})`;
+}
+addEventListener('resize', fit); fit();
+addEventListener('keydown', e => {
+  if (!root.classList.contains('embed')) return;
+  // A click into the lightbox's live copy moves keyboard focus into this page, so hand the
+  // lightbox's own keys back to it.
+  if (e.key === 'Escape' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+    e.preventDefault();
+    parent.dispatchEvent(new KeyboardEvent('keydown', { key: e.key, code: e.code, bubbles: true, cancelable: true }));
+  }
+});
+</script>
+</body>
+</html>
