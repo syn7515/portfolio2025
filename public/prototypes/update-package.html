@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en" class="no-anim">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Update package — prototype</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+<style>
+  /* The "manager-5" Figma composition: the update-firmware dialog on desktop beside the same flow as
+     a drawer on an iPhone 16 Pro, on no background (the carousel card shows around them). The stage
+     is the 1042×918 the old image covered: Figma's 1029×918 plus the 13px the dialog's shadow
+     reaches to its left. The dialog is drawn at Figma's 1.0646× of its 526×610 base; the phone at 1:1.
+     Heights follow what Figma rendered rather than its export, which adds borders Figma draws inside. */
+  :root {
+    --bg: #ffffff;
+    --fg: #1c1917;
+    --fg-light: #44403c;
+    --card-fg: #161210;
+    --muted-fg: #78716c;
+    --muted: #f5f5f4;
+    --border: #e7e5e4;
+    --primary: #57534e;
+    --ring: #a8a29e;
+    --mono: "SF Mono", ui-monospace, Menlo, monospace;
+    --sans: "Pretendard Variable", Pretendard, -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: #d6d3d1; overflow: hidden; }
+  .embed, .embed body { background: transparent; }
+  body { font-family: var(--sans); font-size: 14px; line-height: 20px; color: var(--fg); -webkit-font-smoothing: antialiased; }
+  svg { display: block; }
+
+  #stage { position: absolute; left: 50%; top: 50%; width: 1042px; height: 918px; margin: -459px 0 0 -521px; transform-origin: center; }
+
+  /* package cards, shared by both screens */
+  .month { position: relative; height: 25.77px; }
+  .dr-group + .dr-group .month { height: 26.63px; }
+  .month span { position: absolute; left: 0; top: 6px; padding: 2px 24px; font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.06em; color: var(--muted-fg); opacity: 0.7; }
+  /* the picked card gets a stone scrim and stroke (drawn outside it as Figma does, so picking moves
+     nothing) and a filled check at the end of its name row */
+  .pkg { display: flex; flex-direction: column; gap: 12px; padding: 18px 24px 16px; border-radius: 8px; background: var(--bg); transition: background-color 90ms ease, box-shadow 90ms ease; }
+  .pkg.on { background: #f1efef; box-shadow: 0 0 0 1px var(--ring); }
+  .pkg .info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .pkg .head { display: flex; align-items: center; gap: 8px; }
+  .pkg .name { flex: 1; min-width: 0; font-weight: 500; color: var(--fg-light); }
+  .pkg .check { flex-shrink: 0; color: var(--primary); opacity: 0; transition: opacity 90ms ease; }
+  .pkg.on .check { opacity: 1; }
+  .pkg .name, .pkg .note { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pkg .note { color: var(--muted-fg); }
+  .sw { display: flex; align-items: center; gap: 8px; white-space: nowrap; opacity: 0.8; transition: opacity 90ms ease; }
+  .pkg.on .sw { opacity: 1; }
+  /* Figma's text boxes run a little past the glyphs (the mono ones ~1px), so the badges, the dot and
+     the "@" keep that room and everything after them lands where Figma has it. The HMI badge's
+     stroke sits outside its box, as Figma draws it. */
+  .badge { display: inline-flex; align-items: center; padding: 1px 4px; min-width: 18px; border-radius: 4px; font-family: var(--mono); font-size: 12px; line-height: 16px; }
+  .badge.hmi { padding-right: 4.91px; box-shadow: 0 0 0 1px var(--border); color: var(--fg-light); }
+  .d-group + .d-group .hmi, .dr-group + .dr-group .hmi { color: var(--fg); }
+  .badge.mcu { padding-right: 6px; background: var(--muted); color: var(--primary); }
+  .dot { width: 4px; color: var(--ring); }
+  .fw { display: flex; align-items: center; gap: 2px; color: var(--muted-fg); }
+  .fw .ver { display: flex; align-items: center; gap: 2.4px; }
+  .fw .ver.mono { gap: 4.91px; font-family: var(--mono); font-size: 12px; line-height: 16px; }
+  .fw .at { opacity: 0.5; font-family: var(--sans); }
+  .scroll { overflow-y: auto; scrollbar-width: none; }
+  .scroll::-webkit-scrollbar { display: none; }
+
+  /* desktop dialog */
+  .dialog-wrap { position: absolute; left: 13px; top: 46px; width: 560px; height: 649.43px; }
+  .dialog { position: absolute; left: 0; top: 0; width: 526px; height: 610px; transform: scale(1.0646); transform-origin: 0 0; display: flex; flex-direction: column; overflow: hidden;
+            background: var(--bg); border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1); }
+  .dialog::after { content: ""; position: absolute; inset: 0; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: inherit; pointer-events: none; }
+  /* Figma rounds the dialog's line heights to whole pixels at its 1.0646× size */
+  .dialog .pkg { line-height: 20.66px; }
+  .dialog .badge, .dialog .fw .ver.mono, .dialog .month span { line-height: 16.9px; }
+  .dialog .badge.mcu { padding-right: 5.6px; }
+  .dialog .badge.hmi { padding-right: 4px; }
+  .dialog .dot { width: auto; }
+  .dialog .fw .ver.mono { gap: 5.57px; }
+  .d-head { height: 61.85px; flex-shrink: 0; padding: 24px 8px 0 24px; }
+  .d-title { font-size: 18px; line-height: 1; font-weight: 600; letter-spacing: -0.62px; color: var(--card-fg); }
+  .d-close { position: absolute; top: 13px; right: 13.1px; padding: 12px; border-radius: 8px; color: var(--primary); transition: background-color 90ms ease; }
+  .d-tabs { height: 40px; flex-shrink: 0; display: flex; gap: 6px; padding: 0 0 4px 14px; }
+  .d-tab { height: 36px; padding: 8px 10px 0; border-radius: 6px; transition: background-color 90ms ease; }
+  .d-tab span { display: block; padding-bottom: 12px; color: var(--muted-fg); }
+  .d-tab.on span { color: var(--fg); box-shadow: inset 0 -1.25px 0 var(--primary); }
+  .d-body { flex: 1; min-height: 0; background: var(--muted); padding: 28px 40px; }
+  .d-list { display: flex; flex-direction: column; gap: 72px; padding: 40px 0; }
+  .d-group { position: relative; display: flex; flex-direction: column; gap: 12px; }
+  .d-group .month { position: absolute; left: 13px; top: -38px; height: auto; padding: 6px 0; background: var(--muted); }
+  .d-group + .d-group .month { top: -36px; }
+  .d-group .month span { position: static; display: block; padding: 2px 10px; }
+  .d-foot { height: 64.4px; flex-shrink: 0; display: flex; justify-content: flex-end; align-items: flex-start; gap: 8px; padding: 11px 24px 0; background: var(--bg); border-top: 1px solid rgba(231, 229, 228, 0.5); }
+  /* Cancel keeps the slate of the stock button it came from, as Figma has it */
+  .btn { display: flex; align-items: center; justify-content: center; min-width: 64px; padding: 5px 11px; border-radius: 6px; border: 1px solid #e2e8f0; font-weight: 500; line-height: 24px; color: #0f172a; background: var(--bg); transition: background-color 90ms ease, opacity 90ms ease, filter 90ms ease; }
+  .btn.primary { border-color: var(--primary); background: var(--primary); color: #fafaf9; }
+  .d-foot .btn { line-height: 24.42px; }
+
+  /* phone drawer */
+  .phone { position: absolute; left: 640px; top: 0; width: 402px; height: 918px; overflow: hidden; background: var(--bg); border: 1px solid rgba(0, 0, 0, 0.1); }
+  .ph-screen { position: absolute; left: -1px; top: -1px; width: 402px; height: 874px; overflow: hidden; background: rgba(214, 211, 209, 0.8); }
+  .ph-status { position: absolute; left: 0; top: 0; width: 402px; display: flex; align-items: center; gap: 6px; padding: 11px 16px; }
+  .ph-status .time { flex: 1; text-align: center; padding-top: 2px; font-family: "SF Pro Text", -apple-system, system-ui, sans-serif; font-size: 17px; line-height: 22px; font-weight: 600; color: #000; }
+  .ph-status .island { width: 125px; height: 37px; }
+  .ph-status .levels { flex: 1; display: flex; justify-content: center; align-items: center; gap: 7px; padding-top: 1px; }
+  .drawer { position: absolute; left: 0; top: 62px; width: 402px; height: 812px; overflow: hidden; display: flex; flex-direction: column; background: var(--bg); border-radius: 12px 12px 0 0;
+            filter: drop-shadow(0 10px 7.5px rgba(0, 0, 0, 0.1)) drop-shadow(0 4px 3px rgba(0, 0, 0, 0.1)); }
+  .dr-handle { padding-top: 16px; display: flex; justify-content: center; flex-shrink: 0; }
+  .dr-handle span { width: 100px; height: 8px; border-radius: 999px; background: var(--muted); }
+  .dr-head { position: relative; padding: 16px; flex-shrink: 0; text-align: center; font-size: 16px; line-height: 24px; font-weight: 500; color: var(--card-fg); }
+  .dr-back { position: absolute; left: 16.15px; top: 12px; padding: 8px; border-radius: 6px; color: var(--primary); transition: background-color 90ms ease; }
+  .dr-tabs { display: flex; flex-shrink: 0; box-shadow: inset 0 -1px 0 var(--border); }
+  .dr-tab { flex: 1; padding: 8px 16px 14px; text-align: center; font-size: 16px; line-height: 24px; font-weight: 500; color: var(--muted-fg); transition: background-color 90ms ease; }
+  .dr-tab.on { color: var(--fg); box-shadow: inset 0 -2px 0 var(--primary); }
+  .dr-tab:hover { box-shadow: inset 0 -1px 0 var(--border); }
+  .dr-tab.on:hover { box-shadow: inset 0 -2px 0 var(--primary); }
+  .dr-body { flex: 1; min-height: 0; background: var(--muted); padding: 28px 16px; }
+  .dr-list { display: flex; flex-direction: column; gap: 40px; }
+  .dr-group { display: flex; flex-direction: column; gap: 12px; }
+  .dr-group + .dr-group { gap: 10px; }
+  /* the drawer runs past the screen: only the top of its footer shows above the home indicator */
+  .dr-foot { flex-shrink: 0; height: 80px; margin-bottom: -48px; padding: 7px 16px 32px; background: var(--muted); border-top: 1px solid var(--border); }
+  .dr-foot .btn { width: 100%; height: 40px; font-size: 16px; }
+  .ph-home { position: absolute; left: 50%; bottom: 7px; width: 144px; height: 5px; margin-left: -72px; border-radius: 100px; background: #000; }
+
+  /* ---------- real pointer input ----------
+     In the lightbox the page takes real hover and clicks (on the carousel card it's inert): a click
+     picks a package on both screens at once and each list scrolls; tabs and buttons show hover and press.
+     Text doesn't select. */
+  html { -webkit-user-select: none; user-select: none; cursor: default; }
+  .pkg:not(.on):hover { background: #fafaf9; }
+  .d-close:hover, .dr-back:hover, .d-tab:hover, .dr-tab:hover { background: rgba(231, 229, 228, 0.6); }
+  .btn:not(.primary):hover { background: var(--muted); }
+  .btn.primary:hover { opacity: 0.9; }
+  .pkg:active, .btn:active, .d-close:active, .dr-back:active, .d-tab:active, .dr-tab:active { filter: brightness(0.96); }
+  .no-anim, .no-anim * { transition: none !important; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="dialog-wrap">
+    <div class="dialog">
+      <div class="d-head"><div class="d-title">Update firmware</div></div>
+      <div class="d-close"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>
+      <div class="d-tabs"><div class="d-tab on"><span>By package</span></div><div class="d-tab"><span>Manual</span></div></div>
+      <div class="d-body scroll"><div class="d-list" id="deskList"></div></div>
+      <div class="d-foot"><div class="btn">Cancel</div><div class="btn primary">Apply package</div></div>
+    </div>
+  </div>
+
+  <div class="phone">
+    <div class="ph-screen">
+      <div class="drawer">
+        <div class="dr-handle"><span></span></div>
+        <div class="dr-head">Update firmware<div class="dr-back"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12L6 8L10 4"/></svg></div></div>
+        <div class="dr-tabs"><div class="dr-tab on">By package</div><div class="dr-tab">Manual</div></div>
+        <div class="dr-body scroll"><div class="dr-list" id="phoneList"></div></div>
+        <div class="dr-foot"><div class="btn primary">Apply package</div></div>
+      </div>
+      <div class="ph-status">
+        <div class="time">9:41</div>
+        <div class="island"></div>
+        <div class="levels">
+          <svg width="19.2" height="12.23" viewBox="0 0 19.2 12.2264"><path fill-rule="evenodd" clip-rule="evenodd" d="M19.2 1.14623C19.2 0.513183 18.7224 0 18.1333 0H17.0667C16.4776 0 16 0.513183 16 1.14623V11.0802C16 11.7132 16.4776 12.2264 17.0667 12.2264H18.1333C18.7224 12.2264 19.2 11.7132 19.2 11.0802V1.14623ZM11.7659 2.44528H12.8326C13.4217 2.44528 13.8992 2.97078 13.8992 3.61902V11.0527C13.8992 11.7009 13.4217 12.2264 12.8326 12.2264H11.7659C11.1768 12.2264 10.6992 11.7009 10.6992 11.0527V3.61902C10.6992 2.97078 11.1768 2.44528 11.7659 2.44528ZM7.43411 5.09433H6.36745C5.77834 5.09433 5.30078 5.62652 5.30078 6.28301V11.0377C5.30078 11.6942 5.77834 12.2264 6.36745 12.2264H7.43411C8.02322 12.2264 8.50078 11.6942 8.50078 11.0377V6.28301C8.50078 5.62652 8.02322 5.09433 7.43411 5.09433ZM2.13333 7.53962H1.06667C0.477563 7.53962 0 8.06421 0 8.71132V11.0547C0 11.7018 0.477563 12.2264 1.06667 12.2264H2.13333C2.72244 12.2264 3.2 11.7018 3.2 11.0547V8.71132C3.2 8.06421 2.72244 7.53962 2.13333 7.53962Z" fill="#000"/></svg>
+          <svg width="17.14" height="12.33" viewBox="0 0 17.1417 12.3283"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.5713 2.46628C11.0584 2.46639 13.4504 3.38847 15.2529 5.04195C15.3887 5.1696 15.6056 5.16799 15.7393 5.03834L17.0368 3.77487C17.1045 3.70911 17.1422 3.62004 17.1417 3.52735C17.1411 3.43467 17.1023 3.34603 17.0338 3.28104C12.3028 -1.09368 4.83907 -1.09368 0.108056 3.28104C0.039524 3.34598 0.000639766 3.4346 7.82398e-06 3.52728C-0.000624118 3.61996 0.0370483 3.70906 0.104689 3.77487L1.40255 5.03834C1.53615 5.16819 1.75327 5.1698 1.88893 5.04195C3.69167 3.38836 6.08395 2.46628 8.5713 2.46628ZM8.56795 6.68656C9.92527 6.68647 11.2341 7.19821 12.2403 8.12234C12.3763 8.2535 12.5907 8.25065 12.7234 8.11593L14.0106 6.79663C14.0784 6.72742 14.1161 6.63355 14.1151 6.53599C14.1141 6.43844 14.0746 6.34536 14.0054 6.27757C10.9416 3.38672 6.19688 3.38672 3.13305 6.27757C3.06384 6.34536 3.02435 6.43849 3.02345 6.53607C3.02254 6.63365 3.06028 6.72752 3.12822 6.79663L4.41513 8.11593C4.54778 8.25065 4.76215 8.2535 4.89823 8.12234C5.90368 7.19882 7.21152 6.68713 8.56795 6.68656ZM11.0924 9.48011C11.0943 9.58546 11.0572 9.68703 10.9899 9.76084L8.81327 12.2156C8.74946 12.2877 8.66247 12.3283 8.5717 12.3283C8.48093 12.3283 8.39394 12.2877 8.33013 12.2156L6.1531 9.76084C6.08585 9.68697 6.04886 9.58537 6.05085 9.48002C6.05284 9.37467 6.09365 9.27491 6.16364 9.20429C7.55374 7.8904 9.58966 7.8904 10.9798 9.20429C11.0497 9.27497 11.0904 9.37476 11.0924 9.48011Z" fill="#000"/></svg>
+          <svg width="27.33" height="13" viewBox="0 0 27.328 13"><rect opacity="0.35" x="0.5" y="0.5" width="24" height="12" rx="3.8" stroke="#000" fill="none"/><path opacity="0.4" d="M26 4.78113V8.8566C26.8047 8.51143 27.328 7.70847 27.328 6.81886C27.328 5.92926 26.8047 5.1263 26 4.78113" fill="#000"/><rect x="2" y="2" width="21" height="9" rx="2.5" fill="#000"/></svg>
+        </div>
+      </div>
+    </div>
+    <div class="ph-home"></div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+/* Packages by month: [name, note, MCU firmware, config version, firmware set in mono]. The two July
+   packages show their firmware in mono and the June ones in the sans, as Figma has them. */
+const MONTHS = [
+  ['JUL 2025', [
+    ['FW 3.6.0', 'Supports new firmware build workflow and minor bug fix', 'v1.1g', '3.6.0', true],
+    ['FW 3.5.12', 'Minor recipe temperature control improvements', 'v1.1g', '3.5.12', true],
+  ]],
+  ['JUN 2025', [
+    ['App 3.5.8 / FW 3.5.11', 'Improved support for OQC process', 'v1.1g', '3.5.11', false],
+    ['App 3.5.7 / FW 3.5.10', 'Improved support for OQC process', 'v1.1g', '3.5.11', false],
+  ]],
+];
+const card = ([name, note, fw, cfg, mono]) => `
+  <div class="pkg">
+    <div class="info">
+      <div class="head"><div class="name">${name}</div><svg class="check" width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="currentColor"/><path d="M4.75 8.25 6.9 10.4 11.25 6" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="note">${note}</div>
+    </div>
+    <div class="sw"><span class="badge hmi">3.5.8</span><span class="dot">·</span><span class="fw"><span class="ver${mono ? ' mono' : ''}">${fw}<span class="at">@</span></span><span class="badge mcu">${cfg}</span></span></div>
+  </div>`;
+$('deskList').innerHTML = MONTHS.map(([m, pkgs]) => `<div class="d-group"><div class="month"><span>${m}</span></div>${pkgs.map(card).join('')}</div>`).join('');
+$('phoneList').innerHTML = MONTHS.map(([m, pkgs]) => `<div class="dr-group"><div class="month"><span>${m}</span></div>${pkgs.map(card).join('')}</div>`).join('');
+
+// It's one dialog shown on two screens, so a package picked on either is picked on both. FW 3.6.0
+// starts selected, as in Figma.
+const lists = [$('deskList'), $('phoneList')].map(list => [...list.querySelectorAll('.pkg')]);
+const pick = i => lists.forEach(pkgs => pkgs.forEach((p, j) => p.classList.toggle('on', j === i)));
+lists.forEach(pkgs => pkgs.forEach((p, i) => p.addEventListener('click', () => pick(i))));
+pick(0);
+
+/* ---------- embedding ----------
+   Same handshake as the other prototypes: once the first frame has painted, transitions come back
+   and an embedding page is told this one is ready to show (and told again if it asks with
+   "proto:ping", in case it only started listening after the page had loaded). */
+const SCENE = 'package';
+const root = document.documentElement;
+if (new URLSearchParams(location.search).has('embed')) root.classList.add('embed');
+let shown = false;
+const announce = () => { if (parent !== window) parent.postMessage({ type: 'proto:ready', scene: SCENE }, location.origin); };
+addEventListener('message', e => { if (e.origin === location.origin && e.data === 'proto:ping' && shown) announce(); });
+document.fonts.ready.then(() => requestAnimationFrame(() => requestAnimationFrame(() => {
+  root.classList.remove('no-anim');
+  shown = true;
+  announce();
+})));
+
+function fit() {
+  const st = $('stage');
+  st.style.transform = `scale(${Math.min(innerWidth / st.offsetWidth, innerHeight / st.offsetHeight)})`;
+}
+addEventListener('resize', fit); fit();
+addEventListener('keydown', e => {
+  if (!root.classList.contains('embed')) return;
+  // A click into the lightbox's live copy moves keyboard focus into this page, so hand the
+  // lightbox's own keys back to it.
+  if (e.key === 'Escape' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+    e.preventDefault();
+    parent.dispatchEvent(new KeyboardEvent('keydown', { key: e.key, code: e.code, bubbles: true, cancelable: true }));
+  }
+});
+</script>
+</body>
+</html>
