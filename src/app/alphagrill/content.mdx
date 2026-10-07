@@ -4,6 +4,7 @@ import Heading from '@/components/ui/heading'
 import { Table } from '@/components/ui/table'
 import SupRef from '@/components/ui/sup-ref'
 import ExternalArrow from '@/components/ui/external-arrow'
+import QuickButtonDemo from '@/components/ui/quick-button-demo'
 
 <div className="max-w-[var(--content-w)] mx-auto">
 
@@ -46,6 +47,11 @@ Commercial kitchens move fast and AlphaGrill automates one task: grilling pattie
         mobileImageSizePercent: 88,
         mobileImagePosition: { top: "center", left: "center" },
         withInsetShadow: true,
+      },
+      {
+        label: "GRILL",
+        caption: "Quick recipe select puts recipes on the cook screen as one-tap buttons",
+        content: <QuickButtonDemo />
       },
     ]}
   />
