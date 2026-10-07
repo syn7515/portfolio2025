@@ -273,6 +273,8 @@
   .nav:active, .icon-btn:active, .create:active, .pop-close:active, .bi-arrow:active,
   .tgl:active, .btn:active, .toast .act:active { filter: brightness(0.85); }
   .bi-try:active { color: var(--fg); }
+  /* While a real pointer is over the page, the scripted one steps aside so there's only one. */
+  .real-pointer .cursor.on { opacity: 0; }
 
   /* Fill with the app colour, not transparent: the scaled stage can miss the frame edge by a
      sub-pixel, and a see-through gap there reads as a bright hairline. */
@@ -492,9 +494,9 @@ let loopStart = 0, vt = 0, dry = false;
 // The first real wait is the first moment the screen is in its proper place in the loop. Once that
 // has painted, transitions come back and an embedding page is told the frame is ready to show. The
 // embedder may only start listening after that (it hydrates after this page has loaded), so it
-// also asks with "fwproto:ping", and a page that is already showing answers again.
+// also asks with "proto:ping", and a page that is already showing answers again.
 let caughtUp = false, shown = false;
-const announce = () => { if (parent !== window) parent.postMessage({ type: 'fwproto:ready', scene: SCENE }, location.origin); };
+const announce = () => { if (parent !== window) parent.postMessage({ type: 'proto:ready', scene: SCENE }, location.origin); };
 function markCaughtUp() {
   caughtUp = true;
   requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -503,7 +505,7 @@ function markCaughtUp() {
     announce();
   }));
 }
-addEventListener('message', e => { if (e.origin === location.origin && e.data === 'fwproto:ping' && shown) announce(); });
+addEventListener('message', e => { if (e.origin === location.origin && e.data === 'proto:ping' && shown) announce(); });
 async function wait(ms, id) {
   if (id !== runId) throw 'abort';
   vt += ms;
@@ -836,6 +838,11 @@ addEventListener('keydown', e => {
   if (e.code === 'Space') { e.preventDefault(); paused = !paused; document.body.classList.toggle('playing', !paused); }
   if (e.key === 'r' || e.key === 'R') { paused = false; loop(); }
 });
+// A real pointer only reaches this page in the lightbox (the carousel card makes it inert). Track it
+// with mousemove rather than mouseenter, which doesn't fire if the pointer is already in place when
+// the lightbox opens.
+addEventListener('mousemove', () => root.classList.add('real-pointer'));
+root.addEventListener('mouseleave', () => root.classList.remove('real-pointer'));
 document.fonts.ready.then(loop);
 </script>
 </body>

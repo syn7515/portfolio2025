@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en" class="no-anim">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Design system — prototype</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+<style>
+  /* The "ds-1" Figma frame: the design system's components laid out on a dashed grid, at Figma's
+     1.333× scale (1600×900 stands for a 1200×675 screen, so 18.67px is the 14px body size). Every
+     piece sits under one radial fade, as in Figma. */
+  :root {
+    --bg: #1c1917;
+    --sheet: #292524;
+    --popover: #161210;
+    --fg: #d6d3d1;
+    --fg-light: #a8a29e;
+    --stone-500: #78716c;
+    --divider: #44403c;
+    --border: rgba(68, 64, 60, 0.7);
+    --accent: #292524;
+    --critical: #dc2626;
+    --mono: "SF Mono", ui-monospace, Menlo, monospace;
+    --sans: "Pretendard Variable", Pretendard, -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: #0c0a09; overflow: hidden; }
+  /* Embedded, fill with the sheet colour: the scaled stage can miss the frame edge by a sub-pixel. */
+  .embed, .embed body { background: var(--sheet); }
+  body { font-family: var(--sans); font-size: 18.67px; line-height: 26.67px; -webkit-font-smoothing: antialiased; color: var(--fg); }
+  svg { display: block; }
+  .ic { width: 21.33px; height: 21.33px; flex-shrink: 0; }
+
+  #stage { position: absolute; left: 50%; top: 50%; width: 1600px; height: 900px; margin: -450px 0 0 -800px; background: var(--sheet); overflow: hidden; transform-origin: center; }
+  #sheet { position: absolute; inset: 0;
+           -webkit-mask-image: radial-gradient(916.1px 563.5px at 800px 450px, #000 53.9%, transparent 100%);
+           mask-image: radial-gradient(916.1px 563.5px at 800px 450px, #000 53.9%, transparent 100%); }
+  #sheet > * { position: absolute; }
+
+  /* dashed layout guides */
+  .guide-v { top: 1px; width: 1px; height: 898.5px; background: repeating-linear-gradient(to bottom, #383838 0 4px, transparent 4px 8px); }
+  .guide-h { left: 0; height: 1px; width: 1600px; background: repeating-linear-gradient(to right, #383838 0 4px, transparent 4px 8px); }
+
+  /* buttons */
+  .btn { display: flex; align-items: center; justify-content: center; min-width: 85.33px; height: 42.67px; padding: 0 16px; border-radius: 8px;
+         font-weight: 500; white-space: nowrap; border: 1.33px solid var(--divider); background: var(--bg); color: var(--fg); transition: background-color 90ms ease, opacity 90ms ease, filter 90ms ease; }
+  .btn.destructive { border-color: #7f1d1d; color: var(--critical); }
+  .btn.primary { border-color: var(--fg); background: var(--fg); color: var(--bg); }
+
+  /* toast */
+  .toast { left: 18.67px; top: 64px; width: 506.67px; display: flex; align-items: center; gap: 21.33px; padding: 21.33px 32px 21.33px 26.67px; background: var(--popover); border-radius: 10.67px; }
+  .toast .msg { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2.67px; white-space: nowrap; }
+  .toast .msg span { overflow: hidden; text-overflow: ellipsis; }
+  .toast .msg span + span { color: var(--fg-light); opacity: 0.9; }
+  .toast .undo { margin: -5.33px 10.67px -5.33px 0; min-width: 58.67px; padding: 6.67px 17.33px; line-height: 32px; border: 1.33px solid var(--divider); border-radius: 8px; background: var(--accent); }
+
+  /* radio group */
+  .radios { left: 63px; top: 255px; width: 497.33px; display: flex; flex-direction: column; gap: 21.33px; }
+  .radio-item { cursor: default; display: flex; gap: 10.67px; align-items: flex-start; }
+  .radio { width: 18.67px; height: 18.67px; flex-shrink: 0; border-radius: 50%; background: var(--bg); box-shadow: inset 0 0 0 2.33px var(--fg-light); transition: box-shadow 120ms ease; }
+  .radio.on { box-shadow: inset 0 0 0 4.5px var(--fg); }
+  .radio-item .t { font-weight: 500; line-height: 1; }
+  .radio-item .d { margin-top: 5.33px; color: var(--fg-light); }
+
+  /* breadcrumb bar + dropdown */
+  .crumbs { left: 670.67px; top: 64px; width: 1589.33px; height: 80px; padding: 0 42.67px; display: flex; align-items: center; gap: 10.67px; background: var(--bg); border-bottom: 1.33px solid var(--border); }
+  .crumbs .p { color: var(--fg-light); }
+  .crumbs .cur { display: flex; align-items: center; gap: 8px; }
+  .dropdown { left: 813.33px; top: 125.33px; width: 213.33px; padding: 5.33px; border-radius: 8px; background: var(--popover); filter: drop-shadow(0 1.33px 1.33px rgba(0, 0, 0, 0.1)); }
+  .dd-item { padding: 8px 10.67px; border-radius: 5.33px; transition: background-color 90ms ease; }
+
+  /* inputs */
+  .fields { left: 674px; top: 308px; width: 373.33px; display: flex; flex-direction: column; gap: 16px; }
+  .field { height: 42.67px; display: flex; align-items: center; padding: 0 13.33px; border: 1.33px solid var(--divider); border-radius: 8px; background: var(--bg); transition: box-shadow 120ms ease; }
+  .field.focus { box-shadow: 0 0 0 1px #57534e; }
+  .field.invalid { box-shadow: 0 0 0 1px rgba(220, 38, 38, 0.8); }
+  .field .val { flex: 1; min-width: 0; white-space: pre; overflow: hidden; }
+  .field .ph { color: var(--fg-light); }
+  .field .clear { margin-right: -2.67px; padding: 2.67px; border-radius: 5.33px; transition: background-color 90ms ease; }
+  .caret { display: none; width: 1.33px; height: 26.67px; margin-right: 1px; background: var(--fg); vertical-align: top; animation: blink 1s steps(1) infinite; }
+  .field.focus .caret { display: inline-block; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .field-msg { margin-top: -5.33px; font-size: 16px; line-height: 21.33px; color: var(--critical); }
+
+  .buttons { left: 670.67px; top: 520px; display: flex; gap: 16px; }
+
+  /* combobox */
+  .cb-trigger { left: -21px; top: 521px; width: 545.33px; height: 42.67px; display: flex; align-items: center; gap: 2.67px; padding: 0 13.33px; border: 1.33px solid var(--divider); border-radius: 8px; background: var(--bg); color: var(--fg-light); }
+  .cb-trigger span { flex: 1; }
+  .cb-pop { left: -21px; top: 569px; width: 545.33px; border: 1.33px solid rgba(68, 64, 60, 0.5); border-radius: 10.67px; background: var(--bg); overflow: hidden; }
+  .cb-search { display: flex; align-items: center; gap: 10.67px; padding: 12.67px 16px; background: rgba(41, 37, 36, 0.5); border-bottom: 1.33px solid var(--border); color: rgba(250, 250, 249, 0.5); }
+  .cb-list { padding: 5.33px 0; background: rgba(41, 37, 36, 0.5); }
+  .cb-row { height: 42.67px; display: flex; align-items: center; gap: 10.67px; padding: 0 13.33px; transition: background-color 90ms ease; }
+  .cb-row .id { flex: 1; }
+  .cb-row .name { color: var(--fg-light); }
+  .cb-row.hl { background: var(--bg); }
+
+  /* tags and badges */
+  .tags { left: 671.67px; display: flex; gap: 9px 24px; }
+  .tag { padding: 1.33px 5.33px; border-radius: 5.33px; font-size: 16px; line-height: 21.33px; white-space: nowrap; }
+  .tags.types .tag { font-family: var(--mono); }
+  .badge { font-weight: 500; }
+
+  /* sidebars */
+  .sidebar { top: 255px; height: 944px; background: var(--bg); border-right: 1.33px solid var(--border); }
+  .sb-head { padding: 18.67px 10.67px 48px; display: flex; align-items: center; justify-content: space-between; }
+  .sb-logo { width: 42.67px; height: 42.67px; display: grid; place-items: center; }
+  .icon-btn { padding: 10.67px; border-radius: 8px; color: var(--fg-light); transition: background-color 90ms ease; }
+  .sb-group { padding: 10.67px; }
+  .sb-list { display: flex; flex-direction: column; gap: 8px; }
+  .sb-item { display: flex; align-items: center; gap: 10.67px; padding: 8px 8px 8px 10.67px; border-radius: 8px; color: var(--fg-light); white-space: nowrap; transition: background-color 90ms ease; }
+  .sb-item span { flex: 1; }
+  .sb-item.on { background: var(--accent); color: var(--fg); }
+  .sb-item .chev { padding: 2.67px; margin: -2.67px 0; }
+  .sb-sep { height: 0; border-top: 1.33px solid var(--border); margin: 10.67px 0; }
+  .sb-title { padding: 8px 10.67px; font-size: 16px; font-weight: 500; color: rgba(245, 245, 244, 0.7); }
+  .sidebar.collapsed .sb-item { width: 42.67px; height: 42.67px; padding: 10.67px; }
+
+  /* ---------- real pointer input ----------
+     The sheet is static: in the lightbox it takes real hover and press (on the carousel card it's
+     inert). A press shows the pressed look; the radio group is the one thing a click changes, since
+     choosing is what a radio is for. Text doesn't select. */
+  html { -webkit-user-select: none; user-select: none; cursor: default; }
+  .btn:not(.primary):hover { background: var(--accent); }
+  .btn.primary:hover { opacity: 0.9; }
+  .undo:hover, .icon-btn:hover, .field .clear:hover { background: #44403c; }
+  .dd-item:hover, .sb-item:hover { background: var(--accent); }
+  .radio-item:hover .radio:not(.on) { box-shadow: inset 0 0 0 2.33px var(--fg); }
+  .btn:active, .undo:active, .icon-btn:active, .field .clear:active, .dd-item:active, .sb-item:active, .cb-row:active { filter: brightness(0.85); }
+  /* No transitions until the first frame has painted, so the page appears already in place. */
+  .no-anim, .no-anim * { transition: none !important; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="sheet">
+    <div class="guide-v" style="left: 525px"></div>
+    <div class="guide-v" style="left: 671px"></div>
+    <div class="guide-v" style="left: 1044px"></div>
+    <div class="guide-v" style="left: 1196px"></div>
+    <div class="guide-h" style="top: 64px"></div>
+    <div class="guide-h" style="top: 255px"></div>
+    <div class="guide-h" style="top: 520px"></div>
+
+    <div class="toast">
+      <div class="msg"><span>Firmware update has been scheduled</span><span>Sunday, December 03, 2025 at 9:00 AM</span></div>
+      <div class="undo">Undo</div>
+    </div>
+
+    <div class="radios">
+      <div class="radio-item" id="radioA"><div class="radio"></div><div><div class="t">Use test firmware configuration</div><div class="d">Use config values used in a test firmware without modification.</div></div></div>
+      <div class="radio-item" id="radioB"><div class="radio on"></div><div><div class="t">Create from existing configuration</div><div class="d">Start from an existing config and import values from test firmware.</div></div></div>
+    </div>
+
+    <div class="crumbs">
+      <span class="p">Test bed</span><i data-icon="chevron-right" style="color: var(--stone-500)"></i>
+      <span class="cur">Sandbox<i data-icon="chevron-down" style="color: var(--fg)"></i></span>
+    </div>
+    <div class="dropdown"><div class="dd-item" id="ddV1">AlphaGrill v1</div><div class="dd-item" id="ddV2">AlphaGrill v2</div></div>
+
+    <div class="fields">
+      <div class="field focus"><span class="val"><span class="caret"></span><span class="ph">Email</span></span></div>
+      <div class="field invalid"><span class="val">spark@g.com</span><span class="clear"><i data-icon="x"></i></span></div>
+      <div class="field-msg">Enter valid email</div>
+    </div>
+
+    <div class="buttons"><div class="btn" id="cancelBtn">Cancel</div><div class="btn destructive">Discard</div><div class="btn primary" id="applyBtn">Apply</div></div>
+
+    <div class="cb-trigger"><span>Select product</span><i data-icon="chevrons-up-down" style="color: var(--fg-light)"></i></div>
+    <div class="cb-pop">
+      <div class="cb-search"><i data-icon="search"></i>Search by name or store</div>
+      <div class="cb-list" id="cbList"></div>
+    </div>
+
+    <div class="tags types" style="top: 754px">
+      <span class="tag" style="background: rgba(147, 51, 234, 0.2); color: #c084fc">bool</span>
+      <span class="tag" style="background: rgba(37, 99, 235, 0.2); color: #60a5fa">int</span>
+      <span class="tag" style="background: rgba(37, 99, 235, 0.2); color: #22d3ee">num</span>
+      <span class="tag" style="background: rgba(124, 45, 18, 0.2); color: rgba(253, 186, 116, 0.9)">str</span>
+    </div>
+    <div class="tags" style="top: 796.67px">
+      <span class="tag badge" style="box-shadow: inset 0 0 0 1.33px var(--border); color: var(--fg)">In progress</span>
+      <span class="tag badge" style="background: rgba(69, 26, 3, 0.6); color: var(--critical)">Failed</span>
+      <span class="tag badge" style="background: rgba(22, 101, 52, 0.3); color: #22c55e">Complete</span>
+    </div>
+
+    <div class="sidebar" style="left: 1196px; width: 341.33px">
+      <div class="sb-head">
+        <div class="sb-logo" style="opacity: 0.3"><svg class="ic" viewBox="0 0 21.3333 21.3333"><path d="M10.6664 1.55588C15.2048 1.55588 18.867 5.16204 18.8881 9.59592V19.7776H17.185V9.63401C17.1847 6.07621 14.256 3.21018 10.6664 3.21018C7.07693 3.2102 4.14816 6.07585 4.14789 9.63401V9.63498C4.14829 13.1929 7.07672 16.0588 10.6664 16.0588H12.0336L12.5668 17.7131H10.6664C8.58933 17.7131 6.6965 16.9545 5.24946 15.7063L4.14789 14.7551V19.7776H2.44477V9.63401C2.44503 5.18268 6.11514 1.5559 10.6664 1.55588Z" fill="#57534E" stroke="#57534E" stroke-width="1.33333"/></svg></div>
+        <div class="icon-btn"><i data-icon="panel-left"></i></div>
+      </div>
+      <div class="sb-group"><div class="sb-list">
+        <div class="sb-item"><i data-icon="house"></i><span>Home</span></div>
+        <div class="sb-item"><i data-icon="inbox"></i><span>Inbox</span></div>
+        <div class="sb-item on"><i data-icon="bot"></i><span>Products</span></div>
+        <div class="sb-item" id="sbSoftware"><i data-icon="file-code"></i><span>Software</span><span class="chev" style="flex: 0"><i data-icon="chevron-right"></i></span></div>
+        <div class="sb-item" id="sbConfig"><i data-icon="settings-2"></i><span>Configuration</span><span class="chev" style="flex: 0"><i data-icon="chevron-right"></i></span></div>
+      </div></div>
+      <div class="sb-sep"></div>
+      <div class="sb-group">
+        <div class="sb-title">Tools</div>
+        <div class="sb-list" style="gap: 5.33px"><div class="sb-item"><i data-icon="chart-area"></i><span>Data Explorer</span></div></div>
+      </div>
+    </div>
+
+    <div class="sidebar collapsed" style="left: 1560px; width: 64px">
+      <div class="sb-head" style="padding-bottom: 48px">
+        <div class="icon-btn"><svg class="ic" viewBox="0 0 21.3333 21.3333"><path d="M10.6664 1.77561C15.096 1.77561 18.6613 5.30172 18.6674 9.62326V19.5578H17.4047V10.5207H17.4057V9.63401C17.4054 5.95134 14.3741 2.99045 10.6664 2.99045C6.95882 2.99047 3.92843 5.95097 3.92817 9.63401V9.63498C3.92858 13.3178 6.9586 16.2795 10.6664 16.2795H11.8745L12.2651 17.4934H10.6664C8.64409 17.4934 6.80249 16.7541 5.39399 15.5393L3.92817 14.2746V19.5578H2.6645V9.63401C2.66476 5.30753 6.23327 1.77563 10.6664 1.77561Z" stroke="#57534E" stroke-width="1.77333" fill="none"/></svg></div>
+      </div>
+      <div class="sb-group"><div class="sb-list">
+        <div class="sb-item"><i data-icon="house"></i></div>
+        <div class="sb-item"><i data-icon="inbox"></i></div>
+        <div class="sb-item on"><i data-icon="bot"></i></div>
+        <div class="sb-item"><i data-icon="file-code"></i></div>
+        <div class="sb-item"><i data-icon="settings-2"></i></div>
+      </div></div>
+      <div class="sb-sep"></div>
+      <div class="sb-group"><div class="sb-list"><div class="sb-item"><i data-icon="chart-area"></i></div></div></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ---------- icons (Lucide, drawn at 21.33px like Figma's 16px icons at 1.333×) ---------- */
+const ICONS = {
+  'house': '<path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+  'inbox': '<polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',
+  'bot': '<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/>',
+  'file-code': '<path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M10 12.5 8 15l2 2.5"/><path d="m14 12.5 2 2.5-2 2.5"/>',
+  'settings-2': '<path d="M14 17H5"/><path d="M19 7h-9"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/>',
+  'chart-area': '<path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M7 11.207a.5.5 0 0 1 .146-.353l2-2a.5.5 0 0 1 .708 0l3.292 3.292a.5.5 0 0 0 .708 0l4.292-4.292a.5.5 0 0 1 .854.353V16a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1z"/>',
+  'chevron-right': '<path d="m9 18 6-6-6-6"/>',
+  'panel-left': '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/>',
+  'chevron-down': '<path d="m6 9 6 6 6-6"/>',
+  'chevrons-up-down': '<path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/>',
+  'search': '<path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/>',
+  'x': '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+};
+document.querySelectorAll('i[data-icon]').forEach(i => {
+  i.outerHTML = `<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"${i.getAttribute('style') ? ` style="${i.getAttribute('style')}"` : ''}>${ICONS[i.dataset.icon]}</svg>`;
+});
+
+const $ = id => document.getElementById(id);
+const PRODUCTS = [['R-AG-00017', 'BAS burger Monjung'], ['R-AG-00026', 'BAS burger Dogok'], ['R-AG-00027', 'NRA'],
+  ['R-AG-00028', 'BAS burger Yeouido'], ['R-AG-00029', 'BAS burger Pangyo'], ['R-AG-00030', 'Lotteria Guro'], ['R-AG-00030', 'Lotteria Guro']];
+$('cbList').innerHTML = PRODUCTS.map(([id, name]) => `<div class="cb-row"><span class="id">${id}</span><span class="name">${name}</span></div>`).join('');
+
+// Figma's highlighted row to start with; from there the highlight follows the pointer, as in a
+// command list, rather than a second row lighting up under the hover.
+const cbRows = [...$('cbList').children];
+const highlight = row => cbRows.forEach(r => r.classList.toggle('hl', r === row));
+highlight(cbRows[2]);
+cbRows.forEach(row => row.addEventListener('mouseenter', () => highlight(row)));
+// Radios choose on click; the rest of the sheet only shows hover and press.
+document.querySelectorAll('.radio-item').forEach(item => item.addEventListener('click', () => {
+  document.querySelectorAll('.radio').forEach(r => r.classList.toggle('on', r === item.firstChild));
+}));
+
+/* ---------- embedding ----------
+   Same handshake as the firmware prototype: once the first frame has painted, transitions come back
+   and an embedding page is told this one is ready to show (and told again if it asks with
+   "proto:ping", in case it only started listening after the page had loaded). */
+const SCENE = 'ds';
+const root = document.documentElement;
+if (new URLSearchParams(location.search).has('embed')) root.classList.add('embed');
+let shown = false;
+const announce = () => { if (parent !== window) parent.postMessage({ type: 'proto:ready', scene: SCENE }, location.origin); };
+addEventListener('message', e => { if (e.origin === location.origin && e.data === 'proto:ping' && shown) announce(); });
+document.fonts.ready.then(() => requestAnimationFrame(() => requestAnimationFrame(() => {
+  root.classList.remove('no-anim');
+  shown = true;
+  announce();
+})));
+
+function fit() {
+  const st = $('stage');
+  st.style.transform = `scale(${Math.min(innerWidth / st.offsetWidth, innerHeight / st.offsetHeight)})`;
+}
+addEventListener('resize', fit); fit();
+addEventListener('keydown', e => {
+  if (root.classList.contains('embed')) {
+    // A click into the lightbox's live copy moves keyboard focus into this page, so hand the
+    // lightbox's own keys back to it.
+    if (e.key === 'Escape' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      e.preventDefault();
+      parent.dispatchEvent(new KeyboardEvent('keydown', { key: e.key, code: e.code, bubbles: true, cancelable: true }));
+    }
+  }
+});
+</script>
+</body>
+</html>
