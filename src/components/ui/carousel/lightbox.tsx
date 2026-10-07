@@ -212,6 +212,7 @@ function LightboxContent({
       >
         <div
           ref={contentRef}
+          data-lightbox-live=""
           className="absolute inset-0 overflow-hidden rounded-[4px]"
           style={{ backgroundColor: isDarkMode ? '#232326' : '#fafafa', opacity: isContentReady ? 1 : 0 }}
         >
@@ -431,42 +432,19 @@ export function Lightbox({
   const [isPrevHovered, setIsPrevHovered] = useState(false);
   const [isNextHovered, setIsNextHovered] = useState(false);
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    const vpCenterX = window.innerWidth / 2;
-    const vpCenterY = window.innerHeight / 2;
-    const dx = Math.abs(e.clientX - vpCenterX);
-    const dy = Math.abs(e.clientY - vpCenterY);
+  // The media itself is inert to clicks: live content inside it (a prototype) takes real hover and
+  // shows its pressed states, so a click there must not also step or close. Stepping is the
+  // prev/next buttons and the arrow keys; a click anywhere outside the media closes.
+  const isOverMedia = (e: React.MouseEvent) =>
+    Math.abs(e.clientX - window.innerWidth / 2) <= dimensions.width / 2 &&
+    Math.abs(e.clientY - window.innerHeight / 2) <= dimensions.height / 2;
 
-    if (dx <= dimensions.width / 2 && dy <= dimensions.height / 2) {
-      if (e.clientX < vpCenterX && !isPrevDisabled) {
-        setCursorStyle('w-resize');
-      } else if (e.clientX >= vpCenterX && !isNextDisabled) {
-        setCursorStyle('e-resize');
-      } else {
-        setCursorStyle('default');
-      }
-    } else {
-      setCursorStyle('zoom-out');
-    }
-  };
+  const handleMouseMove = (e: React.MouseEvent) => setCursorStyle(isOverMedia(e) ? 'default' : 'zoom-out');
 
   const handleMouseLeave = () => setCursorStyle('zoom-out');
 
   const handleClick = (e: React.MouseEvent) => {
-    const vpCenterX = window.innerWidth / 2;
-    const vpCenterY = window.innerHeight / 2;
-    const dx = Math.abs(e.clientX - vpCenterX);
-    const dy = Math.abs(e.clientY - vpCenterY);
-
-    if (dx <= dimensions.width / 2 && dy <= dimensions.height / 2) {
-      if (e.clientX < vpCenterX) {
-        if (!isPrevDisabled) prevLightbox();
-      } else {
-        if (!isNextDisabled) nextLightbox();
-      }
-    } else {
-      closeLightbox();
-    }
+    if (!isOverMedia(e)) closeLightbox();
   };
 
   return (
@@ -546,7 +524,7 @@ export function Lightbox({
 
               {/* Prev/Next buttons - only when more than one item, and only from
                   LIGHTBOX_NAV_BREAKPOINT (820px) up: below it the media takes their room and the
-                  halves of the media do the stepping. */}
+                  arrow keys do the stepping. */}
               {!exitTransform && normalizedItems.length > 1 && (
                 <>
                   <div

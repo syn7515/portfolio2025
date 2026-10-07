@@ -66,7 +66,9 @@ export default function FirmwareGeneratorDemo({ scene = "edit" }: { scene?: keyo
           title="Firmware generator prototype"
           loading="lazy"
           tabIndex={-1}
-          className="block w-full h-full border-0 pointer-events-none"
+          // Inert on the carousel card (a click there opens the lightbox); in the lightbox it takes
+          // real hover and press, which the page shows but doesn't act on.
+          className="block w-full h-full border-0 pointer-events-none [[data-lightbox-live]_&]:pointer-events-auto"
           // The site's <meta name="color-scheme" content="light dark"> makes a "normal" iframe count
           // as dark in dark mode, while the page inside declares nothing and counts as light. When
           // the two differ the browser paints the iframe opaque white, so pin it to light to match.

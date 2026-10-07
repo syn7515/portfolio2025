@@ -382,8 +382,8 @@ const LIGHTBOX_OUTER_PADDING = 16;
 const LIGHTBOX_BUTTON_DIAMETER = 48;
 
 // Below this width the lightbox drops its prev/next buttons (lightbox.tsx) and gives their room to
-// the media: at 136px they left it no bigger than the card it opened from. Tapping either half of
-// the media still steps through, as do the arrow keys. 820 is where the site's compact layout ends
+// the media: at 136px they left it no bigger than the card it opened from. The arrow keys still
+// step through. 820 is where the site's compact layout ends
 // (hamburger below, rail above); the lightbox itself only opens from 768.
 export const LIGHTBOX_NAV_BREAKPOINT = 820;
 

@@ -252,6 +252,28 @@
   /* Inset by the same 19px on the right as above and below, so it sits evenly in the toast. */
   .toast .act { margin: -4px -5px -4px 0; padding: 5px 13px; min-width: 44px; line-height: 24px; border: 1px solid #44403c; border-radius: 6px; background: #292524; color: #d6d3d1; }
 
+  /* ---------- real pointer input ----------
+     In the lightbox the page takes real hover and press (on the carousel card it's inert). Hover shows
+     what the timeline's hover classes show, a press shows the pressed look, and nothing acts on a
+     click: there are no click handlers, and text doesn't select. */
+  html { -webkit-user-select: none; user-select: none; cursor: default; }
+  .nav:not(.on):hover, .icon-btn:hover, .pop-close:hover, .bi-arrow:hover { background: var(--accent); }
+  .create:hover { opacity: 0.9; }
+  .row:not(.active):not(.edited):hover { background: rgba(41, 37, 36, 0.35); }
+  .bi:hover { background: var(--muted); }
+  .bi:hover .bi-act { display: flex; }
+  .bi-try:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .c-row:hover { background: #292524; }
+  .c-row:hover .c-name { color: #d6d3d1; }
+  .c-row:hover .c-tgls { display: flex; }
+  .tgl:not(.on):hover { background: rgba(87, 83, 78, 0.3); color: #d6d3d1; opacity: 0.6; }
+  .btn:not(.primary):hover { background: #292524; }
+  .btn.primary:hover { opacity: 0.9; }
+  .toast .act:hover { background: #44403c; }
+  .nav:active, .icon-btn:active, .create:active, .pop-close:active, .bi-arrow:active,
+  .tgl:active, .btn:active, .toast .act:active { filter: brightness(0.85); }
+  .bi-try:active { color: var(--fg); }
+
   /* Fill with the app colour, not transparent: the scaled stage can miss the frame edge by a
      sub-pixel, and a see-through gap there reads as a bright hairline. */
   .embed, .embed body { background: var(--bg); }
@@ -801,6 +823,15 @@ const applyScheme = () => { root.dataset.theme = pinned || (scheme.matches ? 'da
 applyScheme();
 scheme.addEventListener('change', applyScheme);
 addEventListener('keydown', e => {
+  if (root.classList.contains('embed')) {
+    // A click into the lightbox's live copy moves keyboard focus into this page, so hand the
+    // lightbox's own keys back to it; the recording shortcuts below don't apply when embedded.
+    if (e.key === 'Escape' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      e.preventDefault();
+      parent.dispatchEvent(new KeyboardEvent('keydown', { key: e.key, code: e.code, bubbles: true, cancelable: true }));
+    }
+    return;
+  }
   if (e.key === 't' || e.key === 'T') root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light';
   if (e.code === 'Space') { e.preventDefault(); paused = !paused; document.body.classList.toggle('playing', !paused); }
   if (e.key === 'r' || e.key === 'R') { paused = false; loop(); }
