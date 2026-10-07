@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en" class="no-anim">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Update manager — prototype</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+<style>
+  /* The "manager-4" Figma frame: the release screen of the update manager, in light mode, with the
+     HMI version picker open on AG 1.0.5. Figma draws it at 0.891× (1059×661); this page is built at
+     the base size it stands for (1189×742, 14px body text, 40px rows) and the stage scales to fit. */
+  :root {
+    --bg: #ffffff;
+    --fg: #1c1917;
+    --card-fg: #161210;
+    --muted-fg: #78716c;
+    --border: #e7e5e4;
+    --soft-border: rgba(231, 229, 228, 0.5);
+    --secondary: #f5f5f4;
+    --primary: #57534e;
+    --focus: #a8a29e;
+    /* the faint lift the table and the text fields share */
+    --lift: 0 1px 2px rgba(28, 25, 23, 0.05), 0 2px 6px rgba(28, 25, 23, 0.03);
+    --mono: "SF Mono", ui-monospace, Menlo, monospace;
+    --sans: "Pretendard Variable", Pretendard, -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: #e7e5e4; overflow: hidden; }
+  /* Embedded, fill with the screen colour: the scaled stage can miss the frame edge by a sub-pixel. */
+  .embed, .embed body { background: var(--bg); }
+  body { font-family: var(--sans); font-size: 14px; line-height: 20px; color: var(--fg); -webkit-font-smoothing: antialiased; }
+  svg { display: block; }
+  .ic { width: 16px; height: 16px; flex-shrink: 0; }
+
+  #stage { position: absolute; left: 50%; top: 50%; width: 1189px; height: 742px; margin: -371px 0 0 -594.5px; background: var(--bg); overflow: hidden; display: flex; transform-origin: center; }
+  /* Figma's 1px frame outline, drawn over everything so it doesn't take layout room */
+  #stage::after { content: ""; position: absolute; inset: 0; box-shadow: inset 0 0 0 1.12px rgba(0, 0, 0, 0.1); pointer-events: none; z-index: 30; }
+
+  /* sidebar */
+  .sidebar { width: 48px; flex-shrink: 0; background: var(--secondary); border-right: 1px solid var(--soft-border); display: flex; flex-direction: column; }
+  .sb-head { padding: 14px 8px 36px; }
+  .sb-list { padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+  .sb-btn { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 6px; color: var(--primary); transition: background-color 90ms ease; }
+  .sb-btn.on { background: var(--border); color: var(--fg); }
+
+  .content { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .crumbs { height: 48px; flex-shrink: 0; padding: 0 32px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border); }
+  .crumbs .p { color: var(--muted-fg); }
+  .wrap { width: 100%; max-width: 840px; margin: 0 auto; }
+  .intro { padding: 40px 32px 24px; background: rgba(245, 245, 244, 0.5); }
+  .intro .t { font-size: 16px; line-height: 24px; font-weight: 500; color: var(--card-fg); }
+  .intro .d { margin-top: 4px; color: var(--muted-fg); }
+  .main { padding: 40px 32px 64px; }
+  .main .wrap { display: flex; flex-direction: column; gap: 40px; align-items: flex-start; }
+  .label { font-weight: 500; }
+  .desc { margin-top: 4px; color: var(--muted-fg); }
+
+  /* release table */
+  .table { width: 100%; margin-top: 24px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+           box-shadow: var(--lift); }
+  .tr { display: flex; height: 40px; }
+  .tr + .tr { border-top: 1px solid var(--border); }
+  .tr > div { display: flex; align-items: center; padding: 0 16px; min-width: 0; }
+  .c1 { width: 160px; flex-shrink: 0; color: var(--muted-fg); border-right: 1px solid var(--soft-border); }
+  .c2 { width: 316px; flex-shrink: 0; }
+  .c3 { width: 48px; flex-shrink: 0; justify-content: center; padding: 0 !important; color: var(--muted-fg); }
+  .c4 { flex: 1; background: rgba(245, 245, 244, 0.4); }
+  .thead { background: rgba(245, 245, 244, 0.4); }
+  .thead > div { font-weight: 500; line-height: 24px; color: var(--muted-fg); border-right: none; background: none; }
+  .thead .c3 { opacity: 0.5; }
+  .sw { display: flex; align-items: center; gap: 12px; white-space: nowrap; }
+  .sw.dim { opacity: 0.7; }
+  .sep { width: 0; height: 12px; border-left: 1px solid var(--border); }
+  .fw { display: flex; align-items: center; gap: 2px; color: var(--muted-fg); }
+  .fw .at { opacity: 0.5; }
+  .badge { display: inline-flex; align-items: center; padding: 1px 4px; min-width: 18px; border-radius: 4px; font-family: var(--mono); font-size: 10.69px; line-height: 14.25px; white-space: nowrap; }
+  .badge.hmi { box-shadow: inset 0 0 0 1px var(--border); color: var(--fg); }
+  .badge.mcu { background: var(--secondary); color: var(--primary); }
+  .badge.slot { box-shadow: none; border: 1px dashed var(--focus); padding: 0 3px; color: var(--muted-fg); }
+  .cfg { font-family: var(--mono); font-size: 12px; line-height: 16px; color: var(--muted-fg); }
+  .trigger { border-radius: 4px; transition: background-color 90ms ease; }
+
+  /* form */
+  .field-group { width: 420px; display: flex; flex-direction: column; gap: 8px; }
+  .input { height: 34px; padding: 0 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); box-shadow: var(--lift); transition: box-shadow 120ms ease; }
+  .textarea { position: relative; height: 108px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); box-shadow: var(--lift); transition: box-shadow 120ms ease; }
+  .input input, .textarea textarea { width: 100%; height: 100%; border: 0; outline: 0; background: none; font: inherit; color: var(--fg); resize: none; -webkit-user-select: text; user-select: text; }
+  .input:focus-within, .textarea:focus-within { box-shadow: 0 0 0 1px var(--focus), var(--lift); }
+  .resize { position: absolute; right: -1px; bottom: -1px; width: 20px; height: 20px; opacity: 0.6; pointer-events: none; }
+  .btn { padding: 6px 12px; min-width: 64px; border-radius: 6px; background: var(--primary); color: #fafaf9; font-weight: 500; transition: opacity 90ms ease, filter 90ms ease; }
+
+  /* HMI version picker: the combobox popover is dark in both themes */
+  .menu { position: absolute; z-index: 20; width: 214.4px; height: 237.1px; display: flex; flex-direction: column; background: #1c1917; border: 1px solid rgba(68, 64, 60, 0.5); border-radius: 6px; overflow: hidden; color: #fafaf9; }
+  .menu[hidden] { display: none; }
+  .m-search { display: flex; align-items: center; gap: 8px; padding: 10px 12px; flex-shrink: 0; background: rgba(41, 37, 36, 0.5); border-bottom: 1px solid rgba(68, 64, 60, 0.7); color: #a8a29e; }
+  .m-search input { flex: 1; min-width: 0; border: 0; outline: 0; background: none; font: inherit; color: #fafaf9; -webkit-user-select: text; user-select: text; }
+  .m-search input::placeholder { color: rgba(250, 250, 249, 0.5); }
+  .m-list { flex: 1; overflow-y: auto; padding: 4px; background: rgba(41, 37, 36, 0.5); scrollbar-width: thin; scrollbar-color: rgba(87, 83, 78, 0.3) transparent; }
+  .m-list::-webkit-scrollbar { width: 10px; }
+  .m-list::-webkit-scrollbar-thumb { background: rgba(87, 83, 78, 0.3); border-radius: 999px; border: 2px solid transparent; background-clip: content-box; }
+  .m-item { padding: 6px 8px; border-radius: 4px; }
+  .m-item.current { background: rgba(68, 64, 60, 0.6); }
+  .m-item.hl { background: #1c1917; }
+  .m-empty { padding: 6px 8px; color: rgba(250, 250, 249, 0.5); }
+
+  /* ---------- real pointer input ----------
+     In the lightbox the page takes real hover and clicks (on the carousel card it's inert): the
+     version picker works — hover, pick, search, reopen from the HMI slot — the text fields edit,
+     and the rest shows hover and press. Other text doesn't select. */
+  html { -webkit-user-select: none; user-select: none; cursor: default; }
+  .sb-btn:not(.on):hover, .trigger:hover { background: var(--border); }
+  .btn:hover { opacity: 0.9; }
+  .sb-btn:active, .btn:active, .trigger:active, .m-item:active { filter: brightness(0.9); }
+  .no-anim, .no-anim * { transition: none !important; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <aside class="sidebar">
+    <div class="sb-head"><div class="sb-btn"><svg class="ic" viewBox="0 0 21.3333 21.3333"><path d="M10.6664 1.77561C15.096 1.77561 18.6613 5.30172 18.6674 9.62326V19.5578H17.4047V10.5207H17.4057V9.63401C17.4054 5.95134 14.3741 2.99045 10.6664 2.99045C6.95882 2.99047 3.92843 5.95097 3.92817 9.63401V9.63498C3.92858 13.3178 6.9586 16.2795 10.6664 16.2795H11.8745L12.2651 17.4934H10.6664C8.64409 17.4934 6.80249 16.7541 5.39399 15.5393L3.92817 14.2746V19.5578H2.6645V9.63401C2.66476 5.30753 6.23327 1.77563 10.6664 1.77561Z" stroke="#57534E" stroke-width="1.77333" fill="none"/></svg></div></div>
+    <div class="sb-list">
+      <div class="sb-btn"><i data-icon="house"></i></div>
+      <div class="sb-btn on"><i data-icon="chevrons-left-right-ellipsis"></i></div>
+      <div class="sb-btn"><i data-icon="flask-conical"></i></div>
+    </div>
+  </aside>
+  <div class="content">
+    <div class="crumbs"><span class="p">Release center</span><i data-icon="chevron-right" style="color: var(--muted-fg)"></i><span>New release</span></div>
+    <div class="intro"><div class="wrap"><div class="t">Release firmware</div><div class="d">Configure firmware version for field deployment.</div></div></div>
+    <div class="main"><div class="wrap">
+      <div style="width: 100%">
+        <div class="label">Firmware for this release</div>
+        <div class="desc">Configure versions for the service groups that need updates.</div>
+        <div class="table" id="table">
+          <div class="tr thead"><div class="c1"></div><div class="c2">Recently released firmware</div><div class="c3"><i data-icon="arrow-right"></i></div><div class="c4">This release</div></div>
+        </div>
+      </div>
+      <div class="field-group"><div class="label">Update summary</div><div class="input"><input value="FW 3.6.0" spellcheck="false" /></div></div>
+      <div class="field-group" style="height: 136px"><div class="label">Note</div><div class="textarea"><textarea spellcheck="false">Supports new firmware build workflow and minor bug fix</textarea><svg class="resize" viewBox="0 0 17.815 17.815"><path d="M15.7189 9.48302C15.8928 9.30938 16.1749 9.3092 16.3487 9.48302C16.5226 9.65686 16.5224 9.93895 16.3487 10.1129L10.1124 16.3483C9.93846 16.5219 9.65734 16.5221 9.48351 16.3483C9.30969 16.1744 9.30987 15.8933 9.48351 15.7194L15.7189 9.48302ZM15.6876 13.0152C15.8615 12.8414 16.1436 12.8413 16.3175 13.0152C16.4911 13.1892 16.4913 13.4713 16.3175 13.6451L13.6339 16.3287C13.4601 16.5024 13.1779 16.5023 13.004 16.3287C12.8301 16.1548 12.8302 15.8728 13.004 15.6988L15.6876 13.0152Z" fill="#1C1917"/></svg></div></div>
+      <div class="btn">Release firmware group</div>
+    </div></div>
+  </div>
+
+  <div class="menu" id="menu">
+    <div class="m-search"><i data-icon="search"></i><input id="mSearch" placeholder="Search HMI app version" spellcheck="false" /></div>
+    <div class="m-list" id="mList"></div>
+  </div>
+</div>
+
+<script>
+/* ---------- icons (Lucide at 16px, as Figma's 14.25px at 0.891×) ---------- */
+const ICONS = {
+  'house': '<path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+  'chevrons-left-right-ellipsis': '<path d="M12 12h.01"/><path d="M16 12h.01"/><path d="m17 7 5 5-5 5"/><path d="m7 7-5 5 5 5"/><path d="M8 12h.01"/>',
+  'flask-conical': '<path d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2"/><path d="M6.453 15h11.094"/><path d="M8.5 2h7"/>',
+  'chevron-right': '<path d="m9 18 6-6-6-6"/>',
+  'arrow-right': '<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
+  'search': '<path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/>',
+};
+const icon = (name, style = '') => `<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"${style ? ` style="${style}"` : ''}>${ICONS[name]}</svg>`;
+const $ = id => document.getElementById(id);
+
+/* ---------- release table ---------- */
+// [service group, recently released MCU firmware, its config version, needs an update]
+const GROUPS = [
+  ['AG 1.0', 'v1.0.2', '3.5.12', false],
+  ['AG 1.0.5', 'v1.1g-moms', '3.5.12', true],
+  ['AG 1.0.6', 'v1.0.5a', '3.5.12-bas', true],
+  ['AG 1.1_KR', 'v1.1g', '3.5.12', true],
+  ['AG 1.1_US', 'v1.1g', '3.5.12-bas', true],
+  ['AG 1.1_EU', 'v1.1g-lotteria', '3.5.12', false],
+];
+const sw = (hmi, fw, cfg) => `<span class="badge hmi">${hmi}</span><span class="sep"></span><span class="fw">${fw}<span class="at">@</span><span class="badge mcu">${cfg}</span></span>`;
+$('table').insertAdjacentHTML('beforeend', GROUPS.map(([group, fw, cfg, update], i) => `
+  <div class="tr">
+    <div class="c1">${group}</div>
+    <div class="c2"><span class="sw${update ? ' dim' : ''}">${sw('3.5.8', fw, cfg)}</span></div>
+    <div class="c3">${update ? '<i data-icon="arrow-right"></i>' : ''}</div>
+    <div class="c4">${i === 1 ? `<span class="sw"><span class="trigger" id="trigger"><span class="badge slot" id="slot">HMI</span></span><span class="sep"></span><span class="fw"><span class="cfg">CONFIG</span><span class="at">@</span><span class="badge mcu" style="color: var(--muted-fg)">MCU</span></span></span>` : ''}</div>
+  </div>`).join(''));
+document.querySelectorAll('i[data-icon]').forEach(i => { i.outerHTML = icon(i.dataset.icon, i.getAttribute('style') || ''); });
+
+/* ---------- HMI version picker ----------
+   Open on AG 1.0.5's HMI slot, as in Figma: scrolled so 3.5.2 heads the list, the released 3.5.8
+   marked as current just below the fold, and the highlight on 3.5.6. From there it works: the
+   highlight follows the pointer, a pick fills the slot and closes the menu, the slot reopens it,
+   and typing filters the versions. */
+const VERSIONS = ['3.4.8', '3.4.9', '3.5.0', '3.5.1', '3.5.2', '3.5.3', '3.5.4', '3.5.5', '3.5.6', '3.5.7', '3.5.8'];
+const CURRENT = '3.5.8';
+const menu = $('menu'), list = $('mList'), search = $('mSearch');
+let highlighted = '3.5.6';
+
+function renderList() {
+  const q = search.value.trim();
+  const shown = VERSIONS.filter(v => v.includes(q));
+  if (!shown.includes(highlighted)) highlighted = shown[0];
+  list.innerHTML = shown.length
+    ? shown.map(v => `<div class="m-item${v === CURRENT ? ' current' : ''}${v === highlighted ? ' hl' : ''}" data-v="${v}">${v}</div>`).join('')
+    : '<div class="m-empty">No version found</div>';
+}
+function highlight(v) {
+  highlighted = v;
+  list.querySelectorAll('.m-item').forEach(el => el.classList.toggle('hl', el.dataset.v === v));
+}
+// Stage-px box of an element (the stage is scaled to fit the window).
+function stageBox(el) {
+  const st = $('stage'), s = st.getBoundingClientRect(), b = el.getBoundingClientRect();
+  const k = s.width / st.offsetWidth;
+  return { left: (b.left - s.left) / k, bottom: (b.bottom - s.top) / k };
+}
+// Opens under the slot, its left edge on the slot's (Figma leaves 10px between them).
+function placeMenu() {
+  const b = stageBox($('slot'));
+  menu.style.left = `${b.left}px`;
+  menu.style.top = `${b.bottom + 10}px`;
+}
+function openMenu() {
+  search.value = '';
+  renderList();
+  placeMenu();
+  menu.hidden = false;
+  list.scrollTop = VERSIONS.indexOf('3.5.2') * 32;
+}
+const closeMenu = () => { menu.hidden = true; };
+
+list.addEventListener('mouseover', e => { const item = e.target.closest('.m-item'); if (item) highlight(item.dataset.v); });
+list.addEventListener('click', e => {
+  const item = e.target.closest('.m-item');
+  if (!item) return;
+  const slot = $('slot');
+  slot.textContent = item.dataset.v;
+  slot.className = 'badge hmi';
+  closeMenu();
+});
+search.addEventListener('input', renderList);
+$('trigger').addEventListener('click', () => (menu.hidden ? openMenu() : closeMenu()));
+document.addEventListener('mousedown', e => {
+  if (!menu.hidden && !menu.contains(e.target) && !$('trigger').contains(e.target)) closeMenu();
+});
+openMenu();
+
+/* ---------- embedding ----------
+   Same handshake as the other prototypes: once the first frame has painted, transitions come back
+   and an embedding page is told this one is ready to show (and told again if it asks with
+   "proto:ping", in case it only started listening after the page had loaded). */
+const SCENE = 'manager';
+const root = document.documentElement;
+if (new URLSearchParams(location.search).has('embed')) root.classList.add('embed');
+let shown = false;
+const announce = () => { if (parent !== window) parent.postMessage({ type: 'proto:ready', scene: SCENE }, location.origin); };
+addEventListener('message', e => { if (e.origin === location.origin && e.data === 'proto:ping' && shown) announce(); });
+document.fonts.ready.then(() => {
+  placeMenu();
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    root.classList.remove('no-anim');
+    shown = true;
+    announce();
+  }));
+});
+
+function fit() {
+  const st = $('stage');
+  st.style.transform = `scale(${Math.min(innerWidth / st.offsetWidth, innerHeight / st.offsetHeight)})`;
+}
+addEventListener('resize', fit); fit();
+addEventListener('keydown', e => {
+  // Escape closes the picker first; only then does it reach the lightbox.
+  if (e.key === 'Escape' && !menu.hidden) { e.preventDefault(); closeMenu(); return; }
+  if (!root.classList.contains('embed')) return;
+  // A click into the lightbox's live copy moves keyboard focus into this page, so hand the
+  // lightbox's own keys back to it — but leave the arrows to a text field that's being edited.
+  const typing = e.target.closest?.('input, textarea');
+  if (e.key === 'Escape' || (!typing && (e.key === 'ArrowLeft' || e.key === 'ArrowRight'))) {
+    e.preventDefault();
+    parent.dispatchEvent(new KeyboardEvent('keydown', { key: e.key, code: e.code, bubbles: true, cancelable: true }));
+  }
+});
+</script>
+</body>
+</html>
