@@ -108,8 +108,11 @@
      version picker works — hover, pick, search, reopen from the HMI slot — the text fields edit,
      and the rest shows hover and press. Other text doesn't select. */
   html { -webkit-user-select: none; user-select: none; cursor: default; }
-  .sb-btn:not(.on):hover, .trigger:hover { background: var(--border); }
-  .btn:hover { opacity: 0.9; }
+  /* Hover only where a pointer can hover: on a touch screen a tap would leave it stuck on. */
+  @media (hover: hover) and (pointer: fine) {
+    .sb-btn:not(.on):hover, .trigger:hover { background: var(--border); }
+    .btn:hover { opacity: 0.9; }
+  }
   .sb-btn:active, .btn:active, .trigger:active, .m-item:active { filter: brightness(0.9); }
   .no-anim, .no-anim * { transition: none !important; }
 </style>
@@ -223,7 +226,7 @@ function openMenu() {
 }
 const closeMenu = () => { menu.hidden = true; };
 
-list.addEventListener('mouseover', e => { const item = e.target.closest('.m-item'); if (item) highlight(item.dataset.v); });
+list.addEventListener('pointerover', e => { const item = e.target.closest('.m-item'); if (item && e.pointerType !== 'touch') highlight(item.dataset.v); });
 list.addEventListener('click', e => {
   const item = e.target.closest('.m-item');
   if (!item) return;

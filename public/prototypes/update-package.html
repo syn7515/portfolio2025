@@ -7,10 +7,14 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
 <style>
   /* The "manager-5" Figma composition: the update-firmware dialog on desktop beside the same flow as
-     a drawer on an iPhone 16 Pro, on no background (the carousel card shows around them). The stage
-     is the 1042×918 the old image covered: Figma's 1029×918 plus the 13px the dialog's shadow
-     reaches to its left. The dialog is drawn at Figma's 1.0646× of its 526×610 base; the phone at 1:1.
-     Heights follow what Figma rendered rather than its export, which adds borders Figma draws inside. */
+     a drawer on an iPhone 16 Pro, on no background (the carousel card shows around them). The old
+     image covered 1042×918: Figma's 1029×918 plus the 13px the dialog's shadow reached to its left.
+     The stage adds 40px either side of that, so the dialog's softer, wider shadow fades out before
+     the frame edge instead of being cut by it. The dialog is drawn at Figma's 1.0646× of its 526×610
+     base; the phone at 1:1. Heights follow what Figma rendered rather than its export, which adds
+     borders Figma draws inside.
+     Elevation uses the stacked shadows of shadow-plugin (shadow.floriankiem.com), the "-ring" kind
+     whose last layer is the 1px hairline, so an edge and its shadow read as one. */
   :root {
     --bg: #ffffff;
     --fg: #1c1917;
@@ -30,7 +34,7 @@
   body { font-family: var(--sans); font-size: 14px; line-height: 20px; color: var(--fg); -webkit-font-smoothing: antialiased; }
   svg { display: block; }
 
-  #stage { position: absolute; left: 50%; top: 50%; width: 1042px; height: 918px; margin: -459px 0 0 -521px; transform-origin: center; }
+  #stage { position: absolute; left: 50%; top: 50%; width: 1122px; height: 918px; margin: -459px 0 0 -561px; transform-origin: center; }
 
   /* package cards, shared by both screens */
   .month { position: relative; height: 25.77px; }
@@ -65,11 +69,12 @@
   .scroll::-webkit-scrollbar { display: none; }
 
   /* desktop dialog */
-  .dialog-wrap { position: absolute; left: 13px; top: 46px; width: 560px; height: 649.43px; }
+  .dialog-wrap { position: absolute; left: 53px; top: 46px; width: 560px; height: 649.43px; }
   .dialog { position: absolute; left: 0; top: 0; width: 526px; height: 610px; transform: scale(1.0646); transform-origin: 0 0; display: flex; flex-direction: column; overflow: hidden;
             background: var(--bg); border-radius: 8px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1); }
-  .dialog::after { content: ""; position: absolute; inset: 0; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: inherit; pointer-events: none; }
+            /* smooth-shadow-ring-lg, its hairline at Figma's 10% black */
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.05), 0 12px 24px rgba(0, 0, 0, 0.04), 0 6px 12px rgba(0, 0, 0, 0.03),
+                        0 3px 6px rgba(0, 0, 0, 0.02), 0 1.5px 3px rgba(0, 0, 0, 0.02), 0 0 0 1px rgba(0, 0, 0, 0.1); }
   /* Figma rounds the dialog's line heights to whole pixels at its 1.0646× size */
   .dialog .pkg { line-height: 20.66px; }
   .dialog .badge, .dialog .fw .ver.mono, .dialog .month span { line-height: 16.9px; }
@@ -97,23 +102,24 @@
   .d-foot .btn { line-height: 24.42px; }
 
   /* phone drawer */
-  .phone { position: absolute; left: 640px; top: 0; width: 402px; height: 918px; overflow: hidden; background: var(--bg); border: 1px solid rgba(0, 0, 0, 0.1); }
+  .phone { position: absolute; left: 680px; top: 0; width: 402px; height: 918px; overflow: hidden; background: var(--bg); border: 1px solid rgba(0, 0, 0, 0.1); }
   .ph-screen { position: absolute; left: -1px; top: -1px; width: 402px; height: 874px; overflow: hidden; background: rgba(214, 211, 209, 0.8); }
   .ph-status { position: absolute; left: 0; top: 0; width: 402px; display: flex; align-items: center; gap: 6px; padding: 11px 16px; }
   .ph-status .time { flex: 1; text-align: center; padding-top: 2px; font-family: "SF Pro Text", -apple-system, system-ui, sans-serif; font-size: 17px; line-height: 22px; font-weight: 600; color: #000; }
   .ph-status .island { width: 125px; height: 37px; }
   .ph-status .levels { flex: 1; display: flex; justify-content: center; align-items: center; gap: 7px; padding-top: 1px; }
   .drawer { position: absolute; left: 0; top: 62px; width: 402px; height: 812px; overflow: hidden; display: flex; flex-direction: column; background: var(--bg); border-radius: 12px 12px 0 0;
-            filter: drop-shadow(0 10px 7.5px rgba(0, 0, 0, 0.1)) drop-shadow(0 4px 3px rgba(0, 0, 0, 0.1)); }
-  .dr-handle { padding-top: 16px; display: flex; justify-content: center; flex-shrink: 0; }
-  .dr-handle span { width: 100px; height: 8px; border-radius: 999px; background: var(--muted); }
+            /* smooth-shadow-ring-lg with the plugin's own 5% hairline */
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.05), 0 12px 24px rgba(0, 0, 0, 0.04), 0 6px 12px rgba(0, 0, 0, 0.03),
+                        0 3px 6px rgba(0, 0, 0, 0.02), 0 1.5px 3px rgba(0, 0, 0, 0.02), 0 0 0 1px rgba(0, 0, 0, 0.05); }
+  /* the iOS sheet grabber's 36×5, in the same 24px row Figma's 100×8 handle took */
+  .dr-handle { height: 24px; padding-top: 8px; display: flex; justify-content: center; flex-shrink: 0; }
+  .dr-handle span { width: 36px; height: 5px; border-radius: 999px; background: #d6d3d1; }
   .dr-head { position: relative; padding: 16px; flex-shrink: 0; text-align: center; font-size: 16px; line-height: 24px; font-weight: 500; color: var(--card-fg); }
   .dr-back { position: absolute; left: 16.15px; top: 12px; padding: 8px; border-radius: 6px; color: var(--primary); transition: background-color 90ms ease; }
   .dr-tabs { display: flex; flex-shrink: 0; box-shadow: inset 0 -1px 0 var(--border); }
   .dr-tab { flex: 1; padding: 8px 16px 14px; text-align: center; font-size: 16px; line-height: 24px; font-weight: 500; color: var(--muted-fg); transition: background-color 90ms ease; }
   .dr-tab.on { color: var(--fg); box-shadow: inset 0 -2px 0 var(--primary); }
-  .dr-tab:hover { box-shadow: inset 0 -1px 0 var(--border); }
-  .dr-tab.on:hover { box-shadow: inset 0 -2px 0 var(--primary); }
   .dr-body { flex: 1; min-height: 0; background: var(--muted); padding: 28px 16px; }
   .dr-list { display: flex; flex-direction: column; gap: 40px; }
   .dr-group { display: flex; flex-direction: column; gap: 12px; }
@@ -128,10 +134,15 @@
      picks a package on both screens at once and each list scrolls; tabs and buttons show hover and press.
      Text doesn't select. */
   html { -webkit-user-select: none; user-select: none; cursor: default; }
-  .pkg:not(.on):hover { background: #fafaf9; }
-  .d-close:hover, .dr-back:hover, .d-tab:hover, .dr-tab:hover { background: rgba(231, 229, 228, 0.6); }
-  .btn:not(.primary):hover { background: var(--muted); }
-  .btn.primary:hover { opacity: 0.9; }
+  /* Hover only where a pointer can hover: on a touch screen a tap would leave it stuck on. */
+  @media (hover: hover) and (pointer: fine) {
+    .pkg:not(.on):hover { background: #fafaf9; }
+    .d-close:hover, .dr-back:hover, .d-tab:hover, .dr-tab:hover { background: rgba(231, 229, 228, 0.6); }
+    .dr-tab:hover { box-shadow: inset 0 -1px 0 var(--border); }
+    .dr-tab.on:hover { box-shadow: inset 0 -2px 0 var(--primary); }
+    .btn:not(.primary):hover { background: var(--muted); }
+    .btn.primary:hover { opacity: 0.9; }
+  }
   .pkg:active, .btn:active, .d-close:active, .dr-back:active, .d-tab:active, .dr-tab:active { filter: brightness(0.96); }
   .no-anim, .no-anim * { transition: none !important; }
 </style>

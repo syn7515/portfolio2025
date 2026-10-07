@@ -257,19 +257,22 @@
      what the timeline's hover classes show, a press shows the pressed look, and nothing acts on a
      click: there are no click handlers, and text doesn't select. */
   html { -webkit-user-select: none; user-select: none; cursor: default; }
-  .nav:not(.on):hover, .icon-btn:hover, .pop-close:hover, .bi-arrow:hover { background: var(--accent); }
-  .create:hover { opacity: 0.9; }
-  .row:not(.active):not(.edited):hover { background: rgba(41, 37, 36, 0.35); }
-  .bi:hover { background: var(--muted); }
-  .bi:hover .bi-act { display: flex; }
-  .bi-try:hover { text-decoration: underline; text-underline-offset: 3px; }
-  .c-row:hover { background: #292524; }
-  .c-row:hover .c-name { color: #d6d3d1; }
-  .c-row:hover .c-tgls { display: flex; }
-  .tgl:not(.on):hover { background: rgba(87, 83, 78, 0.3); color: #d6d3d1; opacity: 0.6; }
-  .btn:not(.primary):hover { background: #292524; }
-  .btn.primary:hover { opacity: 0.9; }
-  .toast .act:hover { background: #44403c; }
+  /* Hover only where a pointer can hover: on a touch screen a tap would leave it stuck on. */
+  @media (hover: hover) and (pointer: fine) {
+    .nav:not(.on):hover, .icon-btn:hover, .pop-close:hover, .bi-arrow:hover { background: var(--accent); }
+    .create:hover { opacity: 0.9; }
+    .row:not(.active):not(.edited):hover { background: rgba(41, 37, 36, 0.35); }
+    .bi:hover { background: var(--muted); }
+    .bi:hover .bi-act { display: flex; }
+    .bi-try:hover { text-decoration: underline; text-underline-offset: 3px; }
+    .c-row:hover { background: #292524; }
+    .c-row:hover .c-name { color: #d6d3d1; }
+    .c-row:hover .c-tgls { display: flex; }
+    .tgl:not(.on):hover { background: rgba(87, 83, 78, 0.3); color: #d6d3d1; opacity: 0.6; }
+    .btn:not(.primary):hover { background: #292524; }
+    .btn.primary:hover { opacity: 0.9; }
+    .toast .act:hover { background: #44403c; }
+  }
   .nav:active, .icon-btn:active, .create:active, .pop-close:active, .bi-arrow:active,
   .tgl:active, .btn:active, .toast .act:active { filter: brightness(0.85); }
   .bi-try:active { color: var(--fg); }
@@ -839,9 +842,9 @@ addEventListener('keydown', e => {
   if (e.key === 'r' || e.key === 'R') { paused = false; loop(); }
 });
 // A real pointer only reaches this page in the lightbox (the carousel card makes it inert). Track it
-// with mousemove rather than mouseenter, which doesn't fire if the pointer is already in place when
-// the lightbox opens.
-addEventListener('mousemove', () => root.classList.add('real-pointer'));
+// with pointermove rather than pointerenter, which doesn't fire if the pointer is already in place
+// when the lightbox opens. A touch doesn't count: it has no hover to show in the scripted one's place.
+addEventListener('pointermove', e => { if (e.pointerType !== 'touch') root.classList.add('real-pointer'); });
 root.addEventListener('mouseleave', () => root.classList.remove('real-pointer'));
 document.fonts.ready.then(loop);
 </script>

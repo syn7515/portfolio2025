@@ -121,11 +121,14 @@
      inert). A press shows the pressed look; the radio group is the one thing a click changes, since
      choosing is what a radio is for. Text doesn't select. */
   html { -webkit-user-select: none; user-select: none; cursor: default; }
-  .btn:not(.primary):hover { background: var(--accent); }
-  .btn.primary:hover { opacity: 0.9; }
-  .undo:hover, .icon-btn:hover, .field .clear:hover { background: #44403c; }
-  .dd-item:hover, .sb-item:hover { background: var(--accent); }
-  .radio-item:hover .radio:not(.on) { box-shadow: inset 0 0 0 2.33px var(--fg); }
+  /* Hover only where a pointer can hover: on a touch screen a tap would leave it stuck on. */
+  @media (hover: hover) and (pointer: fine) {
+    .btn:not(.primary):hover { background: var(--accent); }
+    .btn.primary:hover { opacity: 0.9; }
+    .undo:hover, .icon-btn:hover, .field .clear:hover { background: #44403c; }
+    .dd-item:hover, .sb-item:hover { background: var(--accent); }
+    .radio-item:hover .radio:not(.on) { box-shadow: inset 0 0 0 2.33px var(--fg); }
+  }
   .btn:active, .undo:active, .icon-btn:active, .field .clear:active, .dd-item:active, .sb-item:active, .cb-row:active { filter: brightness(0.85); }
   /* No transitions until the first frame has painted, so the page appears already in place. */
   .no-anim, .no-anim * { transition: none !important; }
@@ -251,7 +254,7 @@ $('cbList').innerHTML = PRODUCTS.map(([id, name]) => `<div class="cb-row"><span 
 const cbRows = [...$('cbList').children];
 const highlight = row => cbRows.forEach(r => r.classList.toggle('hl', r === row));
 highlight(cbRows[2]);
-cbRows.forEach(row => row.addEventListener('mouseenter', () => highlight(row)));
+cbRows.forEach(row => row.addEventListener('pointerenter', e => { if (e.pointerType !== 'touch') highlight(row); }));
 // Radios choose on click; the rest of the sheet only shows hover and press.
 document.querySelectorAll('.radio-item').forEach(item => item.addEventListener('click', () => {
   document.querySelectorAll('.radio').forEach(r => r.classList.toggle('on', r === item.firstChild));
