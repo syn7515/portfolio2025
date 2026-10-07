@@ -63,7 +63,7 @@
       heatingUp: 'Heating',
       coolingDown: 'Cooling down',
       remaining: 'remaining',
-      changeRecipe: 'Change recipe',
+      changeRecipe: 'Recipe',   // portfolio, as v0-2 ~ v0-4: shorter label (app: 'Change recipe')
       unload: 'Unload',
       quickClean: 'Scrape',
       startCooking: 'Start cooking',

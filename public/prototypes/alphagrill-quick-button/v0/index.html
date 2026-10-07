@@ -46,6 +46,11 @@
   <symbol id="i-recipe-change" viewBox="0 0 64 64" fill="currentColor"><path d="M50.6465 37.3057C48.247 45.5079 40.6702 51.5039 31.6865 51.5039C25.6818 51.5039 20.3068 48.822 16.6865 44.5996L16.2578 50.1523L12 49.8252L13.0166 36.6289L26.252 36.75L26.2129 41.0195L20.6055 40.9678C23.2519 44.1464 27.234 46.165 31.6865 46.165C38.2355 46.165 43.7707 41.7952 45.5225 35.8066L50.6465 37.3057ZM31.6865 12C38.0362 12 43.6811 14.9987 47.292 19.6475L47.7422 13.8281L52 14.1553L50.9834 27.3516L37.748 27.2305L37.7871 22.9609L43.1445 23.0088C40.5081 19.5592 36.3559 17.3379 31.6865 17.3379C24.9688 17.3379 19.3179 21.9367 17.7227 28.1611L12.5518 26.8359C14.7375 18.3074 22.4721 12 31.6865 12Z"/></symbol>
   <symbol id="i-unload" viewBox="0 0 64 64" fill="currentColor"><path d="M55.2422 31.5L38.1211 48.6211L33.8789 44.3789L43.7578 34.5H10.5V28.5H43.7578L33.8789 18.6211L38.1211 14.3789L55.2422 31.5Z"/></symbol>
   <symbol id="i-scrape" viewBox="0 0 64 64" fill="currentColor"><path d="M46.7959 16.4727C43.278 22.1488 39.7611 27.826 36.2432 33.502C34.2364 36.7397 32.2294 39.9778 30.2227 43.2158C30.8629 43.0314 31.5034 42.8475 32.1436 42.6631C36.5964 41.3805 41.0499 40.0979 45.5029 38.8154L49.0938 44.5205C43.992 45.8792 38.8889 47.239 33.7871 48.5977C30.582 49.4513 27.3761 50.3046 24.1709 51.1582L21.5791 51.9053L20.5859 49.334L14.8818 33.6309L20.3721 32.2451C21.5348 35.2554 22.6976 38.266 23.8604 41.2764C26.2546 37.5855 28.6498 33.8948 31.0439 30.2041C34.5476 24.803 38.0503 19.4012 41.5537 14L46.7959 16.4727Z"/></symbol>
+  <!-- portfolio, as v0-2 ~ v0-4: the Recipe and Scrape buttons' icons, filled (v0-4's default) — an
+       open book (Tabler "book") in place of the circular recipe-change arrows, and a griddle scraper
+       (a handle and a blade on the griddle line) in place of the diagonal arrow. -->
+  <symbol id="i-recipe-book-fill" viewBox="0 0 24 24" fill="currentColor"><path d="M2.5 5.4a9.5 9.5 0 0 1 8.75 .55v13.6a9.5 9.5 0 0 0 -8.75 -.55z"/><path d="M12.75 5.95a9.5 9.5 0 0 1 8.75 -.55v13.6a9.5 9.5 0 0 0 -8.75 .55z"/></symbol>
+  <symbol id="i-scraper-fill" viewBox="0 0 24 24" fill="currentColor"><g transform="rotate(-35 12 13)"><rect x="9.75" y="1.75" width="4.5" height="8" rx="1.75"/><rect x="11.25" y="9" width="1.5" height="3"/><path d="M6.6 11.25h10.8l.9 7H5.7z"/></g><rect x="2.5" y="20.2" width="19" height="1.6" rx=".8"/></symbol>
 </svg>
 
 <div class="stage">
@@ -136,7 +141,7 @@
                 <!-- CookQuickActions -->
                 <div class="flex items-center justify-center gap-5">
                   <button type="button" id="qa-recipe" class="flex h-35 w-40 shrink-0 flex-col items-center justify-center gap-3 rounded-[12px] active:bg-white/15">
-                    <svg class="size-16 text-white"><use href="#i-recipe-change"/></svg>
+                    <svg class="size-16 text-white"><use href="#i-recipe-book-fill"/></svg>
                     <span id="qa-recipe-label" class="type-body3 text-center text-white/70">레시피 변경</span>
                   </button>
                   <div id="qa-recipe-divider" class="h-5 w-px bg-white/25"></div>
@@ -152,7 +157,7 @@
                   </button>
                   <div class="h-5 w-px bg-white/25"></div>
                   <button type="button" id="qa-scrape" class="flex h-35 w-40 shrink-0 flex-col items-center justify-center gap-3 rounded-[12px] active:bg-white/15">
-                    <svg class="size-16 text-white"><use href="#i-scrape"/></svg>
+                    <svg class="size-16 text-white"><use href="#i-scraper-fill"/></svg>
                     <span class="type-body3 text-center text-white/70"><span id="qa-scrape-label" class="inline-block">간이 청소</span></span>
                   </button>
                 </div>

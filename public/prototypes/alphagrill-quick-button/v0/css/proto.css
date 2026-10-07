@@ -256,3 +256,20 @@ html[data-from="v14"] .device:has(#app-menu:not([hidden]):not(.is-closed) .menu-
 
 /* v14 (?from=v14): the backdrop (the card's tap target) is the strip right of the menu panel. */
 html[data-from="v14"] #app-menu .menu-backdrop { left: 80%; }
+
+/* portfolio (?from=v14): PREPARING / READY TO COOK as v0-4 (from v0-2) — 400 (500 in the app),
+   24px (28), tracked caps at 0.2em centred against the trailing space
+   (PREPARING 0.28em), tinted with the state's hue at 70 %: light red on preheat, light green
+   on ready. */
+html[data-from="v14"] #phase-label { font-weight: 400; font-size: 24px; letter-spacing: 0.2em; padding-left: 0.2em; }
+html[data-from="v14"] #cook-container.bg-cook-preparing #phase-label { letter-spacing: 0.28em; padding-left: 0.28em; color: hsl(0 100% 86% / 70%); }
+html[data-from="v14"] #cook-container.bg-cook-ready-to-cook #phase-label { color: hsl(150 80% 80% / 70%); }
+
+/* portfolio (?from=v14): the quick-action icons as v0-4 (from v0-2). The filled book and scraper
+   carry more ink than the app's arrows, so all three are drawn smaller and quieter: book and
+   scraper 64 → 44px in a grey tinted with the state's hue (white/55 on black), the unload arrow
+   — a thin glyph in a lot of empty viewBox — 52px at 80 %, keeping its state colour. */
+html[data-from="v14"] :is(#qa-recipe, #qa-scrape) > svg { width: 44px; height: 44px; color: rgb(255 255 255 / 55%); }
+html[data-from="v14"] #cook-container.bg-cook-preparing :is(#qa-recipe, #qa-scrape) > svg { color: hsl(0 14% 66%); }
+html[data-from="v14"] #cook-container.bg-cook-ready-to-cook :is(#qa-recipe, #qa-scrape) > svg { color: hsl(150 12% 64%); }
+html[data-from="v14"] #qa-unload > svg { width: 52px; height: 52px; margin-block: -4px; opacity: .8; }
