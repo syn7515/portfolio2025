@@ -83,7 +83,9 @@
   .dialog .dot { width: auto; }
   .dialog .fw .ver.mono { gap: 5.57px; }
   .d-head { height: 61.85px; flex-shrink: 0; padding: 24px 8px 0 24px; }
-  .d-title { font-size: 18px; line-height: 1; font-weight: 600; letter-spacing: -0.62px; color: var(--card-fg); }
+  /* quieter than Figma's 18px semibold: the 16px medium the phone sheet's title uses, a pixel lower
+     so its centre stays level with the close button */
+  .d-title { padding-top: 1px; font-size: 16px; line-height: 1; font-weight: 500; color: var(--card-fg); }
   .d-close { position: absolute; top: 13px; right: 13.1px; padding: 12px; border-radius: 8px; color: var(--primary); transition: background-color 90ms ease; }
   .d-tabs { height: 40px; flex-shrink: 0; display: flex; gap: 6px; padding: 0 0 4px 14px; }
   .d-tab { height: 36px; padding: 8px 10px 0; border-radius: 6px; transition: background-color 90ms ease; }
