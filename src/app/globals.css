@@ -145,8 +145,8 @@
        nothing once the viewport is wide enough (~1536px) that a centred card already clears the
        edge. The text rides the same offset so body, header and cards share one centre line.
 
-       The one place this can't follow is Home: it has no carousel, so its column stays on the
-       viewport's centre. */
+       Home has no carousel, but its column rides the offset too, so its text starts at the same
+       x as a post's and the two sheets read as one. */
     --paper-center-offset: max(
       0px,
       calc(var(--paper-left) + 48px - (100vw - var(--carousel-card-w)) / 2)

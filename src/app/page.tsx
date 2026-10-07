@@ -164,8 +164,11 @@ export default function Home() {
             the top edge is the thing content should align to. */}
         <div className="flex-1 flex flex-col justify-center sheet:justify-start pt-16 min-[640px]:pt-24 sheet:pt-[100px] paper:pt-[clamp(6.25rem,calc(13.333vw_-_3.75rem),8.75rem)] pb-16 min-[640px]:pb-24 sheet:pb-10">
         {/* 100px is this column's inset from the paper edge at 1200px (50vw - 280px - 220px there),
-            held across the sheet band so the sheet slides left without its contents moving on it. */}
-        <div className="flex flex-col sheet:flex-1 px-6 sheet:px-0 sheet:ml-[100px] paper:ml-[calc(50vw_-_var(--content-w)_/_2_-_var(--paper-left))] sheet:w-[var(--content-w)]">
+            held across the sheet band so the sheet slides left without its contents moving on it.
+            It rides --paper-center-offset like the case-study column in blog-post-layout.tsx, so
+            Home's text starts at the same x as a post's: there is no carousel here to centre on,
+            but the two pages hand off to each other and should read as one sheet. */}
+        <div className="flex flex-col sheet:flex-1 px-6 sheet:px-0 sheet:ml-[calc(100px_+_var(--paper-center-offset))] paper:ml-[calc(50vw_-_var(--content-w)_/_2_-_var(--paper-left)_+_var(--paper-center-offset))] sheet:w-[var(--content-w)]">
         <div className="max-w-[var(--content-w)] mx-auto" data-inline-link-preview-boundary>
           {/* Left column: name */}
           {/* Below the sheet breakpoint the name tracks the viewport: 32px where the sheet appears at
