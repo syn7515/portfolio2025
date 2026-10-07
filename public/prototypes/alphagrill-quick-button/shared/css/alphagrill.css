@@ -243,3 +243,14 @@
     -webkit-mask-image: linear-gradient(rgba(0, 0, 0, 0.01) 0%, rgba(0, 0, 0, 0.02) 11.79%, rgba(0, 0, 0, 0.043) 21.38%, rgba(0, 0, 0, 0.08) 29.12%, rgba(0, 0, 0, 0.13) 35.34%, rgba(0, 0, 0, 0.19) 40.37%, rgba(0, 0, 0, 0.26) 44.56%, rgba(0, 0, 0, 0.333) 48.24%, rgba(0, 0, 0, 0.416) 51.76%, rgba(0, 0, 0, 0.5) 55.44%, rgba(0, 0, 0, 0.59) 59.63%, rgba(0, 0, 0, 0.68) 64.66%, rgba(0, 0, 0, 0.765) 70.88%, rgba(0, 0, 0, 0.847) 78.62%, rgba(0, 0, 0, 0.925) 88.21%, rgb(0, 0, 0) 100%);
   }
 }
+
+/* portfolio: Inter (the site's own InterVariable) in place of Pretendard for the whole canvas,
+   both v14 and v0, so the two frames still match where the take swaps them. Korean, which
+   Inter doesn't have (한글 in Settings), falls back to Pretendard. */
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/InterVariable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+}
+.device, .device * { font-family: "Inter", "Pretendard", system-ui, sans-serif; }
