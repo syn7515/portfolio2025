@@ -1,0 +1,256 @@
+/* ==========================================================================
+   AlphaGrill design classes
+   Ported from fw-app-tauri-AlphaGrill/src/app/global.css (main @ b9ebd24).
+   Kept verbatim so markup copied from the app renders the same here.
+
+   The @layer statement mirrors Tailwind v4's layer order, so `type-*`
+   component classes yield to utility classes exactly as they do in the app.
+   Tailwind itself is compiled at runtime by vendor/tailwind-browser.js.
+   ========================================================================== */
+
+@layer theme, base, components, utilities;
+
+/* App fonts — only Pretendard Medium (500) is used on the cook screens. */
+@font-face {
+  font-family: "Pretendard";
+  src: url("../assets/font/Pretendard-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+}
+
+/* Equivalent of the app's `body` rules, scoped to the canvas. Unlayered on
+   purpose so it beats the stage font set in base.css. */
+.device {
+  font-family: "Pretendard", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* 터치 전용 키오스크 — 키보드 포커스 링을 쓰지 않는다 */
+.device *:focus-visible {
+  outline: none;
+}
+
+@layer components {
+  /* Mask gradient utilities */
+  .mask-fade-top {
+    mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+  }
+  .mask-fade-bottom {
+    mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
+  }
+  .mask-fade-left {
+    mask-image: linear-gradient(to right, black 0%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, black 0%, transparent 100%);
+  }
+  .mask-fade-down {
+    mask-image: linear-gradient(to bottom, transparent 0%, black 55%, black 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 55%, black 100%);
+  }
+
+  /* Typography (px) — type-* to avoid clash with Tailwind text-* */
+  .type-h1 {
+    font-family: "Pretendard", system-ui, sans-serif;
+    font-size: 64px;
+    font-weight: 600;
+    line-height: 120%;
+  }
+  .type-h2 {
+    font-family: "Pretendard", system-ui, sans-serif;
+    font-size: 48px;
+    font-weight: 600;
+    line-height: 130%;
+  }
+  .type-header2 {
+    font-family: "Pretendard", system-ui, sans-serif;
+    font-size: 48px;
+    font-weight: 500;
+    line-height: 130%;
+  }
+  .type-body0 {
+    font-family: "Pretendard", system-ui, sans-serif;
+    font-size: 32px;
+    font-weight: 500;
+    line-height: 140%;
+  }
+  .type-body1 {
+    font-family: "Pretendard", system-ui, sans-serif;
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 150%;
+  }
+  .type-body2 {
+    font-family: "Pretendard", system-ui, sans-serif;
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 130%;
+  }
+  .type-body3 {
+    font-family: "Pretendard", system-ui, sans-serif;
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 130%;
+  }
+
+  /* Cook status backgrounds */
+  .bg-cook-preparing {
+    background:
+      linear-gradient(
+        180deg,
+        rgba(222, 65, 65, 0.14) 0.22%,
+        rgba(222, 64, 64, 0.14) 10.17%,
+        rgba(222, 63, 63, 0.14) 18.27%,
+        rgba(222, 60, 60, 0.13) 24.8%,
+        rgba(221, 57, 57, 0.12) 30.04%,
+        rgba(221, 53, 53, 0.11) 34.29%,
+        rgba(221, 49, 49, 0.1) 37.83%,
+        rgba(220, 44, 44, 0.09) 40.94%,
+        rgba(220, 39, 39, 0.08) 43.9%,
+        rgba(219, 33, 33, 0.07) 47.01%,
+        rgba(219, 28, 28, 0.06) 50.55%,
+        rgba(219, 22, 22, 0.05) 54.79%,
+        rgba(218, 16, 16, 0.03) 60.04%,
+        rgba(218, 11, 11, 0.02) 66.57%,
+        rgba(217, 6, 6, 0.01) 74.67%,
+        rgba(217, 1, 1, 0) 84.62%
+      ),
+      radial-gradient(
+        107.98% 140.43% at 50% 0%,
+        rgba(222, 65, 65, 0.28) 0.22%,
+        rgba(222, 64, 64, 0.28) 10.17%,
+        rgba(222, 63, 63, 0.27) 18.27%,
+        rgba(222, 60, 60, 0.26) 24.8%,
+        rgba(221, 57, 57, 0.25) 30.04%,
+        rgba(221, 53, 53, 0.23) 34.29%,
+        rgba(221, 49, 49, 0.21) 37.83%,
+        rgba(220, 44, 44, 0.19) 40.94%,
+        rgba(220, 39, 39, 0.17) 43.9%,
+        rgba(219, 33, 33, 0.14) 47.01%,
+        rgba(219, 28, 28, 0.12) 50.55%,
+        rgba(219, 22, 22, 0.09) 54.79%,
+        rgba(218, 16, 16, 0.07) 60.04%,
+        rgba(218, 11, 11, 0.04) 66.57%,
+        rgba(217, 6, 6, 0.02) 74.67%,
+        rgba(217, 1, 1, 0) 84.62%
+      ),
+      #000;
+  }
+  .bg-cook-ready-to-cook {
+    background:
+      linear-gradient(
+        180deg,
+        rgba(65, 222, 143, 0.28) 0.22%,
+        rgba(64, 222, 143, 0.28) 10.17%,
+        rgba(63, 222, 142, 0.27) 18.27%,
+        rgba(60, 222, 141, 0.26) 24.8%,
+        rgba(57, 221, 139, 0.25) 30.04%,
+        rgba(53, 221, 137, 0.23) 34.29%,
+        rgba(49, 221, 135, 0.21) 37.83%,
+        rgba(44, 220, 132, 0.19) 40.94%,
+        rgba(39, 220, 129, 0.17) 43.9%,
+        rgba(33, 219, 126, 0.14) 47.01%,
+        rgba(28, 219, 123, 0.12) 50.55%,
+        rgba(22, 219, 120, 0.09) 54.79%,
+        rgba(16, 218, 117, 0.07) 60.04%,
+        rgba(11, 218, 114, 0.04) 66.57%,
+        rgba(6, 217, 112, 0.02) 74.67%,
+        rgba(1, 217, 109, 0) 84.62%
+      ),
+      radial-gradient(
+        97.98% 127.69% at 50% 0%,
+        rgba(65, 222, 143, 0.42) 0.22%,
+        rgba(64, 222, 143, 0.42) 10.17%,
+        rgba(63, 222, 142, 0.41) 18.27%,
+        rgba(60, 222, 141, 0.39) 24.8%,
+        rgba(57, 221, 139, 0.37) 30.04%,
+        rgba(53, 221, 137, 0.34) 34.29%,
+        rgba(49, 221, 135, 0.31) 37.83%,
+        rgba(44, 220, 132, 0.28) 40.94%,
+        rgba(39, 220, 129, 0.25) 43.9%,
+        rgba(33, 219, 126, 0.21) 47.01%,
+        rgba(28, 219, 123, 0.17) 50.55%,
+        rgba(22, 219, 120, 0.14) 54.79%,
+        rgba(16, 218, 117, 0.1) 60.04%,
+        rgba(11, 218, 114, 0.06) 66.57%,
+        rgba(6, 217, 112, 0.03) 74.67%,
+        rgba(1, 217, 109, 0) 84.62%
+      ),
+      #000;
+  }
+
+  /* Cook theme gradients (white / pink) */
+  .line-white {
+    background: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.6) 15%,
+      rgba(255, 255, 255, 0.6) 85%,
+      rgba(255, 255, 255, 0.1) 100%
+    );
+  }
+  .numeric-white {
+    background: linear-gradient(to bottom, #ffffff 0%, rgba(255, 255, 255, 0.85) 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .gradient-white {
+    background: linear-gradient(90deg, #ffffff 0%, rgba(255, 255, 255, 0.9) 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .line-pink {
+    background: linear-gradient(
+      to right,
+      rgba(177, 126, 126, 0.1) 0%,
+      rgba(177, 126, 126, 0.6) 15%,
+      rgba(177, 126, 126, 0.6) 85%,
+      rgba(177, 126, 126, 0.1) 100%
+    );
+  }
+  .numeric-pink {
+    background: linear-gradient(to bottom, #ffd9d9 0%, #d2a1a1 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .gradient-pink {
+    background: linear-gradient(90deg, #ffbaba 0%, rgba(255, 223, 223, 0.9) 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* --------------------------------------------------------------------
+     TickRingSlot (features/cook/components/tick-ring-slot.tsx)
+     In the app these are inline styles computed from
+     src/lib/figma/tick-ring-fade-down-gradient.ts. Values captured from
+     the running app so the mask and dim match Figma Rect 54 / Rect 55.
+     -------------------------------------------------------------------- */
+  .tick-ring-mask {
+    mask-image: radial-gradient(129.2% 101.61% at 50% 1%, rgb(0, 0, 0) 48%, rgba(0, 0, 0, 0.1) 65%, rgba(0, 0, 0, 0) 78%);
+    -webkit-mask-image: radial-gradient(129.2% 101.61% at 50% 1%, rgb(0, 0, 0) 48%, rgba(0, 0, 0, 0.1) 65%, rgba(0, 0, 0, 0) 78%);
+  }
+  .tick-ring-fade {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    background-image: linear-gradient(rgba(0, 0, 0, 0.01) 0%, rgba(0, 0, 0, 0.02) 11.79%, rgba(0, 0, 0, 0.043) 21.38%, rgba(0, 0, 0, 0.08) 29.12%, rgba(0, 0, 0, 0.13) 35.34%, rgba(0, 0, 0, 0.19) 40.37%, rgba(0, 0, 0, 0.26) 44.56%, rgba(0, 0, 0, 0.333) 48.24%, rgba(0, 0, 0, 0.416) 51.76%, rgba(0, 0, 0, 0.5) 55.44%, rgba(0, 0, 0, 0.59) 59.63%, rgba(0, 0, 0, 0.68) 64.66%, rgba(0, 0, 0, 0.765) 70.88%, rgba(0, 0, 0, 0.847) 78.62%, rgba(0, 0, 0, 0.925) 88.21%, rgb(0, 0, 0) 100%);
+    mask-image: linear-gradient(rgba(0, 0, 0, 0.01) 0%, rgba(0, 0, 0, 0.02) 11.79%, rgba(0, 0, 0, 0.043) 21.38%, rgba(0, 0, 0, 0.08) 29.12%, rgba(0, 0, 0, 0.13) 35.34%, rgba(0, 0, 0, 0.19) 40.37%, rgba(0, 0, 0, 0.26) 44.56%, rgba(0, 0, 0, 0.333) 48.24%, rgba(0, 0, 0, 0.416) 51.76%, rgba(0, 0, 0, 0.5) 55.44%, rgba(0, 0, 0, 0.59) 59.63%, rgba(0, 0, 0, 0.68) 64.66%, rgba(0, 0, 0, 0.765) 70.88%, rgba(0, 0, 0, 0.847) 78.62%, rgba(0, 0, 0, 0.925) 88.21%, rgb(0, 0, 0) 100%);
+    -webkit-mask-image: linear-gradient(rgba(0, 0, 0, 0.01) 0%, rgba(0, 0, 0, 0.02) 11.79%, rgba(0, 0, 0, 0.043) 21.38%, rgba(0, 0, 0, 0.08) 29.12%, rgba(0, 0, 0, 0.13) 35.34%, rgba(0, 0, 0, 0.19) 40.37%, rgba(0, 0, 0, 0.26) 44.56%, rgba(0, 0, 0, 0.333) 48.24%, rgba(0, 0, 0, 0.416) 51.76%, rgba(0, 0, 0, 0.5) 55.44%, rgba(0, 0, 0, 0.59) 59.63%, rgba(0, 0, 0, 0.68) 64.66%, rgba(0, 0, 0, 0.765) 70.88%, rgba(0, 0, 0, 0.847) 78.62%, rgba(0, 0, 0, 0.925) 88.21%, rgb(0, 0, 0) 100%);
+  }
+}
+
+/* portfolio: Inter (the site's own InterVariable) in place of Pretendard for the whole canvas,
+   both v14 and v0, so the two frames still match where the take swaps them. Korean, which
+   Inter doesn't have (한글 in Settings), falls back to Pretendard. */
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/InterVariable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+}
+.device, .device * { font-family: "Inter", "Pretendard", system-ui, sans-serif; }

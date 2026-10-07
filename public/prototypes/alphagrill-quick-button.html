@@ -1,0 +1,281 @@
+<!doctype html>
+<!-- AlphaGrill's quick recipe select, played as a storyboard for the portfolio carousel.
+
+     The prototype itself is in alphagrill-quick-button/, copied as it is from the Prototypes repo's
+     "quick button" motion-proto (67b2882): v14 (the cook screen with quick recipe buttons), v0 (the
+     app's cook screen as it ships) and the shared/ files both load. This page frames the two in
+     English and plays one take over them: from the quick buttons, open the menu, turn Quick recipe
+     select off in Settings and back out to the app's own cook screen, then turn it on again and land
+     back on the quick buttons.
+
+     The prototype swaps pages when the setting changes (v14 → v0?from=v14 and back). Here both pages
+     are loaded from the start and stacked, and the swap is which frame is on top: it happens under
+     the settings page, which is the same in both, so it doesn't show.
+
+     Changed from the source (each marked "portfolio" where it is made): the canvas is set in Inter
+     instead of Pretendard (shared/css/alphagrill.css); in v0, as in v0-4 (local/v0-4, cad981a), the
+     phase label takes its style, "Change recipe" reads "Recipe", and the quick actions show its
+     filled book and scraper icons at its sizes and tints. -->
+<html lang="en" class="no-anim">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AlphaGrill quick recipe select — prototype</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #000; }
+  /* Each frame scales its 600×1024 screen to fit itself. They take no input: a real pointer (in the
+     lightbox) would only fight the take. */
+  iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; pointer-events: none; }
+  iframe.top { z-index: 1; }
+  /* The finger: a faint disc where a tap lands. Touch has no hover, so it is only there for the
+     tap, and it stays quiet next to the screen's own pressed looks: it fades in where it lands
+     (no pop), dips a little on the press and fades out in place. Sized in screen px (--s is the
+     screen's scale). */
+  #touch {
+    position: absolute; z-index: 2; left: 0; top: 0; pointer-events: none;
+    width: calc(60px * var(--s, 1)); height: calc(60px * var(--s, 1));
+    margin: calc(-30px * var(--s, 1)) 0 0 calc(-30px * var(--s, 1));
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.16);
+    box-shadow: inset 0 0 0 calc(1.5px * var(--s, 1)) rgba(255, 255, 255, 0.3);
+    opacity: 0;
+    transition: opacity 280ms ease, scale 140ms ease;
+  }
+  #touch.on { opacity: 1; transition-duration: 200ms, 140ms; }
+  #touch.down { scale: 0.92; }
+  .no-anim #touch { transition: none; }
+</style>
+</head>
+<body>
+<iframe id="v14" class="top" src="alphagrill-quick-button/v14/index.html?embed&scenario=ready&lang=en" title="Cook screen with quick recipe select" tabindex="-1"></iframe>
+<iframe id="v0" src="alphagrill-quick-button/v0/index.html?embed&from=v14&scenario=ready&lang=en" title="Cook screen as it ships" tabindex="-1"></iframe>
+<div id="touch"></div>
+<script>
+const root = document.documentElement;
+const EMBED = new URLSearchParams(location.search).has('embed');
+const SCENE = 'quick-select';
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const frames = n => new Promise(r => { const step = () => (n-- > 0 ? requestAnimationFrame(step) : r()); step(); });
+const until = async test => { while (!test()) await sleep(30); };
+const touch = document.getElementById('touch');
+
+/* ---------- the two frames ---------- */
+const F = {};   // 'v14' | 'v0' → { el, win, doc, device }
+
+// The mock recipes that only have Korean names get English ones: this is the English app.
+const EN = { '불고기 패티': 'Bulgogi Patty', '레어': 'Rare', '미디엄 레어': 'Medium rare', '미디엄': 'Medium', '미디엄웰던': 'Medium well', '웰던': 'Well done' };
+
+// The handoff page's trick: copy every :active rule as .is-pressed right after the original, so a
+// scripted press shows the look a finger's would. The Tailwind runtime rebuilds its <style> (a new
+// sheet) whenever new classes appear, which drops the copies, so copy again into each new sheet.
+function makePressable(doc) {
+  const seen = new WeakSet();
+  const walk = group => {
+    for (let i = group.cssRules.length - 1; i >= 0; i--) {
+      const rule = group.cssRules[i];
+      if (!rule.selectorText && rule.cssRules) walk(rule);
+      else if (rule.selectorText?.includes(':active')) group.insertRule(rule.cssText.replaceAll(':active', '.is-pressed'), i + 1);
+    }
+  };
+  const copy = () => {
+    for (const sheet of doc.styleSheets) {
+      if (seen.has(sheet)) continue;
+      seen.add(sheet);
+      try { walk(sheet); } catch (e) { /* unreadable sheet */ }
+    }
+  };
+  copy();
+  new doc.defaultView.MutationObserver(copy).observe(doc.head, { childList: true, subtree: true, characterData: true });
+}
+
+async function setUp(name) {
+  const el = document.getElementById(name);
+  const isLoaded = () => el.contentDocument?.readyState === 'complete' && el.contentWindow.location.href !== 'about:blank';
+  if (!isLoaded()) await new Promise(r => el.addEventListener('load', r, { once: true }));
+  const win = el.contentWindow, doc = el.contentDocument, device = doc.getElementById('device');
+  // menu.js arrives a task after cook.js, and the Tailwind runtime compiles the classes after load
+  await until(() => win.AppMenu && win.Cook && win.getComputedStyle(doc.getElementById('cook-container')).position === 'relative');
+  await doc.fonts.ready;
+  device.classList.add('no-motion');
+  makePressable(doc);
+  win.Cook.RECIPES.forEach(r => {
+    r.name = EN[r.name] || r.name;
+    r.cookOptions.forEach(o => { o.name = EN[o.name] || o.name; });
+  });
+  win.Cook.render();
+  // Open the menu and settings once (unseen), so the Tailwind runtime has styled what they render —
+  // the switch's blue too — before a take shows them.
+  win.AppMenu.open();
+  win.AppMenu.settings.quickSelect = true;
+  win.AppMenu.openSetting();
+  await frames(3);
+  win.AppMenu.closeSetting();
+  await sleep(300);   // the menu's close timer hides it
+  F[name] = { el, win, doc, device };
+}
+
+const $ = (f, sel) => F[f].doc.querySelector(sel) || console.warn(`[quick-select] ${f}: no "${sel}"`);
+const show = f => { for (const k in F) F[k].el.classList.toggle('top', k === f); };
+function hideMenu(f) {
+  const menu = F[f].doc.getElementById('app-menu');
+  menu.classList.add('is-closed');
+  menu.hidden = true;
+}
+// Settings open with the switch at `on`, the menu shut and the cook screen at rest beneath it: the
+// state a swap lands on, set up while that frame is underneath.
+function settle(f, on) {
+  hideMenu(f);
+  F[f].win.AppMenu.settings.quickSelect = on;
+  F[f].win.AppMenu.openSetting();
+}
+// The quick buttons on top at rest, and v0 waiting beneath with the setting off.
+function reset() {
+  F.v14.win.AppMenu.settings.quickSelect = true;
+  F.v14.win.AppMenu.closeSetting();
+  hideMenu('v14');
+  settle('v0', false);
+  show('v14');
+}
+// The switch slides the way the app's ToggleSwitch does (200ms). The prototype re-renders the
+// settings page on a toggle, which snaps it, and then swaps pages; the take does the swap itself.
+const QS = '#app-setting [data-setting-toggle="quickSelect"]';
+function slideSwitch(f, on) {
+  const row = $(f, QS), track = row.lastElementChild, knob = track.firstElementChild;
+  track.classList.toggle('bg-[#38B6FF]', on);
+  track.classList.toggle('bg-white/20', !on);
+  knob.classList.toggle('translate-x-[42px]', on);
+  row.setAttribute('aria-pressed', on);
+  F[f].win.AppMenu.settings.quickSelect = on;
+}
+
+/* ---------- timeline ---------- */
+// Waits are scheduled against the wall clock, as in the other prototypes: step n of the take lands
+// at loopStart + (sum of waits up to n), and embedded copies derive loopStart from Date.now(), so
+// the carousel card and its lightbox copy always show the same moment. A wait whose time has
+// passed returns at once, which is how a copy that starts mid-take catches up.
+let runId = 0, loopStart = 0, vt = 0, dry = false;
+// While steps land late (loading, or a tab that slept) they land without motion, so the take appears
+// already in place rather than replaying at speed. Once caught up, motion comes back and an
+// embedding page is told the frame is ready to show (again if it asks with "proto:ping").
+let behind = true, shown = false;
+const announce = () => { if (parent !== window) parent.postMessage({ type: 'proto:ready', scene: SCENE }, location.origin); };
+addEventListener('message', e => { if (e.origin === location.origin && e.data === 'proto:ping' && shown) announce(); });
+function fallBehind() {
+  behind = true;
+  root.classList.add('no-anim');
+  for (const k in F) F[k].device.classList.add('no-motion');
+}
+async function catchUp() {
+  await frames(4);   // let the last steps paint, and the Tailwind runtime style what they rendered
+  for (const k in F) F[k].device.classList.remove('no-motion');
+  root.classList.remove('no-anim');
+  behind = false;
+  await frames(2);
+  if (!shown) { shown = true; announce(); }
+}
+async function wait(ms, id) {
+  if (id !== runId) throw 'abort';
+  vt += ms;
+  if (dry) return;
+  while (true) {
+    if (id !== runId) throw 'abort';
+    const left = loopStart + vt - Date.now();
+    if (left <= 0) {
+      if (left < -250 && !behind) fallBehind();
+      return;
+    }
+    if (behind) { await catchUp(); continue; }
+    await sleep(Math.min(left, 30));
+  }
+}
+
+// Where the finger lands: the middle of an element, or of its text for a label in a wide row.
+function spot(el, text) {
+  let r = el.getBoundingClientRect();
+  if (text) {
+    const range = el.ownerDocument.createRange();
+    range.selectNodeContents(el);
+    r = range.getBoundingClientRect();
+  }
+  return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+}
+// A tap: the finger sets down, holds with the pressed look and lifts, which is when it acts (a click,
+// unless `act` says otherwise). The frames fill this page, so their coordinates are this page's.
+async function tap(f, sel, id, { at, text = false, act } = {}) {
+  const el = !dry && $(f, sel);
+  if (el) {
+    const p = spot(at ? $(f, at) : el, text);
+    touch.style.translate = `${p.x}px ${p.y}px`;
+    touch.classList.add('on');
+  }
+  await wait(220, id);
+  if (el) { touch.classList.add('down'); el.classList.add('is-pressed'); }
+  await wait(130, id);
+  if (el) {
+    touch.classList.remove('down', 'on');
+    el.classList.remove('is-pressed');
+    act ? act() : el.click();
+  }
+}
+
+const MENU = '#menu-btn', MENU_ICON = '#menu-btn > div';
+const SETTINGS = '#app-menu [data-menu="setting"]', SETTINGS_LABEL = SETTINGS + ' p';
+const BACK = '#app-setting [data-setting-back]';
+const SWITCH = QS + ' > div:last-child';
+
+async function take(id) {
+  if (!dry) reset();
+  await wait(2200, id);                                           // the quick buttons on the cook screen
+  await tap('v14', MENU, id, { at: MENU_ICON });
+  await wait(900, id);                                            // the menu pushes the screen aside (360ms)
+  await tap('v14', SETTINGS, id, { at: SETTINGS_LABEL, text: true });
+  await wait(1000, id);
+  await tap('v14', QS, id, { at: SWITCH, act: () => slideSwitch('v14', false) });
+  await wait(220, id);                                            // the prototype's own beat before it swaps pages
+  if (!dry) show('v0');
+  await wait(700, id);
+  await tap('v0', BACK, id);
+  await wait(2600, id);                                           // the app's own cook screen
+  if (!dry) settle('v14', true);                                  // waiting beneath for the way back
+  await tap('v0', MENU, id, { at: MENU_ICON });
+  await wait(900, id);
+  await tap('v0', SETTINGS, id, { at: SETTINGS_LABEL, text: true });
+  await wait(1000, id);
+  await tap('v0', QS, id, { at: SWITCH, act: () => slideSwitch('v0', true) });
+  await wait(220, id);
+  if (!dry) show('v14');
+  await wait(700, id);
+  await tap('v14', BACK, id);
+  await wait(1200, id);
+}
+
+async function loop() {
+  const id = ++runId;
+  try {
+    // Measure the take with a dry run (every wait returns at once, no step acts), so a synced copy can find its place in it.
+    dry = true; vt = 0; await take(id); dry = false;
+    const length = vt;
+    while (true) {
+      const now = Date.now();
+      loopStart = EMBED ? now - (now % length) : now;
+      vt = 0;
+      await take(id);
+    }
+  } catch (e) { dry = false; if (e !== 'abort') throw e; }
+}
+
+const fit = () => root.style.setProperty('--s', Math.min(innerWidth / 600, innerHeight / 1024));
+addEventListener('resize', fit); fit();
+// A click into the lightbox's live copy moves keyboard focus into this page, so hand the lightbox's
+// own keys back to it.
+addEventListener('keydown', e => {
+  if (!EMBED) return;
+  if (e.key === 'Escape' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+    e.preventDefault();
+    parent.dispatchEvent(new KeyboardEvent('keydown', { key: e.key, code: e.code, bubbles: true, cancelable: true }));
+  }
+});
+Promise.all([setUp('v14'), setUp('v0')]).then(loop);
+</script>
+</body>
+</html>

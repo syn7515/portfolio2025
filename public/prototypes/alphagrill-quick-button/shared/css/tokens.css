@@ -1,0 +1,13 @@
+/* ==========================================================================
+   Tokens — canvas only.
+   The AlphaGrill design classes (fonts, type scale, cook backgrounds) live in
+   css/alphagrill.css, ported verbatim from the app's global.css.
+   ========================================================================== */
+
+:root {
+  --screen-w: 600px;
+  --screen-h: 1024px;
+
+  --canvas-bg:   #000000;
+  --canvas-text: #ffffff;
+}
