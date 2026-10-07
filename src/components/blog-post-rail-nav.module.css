@@ -1,4 +1,4 @@
-/* Compact rail nav for 820–1024px and 1100–1200px, where --sidebar-w collapses to 0, leaving no
+/* Compact rail nav for 820–1024px and 1064–1200px, where --sidebar-w collapses to 0, leaving no
    gutter for the text sidebar. The outline is reduced to tick marks that reveal their
    label on hover.
 
@@ -21,7 +21,7 @@
 }
 
 @media (min-width: 820px) and (max-width: 1023.98px) and (prefers-reduced-motion: no-preference),
-    (min-width: 1100px) and (max-width: 1199.98px) and (prefers-reduced-motion: no-preference) {
+    (min-width: 1064px) and (max-width: 1199.98px) and (prefers-reduced-motion: no-preference) {
     :global(html[data-paper-nav='home']) .railNav {
         animation: rail-blur-in 350ms cubic-bezier(0.23, 1, 0.32, 1) both;
         will-change: opacity, filter;

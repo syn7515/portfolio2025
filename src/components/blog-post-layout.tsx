@@ -276,8 +276,8 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
         }}
       />
 
-      {/* Compact rail: Home + tick-mark TOC, for 820–1024px and 1100–1200px, where there is no
-          gutter for the text sidebar below. Hidden between 1024 and 1100px, where the sheet's
+      {/* Compact rail: Home + tick-mark TOC, for 820–1024px and 1064–1200px, where there is no
+          gutter for the text sidebar below. Hidden between 1024 and 1064px, where the sheet's
           left margin can't hold even the rail — see blog-post-rail-nav.tsx. */}
       <BlogPostRailNav />
 
