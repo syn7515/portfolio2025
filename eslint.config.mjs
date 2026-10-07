@@ -11,5 +11,7 @@ export default defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // prototypes copied in as they are (e.g. alphagrill-quick-button/ from the Prototypes repo)
+    "public/prototypes/**",
   ]),
 ]);

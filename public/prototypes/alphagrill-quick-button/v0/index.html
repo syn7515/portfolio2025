@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<!-- v0 — the app's cook screen with no quick button feature at all: the baseline the
+     other variants are compared against. Keep it a faithful port. -->
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>v0 · 원본 (퀵 버튼 없음)</title>
+  <link rel="stylesheet" href="../shared/css/tokens.css">
+  <link rel="stylesheet" href="../shared/css/base.css">
+  <link rel="stylesheet" href="../shared/css/alphagrill.css">
+  <link rel="stylesheet" href="css/proto.css">
+  <!-- Tailwind v4 browser runtime (vendored from @tailwindcss/browser 4.3.3).
+       Compiles the utility classes in this document at load time, so markup
+       copied from the app keeps its class names verbatim. -->
+  <script src="../shared/vendor/tailwind-browser.js"></script>
+  <style type="text/tailwindcss">
+    /* Theme tokens from the app's global.css that these screens rely on. */
+    :root { --radius: 0.625rem; }
+    @theme inline {
+      --radius-sm: calc(var(--radius) - 4px);
+      --radius-md: calc(var(--radius) - 2px);
+      --radius-lg: var(--radius);
+      --radius-xl: calc(var(--radius) + 4px);
+      --shadow-switch-red: inset 0 0 12px 0 rgb(0 0 0 / 0.5);
+    }
+  </style>
+</head>
+<body>
+
+<!-- Icons used by the cook screens. lucide (Menu, X, ChevronLeft/Right), phosphor Play (fill),
+     and the app's own Icons.heat / recipeChange / unload / scrape / zone from components/ui/icons.tsx. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16"/><path d="M4 12h16"/><path d="M4 19h16"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  <symbol id="i-chevron-left-thin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="i-chevron-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-chevron-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="i-play-fill" viewBox="0 0 256 256" fill="currentColor"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.32,229.65a16,16,0,0,1-16.2.3A15.86,15.86,0,0,1,64,216.13V39.87a15.86,15.86,0,0,1,8.12-13.82,16,16,0,0,1,16.2.3L232.4,114.49A15.74,15.74,0,0,1,240,128Z"/></symbol>
+  <symbol id="i-heat" viewBox="0 0 40 40" fill="currentColor">
+    <path d="M19.2153 7.19781C19.4787 6.4604 20.521 6.4604 20.7843 7.19781L23.7694 15.5523C23.9631 16.0948 23.5608 16.6667 22.9849 16.6672H21.0952C21.034 17.7185 20.7153 18.769 20.1333 19.8036C19.2122 21.4414 19.212 23.0047 20.1333 24.6425C21.4337 26.9549 21.434 29.3434 20.1333 31.6558C19.6425 32.5286 19.4276 33.3543 19.4416 34.1477L17.2248 34.1867C17.2029 32.9436 17.5453 31.7322 18.1997 30.5686C19.1209 28.9308 19.1207 27.3674 18.1997 25.7297C16.8989 23.4173 16.8992 21.0288 18.1997 18.7164C18.5892 18.0239 18.8117 17.3442 18.8719 16.6672H17.0164C16.4402 16.6672 16.0365 16.095 16.2303 15.5523L19.2153 7.19781Z"/>
+    <path d="M30.0487 7.19781C30.3121 6.4604 31.3543 6.4604 31.6177 7.19781L34.6027 15.5523C34.7965 16.0948 34.3941 16.6667 33.8182 16.6672H31.9286C31.8673 17.7185 31.5486 18.769 30.9667 19.8036C30.0456 21.4414 30.0454 23.0047 30.9667 24.6425C32.2671 26.9549 32.2674 29.3434 30.9667 31.6558C30.4759 32.5286 30.261 33.3543 30.2749 34.1477L28.0581 34.1867C28.0363 32.9436 28.3787 31.7322 29.0331 30.5686C29.9543 28.9308 29.9541 27.3674 29.0331 25.7297C27.7323 23.4173 27.7326 21.0288 29.0331 18.7164C29.4226 18.0239 29.6451 17.3442 29.7053 16.6672H27.8498C27.2735 16.6672 26.8698 16.095 27.0637 15.5523L30.0487 7.19781Z"/>
+    <path d="M8.38195 7.19781C8.64531 6.4604 9.6876 6.4604 9.95096 7.19781L12.936 15.5523C13.1297 16.0948 12.7274 16.6667 12.1515 16.6672H10.2618C10.2006 17.7185 9.8819 18.769 9.29992 19.8036C8.37884 21.4414 8.37867 23.0047 9.29992 24.6425C10.6004 26.9549 10.6007 29.3434 9.29992 31.6558C8.80912 32.5286 8.59425 33.3543 8.60819 34.1477L6.39139 34.1867C6.36954 32.9436 6.71196 31.7322 7.36633 30.5686C8.28756 28.9308 8.28738 27.3674 7.36633 25.7297C6.06557 23.4173 6.06585 21.0288 7.36633 18.7164C7.75581 18.0239 7.97834 17.3442 8.03853 16.6672H6.18306C5.60678 16.6672 5.2031 16.095 5.39692 15.5523L8.38195 7.19781Z"/>
+  </symbol>
+  <symbol id="i-recipe-change" viewBox="0 0 64 64" fill="currentColor"><path d="M50.6465 37.3057C48.247 45.5079 40.6702 51.5039 31.6865 51.5039C25.6818 51.5039 20.3068 48.822 16.6865 44.5996L16.2578 50.1523L12 49.8252L13.0166 36.6289L26.252 36.75L26.2129 41.0195L20.6055 40.9678C23.2519 44.1464 27.234 46.165 31.6865 46.165C38.2355 46.165 43.7707 41.7952 45.5225 35.8066L50.6465 37.3057ZM31.6865 12C38.0362 12 43.6811 14.9987 47.292 19.6475L47.7422 13.8281L52 14.1553L50.9834 27.3516L37.748 27.2305L37.7871 22.9609L43.1445 23.0088C40.5081 19.5592 36.3559 17.3379 31.6865 17.3379C24.9688 17.3379 19.3179 21.9367 17.7227 28.1611L12.5518 26.8359C14.7375 18.3074 22.4721 12 31.6865 12Z"/></symbol>
+  <symbol id="i-unload" viewBox="0 0 64 64" fill="currentColor"><path d="M55.2422 31.5L38.1211 48.6211L33.8789 44.3789L43.7578 34.5H10.5V28.5H43.7578L33.8789 18.6211L38.1211 14.3789L55.2422 31.5Z"/></symbol>
+  <symbol id="i-scrape" viewBox="0 0 64 64" fill="currentColor"><path d="M46.7959 16.4727C43.278 22.1488 39.7611 27.826 36.2432 33.502C34.2364 36.7397 32.2294 39.9778 30.2227 43.2158C30.8629 43.0314 31.5034 42.8475 32.1436 42.6631C36.5964 41.3805 41.0499 40.0979 45.5029 38.8154L49.0938 44.5205C43.992 45.8792 38.8889 47.239 33.7871 48.5977C30.582 49.4513 27.3761 50.3046 24.1709 51.1582L21.5791 51.9053L20.5859 49.334L14.8818 33.6309L20.3721 32.2451C21.5348 35.2554 22.6976 38.266 23.8604 41.2764C26.2546 37.5855 28.6498 33.8948 31.0439 30.2041C34.5476 24.803 38.0503 19.4012 41.5537 14L46.7959 16.4727Z"/></symbol>
+</svg>
+
+<div class="stage">
+  <div class="device" id="device">
+
+    <!-- ================================================================
+         SCREEN: cook — 조리 탭 (준비 중 / 준비 완료)
+         Ported from app/routes/cook/cook.tsx + features/cook/components/screens/
+         cook-preheat-screen.tsx / cook-ready-screen.tsx. Class names are the
+         app's Tailwind classes; state-dependent ones are swapped by js/cook.js.
+         `fixed` layers in the app (tick ring slot, bottom sheet, modal) are
+         `absolute` here so they stay inside the scaled 600×1024 canvas.
+         ================================================================ -->
+    <section class="screen" data-screen="cook">
+      <div class="relative h-full w-full min-w-0 bg-black">
+        <div id="cook-container" class="relative flex h-full flex-col overflow-hidden bg-cook-preparing">
+          <!-- v14 (?from=v14 only): the state backgrounds as two layers that fade, as in v13 / v14.
+               Hidden otherwise, so v0 keeps the app's instant change. -->
+          <div class="bg-layer bg-layer-red bg-cook-preparing" aria-hidden="true"></div>
+          <div class="bg-layer bg-layer-green bg-cook-ready-to-cook" aria-hidden="true"></div>
+
+          <!-- COOK_SCREEN_COLUMN_CLASS -->
+          <div class="relative z-10 flex min-h-0 flex-1 flex-col">
+
+            <!-- CookHeader -->
+            <header class="grid h-[100px] grid-cols-[1fr_auto_1fr] items-center">
+              <button type="button" id="menu-btn" class="group ml-3 min-w-0 shrink-0 justify-self-start py-[18px] pr-16 pl-2">
+                <div class="flex min-w-0 shrink-0 items-center justify-center rounded-lg p-3 text-white group-active:bg-white/20 [&_svg]:size-10">
+                  <svg><use href="#i-menu"/></svg>
+                </div>
+              </button>
+
+              <!-- Switch variant="sm" surface="header" (components/ui/switch.tsx, base-ui Switch markup) -->
+              <div class="-my-5 inline-flex cursor-pointer py-5">
+                <button type="button" role="switch" aria-checked="false" id="clean-switch" data-slot="switch" data-variant="sm" data-color="red" data-unchecked=""
+                  class="peer group/switch relative inline-flex h-15 w-[276px] shrink-0 overflow-hidden rounded-[12px] border-transparent p-1.5 outline-none transition-colors duration-200 ease-out after:absolute after:-inset-y-4.5 data-disabled:opacity-50 bg-black/50 shadow-switch-red">
+                  <span id="switch-slide" class="absolute top-1.5 bottom-1.5 left-1.5 z-0 w-[calc(50%-6px)] rounded-[8px] transition-transform duration-200 ease-out group-data-unchecked/switch:translate-x-0 group-data-checked/switch:translate-x-full bg-[rgb(245,96,96)]/50" aria-hidden="true"></span>
+                  <span id="switch-left" class="relative z-0 flex min-h-0 flex-1 cursor-pointer items-center justify-center rounded-xl type-body2 text-white transition-all duration-200 ease-out group-data-checked/switch:opacity-70" aria-hidden="true">그릴</span>
+                  <span id="switch-right" class="relative z-0 flex min-h-0 flex-1 cursor-pointer items-center justify-center rounded-xl type-body2 text-white transition-all duration-200 ease-out group-data-unchecked/switch:opacity-70" aria-hidden="true">마감 청소</span>
+                </button>
+              </div>
+
+              <div class="justify-self-end">
+                <button type="button" id="temp-btn" class="group mr-3 min-w-0 shrink-0 py-[18px] pr-2 pl-16" aria-label="온도">
+                  <div class="flex min-w-0 shrink-0 items-center justify-center rounded-lg p-3 group-active:bg-white/20">
+                    <svg class="size-10 text-white"><use href="#i-heat"/></svg>
+                  </div>
+                </button>
+              </div>
+            </header>
+
+            <!-- COOK_STATUS_MAIN_CLASS -->
+            <div class="relative min-h-0 flex-1 overflow-hidden">
+              <div id="status-wrap" class="mt-[290px] flex flex-col gap-13.5">
+                <!-- RecipeInfo -->
+                <div id="recipe-info" data-slot="recipe-info" class="flex flex-col items-center gap-13.5">
+                  <div id="phase-group" class="flex flex-col items-center gap-2">
+                    <p id="phase-label" class="text-center text-[28px] leading-[130%] font-medium tracking-[0.56px] text-[#C39D9D]">준비 중</p>
+                    <div id="name-block" class="flex flex-col items-center gap-1">
+                      <p id="recipe-name" class="max-w-[500px] min-w-0 truncate text-center text-[54px] leading-[120%] font-medium text-white">불고기 패티</p>
+                      <div id="cook-option-badge" class="hidden items-center justify-center rounded-full border border-white/10 bg-black/20 px-6 py-2">
+                        <span id="cook-option-name" class="type-body2 px-1 text-white/80"></span>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- temperatureHint (preheat only) -->
+                  <div id="temp-hint" class="type-body2 flex items-center justify-center gap-2 text-center">
+                    <span id="temp-hint-state" class="text-white/70">가열 중 ·</span>
+                    <span id="temp-hint-value" class="text-white">0°C</span>
+                    <span id="temp-hint-remaining" class="text-white/70">남음</span>
+                  </div>
+                </div>
+                <!-- ready guidance (ready only) -->
+                <p id="ready-guidance" class="type-body2 text-white/70 hidden">음식을 올리고 조리를 시작하세요</p>
+              </div>
+
+              <!-- No recipe selected: app's CookSelectRecipeScreen (guidance + "레시피 선택" trigger) -->
+              <div id="select-guidance" class="absolute inset-x-0 top-0 hidden flex-col items-center gap-16 pt-[343px]">
+                <span id="select-guidance-text" class="block w-150 whitespace-pre-line text-center type-body1 text-white">레시피를 선택하세요</span>
+                <button type="button" id="select-trigger" class="flex h-20 w-100 shrink-0 items-center justify-center rounded-lg px-6 type-body2 font-medium bg-white text-black active:bg-[#aaa]"><span id="select-trigger-label" class="type-body2">레시피 선택</span></button>
+              </div>
+              </div>
+            </div>
+
+            <!-- CookStatusActionPanel -->
+            <div id="action-panel" class="relative flex h-[312px] w-full shrink-0 flex-col gap-10">
+              <div class="flex justify-center">
+                <!-- CookQuickActions -->
+                <div class="flex items-center justify-center gap-5">
+                  <button type="button" id="qa-recipe" class="flex h-35 w-40 shrink-0 flex-col items-center justify-center gap-3 rounded-[12px] active:bg-white/15">
+                    <svg class="size-16 text-white"><use href="#i-recipe-change"/></svg>
+                    <span id="qa-recipe-label" class="type-body3 text-center text-white/70">레시피 변경</span>
+                  </button>
+                  <div id="qa-recipe-divider" class="h-5 w-px bg-white/25"></div>
+                  <button type="button" id="qa-unload" class="flex h-35 w-40 shrink-0 flex-col items-center justify-center gap-3 rounded-[12px] active:bg-white/15">
+                    <svg id="qa-unload-icon" class="size-16 text-[#FF5C5C]"><use href="#i-unload"/></svg>
+                    <span class="type-body3 text-center text-white/70">
+                      <span id="qa-unload-label">배출</span>
+                      <span class="inline-grid">
+                        <span class="invisible col-start-1 row-start-1" aria-hidden="true">OFF</span>
+                        <span id="qa-unload-state" class="col-start-1 row-start-1 text-center text-white">ON</span>
+                      </span>
+                    </span>
+                  </button>
+                  <div class="h-5 w-px bg-white/25"></div>
+                  <button type="button" id="qa-scrape" class="flex h-35 w-40 shrink-0 flex-col items-center justify-center gap-3 rounded-[12px] active:bg-white/15">
+                    <svg class="size-16 text-white"><use href="#i-scrape"/></svg>
+                    <span class="type-body3 text-center text-white/70"><span id="qa-scrape-label" class="inline-block">간이 청소</span></span>
+                  </button>
+                </div>
+              </div>
+              <div class="flex min-h-0 w-full flex-1">
+                <!-- CookStatusPrimaryButton variant="primary" -->
+                <div id="primary-btn" role="button" tabindex="-1" aria-disabled="true" class="group relative flex min-h-0 w-full flex-1 items-center justify-center px-7 pb-13 ring-0 outline-none pointer-events-none">
+                  <div class="pointer-events-none flex w-full items-center justify-center bg-transparent p-0">
+                    <span class="flex h-20 w-full items-center justify-center rounded-full px-6 type-body2 font-medium transition-colors outline-none ring-1 ring-inset ring-transparent bg-white text-black group-active:bg-[#aaa] group-aria-disabled:bg-[#666] group-aria-disabled:text-black/40">
+                      <span class="flex items-center justify-center gap-5 px-3">
+                        <svg class="size-8 shrink-0"><use href="#i-play-fill"/></svg>
+                        <span id="primary-label" class="type-body2">조리 시작</span>
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TickRingSlot variant="cook" (fixed → absolute) -->
+          <div id="tick-ring-slot" class="pointer-events-none absolute inset-0 z-0 isolate overflow-hidden" aria-hidden="true">
+            <div id="tick-ring-frame" class="tick-ring-mask pointer-events-none absolute left-1/2 -translate-x-1/2" style="top:-100px;width:632px;height:1024px">
+              <div id="tick-ring-box" class="relative left-1/2 z-0 -translate-x-1/2 shrink-0" style="width:625px;height:625px;top:280px">
+                <!-- CookTickRing -->
+                <div class="relative flex w-full justify-center">
+                  <div class="relative shrink-0" style="width:625px;height:625px">
+                    <svg id="tick-ring" class="absolute inset-0" width="625" height="625" viewBox="0 0 625 625" preserveAspectRatio="xMidYMid meet" overflow="visible" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>
+                  </div>
+                </div>
+              </div>
+              <!-- ProgressiveBlurOverlay variant="fadeDown" -->
+              <div class="pointer-events-none absolute left-1/2 z-[1] -translate-x-1/2" style="top:3px;width:642px;height:1021px;opacity:0.8">
+                <div class="tick-ring-fade absolute inset-0 transform-gpu will-change-[backdrop-filter]"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RecipeBottomSheet (fixed → absolute; list rendered by cook.js) -->
+          <div id="recipe-sheet" class="hidden">
+            <button type="button" aria-label="취소" data-action="sheet-close" class="absolute inset-0 z-30 cursor-default bg-black/60"></button>
+            <div data-testid="recipe-bottom-sheet" class="absolute inset-x-0 bottom-0 z-40 flex h-[864px] flex-col overflow-hidden rounded-t-[20px] bg-[#222]">
+              <!-- RecipeBottomSheetHeader -->
+              <div class="relative flex h-25 w-full shrink-0 items-center justify-center">
+                <p id="sheet-title" class="type-body2 max-w-[400px] truncate px-4 text-white/70">레시피</p>
+                <!-- v14: cook-option level only — back to the recipe list (✕ closes the sheet). Drawn at
+                     ✕'s 1.5 stroke, so the two header icons match. -->
+                <button type="button" aria-label="뒤로" data-action="sheet-back" hidden class="absolute top-0 left-0 flex h-25 w-30 items-center justify-center p-2.5 transition-colors active:bg-white/18">
+                  <span class="sheet-icon-box"><svg class="size-10 text-white"><use href="#i-chevron-left-thin"/></svg></span>
+                </button>
+                <button type="button" aria-label="취소" data-action="sheet-header-close" class="absolute top-0 right-0 flex h-25 w-30 items-center justify-center p-2.5 transition-colors active:bg-white/18">
+                  <span class="sheet-icon-box"><svg class="size-10 text-white"><use href="#i-x"/></svg></span>
+                </button>
+              </div>
+              <!-- RecipeBottomSheetList / CookOptionList -->
+              <div id="sheet-list" class="flex min-h-0 flex-1 flex-col gap-2 overflow-hidden px-7 py-3"></div>
+              <!-- RecipeTablePagination -->
+              <div class="flex h-[100px] items-center justify-center">
+                <div class="-mt-5 flex items-center justify-center pb-5">
+                  <button type="button" id="sheet-prev" data-action="sheet-prev" class="flex w-[160px] min-w-0 shrink-0 items-center justify-center rounded-lg px-7 py-5 text-white transition-colors active:bg-black/20 [&_svg]:size-10">
+                    <svg><use href="#i-chevron-left"/></svg>
+                  </button>
+                  <div class="flex w-[100px] items-center justify-center gap-2 type-body1" style="font-variant-numeric: lining-nums tabular-nums">
+                    <span id="sheet-page-cur" class="text-white">1</span>
+                    <span id="sheet-page-total" class="text-[#999999]">/ 1</span>
+                  </div>
+                  <button type="button" id="sheet-next" data-action="sheet-next" class="flex w-[160px] min-w-0 shrink-0 items-center justify-center rounded-lg px-7 py-5 text-white transition-colors active:bg-black/20 [&_svg]:size-10">
+                    <svg><use href="#i-chevron-right"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CookTemperatureModal (portal → absolute) -->
+          <div id="temp-modal" class="hidden">
+            <button type="button" aria-label="취소" data-action="temp-close" class="absolute inset-0 z-40 bg-black/70 backdrop-blur-sm"></button>
+            <div class="absolute top-1/2 left-1/2 z-50 w-[540px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-xl bg-[#222] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.2)]">
+              <div class="relative flex h-25 items-center justify-center">
+                <p id="tm-title" class="type-body2 whitespace-nowrap text-white/70">온도</p>
+                <button type="button" aria-label="취소" data-action="temp-close" class="absolute top-0 right-0 flex h-25 w-30 items-center justify-center">
+                  <span class="sheet-icon-box"><svg class="size-10 text-white"><use href="#i-x"/></svg></span>
+                </button>
+              </div>
+              <div class="grid grid-cols-[140px_1fr_156px] bg-black/20">
+                <div id="tm-griddle" class="type-body3 px-10 py-3.5 whitespace-nowrap text-white/85">그리들</div>
+                <div id="tm-recipe" class="type-body3 truncate px-10 py-3.5 text-right whitespace-nowrap text-white/85">-</div>
+                <div id="tm-current" class="type-body3 px-10 py-3.5 text-right whitespace-nowrap text-white/85">현재</div>
+              </div>
+              <div class="grid grid-cols-[140px_1fr_156px] border-t border-black/20">
+                <div id="tm-top-label" class="type-body3 px-10 py-5 text-white/85">상판</div>
+                <div id="tm-top-target" class="type-body2 px-10 py-5 text-right text-white tabular-nums">0</div>
+                <div class="flex flex-col items-end gap-2 px-10 py-5">
+                  <div class="flex items-center justify-end">
+                    <div><svg class="size-8" viewBox="0 0 32 32" fill="none"><path data-zone="top-z2" d="M9 12C9 9.79086 10.7909 8 13 8H19C21.2091 8 23 9.79086 23 12V16H9V12Z" fill="#FFFFFF"/><path d="M9 16H23V20C23 22.2091 21.2091 24 19 24H13C10.7909 24 9 22.2091 9 20V16Z" fill="rgba(255,255,255,0.2)"/></svg></div>
+                    <span id="tm-top-z2" class="type-body2 tabular-nums text-white">0.0</span>
+                  </div>
+                  <div class="flex items-center justify-end">
+                    <div class="-scale-y-100"><svg class="size-8" viewBox="0 0 32 32" fill="none"><path data-zone="top-z1" d="M9 12C9 9.79086 10.7909 8 13 8H19C21.2091 8 23 9.79086 23 12V16H9V12Z" fill="#FFFFFF"/><path d="M9 16H23V20C23 22.2091 21.2091 24 19 24H13C10.7909 24 9 22.2091 9 20V16Z" fill="rgba(255,255,255,0.2)"/></svg></div>
+                    <span id="tm-top-z1" class="type-body2 tabular-nums text-white">0.0</span>
+                  </div>
+                </div>
+              </div>
+              <div class="h-1 bg-black/20"></div>
+              <div class="grid grid-cols-[140px_1fr_156px]">
+                <div id="tm-bot-label" class="type-body3 px-10 py-5 text-white/85">하판</div>
+                <div id="tm-bot-target" class="type-body2 px-10 py-5 text-right text-white tabular-nums">0</div>
+                <div class="flex flex-col items-end gap-2 px-10 py-5">
+                  <div class="flex items-center justify-end">
+                    <div><svg class="size-8" viewBox="0 0 32 32" fill="none"><path data-zone="bot-z2" d="M9 12C9 9.79086 10.7909 8 13 8H19C21.2091 8 23 9.79086 23 12V16H9V12Z" fill="#FFFFFF"/><path d="M9 16H23V20C23 22.2091 21.2091 24 19 24H13C10.7909 24 9 22.2091 9 20V16Z" fill="rgba(255,255,255,0.2)"/></svg></div>
+                    <span id="tm-bot-z2" class="type-body2 tabular-nums text-white">0.0</span>
+                  </div>
+                  <div class="flex items-center justify-end">
+                    <div class="-scale-y-100"><svg class="size-8" viewBox="0 0 32 32" fill="none"><path data-zone="bot-z1" d="M9 12C9 9.79086 10.7909 8 13 8H19C21.2091 8 23 9.79086 23 12V16H9V12Z" fill="#FFFFFF"/><path d="M9 16H23V20C23 22.2091 21.2091 24 19 24H13C10.7909 24 9 22.2091 9 20V16Z" fill="rgba(255,255,255,0.2)"/></svg></div>
+                    <span id="tm-bot-z1" class="type-body2 tabular-nums text-white">0.0</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Classes cook.js swaps at runtime, listed so the Tailwind runtime compiles them up front. -->
+    <div style="display:none" class="text-[#C39D9D] text-white/60 items-center mt-[290px] mt-[270px] gap-13.5 gap-8 gap-5 gap-2 bg-black/50 shadow-switch-red bg-black/20 bg-white/18! bg-[rgb(245,96,96)]/50 bg-[#46CB89]/40 shadow-[0px_0px_12px_0px_rgba(0,0,0,0.25)] bg-white/20! text-white/20 text-[#FF5C5C] text-[#56FAA8] pointer-events-none flex bg-white/30 shadow-[inset_0_0_0_2px_white] active:opacity-70 active:bg-black/40 opacity-50 cursor-not-allowed active:bg-transparent text-[#FF5454] w-15 w-10 h-16 rounded-sm py-4 pr-7 pl-1.5 gap-0.5 gap-3 h-25 focus:outline-none focus-visible:outline-none pt-[343px] h-25 line-clamp-2 py-2 pr-4 ml-2 py-0.5 px-3 rounded-[12px] bg-white/10 active:bg-white/20 border border-white/20 text-white/85 active:bg-white/10 bg-white/60 bg-white/20 translate-x-[42px] translate-x-0 opacity-50 pl-2.5 invisible flex h-[264px] h-[312px] mt-12 pt-7 gap-7 gap-10 absolute inset-x-5 bottom-5 z-10 h-[216px] rounded-[24px] p-6 pl-6 pr-6 pb-6 -ml-6 -mr-6 -mb-6 items-center h-22 h-px bg-white/10 bg-transparent px-15 -mx-7 type-body3 h-32 h-[224px] w-[200px] gap-4 pl-7 pr-15 text-white/85 invisible overflow-hidden h-[88px] w-[224px] px-6 px-5 border-white/20 group-active:bg-white/10 group-aria-disabled:text-white/30 h-full justify-center text-white/70 inline-grid col-start-1 row-start-1 invisible bg-white/15 text-white/85 group-active:bg-white/20 h-14 pl-12 pl-10 transition-[width] duration-200 ease-linear inset-y-0 left-0 gap-1 size-8 [&_svg]:size-8 flex-col justify-between text-white/50 px-7 pb-13 pl-7 pr-2.5 shrink-0 relative text-white text-white/60 text-white/50" aria-hidden="true"></div>
+
+  </div>
+</div>
+
+<!-- Dev bar: outside the device. Press "h" to hide, or add ?bare to the URL. -->
+<div class="devbar" id="devbar">
+  <span class="devbar__dim">600×1024</span>
+  <select data-dev="variant" title="Prototype variant"></select>
+  <select data-dev="screen" title="Jump to screen"></select>
+  <select data-dev="scenario" title="Cook scenario (mock state)"></select>
+  <button data-dev="lang" title="Toggle language">ko</button>
+  <button data-dev="back" title="Back (Esc)">←</button>
+  <button data-dev="fit" title="Toggle fit-to-window / 1:1">Fit</button>
+  <button data-dev="grid" title="8px grid overlay">Grid</button>
+  <span class="devbar__dim">h = hide</span>
+</div>
+
+<script src="../shared/js/app.js"></script>
+<script src="js/cook.js"></script>
+</body>
+</html>
