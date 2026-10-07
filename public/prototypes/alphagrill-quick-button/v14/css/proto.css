@@ -1,0 +1,648 @@
+/* v10: v9's type, status and shade on v5's fixed button cards. (v9: v8 with the app's phase-label shade between the status and the grid and a scrim only on the selected / pressed cell. All measurements use the 600 × 1024 canvas. */
+.stage { grid-template-rows: minmax(0, 1fr); grid-template-columns: minmax(0, 1fr); }
+/* The grid gave back 72 when the keys lost their number row; it goes above the status, so
+   the whole block sits lower and everything below the grid stays where it was. The status
+   then grew 12 for air under the recipe name, and the inset gave that back so the grid
+   still starts on y320. */
+.grid-workspace { position: absolute; inset: 184px 28px auto; }
+/* No divider under the status either: the grid's own hairlines are the only rules on the
+   screen. The status sits 24 lower than in v6 and gives the 24 back out of the air below
+   it, so the block ends on the same line and the grid does not move. */
+.grid-status { position: relative; height: 108px; padding: 4px 0 16px; border-bottom: 1px solid transparent; }
+.grid-status-line { display: flex; align-items: center; justify-content: center; gap: 16px; }
+.grid-phase { display: flex; align-items: center; gap: 10px; margin-left: -18px; font-size: 24px; line-height: 32px; }
+.grid-status-dot { width: 8px; height: 8px; border-radius: 50%; background: #9e9e9e; }
+[data-phase="ready"] .grid-status-dot { background: #56faa8; }
+[data-phase="preheat"] .grid-status-dot { background: #ff8484; }
+.grid-hint { font-size: 20px; color: rgb(255 255 255 / 60%); white-space: nowrap; }
+/* The English phase labels are set in caps (PREPARING / READY TO COOK), which need the
+   tracking caps want; the Korean ones do not. */
+html[lang="en"] #grid-phase { letter-spacing: 0.08em; }
+.grid-hint:empty { display: none; }
+.grid-current { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 12px 0 0; font-size: 34px; line-height: 44px; text-align: center; }
+.grid-current-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Cook option as a pill, the same form the app's hero badge uses. */
+.grid-current-option { flex-shrink: 0; padding: 2px 14px; border: 1px solid rgb(255 255 255 / 12%); border-radius: 999px; background: rgb(0 0 0 / 20%); font-size: 20px; line-height: 28px; color: rgb(255 255 255 / 80%); }
+/* With no recipe the phase line and the name said the same thing; only the sentence is
+   left, at the phase line's size, centred in the block. */
+[data-phase="standby"] .grid-status-line { display: none; }
+[data-phase="standby"] .grid-status { display: flex; align-items: center; justify-content: center; }
+[data-phase="standby"] .grid-current { margin: 0; color: rgb(255 255 255 / 50%); font-size: 24px; }
+.grid-heading { display: flex; align-items: center; gap: 12px; height: 64px; padding-inline: 21px; font-size: 22px; }
+/* The heading keeps its 64 even on the recipe screen, so the grid sits on the same line in
+   both levels and the back button drops into the band between the status and the grid. */
+.grid-heading.is-blank { visibility: hidden; }   /* keeps its 64 so the grid never shifts */
+#grid-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.grid-back { display: flex; align-items: center; gap: 4px; height: 56px; padding-right: 12px; flex-shrink: 0; color: rgb(255 255 255 / 65%); }
+.grid-back svg { width: 24px; height: 24px; }
+.grid-back[hidden] { display: none; }
+/* No cards and no lines: the names sit on the background and the selected fill is the one
+   thing that marks a cell, so the cells carry a gap to keep the fills apart. 100 × 3 plus
+   two 12 gaps is the 324 the cards had, so nothing below the grid moves. */
+.recipe-grid { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(3, 100px); gap: 12px; }
+/* Unselected keys carry no outline — the fill alone separates them. The border stays in
+   the box as transparent so the selected state does not shift the text by a pixel. */
+.recipe-key { position: relative; display: flex; flex-direction: column; align-items: stretch; justify-content: center; text-align: left; min-width: 0; padding: 0 22px; border: 0; border-radius: 20px; background: none; color: white; }
+/* v5's button surfaces: every cell is a card, the selected one brighter with a white edge.
+   The border is always in the box (transparent) so selection never shifts the text. */
+.recipe-key { border: 1px solid transparent; background: rgb(255 255 255 / 7%); transition: background 120ms, border-color 120ms; }
+.recipe-key.is-selected { background: rgb(255 255 255 / 19%); border-color: rgb(255 255 255 / 70%); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 20%); }
+.recipe-key:active { background: rgb(255 255 255 / 22%); }
+/* The check follows the name instead of sitting in a card corner. */
+.recipe-key-check { flex-shrink: 0; margin-left: 10px; font-size: 21px; color: rgb(255 255 255 / 80%); }
+/* One line only: the name truncates and the check stays put beside it. */
+.recipe-key-name { display: flex; align-items: center; min-width: 0; font-size: 27px; line-height: 30px; letter-spacing: -.4px; }
+.recipe-key-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* The chevron belongs to the count, so it sits right after it instead of being pushed to
+   the far edge. */
+.recipe-key-meta { display: flex; align-items: center; justify-content: flex-start; gap: 0; min-height: 30px; margin-top: 4px; font-size: 24px; line-height: 30px; color: rgb(255 255 255 / 55%); }
+.recipe-key-meta svg { width: 26px; height: 26px; flex-shrink: 0; margin-left: 4px; }  /* plus the ~9 the glyph sits inside its box: ~13 visible */
+/* Reserved slot on a short page: a fill this faint, like the keys, instead of the only
+   outline left in the grid. */
+.recipe-key-empty { border-radius: 20px; background: rgb(255 255 255 / 2%); }
+.grid-pager { display: flex; align-items: center; justify-content: center; height: 64px; margin-top: 12px; gap: 12px; }
+.grid-pager button { display: flex; align-items: center; justify-content: center; height: 64px; width: 160px; border-radius: 12px; }
+.grid-pager button svg { width: 32px; height: 32px; }
+.grid-pager button:disabled { opacity: .2; }
+.grid-pager button:active:not(:disabled), .grid-back:active { background: rgb(255 255 255 / 10%); }
+.grid-page { display: flex; gap: 10px; justify-content: center; width: 100px; font-size: 22px; font-variant-numeric: tabular-nums; }
+#quick-page-total { color: rgb(255 255 255 / 40%); }
+.grid-actions { position: absolute; inset: auto 28px 52px; display: flex; flex-direction: column; gap: 16px; }
+.grid-secondary { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; height: 64px; }
+.grid-secondary button { display: flex; justify-content: center; align-items: center; gap: 12px; font-size: 24px; border-radius: 999px; color: rgb(255 255 255 / 75%); background: rgb(255 255 255 / 7%); }
+.grid-secondary button:active { background: rgb(255 255 255 / 18%); }
+.grid-secondary svg { height: 30px; width: 30px; }
+#quick-unload:disabled { opacity: .35; }
+#quick-unload-state { color: white; width: 45px; text-align: left; }
+#quick-unload[aria-checked="false"] #quick-unload-state { color: rgb(255 255 255 / 45%); }
+/* The recipe area has no surfaces at all, so the actions are fully round: the shape is
+   what says "this is a button". */
+.grid-start { display: flex; align-items: center; justify-content: center; gap: 16px; height: 80px; border-radius: 999px; background: white; color: #111; font-size: 28px; }
+.grid-start svg { height: 30px; width: 30px; }
+.grid-start:active:not(:disabled) { background: #bbb; }
+.grid-start:disabled { background: #555; color: rgb(0 0 0 / 45%); }
+.grid-workspace button:focus-visible, .grid-actions button:focus-visible { outline: 3px solid white; outline-offset: 3px; }
+
+/* The app's PhaseLabelShade (features/cook/components/phase-label-shade.tsx), which splits
+   the recipe info from the timer on the cooking screen: black across the middle 25-75 %,
+   masked from 20 % at the top to nothing 37 below, so it is darkest top-centre. Full
+   screen width, it sits on the top edge of the selection area:
+   - recipe level: on the grid itself (y356);
+   - cook-option level: on the heading band instead (y293), so the back button and the
+     recipe title read as part of the option list below them, not as part of the status. */
+.grid-heading { position: relative; }
+.recipe-grid::before, .grid-heading::before {
+  content: "";
+  position: absolute;
+  inset: -18px -28px auto;   /* raised by half its height: only the lower half overlaps the cells */
+  height: 37px;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgb(0 0 0 / 0) 0%, #000 25%, #000 75%, rgb(0 0 0 / 0) 100%);
+  -webkit-mask-image: linear-gradient(180deg, rgb(0 0 0 / .2) 0%, rgb(0 0 0 / 0) 100%);
+  mask-image: linear-gradient(180deg, rgb(0 0 0 / .2) 0%, rgb(0 0 0 / 0) 100%);
+}
+.grid-heading.is-blank::before, .grid-heading:not(.is-blank) + .recipe-grid::before { display: none; }
+
+/* Level geometry. The status ends on y292 and the pager starts on y692 at both levels.
+   - recipe level: the blank heading band is 48, so the grid starts on y340 (16 higher
+     than v8) and the pager takes the 16 back in its top margin; the shade sits on y322.
+   - cook-option level: the shade stays on y322, and the heading band grows to 100 with
+     the back button at its foot (y332–388), below the shade's darkest edge. The grid then
+     starts on y392 with 88-tall rows (options carry no count line), ending on y680. */
+.grid-heading.is-blank { height: 48px; }
+.grid-heading.is-blank ~ .grid-pager { margin-top: 28px; }
+.grid-heading:not(.is-blank) { height: 100px; align-items: flex-end; padding-bottom: 4px; }
+.grid-heading:not(.is-blank)::before { top: 30px; }
+.grid-heading:not(.is-blank) + .recipe-grid { grid-template-rows: repeat(3, 88px); }
+.grid-heading:not(.is-blank) #grid-title { line-height: 56px; }   /* same line box as the back button, so both sit on one baseline */
+
+/* Recipe name first, phase line (● 준비 완료 / 준비 중 · 남은 온도) under it. */
+.grid-status { display: flex; flex-direction: column; }
+.grid-current { order: 0; margin: 0; }
+.grid-status-line { order: 1; margin-top: 12px; }
+/* The back label ("레시피") starts on the cells' text line (x50); the chevron hangs out to its left. */
+.grid-heading:not(.is-blank) .grid-back { margin-left: -27px; }
+.grid-heading:not(.is-blank) { gap: 14px; }
+.grid-heading:not(.is-blank) .grid-back { padding-right: 0; }   /* 레시피 → title gap: 14 */
+/* Pressed scrim: rounded, with 8 of air on both sides. Negative margins give that air
+   back so the label stays on x50 and the title stays 14 after it. */
+.grid-heading:not(.is-blank) .grid-back { border-radius: 12px; padding-inline: 8px; margin-left: -35px; margin-right: -8px; }
+.grid-hint { font-variant-numeric: tabular-nums; }   /* "163°C 남음" ticks down without the line jittering */
+/* Back target = ‹ 레시피 + the recipe title. The 14 gap moves into the title's own padding
+   so there is no dead strip between them, and the title is 56 tall like the button. Only
+   the back button shows the pressed scrim, whichever half is pressed. */
+.grid-heading:not(.is-blank) { gap: 0; }
+.grid-heading:not(.is-blank) #grid-title { height: 56px; padding: 0 12px 0 14px; cursor: pointer; }
+.grid-heading:not(.is-blank):has(#grid-title:active) .grid-back { background: rgb(255 255 255 / 10%); }
+/* Bottom buttons take v5's radius (20), matching the cards, instead of v9's pills. */
+.grid-secondary button, .grid-start { border-radius: 20px; }
+/* Cook-option cards carry no count, but the empty count line still held its 34 and pushed
+   the name up to 18 from the card's top. Drop it there, so the name centres (29 above). */
+/* Option level only: on the recipe level the empty line keeps names on one line across a row. */
+.grid-heading:not(.is-blank) + .recipe-grid .recipe-key-meta:empty { display: none; }
+/* The phase word (준비 중 / 준비 완료) reads at the temperature's weight (white/60), and an
+   interpunct joins the two: "● 준비 중 · 163°C 남음". */
+#grid-phase { color: rgb(255 255 255 / 60%); }
+.grid-status-line { gap: 10px; }
+.grid-hint::before { content: "·"; margin-right: 10px; }
+/* No coloured dot; the -18 that re-centred the line around it goes too. */
+.grid-status-dot { display: none; }
+.grid-phase { margin-left: 0; }
+/* Pager 12 higher (y692 → y680) at both levels: 16 under the recipe grid, and the option
+   rows give up 4 each (88 → 84) so the option grid ends on y668, 12 above it. */
+.grid-heading.is-blank ~ .grid-pager { margin-top: 16px; }
+.grid-heading:not(.is-blank) + .recipe-grid { grid-template-rows: repeat(3, 84px); }
+/* One size for all three bottom buttons: the secondary row's 24px text and 64 height.
+   The block is pinned to the bottom (52), so 조리 시작 keeps its bottom edge (y972) and
+   the row above it moves down 16. */
+.grid-start { height: 64px; font-size: 24px; }
+.grid-start svg { width: 26px; height: 26px; }
+/* 조리 시작's tap target runs out to both screen edges and down to the bottom of the screen
+   (the 28 side gutters and the 52 below), without changing what is drawn. */
+.grid-start { position: relative; }
+.grid-start::after { content: ""; position: absolute; inset: 0 -28px -52px; }
+/* 배출 / 간이 청소 targets: out to their screen edge (28), 6 into the 12 between them, all
+   of the 16 down to 조리 시작's target, and 20 up into the space under the pager. */
+.grid-secondary button { position: relative; }
+.grid-secondary button::after { content: ""; position: absolute; }
+#quick-unload::after { inset: -20px -6px -16px -28px; }
+#quick-scrape::after { inset: -20px -28px -16px -6px; }
+
+/* ── v11: 배출 / 간이 청소 on one surface tucked behind 조리 시작 ──────────────────────
+   One white/7 surface, rounded on top only, split by a short centre divider. It runs 20
+   down behind 조리 시작 so that button's rounded corners sit over it with no gap; the
+   block keeps 조리 시작 on y908–972 and the surface's buttons on y844–908. */
+.grid-actions { gap: 0; }
+.grid-secondary {
+  position: relative;
+  gap: 0;
+  height: auto;
+  margin-bottom: -20px;
+  padding-bottom: 20px;
+  border-radius: 20px 20px 0 0;
+  background: rgb(255 255 255 / 7%);
+}
+.grid-secondary button { height: 64px; border-radius: 0; background: none; }
+.grid-secondary button:first-child { border-top-left-radius: 20px; }
+.grid-secondary button:last-child { border-top-right-radius: 20px; }
+.grid-secondary button:active { background: rgb(255 255 255 / 11%); }
+.grid-secondary::before {
+  content: "";
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  width: 1px;
+  height: 28px;
+  background: rgb(255 255 255 / 15%);
+  pointer-events: none;
+}
+.grid-start { z-index: 1; }
+/* Targets: each half runs to its screen edge and 20 up; they meet at the divider and stop
+   at 조리 시작, whose own target (edges + bottom) is unchanged. */
+#quick-unload::after { inset: -20px 0 0 -28px; }
+#quick-scrape::after { inset: -20px -28px 0 0; }
+/* The surface sits 12 in from 조리 시작 on each side, so it reads as resting behind it.
+   Targets still reach the screen edges (28 + 12). */
+.grid-secondary { margin-inline: 12px; }
+#quick-unload::after { left: -40px; }
+#quick-scrape::after { right: -40px; }
+/* 조리 시작 a touch taller (64 → 72); its bottom stays on y972, so it and the surface above rise 8. */
+.grid-start { height: 72px; }
+/* 배출 / 간이 청소 8 taller as well (64 → 72); the divider stays centred (top 18 → 22). */
+.grid-secondary button { height: 72px; }
+.grid-secondary::before { top: 22px; }
+/* Surface a little more present at rest (white/7 → white/10); pressed follows (11 → 14). */
+.grid-secondary { background: rgb(255 255 255 / 10%); }
+.grid-secondary button:active { background: rgb(255 255 255 / 14%); }
+/* Divider a little shorter (28 → 22), still centred on the 72 row. */
+.grid-secondary::before { top: 25px; height: 22px; }
+/* The divider hides while either half is pressed, so the pressed fill reads as one clean shape. */
+.grid-secondary:has(button:active)::before { opacity: 0; }
+
+/* ── v12: scrims follow the background ─────────────────────────────────────────────
+   On the coloured backgrounds the recipe / cook-option cards and the back button's
+   pressed fill turn dark, the way the header's 그릴 / 마감 청소 switch does (its track is
+   black/50 on red, black/20 on green). On the black no-recipe background they stay the
+   light white scrims. Order within a background: empty < card < selected < pressed. */
+#cook-container.bg-cook-preparing .recipe-key { background: rgb(0 0 0 / 25%); }
+#cook-container.bg-cook-preparing .recipe-key.is-selected { background: rgb(0 0 0 / 50%); }
+#cook-container.bg-cook-preparing .recipe-key:active { background: rgb(0 0 0 / 60%); }
+#cook-container.bg-cook-preparing .recipe-key-empty { background: rgb(0 0 0 / 8%); }
+#cook-container.bg-cook-preparing .grid-back:active { background: rgb(0 0 0 / 30%); }
+
+#cook-container.bg-cook-ready-to-cook .recipe-key { background: rgb(0 0 0 / 12%); }
+#cook-container.bg-cook-ready-to-cook .recipe-key.is-selected { background: rgb(0 0 0 / 30%); }
+#cook-container.bg-cook-ready-to-cook .recipe-key:active { background: rgb(0 0 0 / 40%); }
+#cook-container.bg-cook-ready-to-cook .recipe-key-empty { background: rgb(0 0 0 / 5%); }
+#cook-container.bg-cook-ready-to-cook .grid-back:active { background: rgb(0 0 0 / 20%); }
+
+/* Selected card = the header switch's slide, solid and without an outline (the check
+   stays): red rgb(245 96 96)/50 on preheat, #46CB89/40 with its soft shadow on ready,
+   white/20 on the black no-recipe background. */
+.recipe-key.is-selected { border-color: transparent; box-shadow: none; background: rgb(255 255 255 / 20%); }
+#cook-container.bg-cook-preparing .recipe-key.is-selected { background: rgb(245 96 96 / 50%); }
+#cook-container.bg-cook-ready-to-cook .recipe-key.is-selected { background: rgb(70 203 137 / 40%); box-shadow: 0 0 12px 0 rgb(0 0 0 / 25%); }
+/* Red selected a step darker than the switch slide (50% → 35%): at card size it read too bright. */
+#cook-container.bg-cook-preparing .recipe-key.is-selected { background: rgb(245 96 96 / 35%); }
+/* Phase word and remaining temperature at one size (24; the temperature was 20). */
+.grid-hint { font-size: 24px; line-height: 32px; }
+/* No check mark: the solid fill alone marks the selected card. */
+.recipe-key-check { display: none; }
+/* No chevron after the option count: the count alone ("2") says the card opens options. */
+.recipe-key-meta svg { display: none; }
+/* No recipe yet ("레시피를 선택하세요"): the bottom buttons are hidden altogether. */
+#cook-container:has(#grid-status[data-phase="standby"]) #action-panel { display: none; }
+/* …and the grid takes their room: 2 × 5 (ten recipes a page), y340–888, pager on y904. */
+#cook-container:has(#grid-status[data-phase="standby"]) .recipe-grid { grid-template-rows: repeat(5, 100px); }
+
+/* 배출 / 간이 청소 surface: a 1px diagonal gradient border, brightest at the top-left
+   corner and fading towards the bottom-right, like a lit edge. Drawn with the mask
+   trick on ::after (::before is the divider), so the rounded top follows the surface;
+   the bottom run is tucked behind 조리 시작 anyway. */
+.grid-secondary::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(135deg, rgb(255 255 255 / 16%) 0%, rgb(255 255 255 / 10%) 40%, rgb(255 255 255 / 4%) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+/* All three buttons 8 taller (72 → 80). 조리 시작 keeps its bottom on y972 (y892–972);
+   the surface row above is y812–892. Divider re-centred. */
+.grid-start, .grid-secondary button { height: 80px; }
+.grid-secondary::before { top: 29px; }
+/* Recipe name + status line 12 higher (y184 → y172); the status block grows by the same
+   12 below the text, so the shade and the grid stay where they are. */
+.grid-workspace { top: 172px; }
+.grid-status { height: 120px; padding-bottom: 28px; }
+
+/* One page (no pager): cards 12 taller, taken from the pager's empty band.
+   Recipe level 100 → 112 (y340–700), cook-option level 84 → 96 (y392–704), and the no-recipe
+   2 × 5 grid 100 → 112 (y340–948). Multi-page layouts are unchanged. */
+.grid-workspace.is-single-page .recipe-grid { grid-template-rows: repeat(3, 112px); }
+.grid-workspace.is-single-page .grid-heading:not(.is-blank) + .recipe-grid { grid-template-rows: repeat(3, 96px); }
+#cook-container:has(#grid-status[data-phase="standby"]) .grid-workspace.is-single-page .recipe-grid { grid-template-rows: repeat(5, 112px); }
+/* 조리 시작 as a pill. The surface above still runs 20 behind it: 12 in from the pill's
+   end, its curve is only ~11 down, so the surface's square bottom corners stay hidden. */
+.grid-start { border-radius: 999px; }
+/* Surface top corners rounder (20 → 40), with the pressed halves following. */
+.grid-secondary { border-radius: 40px 40px 0 0; }
+.grid-secondary button:first-child { border-top-left-radius: 40px; }
+.grid-secondary button:last-child { border-top-right-radius: 40px; }
+/* Preheat: the temperature alone ("163°C 남음") — no "준비 중", no interpunct.
+   준비 완료 is unchanged (it has no temperature to stand in for it). */
+[data-phase="preheat"] .grid-phase { display: none; }
+[data-phase="preheat"] .grid-hint::before { content: none; }
+
+/* Recipe area 16 higher, pager with it: the blank heading band 48 → 32 (grid y324, shade
+   y306); on the cook-option level the band 100 → 84 keeps the shade on the same y306, the
+   back button at its foot (y316–372) and the options from y376. Status unchanged. */
+.grid-heading.is-blank { height: 32px; }
+.grid-heading:not(.is-blank) { height: 84px; }
+.grid-heading:not(.is-blank)::before { top: 14px; }
+
+/* Recipe / cook-option grid as wide as the 배출 / 간이 청소 surface (x40–560): 12 in on each
+   side. The heading band moves in with it, so "레시피" stays on the cells' text line
+   (now x62); the shade still spans the screen (inset -40). */
+.recipe-grid, .grid-heading { margin-inline: 12px; }
+.recipe-grid::before, .grid-heading::before { left: -40px; right: -40px; }
+
+/* Cook option on the status line, not a pill: "웰던 · 준비 완료", "웰던 · 163°C 남음".
+   Same size and white/60 as the rest of the line; an interpunct follows it. */
+.grid-option { font-size: 24px; line-height: 32px; color: rgb(255 255 255 / 60%); white-space: nowrap; }
+.grid-option:empty { display: none; }
+.grid-option:not(:empty)::after { content: "·"; margin-left: 10px; }
+/* Shade a little lighter: 20 % → 14 % at its darkest (top-centre). */
+.recipe-grid::before, .grid-heading::before {
+  -webkit-mask-image: linear-gradient(180deg, rgb(0 0 0 / .14) 0%, rgb(0 0 0 / 0) 100%);
+  mask-image: linear-gradient(180deg, rgb(0 0 0 / .14) 0%, rgb(0 0 0 / 0) 100%);
+}
+
+
+/* ── v13: first-selection transition (View Transitions) ─────────────────────────────
+   Whole thing ≤ ~260ms. Cards present before and after morph (position + size: 112 → 100,
+   or row 4 → row 1 of the next page). Cards that only exist before shrink and fade out;
+   cards that only exist after fade in a beat later. The pager and bottom buttons rise
+   16 as they appear. Everything else (background colour, status text) cross-fades. */
+#quick-pager { view-transition-name: vt-pager; }
+#action-panel { view-transition-name: vt-actions; }
+
+::view-transition-group(*) { animation-duration: 240ms; animation-timing-function: cubic-bezier(.2, 0, 0, 1); }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 200ms; }
+
+::view-transition-old(*):only-child { animation: vt-card-out 70ms ease-in both; }   /* exit 120 → 70ms: the leaving cards clear out quicker */
+::view-transition-new(*):only-child { animation: vt-card-in 180ms 60ms ease-out both; }
+::view-transition-new(vt-actions):only-child,
+::view-transition-new(vt-pager):only-child { animation: vt-rise-in 200ms 60ms cubic-bezier(.2, 0, 0, 1) both; }
+
+/* Drill in / out of the cook-option level: leaving cards slide away and fade, arriving
+   ones slide in after them — a short sideways shift (80), quick but on a soft curve rather than a sharp snap, not a full page, so nothing
+   travels outside the canvas. */
+.vt-drill-in::view-transition-old(*):only-child { animation: vt-slide-out-left 120ms cubic-bezier(.4, 0, .6, 1) both; }
+.vt-drill-in::view-transition-new(*):only-child { animation: vt-slide-in-right 190ms 40ms cubic-bezier(.3, 0, .25, 1) both; }
+.vt-drill-out::view-transition-old(*):only-child { animation: vt-slide-out-right 120ms cubic-bezier(.4, 0, .6, 1) both; }
+.vt-drill-out::view-transition-new(*):only-child { animation: vt-slide-in-left 190ms 40ms cubic-bezier(.3, 0, .25, 1) both; }
+@keyframes vt-slide-out-left { to { opacity: 0; transform: translateX(-80px); } }
+@keyframes vt-slide-in-right { from { opacity: 0; transform: translateX(80px); } }
+@keyframes vt-slide-out-right { to { opacity: 0; transform: translateX(80px); } }
+@keyframes vt-slide-in-left { from { opacity: 0; transform: translateX(-80px); } }
+@keyframes vt-card-out { to { opacity: 0; transform: scale(.96); } }
+@keyframes vt-card-in { from { opacity: 0; transform: scale(.96); } }
+@keyframes vt-rise-in { from { opacity: 0; transform: translateY(16px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}
+
+/* 배출's ON / OFF as a small badge: 18px (from 24), pill, fixed width so 배출 does not
+   shift between the two. ON reads white on white/18, OFF dims to white/45 on white/8. */
+#quick-unload-state {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: auto; min-width: 52px; height: 30px; padding: 0 10px;
+  border-radius: 999px; background: rgb(255 255 255 / 18%);
+  font-size: 18px; line-height: 1; letter-spacing: .02em; text-align: center;
+}
+#quick-unload[aria-checked="false"] #quick-unload-state { background: rgb(255 255 255 / 8%); }
+/* Pill is one fixed size (56 × 30) for ON and OFF; the text keeps its natural width and
+   sits dead centre (no letter-spacing, which would add trailing space and push it left). */
+#quick-unload-state { width: 56px; min-width: 0; padding: 0; letter-spacing: 0; justify-content: center; }
+/* Optical centring: "ON" reads right-heavy (round O, straight-sided N), so nudge it 1px left. */
+#quick-unload[aria-checked="true"] #quick-unload-state { padding-right: 2px; }
+/* Badge text one step up (18 → 20); the 56 × 30 pill still fits OFF with ~9 each side. */
+#quick-unload-state { font-size: 20px; }
+/* Badge fill: a gentle top-to-bottom gradient around the same average (ON 21 → 15 %,
+   OFF 10 → 6 %), lighter on top, only a few percent apart. */
+#quick-unload-state { background: linear-gradient(to bottom, rgb(255 255 255 / 21%), rgb(255 255 255 / 15%)); }
+#quick-unload[aria-checked="false"] #quick-unload-state { background: linear-gradient(to bottom, rgb(255 255 255 / 10%), rgb(255 255 255 / 6%)); }
+
+/* Badge colours swapped: OFF takes the old neutral ON look (white text on white 21 → 15 %);
+   ON is coloured by the background it sits on — the header switch's green on ready,
+   its red on preheat — with the same gentle top-light gradient. */
+#quick-unload[aria-checked="false"] #quick-unload-state {
+  color: white;
+  background: linear-gradient(to bottom, rgb(255 255 255 / 21%), rgb(255 255 255 / 15%));
+}
+#cook-container.bg-cook-ready-to-cook #quick-unload[aria-checked="true"] #quick-unload-state {
+  background: linear-gradient(to bottom, rgb(70 203 137 / 70%), rgb(70 203 137 / 58%));
+}
+#cook-container.bg-cook-preparing #quick-unload[aria-checked="true"] #quick-unload-state {
+  background: linear-gradient(to bottom, rgb(245 96 96 / 62%), rgb(245 96 96 / 50%));
+}
+/* The surface now runs all the way down behind 조리 시작 (80, not 20) and is rounded 40 at
+   the bottom too, so its lower corners sit inside the pill's ends. The pressed highlight
+   is painted on the surface itself — a half-width overlay — so it follows the same shape
+   right down to the bottom of 조리 시작 instead of stopping at the buttons' 80. */
+.grid-secondary { margin-bottom: -80px; padding-bottom: 80px; border-radius: 40px; }
+.grid-secondary button:active { background: none; }
+.grid-secondary:has(#quick-unload:active) { background-image: linear-gradient(to right, rgb(255 255 255 / 5%) 50%, transparent 50%); }
+.grid-secondary:has(#quick-scrape:active) { background-image: linear-gradient(to right, transparent 50%, rgb(255 255 255 / 5%) 50%); }
+
+/* ── Current-recipe block, left-aligned (test) ─────────────────────────────────────────
+   Text starts on the cards' text line: grid x40 + 1 border + 22 padding = x63, i.e. 35 in
+   from the workspace. Name one step up (34 → 40), status line under it. */
+.grid-status { align-items: flex-start; padding: 0 35px 24px; text-align: left; }
+.grid-current { justify-content: flex-start; text-align: left; font-size: 40px; line-height: 48px; max-width: 100%; }
+.grid-status-line { justify-content: flex-start; margin-top: 8px; }
+[data-phase="standby"] .grid-status { align-items: center; justify-content: flex-start; }
+[data-phase="standby"] .grid-current { font-size: 24px; line-height: 32px; }
+
+
+/* "레시피를 선택하세요" sits where the status line would (y228–260, 24/32), so its baseline
+   matches "준비 완료" / "163°C 남음" on the other screens. */
+#grid-status[data-phase="standby"] { justify-content: flex-start; }
+#grid-status[data-phase="standby"] .grid-current { margin: 56px 0 0; font-size: 24px; line-height: 32px; }
+/* English phase labels are sentence case now ("Ready to cook"), so the caps tracking goes. */
+html[lang="en"] #grid-phase { letter-spacing: 0; }
+
+/* ON badge: a dark scrim of the background's hue instead of the light switch colour, with
+   the label in the bright state colour (the app's ready green #56FAA8 / preheat red #FF8484). */
+#cook-container.bg-cook-ready-to-cook #quick-unload[aria-checked="true"] #quick-unload-state {
+  background: linear-gradient(to bottom, hsl(150 40% 24% / 80%), hsl(150 40% 20% / 80%));
+  color: hsl(150 42% 87%);
+}
+#cook-container.bg-cook-preparing #quick-unload[aria-checked="true"] #quick-unload-state {
+  background: linear-gradient(to bottom, hsl(0 38% 27% / 80%), hsl(0 38% 22% / 80%));
+  color: hsl(0 55% 89%);
+}
+
+/* Header icon buttons 12 further in from the screen edges, with the tap area reaching the
+   viewport edge: the 12 outer margin becomes padding (8 + 12 + 12 = 32 on the outer side). */
+#menu-btn { margin-left: 0; padding-left: 32px; }
+#temp-btn { margin-right: 0; padding-right: 32px; }
+/* "On" in sentence case no longer reads right-heavy the way "ON" did; drop the nudge. */
+#quick-unload[aria-checked="true"] #quick-unload-state { padding-right: 0; }
+
+/* Background colour changes fade (black → red → green and back). The container stays black;
+   the red and green gradients sit on two layers behind everything and cross by opacity.
+   Red stays on under green, so red → green is green fading in over it, never a dip through
+   black. 600ms ease. Instant under prefers-reduced-motion. */
+#cook-container.bg-cook-preparing, #cook-container.bg-cook-ready-to-cook { background: #000; }
+.bg-layer { position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0; transition: opacity 600ms ease; }
+#cook-container:is(.bg-cook-preparing, .bg-cook-ready-to-cook) > .bg-layer-red { opacity: 1; }
+#cook-container.bg-cook-ready-to-cook > .bg-layer-green { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .bg-layer { transition: none; } }
+/* The selected card's fill changes with the background (white → red → green) on the same
+   600ms ease. Pressing it stays quick. Instant under prefers-reduced-motion. */
+.recipe-key.is-selected { transition: background 600ms ease, box-shadow 600ms ease, border-color 600ms ease; }
+.recipe-key.is-selected:active { transition-duration: 120ms; }
+@media (prefers-reduced-motion: reduce) { .recipe-key.is-selected { transition: none; } }
+/* The header switch's knob (and its track) change colour with the background on the same
+   600ms ease; the knob's slide keeps its own 200ms. */
+#switch-slide { transition: transform 200ms ease-out, background-color 600ms ease, box-shadow 600ms ease; }
+#clean-switch { transition: background-color 600ms ease, box-shadow 600ms ease; }
+@media (prefers-reduced-motion: reduce) { #switch-slide { transition: transform 200ms ease-out; } #clean-switch { transition: none; } }
+
+/* The selected card shows a pressed state too (it had none on red / green): a step stronger
+   fill of its own colour. */
+#cook-container .recipe-key.is-selected:active { background: rgb(255 255 255 / 28%); }
+#cook-container.bg-cook-preparing .recipe-key.is-selected:active { background: rgb(245 96 96 / 52%); }
+#cook-container.bg-cook-ready-to-cook .recipe-key.is-selected:active { background: rgb(70 203 137 / 58%); }
+
+/* ── v14: recipe bottom sheet motion ─────────────────────────────────────────────────
+   Open: the sheet slides up from below the screen, 360ms on a soft, decelerating curve;
+   the scrim fades in alongside. Close: slides back down faster, 220ms, the same curve
+   family so it starts quick and settles. Under prefers-reduced-motion only the scrim and
+   sheet fade (150ms). */
+#recipe-sheet {
+  --sheet-open-dur: 360ms;
+  --sheet-close-dur: 220ms;
+  --sheet-ease: cubic-bezier(0.32, 0.72, 0, 1);
+}
+#grid-status { cursor: pointer; }
+#recipe-sheet > [data-action="sheet-close"] {
+  opacity: 0;
+  transition: opacity var(--sheet-close-dur) var(--sheet-ease);
+}
+#recipe-sheet > [data-testid="recipe-bottom-sheet"] {
+  transform: translateY(100%);
+  transition: transform var(--sheet-close-dur) var(--sheet-ease);
+  will-change: transform;
+}
+#recipe-sheet.is-open > [data-action="sheet-close"] {
+  opacity: 1;
+  transition-duration: var(--sheet-open-dur);
+}
+#recipe-sheet.is-open > [data-testid="recipe-bottom-sheet"] {
+  transform: translateY(0);
+  transition-duration: var(--sheet-open-dur);
+}
+@media (prefers-reduced-motion: reduce) {
+  #recipe-sheet > [data-testid="recipe-bottom-sheet"] { transform: none; opacity: 0; transition: opacity 150ms ease; }
+  #recipe-sheet.is-open > [data-testid="recipe-bottom-sheet"] { opacity: 1; }
+  #recipe-sheet > [data-action="sheet-close"] { transition-duration: 150ms !important; }
+}
+
+/* ── v14: recipe sheet layout and scrims, from v0-4 ──────────────────────────────────
+   Rows run edge to edge (the list's 28 side padding taken back and returned as padding),
+   so the selected band reaches both screen edges while numbers and names stay put. */
+#sheet-list > button { margin-inline: -28px; width: calc(100% + 56px); padding-left: 34px; padding-right: 56px; }
+/* Selected: a dark band (black/35) fading out at both ends on 0 / 15 / 85 / 100 stops, no
+   corners, with a check after the name. Pressed: the same band at 45 %. */
+.sheet-row-on {
+  border-radius: 0;
+  background: linear-gradient(to right, rgb(0 0 0 / 0) 0%, rgb(0 0 0 / 35%) 15%, rgb(0 0 0 / 35%) 85%, rgb(0 0 0 / 0) 100%);
+}
+#sheet-list > button:active {
+  border-radius: 0;
+  background: linear-gradient(to right, rgb(0 0 0 / 0) 0%, rgb(0 0 0 / 45%) 15%, rgb(0 0 0 / 45%) 85%, rgb(0 0 0 / 0) 100%);
+}
+.sheet-check { width: 28px; height: 28px; flex-shrink: 0; color: rgb(255 255 255 / 85%); }
+/* Recipes with cook options show "N ›" instead of "조리 설정 N". */
+.sheet-count { display: inline-flex; align-items: center; }
+.sheet-count svg { width: 32px; height: 32px; margin-left: 2px; }
+/* Edge light: a hairline along the top plus a faint all-round inner edge. */
+[data-testid="recipe-bottom-sheet"] {
+  box-shadow: inset 0 .5px 0 rgba(255, 255, 255, .1), inset 0 0 .5px rgba(255, 255, 255, .3);
+}
+/* Header: title and ✕ 8 lower; title in tracked caps, 400 / 24px. */
+#sheet-title, [data-action="sheet-header-close"], [data-action="sheet-back"] { transform: translateY(8px); }
+#sheet-title { text-transform: uppercase; font-weight: 400; font-size: 24px; line-height: 32px; }
+/* Tracking (0.16em, centred against its trailing space) on the English title only. */
+html[lang="en"] #sheet-title { letter-spacing: 0.16em; padding-left: 0.16em; }
+
+/* ── v14: menu opens like X (Twitter)'s side menu ───────────────────────────────────
+   Tapping ☰ pushes the cook screen's content 480 to the right (80 % of the width) as a card
+   with rounded corners and a soft shadow (the background stays); its content fades to 40 % as it goes, and the ☰ button fades out.
+   The menu underneath fades in and grows from 98 % on the left edge. The background
+   colour stays the same: the black/70 backdrop is now see-through, which looks the same
+   over the black device, so it no longer darkens the card. Tapping the card closes the
+   menu. Open 360ms on the sheet's decelerating curve; close 260ms. Under
+   prefers-reduced-motion the menu only fades and the screen stays put. */
+html #app-menu { --menu-close-ms: 260; }
+html #app-menu .menu-backdrop { background: transparent; }
+html #app-menu .menu-popup { right: auto; width: 80%; backdrop-filter: none; transform-origin: 0 50%;
+  transition: opacity 360ms cubic-bezier(0.32, 0.72, 0, 1), transform 360ms cubic-bezier(0.32, 0.72, 0, 1); }
+html #app-menu.is-closed .menu-popup { opacity: 0; transform: scale(0.98); transition-duration: 260ms; }
+/* Only the content moves: the column (and the tick ring in v0) slides as a rounded card,
+   while the red / green background behind it stays where it is. */
+html :is(#cook-container > .z-10, #tick-ring-slot) { transition: transform 360ms cubic-bezier(0.32, 0.72, 0, 1); }
+html #cook-container > .z-10 { border-radius: 40px; box-shadow: -12px 0 40px rgb(0 0 0 / 0), inset 0 0 0 1px rgb(255 255 255 / 0); transition: transform 360ms cubic-bezier(0.32, 0.72, 0, 1), box-shadow 360ms cubic-bezier(0.32, 0.72, 0, 1); }
+html :is(#cook-container > .z-10 > *, #tick-ring-slot) { transition: opacity 360ms cubic-bezier(0.32, 0.72, 0, 1); }
+html #tick-ring-slot { transition: transform 360ms cubic-bezier(0.32, 0.72, 0, 1), opacity 360ms cubic-bezier(0.32, 0.72, 0, 1); }
+html #menu-btn { transition: opacity 360ms cubic-bezier(0.32, 0.72, 0, 1); }
+/* The card also shrinks to 98 % (from its left edge), so its rounded top and bottom corners
+   come into view. */
+html :is(#cook-container > .z-10, #tick-ring-slot) { transform-origin: 0 50%; }
+html .device:has(#app-menu:not([hidden]):not(.is-closed)) :is(#cook-container > .z-10, #tick-ring-slot) { transform: translateX(480px) scale(0.98); }
+/* No surface on the card: its content just drops to 40 % opacity. Its rounded edge shows
+   by a soft shadow cast to the left, as in the X reference. */
+/* A 1px white/12 rim along the card's edge, so it still reads as a layer on the black
+   background, where the shadow cannot show. */
+html .device:has(#app-menu:not([hidden]):not(.is-closed)) #cook-container > .z-10 { box-shadow: -12px 0 40px rgb(0 0 0 / 45%), inset 0 0 0 1px rgb(255 255 255 / 12%); }
+html .device:has(#app-menu:not([hidden]):not(.is-closed)) :is(#cook-container > .z-10 > *, #tick-ring-slot) { opacity: 0.4; }
+html .device:has(#app-menu:not([hidden]):not(.is-closed)) #menu-btn { opacity: 0; }
+html .device:has(#app-menu.is-closed) :is(#cook-container > .z-10, #cook-container > .z-10 > *, #tick-ring-slot, #menu-btn) { transition-duration: 260ms; }
+@media (prefers-reduced-motion: reduce) {
+  html .device:has(#app-menu:not([hidden]):not(.is-closed)) :is(#cook-container > .z-10, #tick-ring-slot) { transform: none; }
+  html #app-menu .menu-popup { transform: none !important; transition: opacity 150ms ease !important; }
+}
+
+/* 배출 / 간이 청소 labels at full white (from white/75). */
+#quick-unload-label, #quick-scrape-label { color: #fff; }
+
+/* Menu header (the row with ←|) without the app's grey #7070704D band. */
+html #app-menu .menu-popup > header { background: transparent; }
+
+/* v14: the 레시피 / 설정 rows' pressed scrim is dark (black/30, from white/18) on the red and
+   green backgrounds. On black (no recipe) it stays white/18, where a dark one would not show. */
+html .device:has(#cook-container:is(.bg-cook-preparing, .bg-cook-ready-to-cook)) #app-menu section button[data-menu]:active { background-color: rgb(0 0 0 / 30%); }
+
+/* Menu footer (versions + 장비 관리) 21 higher, so 장비 관리's bottom lines up with
+   조리 시작's bottom on the pushed-aside card (y963 with the card at 98 %): pb 40 → 61. */
+html #app-menu .menu-popup footer { padding-bottom: 61px; }
+
+/* On the black background (no recipe) the shadow cannot show, so the pushed-aside card gets
+   a white/8 surface as well; it fades in and out with the slide. Red / green keep no surface. */
+html #cook-container > .z-10 { background-color: rgb(255 255 255 / 0); }
+html .device:has(#app-menu:not([hidden]):not(.is-closed)) #cook-container.bg-black > .z-10 { background-color: rgb(255 255 255 / 8%); }
+html #cook-container > .z-10 { transition-property: transform, box-shadow, background-color; }
+
+/* v14: the ←| close button's tap area is the whole top band of the menu (the panel's width ×
+   100), not just the icon's corner; the icon stays where it was (header padding moved into
+   the button). */
+html #app-menu .menu-popup > header { padding: 0; }
+html #app-menu .menu-popup > header > [data-menu="close"] { flex: 1; align-self: stretch; padding: 30px 20px 30px 8px; }
+
+/* v14: menu's 레시피 / 설정 rows a little shorter, 120 → 104 (py 20 → 12). */
+html #app-menu section button[data-menu] { height: 104px; padding-top: 12px; padding-bottom: 12px; }
+
+/* Cook-option level of the sheet: the title is the recipe's name, so it stays as written —
+   no caps, no tracking (those are for the "RECIPE" title only). */
+html #sheet-title.is-recipe-name { text-transform: none; letter-spacing: 0; padding-left: 0; }
+
+/* v14: the sheet's ‹ back button (cook-option level) hides with [hidden] despite its flex class. */
+#recipe-sheet [data-action="sheet-back"][hidden] { display: none; }
+
+/* v14: the sheet's ‹ and ✕ keep their 120 × 100 tap area, but the pressed fill sits on a
+   64 × 64 rounded box around the icon (white/10), like the other icon buttons (menu ←|). */
+.sheet-icon-box { display: flex; width: 64px; height: 64px; align-items: center; justify-content: center; border-radius: 8px; }
+html #recipe-sheet :is([data-action="sheet-back"], [data-action="sheet-header-close"]):active { background-color: transparent; }
+html #recipe-sheet :is([data-action="sheet-back"], [data-action="sheet-header-close"]):active .sheet-icon-box { background-color: rgb(255 255 255 / 10%); }
+
+/* Cook-option level heading (‹ 레시피 + recipe name): the tap target is the whole heading
+   band, edge to edge of the viewport (::after reaches past the grid's side margins and the
+   cook container clips it); pressing anywhere on it fills ‹ 레시피 and the recipe name as
+   one rounded scrim. The back button's -8 right margin moves into the title's padding, so
+   the two fills meet without overlapping (text stays where it was). */
+.grid-heading:not(.is-blank) { cursor: pointer; }
+.grid-heading:not(.is-blank)::after { content: ""; position: absolute; top: 0; bottom: 0; left: -100px; right: -100px; z-index: 1; }
+.grid-heading:not(.is-blank) .grid-back { margin-right: 0; border-radius: 12px 0 0 12px; }
+.grid-heading:not(.is-blank) #grid-title { padding-left: 6px; border-radius: 0 12px 12px 0; }
+.grid-heading:not(.is-blank) .grid-back:active { background: none; }
+.grid-heading:not(.is-blank):active :is(.grid-back, #grid-title) { background: rgb(255 255 255 / 10%); }
+#cook-container.bg-cook-preparing .grid-heading:not(.is-blank):active :is(.grid-back, #grid-title) { background: rgb(0 0 0 / 30%); }
+#cook-container.bg-cook-ready-to-cook .grid-heading:not(.is-blank):active :is(.grid-back, #grid-title) { background: rgb(0 0 0 / 20%); }
+
+/* ‹ 레시피 indented 21 further: the chevron's drawn left edge (x63) lines up with the option
+   names in the cards below (it hung 21 to the left of them). Label and title move with it. */
+.grid-heading:not(.is-blank) .grid-back { margin-left: -14px; }
+
+/* The ‹ 레시피 + name scrim 7 wider on each side, so its left edge starts where the recipe
+   cards do (x40); the chevron and text stay put (padding grows as the margin shrinks). */
+.grid-heading:not(.is-blank) .grid-back { margin-left: -21px; padding-left: 15px; }
+.grid-heading:not(.is-blank) #grid-title { padding-right: 19px; }
+
+/* v14: header icon buttons' pressed scrim (☰, the temperature button, the menu's ←|) stays
+   white/20 (←| white/10) on the black background, and turns dark on the lit red / green
+   ones — black/30 on red, black/20 on green, as the quick grid's back heading. */
+html #cook-container.bg-cook-preparing :is(#menu-btn, #temp-btn):active > div { background-color: rgb(0 0 0 / 30%); }
+html #cook-container.bg-cook-ready-to-cook :is(#menu-btn, #temp-btn):active > div { background-color: rgb(0 0 0 / 20%); }
+html .device:has(#cook-container.bg-cook-preparing) #app-menu header [data-menu="close"]:active > div { background-color: rgb(0 0 0 / 30%); }
+html .device:has(#cook-container.bg-cook-ready-to-cook) #app-menu header [data-menu="close"]:active > div { background-color: rgb(0 0 0 / 20%); }
+
+/* v14: the temperature modal's ✕ presses like the recipe sheet's — a 64 × 64 rounded
+   white/10 box around the icon; the 120 × 100 tap area stays. */
+html #temp-modal [data-action="temp-close"]:active .sheet-icon-box { background-color: rgb(255 255 255 / 10%); }
+
+/* Pressing the pushed-aside card (the tap lands on the menu's see-through backdrop) dims its
+   content further, 40 → 25 %, at once; letting go closes the menu and it comes back to 100 %.
+   The rim and shadow stay, so the card still reads while pressed. */
+html .device:has(#app-menu:not([hidden]):not(.is-closed) .menu-backdrop:active) :is(#cook-container > .z-10 > *, #tick-ring-slot) { opacity: 0.25; transition-duration: 0s; }
+
+/* The see-through backdrop (the card's tap target, D5) covers only the strip right of the
+   80 % menu panel, top to bottom of the screen — the same area it could be tapped in before. */
+html #app-menu .menu-backdrop { left: 80%; }
