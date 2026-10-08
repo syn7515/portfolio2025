@@ -9,7 +9,8 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
    for a page whose pieces sit on the card itself.
 
    A fresh iframe paints blank for a few frames before the page loads and catches up with its loop,
-   so the frame stays invisible until the page posts "proto:ready" for this scene. The root carries
+   so the frame stays invisible until the page posts "proto:ready" for this scene, with a skeleton
+   in its place on the card meanwhile. The root carries
    data-content-pending until then and fires a bubbling "contentready" event, so a container (the
    lightbox) can keep showing what's underneath instead of flashing an empty box. */
 
@@ -50,8 +51,17 @@ export default function LivePrototype({ src, scene, title, frame, bare = false }
       data-content-pending={ready ? undefined : ""}
       aria-hidden
     >
+      {/* The loading skeleton image and video cards show (.media-skeleton in globals.css), in the
+          frame's own box; the frame fades in over it once the page is ready. Card only: a lightbox
+          copy stays wholly transparent until ready and then has to stand in for the card in one
+          frame, so there it gets neither the skeleton nor the fade. */}
       <div
-        className={`absolute overflow-hidden${bare ? "" : " shadow-[0px_1px_1px_-0.5px_rgba(0,0,0,0.10),0px_3px_3px_-1.5px_rgba(0,0,0,0.10)] dark:shadow-[0px_2px_4px_rgba(0,0,0,0.25)]"}`}
+        data-shown={ready ? "" : undefined}
+        className="media-skeleton transition-opacity duration-300 ease-[ease-out] [[data-lightbox-live]_&]:hidden"
+        style={{ ...frame, opacity: ready ? 0 : 1 }}
+      />
+      <div
+        className={`absolute overflow-hidden transition-opacity duration-300 ease-[ease-out] [[data-lightbox-live]_&]:transition-none ${bare ? "" : "shadow-[0px_1px_1px_-0.5px_rgba(0,0,0,0.10),0px_3px_3px_-1.5px_rgba(0,0,0,0.10)] dark:shadow-[0px_2px_4px_rgba(0,0,0,0.25)]"}`}
         style={{ ...frame, opacity: ready ? 1 : 0 }}
       >
         <iframe
