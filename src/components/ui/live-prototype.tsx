@@ -12,7 +12,15 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
    so the frame stays invisible until the page posts "proto:ready" for this scene, with a skeleton
    in its place on the card meanwhile. The root carries
    data-content-pending until then and fires a bubbling "contentready" event, so a container (the
-   lightbox) can keep showing what's underneath instead of flashing an empty box. */
+   lightbox) can keep showing what's underneath instead of flashing an empty box.
+
+   A page with lists the reader can scroll (in the lightbox) posts "proto:scroll" with the list's
+   name as one moves. The other copies of that page follow it, and a copy that loads later starts
+   where each list was left, so the card a lightbox copy closes onto, or opens from, shows the same
+   rows. */
+
+// Where each page's lists were last scrolled to, by src and then by list name.
+const scrollTops = new Map<string, Record<string, number>>();
 
 export type LivePrototypeProps = {
   src: string;
@@ -32,8 +40,23 @@ export default function LivePrototype({ src, scene, title, frame, bare = false }
 
   useEffect(() => {
     const onMessage = (e: MessageEvent) => {
-      if (e.source !== iframeRef.current?.contentWindow) return;
-      if (e.data?.type !== "proto:ready" || e.data.scene !== scene) return;
+      const iframe = iframeRef.current;
+      if (!iframe || e.source !== iframe.contentWindow || e.data?.scene !== scene) return;
+      if (e.data.type === "proto:scroll") {
+        const { list, top } = e.data;
+        scrollTops.set(src, { ...scrollTops.get(src), [list]: top });
+        for (const other of document.querySelectorAll("iframe")) {
+          if (other !== iframe && other.getAttribute("src") === src) {
+            other.contentWindow?.postMessage({ type: "proto:scroll", list, top }, window.location.origin);
+          }
+        }
+        return;
+      }
+      if (e.data.type !== "proto:ready") return;
+      // Posted ahead of the render that reveals this copy, so they land first.
+      for (const [list, top] of Object.entries(scrollTops.get(src) ?? {})) {
+        iframe.contentWindow?.postMessage({ type: "proto:scroll", list, top }, window.location.origin);
+      }
       setReadySrc(src);
       rootRef.current?.dispatchEvent(new Event("contentready", { bubbles: true }));
     };
