@@ -254,3 +254,7 @@
   font-style: normal;
 }
 .device, .device * { font-family: "Inter", "Pretendard", system-ui, sans-serif; }
+/* Pretendard came in Medium alone, so text that names no weight (v14's status, keys and
+   buttons) drew at 500; Inter is variable and would draw it at 400. Medium stays the canvas
+   default, as in the app — a weight set on purpose (400 on v0's phase label) still applies. */
+.device { font-weight: 500; }
