@@ -143,7 +143,9 @@
   .scene-build .sidebar .me { display: block; }
   .icon-btn { position: relative; transition: background-color 90ms ease; }
   .icon-btn.pressed, .pop-close.pressed { background: var(--accent); }
-  .dot { position: absolute; top: -3px; right: -3px; width: 10px; height: 10px; border-radius: 50%; background: #991b1b; display: none; }
+  /* Bright enough to read on the dark bar, and ringed in the bar's colour so it stands clear of the
+     button's border. */
+  .dot { position: absolute; top: -3px; right: -3px; width: 10px; height: 10px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 0 2px var(--bg); display: none; }
   .dot.on { display: block; }
   .main { position: relative; }
   .dim { position: absolute; inset: 0; z-index: 5; background: rgba(28, 25, 23, 0.8); opacity: 0; pointer-events: none; transition: opacity 150ms ease; }
