@@ -75,8 +75,12 @@ export default function Home() {
   const [reloadSuppressed, setReloadSuppressed] = useState(false);
 
   useEffect(() => {
+    // Latched once after hydration on purpose: the server can't see these signals, and the <html>
+    // attributes behind them are cleared right after (below), so they can't be read during render.
+    /* eslint-disable react-hooks/set-state-in-effect */
     if (isPaperBackNav()) setExitEntrance(true);
     if (isPageReload()) setReloadSuppressed(true);
+    /* eslint-enable react-hooks/set-state-in-effect */
     hasVisitedHome = true;
   }, []);
 

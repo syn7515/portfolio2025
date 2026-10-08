@@ -1,5 +1,5 @@
 import type { CSSProperties, RefObject } from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useSyncExternalStore } from "react";
 
 import {
   PAPER_BREAKPOINT,
@@ -79,20 +79,35 @@ export function useNearViewport(ref: RefObject<Element | null>): boolean {
   return isNear;
 }
 
+// Whether a media query matches, read without an effect. The server and the hydrating render both
+// see false, so the markup matches what was sent; every client render after that sees the live
+// value, including the first render of anything mounted after hydration.
+export function useMediaQuery(query: string): boolean {
+  const subscribe = useCallback(
+    (onChange: () => void) => {
+      const mql = window.matchMedia(query);
+      mql.addEventListener("change", onChange);
+      return () => mql.removeEventListener("change", onChange);
+    },
+    [query]
+  );
+  return useSyncExternalStore(subscribe, () => window.matchMedia(query).matches, () => false);
+}
+
+const subscribeToNothing = () => () => {};
+
+// False on the server and through hydration, true on every client render after: holds client-only
+// output back until the markup the server sent has been adopted, with no effect to flip it.
+export function useIsHydrated(): boolean {
+  return useSyncExternalStore(subscribeToNothing, () => true, () => false);
+}
+
 const COMPACT_QUERY = "(max-width: 639.98px)";
 
-// True below the sm breakpoint, where cards are 4:3. False on the server and first render; carousel
-// media is gated until it nears the viewport anyway, so nothing visibly jumps.
+// True below the sm breakpoint, where cards are 4:3. False on the server and through hydration;
+// carousel media is gated until it nears the viewport anyway, so nothing visibly jumps.
 export function useIsCompact(): boolean {
-  const [isCompact, setIsCompact] = useState(false);
-  useEffect(() => {
-    const mql = window.matchMedia(COMPACT_QUERY);
-    const update = () => setIsCompact(mql.matches);
-    update();
-    mql.addEventListener("change", update);
-    return () => mql.removeEventListener("change", update);
-  }, []);
-  return isCompact;
+  return useMediaQuery(COMPACT_QUERY);
 }
 
 export type ImagePosition = {
@@ -300,6 +315,8 @@ export function useResponsiveSizing(
   explicitGap?: number,
   mobileAspect: "16/9" | "4/3" = "16/9"
 ) {
+  // Fully specified sizes are used as given; only the responsive case needs state and a listener.
+  const isExplicit = explicitWidth != null && explicitHeight != null && explicitGap != null;
   const [size, setSize] = useState(() => ({
     cardWidth: explicitWidth ?? 0,
     cardHeight: explicitHeight ?? 0,
@@ -307,18 +324,7 @@ export function useResponsiveSizing(
   }));
 
   useEffect(() => {
-    if (
-      explicitWidth != null &&
-      explicitHeight != null &&
-      explicitGap != null
-    ) {
-      setSize({
-        cardWidth: explicitWidth,
-        cardHeight: explicitHeight,
-        gap: explicitGap,
-      });
-      return;
-    }
+    if (isExplicit) return;
 
     const compute = () => {
       if (typeof window === "undefined") return;
@@ -374,9 +380,11 @@ export function useResponsiveSizing(
       window.addEventListener("resize", compute);
       return () => window.removeEventListener("resize", compute);
     }
-  }, [explicitWidth, explicitHeight, explicitGap, mobileAspect]);
+  }, [isExplicit, mobileAspect]);
 
-  return size;
+  return isExplicit
+    ? { cardWidth: explicitWidth, cardHeight: explicitHeight, gap: explicitGap }
+    : size;
 }
 
 // Prev/next buttons are 48px in diameter (p-3 padding + w-6 h-6 icon) once the
