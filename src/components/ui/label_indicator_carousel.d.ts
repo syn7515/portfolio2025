@@ -15,6 +15,7 @@ export type CarouselItem = string | {
   imagePosition?: ImagePosition;
   mobileImageSizePercent?: number;
   mobileImagePosition?: ImagePosition;
+  mediaAspectRatio?: string;
   withInsetShadow?: boolean;
   content?: React.ReactNode;
 };

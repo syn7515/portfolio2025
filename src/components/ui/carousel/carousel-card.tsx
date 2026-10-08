@@ -9,6 +9,9 @@ import { GrillLines } from "./grill-lines";
 import { CARD_LIGHT_SHADOW } from "@/components/ui/card-shadow";
 import { renderCaptionWithBadges } from "@/components/ui/sup-caption-badge";
 
+// How long carousel media takes to fade in over its skeleton once something is on screen.
+const MEDIA_REVEAL_MS = 300;
+
 interface CarouselCardProps {
   item: CarouselItem;
   index: number;
@@ -57,12 +60,18 @@ export function CarouselCard({
   forceActive = false,
   mobileAspect = "16/9"
 }: CarouselCardProps) {
-  const { label, caption, imageUrl, videoUrl, alt, videoAutoplay, videoLoop, videoMuted, videoControls, cardVariant, backgroundLines, fetchPriority, withInsetShadow, content } = item;
+  const { label, caption, imageUrl, videoUrl, alt, videoAutoplay, videoLoop, videoMuted, videoControls, cardVariant, backgroundLines, fetchPriority, withInsetShadow, mediaAspectRatio, content } = item;
   const isCompact = useIsCompact();
   const imageSizePercent = (isCompact ? item.mobileImageSizePercent : null) ?? item.imageSizePercent;
   const imagePosition = (isCompact ? item.mobileImagePosition : null) ?? item.imagePosition;
   const hasMedia = !!(imageUrl || videoUrl);
-  const [isMediaLoading, setIsMediaLoading] = useState(hasMedia);
+  // The media this card has put on screen — its image, a video's still or its first frame. Kept as
+  // the URL rather than a flag, so a card handed new media reads as not shown again on its own,
+  // with no effect needed to reset it.
+  const mediaKey = videoUrl ?? imageUrl;
+  const [shownMediaKey, setShownMediaKey] = useState<string | null>(null);
+  const isMediaShown = shownMediaKey === mediaKey;
+  const markMediaShown = () => setShownMediaKey(mediaKey);
   const [isHovered, setIsHovered] = useState(false);
 
   // Carousels only ever appear well below the fold, so no card's media belongs on the initial
@@ -89,17 +98,30 @@ export function CarouselCard({
   // not hoist it into a <head> preload that competes with the page's own JS and CSS.
   const imageLoading = fetchPriority === 'high' ? 'eager' : 'lazy';
 
+  // A video's still is a poster, which fires no load event of its own, and the first frame can be
+  // seconds behind it. Loading the same URL as an image (one request: it shares the poster's from
+  // the cache) says when the still is ready, so it takes over from the skeleton without waiting.
   useEffect(() => {
-    if (imageUrl || videoUrl) {
-      setIsMediaLoading(true);
-    }
-  }, [imageUrl, videoUrl]);
+    if (!videoPoster) return;
+    let cancelled = false;
+    const still = new Image();
+    still.src = videoPoster;
+    still.decode().then(
+      () => { if (!cancelled) setShownMediaKey(mediaKey); },
+      () => {}
+    );
+    return () => { cancelled = true; };
+  }, [videoPoster, mediaKey]);
 
-  // The spinner means "media is on its way". A card that hasn't been scrolled near yet hasn't
-  // started loading anything, and a non-autoplaying video won't load until the viewer presses
-  // play — neither should sit there spinning.
-  const showSpinner =
-    isMediaLoading && hasMedia && !renderCard && (videoUrl ? isNearViewport && videoAutoplay : true);
+  // Until something is on screen the media stays invisible and a skeleton holds its place: an empty
+  // <video> is otherwise a blank box, and one with no intrinsic size yet a 300px-wide one that the
+  // inset shadow outlines. A video with neither autoplay nor a still never shows anything until it
+  // is played, so it gets no skeleton to sit there forever.
+  const showSkeleton = hasMedia && !renderCard && (videoUrl ? videoAutoplay || !!imageUrl : true);
+  const mediaRevealStyle: CSSProperties = {
+    opacity: isMediaShown ? 1 : 0,
+    transition: `opacity ${MEDIA_REVEAL_MS}ms ease-out`,
+  };
 
   const hasPositionedImage = imageSizePercent != null && imageUrl;
   const hasPositionedVideo = imageSizePercent != null && videoUrl;
@@ -112,6 +134,24 @@ export function CarouselCard({
   const canOpenLightboxFromCard = effectiveLightboxEnabled && openLightboxOnCardClick && (imageUrl || videoUrl || content);
 
   const isHiddenByLightbox = hiddenCardIndex === index;
+
+  // In the media's own box when its shape is known before anything has loaded (positioned media
+  // with a mediaAspectRatio), across the whole card otherwise. It fades out as the media fades in
+  // over it, its sheen paused, and stays at zero opacity rather than unmounting mid-fade.
+  const skeleton = showSkeleton && (
+    <div
+      aria-hidden
+      data-shown={isMediaShown ? "" : undefined}
+      className="media-skeleton"
+      style={{
+        ...(imageSizePercent != null && mediaAspectRatio
+          ? { height: `${imageSizePercent}%`, aspectRatio: mediaAspectRatio, ...calculateImagePosition(imagePosition) }
+          : { inset: 0 }),
+        opacity: isMediaShown ? 0 : 1,
+        transition: `opacity ${MEDIA_REVEAL_MS}ms ease-out`,
+      }}
+    />
+  );
 
   return (
     <div
@@ -201,6 +241,7 @@ export function CarouselCard({
                       <GrillLines className="w-full h-full" />
                     </div>
                   )}
+                  {skeleton}
                   {/* Video on top */}
                   {hasVideo && (
                     hasPositionedVideo ? (
@@ -214,11 +255,12 @@ export function CarouselCard({
                         controls={videoControls}
                         playsInline
                         preload="none"
-                        onCanPlay={() => setIsMediaLoading(false)}
+                        onLoadedData={markMediaShown}
                         style={{
                           height: `${imageSizePercent}%`,
                           width: "auto",
                           ...calculateImagePosition(imagePosition),
+                          ...mediaRevealStyle,
                         }}
                       />
                     ) : (
@@ -232,13 +274,15 @@ export function CarouselCard({
                         controls={videoControls}
                         playsInline
                         preload="none"
-                        onCanPlay={() => setIsMediaLoading(false)}
+                        onLoadedData={markMediaShown}
+                        style={mediaRevealStyle}
                       />
                     )
                   )}
                 </>
               ) : (
                 <>
+                  {skeleton}
                   {hasVideo ? (
                     hasPositionedVideo ? (
                     <video
@@ -251,11 +295,12 @@ export function CarouselCard({
                       controls={videoControls}
                       playsInline
                       preload="none"
-                      onCanPlay={() => setIsMediaLoading(false)}
+                      onLoadedData={markMediaShown}
                       style={{
                         height: `${imageSizePercent}%`,
                         width: 'auto',
                         ...calculateImagePosition(imagePosition),
+                        ...mediaRevealStyle,
                         ...(withInsetShadow && isHydrated ? {
                           boxShadow: isDarkMode
                             ? 'inset 0 1px 0 0 rgba(255,255,255,0.10), inset 0 0 0 1px rgba(255,255,255,0.08), 0px 0px 0px 1px rgba(0,0,0,0.20), 0px 2px 4px rgba(0,0,0,0.25)'
@@ -274,7 +319,8 @@ export function CarouselCard({
                       controls={videoControls}
                       playsInline
                       preload="none"
-                      onCanPlay={() => setIsMediaLoading(false)}
+                      onLoadedData={markMediaShown}
+                      style={mediaRevealStyle}
                     />
                   )
                 ) : imageUrl ? (
@@ -286,12 +332,13 @@ export function CarouselCard({
                       fetchPriority={fetchPriority}
                       loading={imageLoading}
                       decoding="async"
-                      ref={(el) => { if (el?.complete) setIsMediaLoading(false); }}
-                      onLoad={() => setIsMediaLoading(false)}
+                      ref={(el) => { if (el?.complete) markMediaShown(); }}
+                      onLoad={markMediaShown}
                       style={{
                         height: `${imageSizePercent}%`,
                         width: 'auto',
-                        ...calculateImagePosition(imagePosition)
+                        ...calculateImagePosition(imagePosition),
+                        ...mediaRevealStyle,
                       }}
                     />
                   ) : (
@@ -302,8 +349,9 @@ export function CarouselCard({
                       fetchPriority={fetchPriority}
                       loading={imageLoading}
                       decoding="async"
-                      ref={(el) => { if (el?.complete) setIsMediaLoading(false); }}
-                      onLoad={() => setIsMediaLoading(false)}
+                      ref={(el) => { if (el?.complete) markMediaShown(); }}
+                      onLoad={markMediaShown}
+                      style={mediaRevealStyle}
                     />
                   )
                 ) : content ? (
@@ -317,13 +365,6 @@ export function CarouselCard({
               )}
             </div>
           )}
-          {/* Loading spinner */}
-          {showSpinner && (
-            <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
-              <div className="w-6 h-6 rounded-full border-2 border-stone-300 dark:border-zinc-600 border-t-stone-500 dark:border-t-zinc-400 animate-spin" />
-            </div>
-          )}
-
           {/* Border layer on top */}
           {(imageUrl || videoUrl || content) && (
             <div

@@ -54,6 +54,10 @@
   --paper-grid-major: rgb(120 113 108 / 0.12);
   --paper-grid-hover-minor: rgb(120 113 108 / 0.12);
   --paper-grid-hover-major: rgb(120 113 108 / 0.13);
+  /* Loading skeleton for carousel media (.media-skeleton below). The block sits a step darker
+     than the card even with the hover scrim up, so it still reads as a shape under the pointer. */
+  --media-skeleton: rgb(231 229 228 / 0.75); /* stone-200 */
+  --media-skeleton-sheen: rgb(255 255 255 / 0.6);
 }
 
 @theme inline {
@@ -87,6 +91,8 @@
     --paper-grid-major: rgb(161 161 170 / 0.1);
     --paper-grid-hover-minor: rgb(161 161 170 / 0.06);
     --paper-grid-hover-major: rgb(161 161 170 / 0.07);
+    --media-skeleton: rgb(63 63 70 / 0.55); /* zinc-700 */
+    --media-skeleton-sheen: rgb(255 255 255 / 0.05);
   }
 }
 
@@ -927,6 +933,49 @@ a[role="button"],
 a.inline-flex.items-center {
   text-decoration: none !important;
   font-style: normal !important;
+}
+
+/* Loading skeleton for carousel media (carousel-card.tsx): a flat block where the image or video
+   will appear, with a sheen sweeping across it and a rest between sweeps. The sheen is a
+   translated pseudo-element, so the sweep runs on the compositor and never repaints the card.
+   Once the media is on screen the block fades out under it and the sweep pauses where it is. */
+.media-skeleton {
+  position: absolute;
+  overflow: hidden;
+  pointer-events: none;
+  background-color: var(--media-skeleton);
+}
+
+.media-skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(
+    100deg,
+    transparent 25%,
+    var(--media-skeleton-sheen) 50%,
+    transparent 75%
+  );
+  transform: translateX(-100%);
+  animation: media-skeleton-sheen 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.media-skeleton[data-shown]::after {
+  animation-play-state: paused;
+}
+
+@keyframes media-skeleton-sheen {
+  60%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* The block alone still says "loading"; the moving sheen is what reduced motion asks to drop. */
+@media (prefers-reduced-motion: reduce) {
+  .media-skeleton::after {
+    display: none;
+  }
 }
 
 /* Arrow up bounce animation */

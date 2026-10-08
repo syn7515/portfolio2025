@@ -114,6 +114,10 @@ export type CarouselItem = {
   // on a 16:9 card mostly wastes height; these let a card fill more of it. Unset falls back.
   mobileImageSizePercent: number | null;
   mobileImagePosition: ImagePosition | null;
+  // Width / height of positioned media, as a CSS aspect-ratio ("1120 / 1920"). A video has no
+  // shape until its still or metadata arrives, so this is what lets the loading skeleton take the
+  // media's own shape on the card. Unset, the skeleton covers the whole card instead.
+  mediaAspectRatio: string | null;
   videoAutoplay: boolean;
   videoLoop: boolean;
   videoMuted: boolean;
@@ -140,6 +144,7 @@ const DEFAULT_ITEM: CarouselItem = {
   imagePosition: null,
   mobileImageSizePercent: null,
   mobileImagePosition: null,
+  mediaAspectRatio: null,
   videoAutoplay: true,
   videoLoop: true,
   videoMuted: true,
@@ -190,6 +195,8 @@ export function normalizeItem(item: Normalizable): CarouselItem {
             : null,
         mobileImagePosition:
           (item.mobileImagePosition as ImagePosition | null | undefined) ?? null,
+        mediaAspectRatio:
+          typeof item.mediaAspectRatio === "string" ? item.mediaAspectRatio : null,
         videoAutoplay:
           typeof item.videoAutoplay === "boolean"
             ? item.videoAutoplay
