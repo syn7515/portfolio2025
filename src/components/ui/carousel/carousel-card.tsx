@@ -129,9 +129,17 @@ export function CarouselCard({
           role="button"
           tabIndex={0}
           aria-label={`Select card ${index + 1}${label ? `: ${label}` : ""}`}
-          onClick={() => {
+          onClick={(e) => {
             if (isActive) {
-              if (openLightboxOnCardClick && effectiveLightboxEnabled) openLightbox(index);
+              if (openLightboxOnCardClick && effectiveLightboxEnabled) {
+                // A click focuses the card, and the lightbox leaves that focus where it is. Its
+                // Escape and arrow keys are keyboard use, which turns the still-focused card
+                // :focus-visible, so the ring appeared on it as the lightbox closed. A pointer open
+                // lets go of focus; a keyboard one (and assistive tech's click, detail 0) keeps it,
+                // so the ring still marks the reader's place.
+                if (e.detail > 0) e.currentTarget.blur();
+                openLightbox(index);
+              }
             } else {
               setIndex(index);
             }
