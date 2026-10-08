@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { CarouselCard } from "./carousel/carousel-card";
 import { Lightbox } from "./carousel/lightbox";
-import { normalizeItem, useResponsiveSizing, getLightboxMaxWidth, FALLBACK_ITEMS } from "./carousel/hooks";
+import { normalizeItem, useResponsiveSizing, getLightboxMaxWidth, FALLBACK_ITEMS, useMediaQuery, useIsHydrated } from "./carousel/hooks";
 import { scrollBehavior } from "@/lib/utils";
 
 // LabelIndicatorCarousel Component (always renders as a vertical stack)
@@ -63,37 +63,15 @@ export default function LabelIndicatorCarousel({
   const wrapperRef = useRef(null);
 
   // Viewport detection for disabling lightbox on sm and below
-  const [isSmOrBelow, setIsSmOrBelow] = useState(false);
-
-  useEffect(() => {
-    setIsSmOrBelow(window.innerWidth < 768);
-    const handleResize = () => setIsSmOrBelow(window.innerWidth < 768);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  const isSmOrBelow = useMediaQuery('(max-width: 767.98px)');
 
   // Viewport detection for lg+ (1024px+)
-  const [isLgOrAbove, setIsLgOrAbove] = useState(false);
+  const isLgOrAbove = useMediaQuery('(min-width: 1024px)');
 
-  useEffect(() => {
-    setIsLgOrAbove(window.innerWidth >= 1024);
-    const handleResize = () => setIsLgOrAbove(window.innerWidth >= 1024);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  // Dark mode detection - only set after hydration to avoid SSR mismatch
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [isHydrated, setIsHydrated] = useState(false);
-
-  useEffect(() => {
-    setIsHydrated(true);
-    setIsDarkMode(window.matchMedia('(prefers-color-scheme: dark)').matches);
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = (e) => setIsDarkMode(e.matches);
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, []);
+  // Dark mode detection. Both read false on the server and through hydration (see useMediaQuery),
+  // so the server markup is never branched on them.
+  const isDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const isHydrated = useIsHydrated();
 
   // Lightbox state
   const [isLightboxOpen, setLightboxOpen] = useState(false);
@@ -229,7 +207,7 @@ export default function LabelIndicatorCarousel({
     }
   }, [normalized]);
 
-  const { cardWidth: effWidth, cardHeight: effHeight, gap: effGap } = useResponsiveSizing(
+  const { cardWidth: effWidth, gap: effGap } = useResponsiveSizing(
     cardWidth,
     cardHeight,
     gap,
@@ -405,10 +383,14 @@ export default function LabelIndicatorCarousel({
     // Step 5: Open lightbox with pre-calculated transform, and hide source card — all in one render.
     // A live-content card stays visible until its lightbox copy reports ready (handleLightboxContentReady):
     // the copy may need a few frames to load, and hiding the card first would flash an empty box.
+    // These have to follow the measurement and the lock above, after the index change has rendered,
+    // which is why this runs as an effect rather than in openLightbox.
+    /* eslint-disable react-hooks/set-state-in-effect */
     if (!normalized[pendingLightboxIndex]?.content) setHiddenCardIndex(pendingLightboxIndex);
     setInitialTransform(transform);
     setLightboxOpen(true);
     setPendingLightboxIndex(null);
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [pendingLightboxIndex, calculateCardTransform, normalized]);
 
   const handleLightboxContentReady = useCallback(() => {

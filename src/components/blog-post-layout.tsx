@@ -119,7 +119,6 @@ function startInterruptibleScrollToTop(): () => void {
 
   const controller = new AbortController()
   let finished = false
-  let fallbackTimer: number
 
   const cleanUp = () => {
     if (finished) return
@@ -147,7 +146,7 @@ function startInterruptibleScrollToTop(): () => void {
   window.addEventListener('keydown', handleKeyDown, { signal: controller.signal })
   window.addEventListener('scrollend', cleanUp, { once: true, signal: controller.signal })
 
-  fallbackTimer = window.setTimeout(cleanUp, 2000)
+  const fallbackTimer = window.setTimeout(cleanUp, 2000)
   window.scrollTo({ top: 0, behavior: 'smooth' })
 
   return interrupt
@@ -182,9 +181,13 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
   useScrollDepth(slug)
 
   useEffect(() => {
+    // Latched once per post after hydration on purpose: the server can't see these signals, and the
+    // <html> attributes behind them are cleared right after (below), so they can't be read in render.
+    /* eslint-disable react-hooks/set-state-in-effect */
     if (isPaperBackNav()) setExitEntrance(true)
     if (isPageReload()) setReloadSuppressedSlug(slug ?? null)
     if (isBlogPostMaskNavigation()) setMaskSuppressedSlug(slug ?? null)
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [slug])
 
   // Release the <html> attribute as soon as the suppression class above it has committed. It has to
