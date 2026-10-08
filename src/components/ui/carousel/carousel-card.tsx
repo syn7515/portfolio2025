@@ -104,13 +104,11 @@ export function CarouselCard({
   const hasPositionedImage = imageSizePercent != null && imageUrl;
   const hasPositionedVideo = imageSizePercent != null && videoUrl;
   const hasVideo = !!videoUrl;
-  const hasPositionedMedia = hasPositionedImage || hasPositionedVideo;
   const withBackgroundLines = cardVariant === "with-background-lines";
   const isActive = forceActive || index === currentIndex;
+  // The hover scrim reads isHovered, not CSS :hover — see onPointerMove on the card.
   const backgroundClass =
-    hasPositionedMedia || withBackgroundLines
-      ? `bg-stone-200/20 dark:bg-zinc-800/70 ${isActive ? "hover:bg-stone-200/60 dark:hover:bg-zinc-800" : ""}`
-      : `bg-stone-200/20 dark:bg-zinc-800/70 ${isActive ? "hover:bg-stone-200/60 dark:hover:bg-zinc-800" : ""}`;
+    isActive && isHovered ? "bg-stone-200/60 dark:bg-zinc-800" : "bg-stone-200/20 dark:bg-zinc-800/70";
   const canOpenLightboxFromCard = effectiveLightboxEnabled && openLightboxOnCardClick && (imageUrl || videoUrl || content);
 
   const isHiddenByLightbox = hiddenCardIndex === index;
@@ -148,14 +146,24 @@ export function CarouselCard({
               }
             }
           }}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
+          // Hover follows the hand, not the page. CSS :hover also matches a card that slides in under
+          // a resting pointer, so with the pointer parked over the column every card flashed its
+          // scrim on and off as a scroll carried it past, and one lit up by itself when the lightbox
+          // closed over it. Only real movement lights a card (an engine's synthetic move after a
+          // scroll has no delta). The scrim and the light-mode shadow both read this one state —
+          // the shadow used mouseenter, which React drops when the lightbox copy unmounts under the
+          // pointer, so the two could disagree.
+          onPointerMove={(e) => {
+            if (e.pointerType === "touch" || (e.movementX === 0 && e.movementY === 0)) return;
+            setIsHovered(true);
+          }}
+          onPointerLeave={() => setIsHovered(false)}
           className={`group relative ${mobileAspect === "4/3" ? "aspect-[4/3] sm:aspect-video" : "aspect-video"} ${backgroundClass} transition-all duration-150 ${
             disableCursor ? 'cursor-default'
               : isActive
               ? canOpenLightboxFromCard ? 'cursor-zoom-in' : 'cursor-default'
               : index < currentIndex ? 'cursor-[w-resize]' : 'cursor-[e-resize]'
-          } focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-600/60 dark:focus-visible:ring-rose-300/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background ${!disableCursor && !isActive ? 'hover:opacity-70' : ''}`}
+          } focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-600/60 dark:focus-visible:ring-rose-300/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background ${!disableCursor && !isActive && isHovered ? 'opacity-70' : ''}`}
           style={{
             width: "100%",
             boxSizing: 'border-box',
