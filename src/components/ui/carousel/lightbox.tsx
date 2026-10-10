@@ -11,6 +11,7 @@ import {
 } from "./hooks";
 import { GrillLines } from "./grill-lines";
 import { renderCaptionWithBadges } from "@/components/ui/sup-caption-badge";
+import { keepOnMainThread } from "@/lib/motion";
 
 /* The nav buttons float over the backdrop, so their edge comes from the shadow's own hairline ring
    (smooth-shadow-ring) rather than a border or a blurred 1px layer standing in for one — a separate
@@ -467,6 +468,9 @@ export function Lightbox({
             }}
             className={`fixed inset-0 z-[70] cursor-zoom-out ${isDarkMode ? 'bg-black/70' : 'bg-stone-100/85'}`}
             onClick={closeLightbox}
+            // Without it the backdrop blinks out as it lands and back in as it leaves — see
+            // keepOnMainThread.
+            onUpdate={keepOnMainThread}
           />
 
           {/* Lightbox content container */}
@@ -516,6 +520,7 @@ export function Lightbox({
                       duration: exitTransform ? exitDuration : 0.4,
                       ease: [0.77, 0, 0.175, 1],
                     }}
+                    onUpdate={keepOnMainThread}
                   >
                     {renderCaptionWithBadges(caption)}
                   </motion.div>

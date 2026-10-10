@@ -19,6 +19,7 @@ import {
   isPageReload,
   clearPageReload,
 } from '@/lib/paper-exit-transition';
+import { keepOnMainThread } from '@/lib/motion';
 
 // Persists across client-side navigation (back button) but resets on full page load
 let hasVisitedHome = false;
@@ -401,6 +402,9 @@ export default function Home() {
             animate={PAPER_EXIT_OFFSCREEN}
             transition={exitTransition}
             onAnimationComplete={() => setExitDone(true)}
+            // Without it the sheet flashes back to full opacity just before it unmounts — see
+            // keepOnMainThread.
+            onUpdate={keepOnMainThread}
           />
         )}
       </main>

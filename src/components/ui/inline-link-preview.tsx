@@ -6,6 +6,7 @@ import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { SHEET_BREAKPOINT } from '@/lib/breakpoints'
 import { cn } from '@/lib/utils'
+import { keepOnMainThread } from '@/lib/motion'
 import { DescriptionBackdrop } from '@/components/ui/description-backdrop'
 import ExternalArrow from '@/components/ui/external-arrow'
 
@@ -231,6 +232,8 @@ export function InlineLinkPreview({
               // immediate. No y offset on exit — the drift is what felt laggy.
               exit={{ opacity: 0, filter: 'blur(1px)', transition: { duration: 0.12, ease: 'easeOut' } }}
               transition={{ duration: 0.18, ease: [0.25, 0.1, 0.25, 1] }}
+              // Without it the fade blinks as it lands and as it leaves — see keepOnMainThread.
+              onUpdate={keepOnMainThread}
             >
               <DescriptionBackdrop />
               <span className="relative z-10">{explanation}</span>
@@ -255,6 +258,8 @@ export function InlineLinkPreview({
               animate={{ opacity: 1, filter: 'blur(0px)' }}
               exit={{ opacity: 0, filter: 'blur(1px)', transition: { duration: 0.12, ease: 'easeOut' } }}
               transition={{ duration: 0.18, ease: [0.25, 0.1, 0.25, 1] }}
+              // Without it the fade blinks as it lands and as it leaves — see keepOnMainThread.
+              onUpdate={keepOnMainThread}
             >
               <DescriptionBackdrop />
               <span className="relative z-10">{explanation}</span>

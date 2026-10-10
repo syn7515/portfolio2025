@@ -31,6 +31,7 @@ import {
   clearPageReload,
   shouldSkipPaperPageTransition,
 } from '@/lib/paper-exit-transition'
+import { keepOnMainThread } from '@/lib/motion'
 
 // The last thing the entrance in blog-post.module.css finishes is the underlay retiring — a 500ms
 // fade that starts on the sheet's 450ms landing frame. (Content reveal ends earlier, at 700ms.)
@@ -556,6 +557,9 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
             animate={PAPER_EXIT_OFFSCREEN}
             transition={exitTransition}
             onAnimationComplete={() => setExitDone(true)}
+            // Without it the sheet flashes back to full opacity just before it unmounts — see
+            // keepOnMainThread.
+            onUpdate={keepOnMainThread}
           />
         )}
       </div>
