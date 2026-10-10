@@ -17,7 +17,8 @@
  * as fully rounded, while the multi-line link previews keep their widest line's ends covered
  * instead of having the curve bite into them.
  *
- * Shared by the inline link previews and the compact rail nav so the two can't drift apart.
+ * Shared by the inline link previews, the compact rail nav and the lightbox caption so they can't
+ * drift apart.
  */
 export function DescriptionBackdrop() {
   return (

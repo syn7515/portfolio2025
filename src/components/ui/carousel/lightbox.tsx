@@ -11,6 +11,7 @@ import {
 } from "./hooks";
 import { GrillLines } from "./grill-lines";
 import { renderCaptionWithBadges } from "@/components/ui/sup-caption-badge";
+import { DescriptionBackdrop } from "@/components/ui/description-backdrop";
 import { keepOnMainThread } from "@/lib/motion";
 
 /* The nav buttons float over the backdrop, so their edge comes from the shadow's own hairline ring
@@ -522,7 +523,12 @@ export function Lightbox({
                     }}
                     onUpdate={keepOnMainThread}
                   >
-                    {renderCaptionWithBadges(caption)}
+                    {/* The backdrop hugs the text, so it wraps an inline box rather than spanning
+                        the full-width row; it fades and drifts with the caption it backs. */}
+                    <span className="relative isolate inline-block">
+                      <DescriptionBackdrop />
+                      <span className="relative z-10">{renderCaptionWithBadges(caption)}</span>
+                    </span>
                   </motion.div>
                 );
               })()}
