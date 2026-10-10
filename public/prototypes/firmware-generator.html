@@ -25,6 +25,7 @@
     --page: #0c0a09;
     --sidebar-bg: #1c1917;
     --scroll: rgba(87, 83, 78, 0.3);
+    --scroll-on: rgba(120, 113, 108, 0.5);
     --tag-purple: #c084fc; --tag-purple-bg: rgba(147, 51, 234, 0.2);
     --tag-blue: #60a5fa; --tag-blue-bg: rgba(37, 99, 235, 0.2);
     --tag-orange: rgba(253, 186, 116, 0.9); --tag-orange-bg: rgba(124, 45, 18, 0.2);
@@ -52,6 +53,7 @@
     --v-str: #c2410c;
     --v-err: #dc2626;
     --scroll: rgba(168, 162, 158, 0.35);
+    --scroll-on: rgba(120, 113, 108, 0.5);
     --tag-purple: #9333ea; --tag-purple-bg: rgba(147, 51, 234, 0.1);
     --tag-blue: #2563eb; --tag-blue-bg: rgba(37, 99, 235, 0.1);
     --tag-orange: #c2410c; --tag-orange-bg: rgba(234, 88, 12, 0.1);
@@ -82,8 +84,18 @@
 
   .main { flex: 1; display: flex; min-height: 0; }
   .editor { width: 946px; position: relative; overflow: hidden; background: var(--editor-bg); border-right: 1px solid var(--border); }
-  .scroll { position: absolute; right: 5px; top: 2px; width: 6px; height: 118px; border-radius: 3px; background: var(--scroll); }
-  .list { padding: 39px 0 0 77px; width: 870px; }
+  /* Lists scroll under an overlay scrollbar, the way macOS draws one: hidden at rest, shown while the
+     list moves. */
+  .scroller { position: absolute; inset: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
+  .scroller::-webkit-scrollbar { display: none; }
+  .bar { position: absolute; top: 0; right: 0; bottom: 0; width: 16px; opacity: 0; pointer-events: none; transition: opacity 300ms ease; }
+  .bar.on { opacity: 1; transition-duration: 100ms; }
+  .thumb { position: absolute; top: 0; right: 2px; width: 6px; border-radius: 3px; background: var(--scroll); transition: background-color 90ms ease; }
+  .bar.drag .thumb { background: var(--scroll-on); }
+  /* The editor's list and bar end --clip above the bottom, where an embedding card cuts the screen
+     off (?clip), so the last rows and the end of the thumb's travel stay in view. */
+  .editor > .scroller, .editor > .bar { bottom: var(--clip, 0px); }
+  .list { padding: 39px 0 40px 77px; width: 870px; }
   .section { color: var(--fg-light); font-size: 14px; line-height: 20px; padding: 0 0 13px 16px; }
   .section:not(:first-child) { margin-top: 34px; }
   .row { height: 28px; display: flex; align-items: center; position: relative; border-radius: 2px; font-family: var(--mono); font-size: 14px; line-height: 20px; transition: background-color 90ms ease; }
@@ -131,21 +143,33 @@
   .scene-build .sidebar .me { display: block; }
   .icon-btn { position: relative; transition: background-color 90ms ease; }
   .icon-btn.pressed, .pop-close.pressed { background: var(--accent); }
-  .dot { position: absolute; top: -3px; right: -3px; width: 10px; height: 10px; border-radius: 50%; background: #991b1b; display: none; }
+  /* Bright enough to read on the dark bar, and ringed in the bar's colour so it stands clear of the
+     button's border. */
+  .dot { position: absolute; top: -3px; right: -3px; width: 10px; height: 10px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 0 2px var(--bg); display: none; }
   .dot.on { display: block; }
   .main { position: relative; }
   .dim { position: absolute; inset: 0; z-index: 5; background: rgba(28, 25, 23, 0.8); opacity: 0; pointer-events: none; transition: opacity 150ms ease; }
-  .dim.on { opacity: 1; }
+  .dim.on { opacity: 1; pointer-events: auto; }
+  /* The open popover is modal: the dimmed editor takes no pointer and doesn't scroll, not even a
+     fling already under way (a thumb drag lets go too, in overlayScroll). */
+  #stage:has(.pop.on) .editor > .scroller { overflow: hidden; }
   .pop { position: absolute; left: 769px; /* re-anchored to the build button in resetBuild */ top: 44px; width: 424px; z-index: 10; background: var(--bg); border: 1px solid var(--divider); border-radius: 8px; overflow: hidden;
          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
          opacity: 0; transform: scale(0.96); transform-origin: calc(100% - 16px) -8px; transition: opacity 150ms ease, transform 150ms cubic-bezier(0.2, 0.9, 0.3, 1); }
   .pop.on { opacity: 1; transform: none; }
+  /* Closed, it still lies over the editor's right side, so it lets the pointer through to the rows,
+     the list's wheel and the scrollbar, its own scrollbar included. */
+  .pop:not(.on), .pop:not(.on) .bar { pointer-events: none; }
   .pop-head { display: flex; justify-content: space-between; align-items: flex-start; padding: 12px 24px 8px; border-bottom: 1px solid var(--divider); }
   .pop-title { font-size: 14px; line-height: 24px; font-weight: 500; color: #fafaf9; }
   :root[data-theme="light"] .pop-title { color: var(--fg); }
   .pop-close { padding: 6px; margin: -4px -10px 0 0; border-radius: 4px; color: var(--fg); transition: background-color 90ms ease; }
   .pop-body { padding: 8px 24px 0; }
-  .pop-scroll { margin: 0 -16px; height: 388px; overflow: hidden; }
+  /* The list runs to the popover's edges, so its scrollbar sits against the edge; the rows keep 8px
+     in from it. */
+  .pop-scroll { position: relative; margin: 0 -24px; height: 388px; overflow: hidden; }
+  .pop-scroll .scroller { padding: 0 8px 6px; }
+  .pop-scroll .bar { width: 12px; }
   .bi { display: flex; align-items: center; gap: 20px; height: 32px; margin-bottom: 2px; padding: 0 16px; border-radius: 6px; overflow: hidden; font-size: 14px; line-height: 20px;
         transition: height 240ms cubic-bezier(0.2, 0.8, 0.2, 1), margin 240ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 180ms ease; }
   .bi.out { height: 0; margin-bottom: 0; opacity: 0; }
@@ -212,7 +236,8 @@
   .cmd { height: 404px; background: #161210; border-radius: 6px; display: flex; flex-direction: column; overflow: hidden; }
   .cmd-input { height: 40px; flex-shrink: 0; display: flex; align-items: center; gap: 8px; padding: 0 12px; border-bottom: 1px solid rgba(68, 64, 60, 0.7); color: rgba(250, 250, 249, 0.5); }
   .cmd-list { position: relative; flex: 1; overflow: hidden; }
-  .cmd-thumb { position: absolute; right: 2px; bottom: 2px; width: 6px; height: 118px; border-radius: 3px; background: rgba(87, 83, 78, 0.3); }
+  .cmd-list .bar { width: 12px; }
+  .cmd-list .thumb { background: rgba(87, 83, 78, 0.3); }
   .c-row { height: 32px; display: flex; align-items: center; transition: background-color 90ms ease; }
   .c-id { width: 64px; margin-left: 10px; text-align: center; color: #a8a29e; font-variant-numeric: lining-nums tabular-nums; }
   .c-name { flex: 1; min-width: 0; margin-left: 16px; color: #a8a29e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -272,12 +297,18 @@
     .btn:not(.primary):hover { background: #292524; }
     .btn.primary:hover { opacity: 0.9; }
     .toast .act:hover { background: #44403c; }
+    /* The shown scrollbar takes the pointer (hover holds it, the thumb drags); a touch pans the list. */
+    .bar.on { pointer-events: auto; }
+    .bar:hover .thumb { background: var(--scroll-on); }
   }
   .nav:active, .icon-btn:active, .create:active, .pop-close:active, .bi-arrow:active,
   .tgl:active, .btn:active, .toast .act:active { filter: brightness(0.85); }
   .bi-try:active { color: var(--fg); }
   /* While a real pointer is over the page, the scripted one steps aside so there's only one. */
   .real-pointer .cursor.on { opacity: 0; }
+  /* Its moves are laid out over an unscrolled list, so while a reader has the list scrolled (the
+     rows moved out from under it) it stays out of sight too, until the list is back at the top. */
+  .list-scrolled .cursor.on { opacity: 0; }
 
   /* Fill with the app colour, not transparent: the scaled stage can miss the frame edge by a
      sub-pixel, and a see-through gap there reads as a bright hairline. */
@@ -310,7 +341,10 @@
       </div>
     </header>
     <div class="main">
-      <div class="editor"><div class="scroll"></div><div class="list" id="list"></div></div>
+      <div class="editor">
+        <div class="scroller" id="editorScroller"><div class="list" id="list"></div></div>
+        <div class="bar" id="editorBar"><div class="thumb" id="editorThumb"></div></div>
+      </div>
       <div class="panel"><div class="panel-inner" id="panel"></div></div>
       <div class="dim" id="dim"></div>
     </div>
@@ -319,7 +353,12 @@
     <div class="pop-head"><div class="pop-title">Build progress</div>
       <div class="pop-close" id="popClose"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>
     </div>
-    <div class="pop-body"><div class="pop-scroll" id="builds"></div></div>
+    <div class="pop-body">
+      <div class="pop-scroll">
+        <div class="scroller" id="builds"></div>
+        <div class="bar" id="buildBar"><div class="thumb" id="buildThumb"></div></div>
+      </div>
+    </div>
   </div>
   <div id="create">
     <div class="dlg" id="importDlg">
@@ -331,7 +370,10 @@
         </div>
         <div class="cmd">
           <div class="cmd-input"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>Search by ID or name</div>
-          <div class="cmd-list"><div id="srcRows"></div><div class="cmd-thumb"></div></div>
+          <div class="cmd-list">
+            <div class="scroller" id="srcScroller"><div id="srcRows"></div></div>
+            <div class="bar" id="srcBar"><div class="thumb" id="srcThumb"></div></div>
+          </div>
         </div>
       </div>
       <div class="dlg-foot"><div class="btn">Cancel</div><div class="btn primary" id="importBtn">Import</div></div>
@@ -400,6 +442,48 @@ const ROWS = [
   ['int','CONFIG_HOTGUIDE_SENSOR_WIDTH','16'],
   ['int','CONFIG_HOTSPATULA_SENSOR_WIDTH','16'],
   ['int','CONFIG_XAXIS_MAX_POS','4272'],
+  ['int','CONFIG_ZAXIS_MAX_POS','1890'],
+  ['int','CONFIG_XAXIS_HOME_OFFSET','48'],
+  ['int','CONFIG_ZAXIS_HOME_OFFSET','24'],
+  ['int','CONFIG_SPATULA_FLIP_ANGLE','172'],
+  ['int','CONFIG_SPATULA_FLIP_SPEED','1400'],
+  ['int','CONFIG_SPATULA_LIFT_HEIGHT','36'],
+  ['num','CONFIG_SPATULA_PRESS_FORCE','2.5'],
+  ['int','CONFIG_SPATULA_DWELL_TIME_MS','350'],
+  ['bool','CONFIG_SPATULA_STALL_DETECTION','true'],
+  ['#', 'Scraper related properties'],
+  ['bool','CONFIG_SCRAPER_ENABLED','true'],
+  ['bool','CONFIG_SCRAPER_ALARM_ACTIVE_HIGH','true'],
+  ['int','CONFIG_SCRAPER_STROKE_LENGTH','412'],
+  ['int','CONFIG_SCRAPER_STROKE_SPEED','900'],
+  ['int','CONFIG_SCRAPER_PASSES_PER_CYCLE','3'],
+  ['int','CONFIG_SCRAPER_BLADE_ANGLE','18'],
+  ['num','CONFIG_SCRAPER_DOWN_FORCE','4.2'],
+  ['int','CONFIG_SCRAPER_ZEROING_MARGIN','280'],
+  ['int','CONFIG_SCRAPER_IDLE_TIMEOUT_MS','30000'],
+  ['str','ENV_SCRAPER_BLADE_TYPE','steel_v2'],
+  ['#', 'Wiper related properties'],
+  ['bool','CONFIG_WIPER_ENABLED','true'],
+  ['bool','CONFIG_WIPER_ALARM_ACTIVE_HIGH','false'],
+  ['int','CONFIG_WIPER_SWEEP_COUNT','2'],
+  ['int','CONFIG_WIPER_SWEEP_SPEED','750'],
+  ['int','CONFIG_WIPER_PAD_PRESSURE','60'],
+  ['int','CONFIG_WIPER_OIL_DISPENSE_MS','180'],
+  ['num','CONFIG_WIPER_OIL_RATIO','0.35'],
+  ['int','CONFIG_WIPER_PARK_POS','96'],
+  ['int','CONFIG_WIPER_PAD_LIFETIME_CYCLES','1200'],
+  ['#', 'Temperature control properties'],
+  ['int','CONFIG_GRILL_TARGET_TEMP_C','220'],
+  ['int','CONFIG_GRILL_MAX_TEMP_C','260'],
+  ['int','CONFIG_GRILL_PREHEAT_TIMEOUT_S','900'],
+  ['num','CONFIG_PID_KP','1.8'],
+  ['num','CONFIG_PID_KI','0.04'],
+  ['num','CONFIG_PID_KD','12.5'],
+  ['int','CONFIG_HEATER_PWM_PERIOD_MS','1000'],
+  ['int','CONFIG_RTD_SAMPLE_INTERVAL_MS','250'],
+  ['num','CONFIG_RTD_FILTER_ALPHA','0.2'],
+  ['bool','CONFIG_OVERHEAT_SHUTDOWN','true'],
+  ['int','CONFIG_OVERHEAT_GRACE_PERIOD_S','15'],
 ];
 
 const INFO = {
@@ -423,18 +507,22 @@ const panel = document.getElementById('panel');
 const rowEls = {};
 const ERR_SVG = '<svg class="err" viewBox="0 0 256 256" fill="var(--err-fill)"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm-8,56a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm8,104a12,12,0,1,1,12-12A12,12,0,0,1,128,184Z"/></svg>';
 
+// Each loop rebuilds the rows in one swap, so the list never empties and the editor keeps the
+// reader's scroll position.
 function build() {
-  list.innerHTML = '';
+  const rows = document.createDocumentFragment();
   for (const r of ROWS) {
-    if (r[0] === '#') { const s = document.createElement('div'); s.className = 'section'; s.textContent = r[1]; list.appendChild(s); continue; }
+    if (r[0] === '#') { const s = document.createElement('div'); s.className = 'section'; s.textContent = r[1]; rows.appendChild(s); continue; }
     const [type, name, value] = r;
     const el = document.createElement('div');
     el.className = `row t-${type}`;
     el.innerHTML = `<div class="tag"><span>${type}</span></div><div class="name">${name}</div><div class="val">${ERR_SVG}<span class="txt">${value}</span></div>`;
     el.dataset.type = type; el.dataset.name = name; el.dataset.value = value;
-    list.appendChild(el);
+    rows.appendChild(el);
     rowEls[name] = el;
   }
+  list.replaceChildren(rows);
+  editorScroll.place();
 }
 
 let active = null;
@@ -508,7 +596,11 @@ function markCaughtUp() {
     announce();
   }));
 }
-addEventListener('message', e => { if (e.origin === location.origin && e.data === 'proto:ping' && shown) announce(); });
+addEventListener('message', e => {
+  if (e.origin !== location.origin) return;
+  if (e.data === 'proto:ping' && shown) announce();
+  if (e.data?.type === 'proto:scroll') lists[e.data.list]?.sync(e.data.top);
+});
 async function wait(ms, id) {
   if (id !== runId) throw 'abort';
   vt += ms;
@@ -577,6 +669,17 @@ const BUILDS = [
   ['v1.0.3c-lc @ 3.6.1-rc1', 'complete'],
   ['v1.0.3c-mcu_lc @ 3.6.1-rc.1', 'complete'],
   ['v1.0.3c-mcu @ 3.6.1-rc.1', 'complete'],
+  ['v1.0.3c @ 3.6.0', 'complete'],
+  ['v1.0.3b-lc_fix', 'complete'],
+  ['v1.0.3b @ 3.6.0', 'complete'],
+  ['v1.0.3a-wiper_test', 'failure'],
+  ['v1.0.3a @ 3.5.9', 'complete'],
+  ['v1.0.2-spat_speed', 'complete'],
+  ['v1.0.2 @ 3.5.8', 'complete'],
+  ['v1.0.1-scrb_off', 'complete'],
+  ['v1.0.1 @ 3.5.8', 'complete'],
+  ['v1.0.0-rc.2', 'complete'],
+  ['v1.0.0-rc.1', 'github'],
   ['20호기에서 샌드박스 최초 테스트', 'github'],
 ];
 const ICON = {
@@ -651,6 +754,9 @@ function resetBuild() {
   track($('builds').children[0], TEFLON_S, 0);
   $('dot').classList.add('on');
   $('pop').classList.remove('on'); $('dim').classList.remove('on');
+  // Each loop opens the popover afresh, at the top of its list.
+  $('builds').scrollTop = 0;
+  buildScroll.place();
 }
 async function press(el, id) { el.classList.add('pressed'); await wait(130, id); el.classList.remove('pressed'); }
 
@@ -733,6 +839,25 @@ const SOURCES = [
   ['MC-0001', 'v1.1.5 scrb'],
   ['MC-0001', 'v1.1.5_test'],
   ['MC-0001', 'v1.1.5_test'],
+  ['FW-0007', 'v1.1.4_0221'],
+  ['FW-0006', 'v1.1.4_temp'],
+  ['FW-0005', 'v1.1.4_test05'],
+  ['FW-0004', 'v1.1.4_test04'],
+  ['FW-0003', 'v1.1.4_test03'],
+  ['FW-0002', 'v1.1.4_test02'],
+  ['FW-0001', 'v1.1.4_test01'],
+  ['MC-0003', 'v1.1.4 wipr'],
+  ['MC-0002', 'v1.1.4 spat'],
+  ['MC-0001', 'v1.1.4 scrb'],
+  ['FW-0006', 'v1.1.3_0114'],
+  ['FW-0005', 'v1.1.3_temp'],
+  ['FW-0004', 'v1.1.3_test04'],
+  ['FW-0003', 'v1.1.3_test03'],
+  ['FW-0002', 'v1.1.3_test02'],
+  ['FW-0001', 'v1.1.3_test01'],
+  ['MC-0002', 'v1.1.3 spat'],
+  ['MC-0001', 'v1.1.3 scrb'],
+  ['MC-0001', 'v1.1.3_test'],
 ];
 function resetCreate() {
   $('srcRows').replaceChildren(...SOURCES.map(([id, name, on]) => {
@@ -747,6 +872,9 @@ function resetCreate() {
   ov.textContent = '-'; ov.classList.add('none');
   $('ovScrb').classList.remove('flash'); $('srcScrb').classList.remove('flash');
   $('toast').className = 'toast';
+  // Each loop opens the dialog afresh, at the top of its list.
+  $('srcScroller').scrollTop = 0;
+  sourceScroll.place();
 }
 const hoverSource = i => [...$('srcRows').children].forEach((r, j) => r.classList.toggle('hover', j === i));
 const flash = el => { el.classList.remove('flash'); el.offsetWidth; el.classList.add('flash'); };
@@ -793,6 +921,96 @@ async function playCreate(id) {
   await wait(800, id);
 }
 
+/* ---------- list scroll ----------
+   Real input moves a list; the timeline only puts a dialog's or popover's back at the top as each
+   loop opens it. The thumb shows while its list moves, stays while the pointer is on it or drags it,
+   and fades a moment after; a press on the track pages toward the press. Embedded, a scroll is
+   posted to the parent, which moves the page's other copies (the carousel card under its lightbox
+   copy) to the same place and starts a newly loaded copy there, so the swap between them doesn't
+   jump. */
+function overlayScroll(name, scroller, bar, thumb, row) {
+  let hideTimer = 0, drag = null, syncedTop = null;
+  // Stage px: the track runs 2px in from each end of the visible list.
+  function box() {
+    const track = scroller.clientHeight - 4;
+    const height = Math.max(24, track * scroller.clientHeight / scroller.scrollHeight);
+    return { height, travel: track - height, range: scroller.scrollHeight - scroller.clientHeight };
+  }
+  function place() {
+    const { height, travel, range } = box();
+    thumb.style.height = `${height}px`;
+    thumb.style.transform = `translateY(${2 + (range > 0 ? (scroller.scrollTop / range) * travel : 0)}px)`;
+  }
+  function show() {
+    bar.classList.add('on');
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(() => {
+      // Held by the pointer: leaving or letting go starts the fade again.
+      if (!drag && !bar.matches(':hover')) bar.classList.remove('on');
+    }, 900);
+  }
+  // Another copy's scroll lands silently: no bar, and it isn't posted back.
+  function sync(top) {
+    const before = scroller.scrollTop;
+    scroller.scrollTop = top;
+    if (scroller.scrollTop !== before) syncedTop = scroller.scrollTop;
+  }
+  scroller.addEventListener('scroll', () => {
+    place();
+    if (syncedTop !== null && scroller.scrollTop === syncedTop) { syncedTop = null; return; }
+    syncedTop = null;
+    show();
+    if (parent !== window) parent.postMessage({ type: 'proto:scroll', scene: SCENE, list: name, top: scroller.scrollTop }, location.origin);
+  });
+  bar.addEventListener('pointerleave', () => { if (!drag) show(); });
+  // The bar sits beside the list rather than in it, so a wheel over it is handed to the list.
+  bar.addEventListener('wheel', e => {
+    e.preventDefault();
+    scroller.scrollBy({ top: e.deltaY * [1, row, scroller.clientHeight][e.deltaMode] });
+  }, { passive: false });
+  bar.addEventListener('pointerdown', e => {
+    if (e.button !== 0 || e.pointerType === 'touch') return;
+    e.preventDefault();
+    const t = thumb.getBoundingClientRect();
+    if (e.clientY < t.top || e.clientY > t.bottom) {
+      // A page, less a row so the reader keeps their place.
+      scroller.scrollBy({ top: Math.sign(e.clientY - t.top) * (scroller.clientHeight - row), behavior: 'smooth' });
+      return;
+    }
+    // Pointer px to scroll px: through the stage's fit-to-window scale, then the thumb's travel.
+    const { travel, range } = box();
+    const stage = $('stage');
+    const scale = stage.getBoundingClientRect().height / stage.offsetHeight;
+    drag = { y: e.clientY, top: scroller.scrollTop, rate: range / travel / scale };
+    bar.classList.add('drag');
+    bar.setPointerCapture(e.pointerId);
+  });
+  const endDrag = () => {
+    if (!drag) return;
+    drag = null;
+    bar.classList.remove('drag');
+    show();
+  };
+  bar.addEventListener('pointermove', e => {
+    if (!drag) return;
+    // A list that stops scrolling (the editor once the popover opens over it) lets go of the thumb.
+    if (getComputedStyle(scroller).overflowY === 'hidden') return endDrag();
+    scroller.scrollTop = drag.top + (e.clientY - drag.y) * drag.rate;
+  });
+  bar.addEventListener('lostpointercapture', endDrag);
+  return { place, sync };
+}
+const editorScroll = overlayScroll('editor', $('editorScroller'), $('editorBar'), $('editorThumb'), 28);
+const sourceScroll = overlayScroll('sources', $('srcScroller'), $('srcBar'), $('srcThumb'), 32);
+const buildScroll = overlayScroll('builds', $('builds'), $('buildBar'), $('buildThumb'), 34);
+// By the name a scroll is posted under, for the page's other copies to follow.
+const lists = { editor: editorScroll, sources: sourceScroll, builds: buildScroll };
+// The lists the scripted pointer works in. A copy following another's scroll hides it as well, so
+// the card and its lightbox copy agree.
+for (const list of [$('srcScroller'), $('builds')]) {
+  list.addEventListener('scroll', () => root.classList.toggle('list-scrolled', list.scrollTop > 0));
+}
+
 async function loop() {
   const id = ++runId;
   document.body.classList.add('playing');
@@ -822,6 +1040,8 @@ const params = new URLSearchParams(location.search);
 // ?embed: framed inside the portfolio carousel — transparent page, no HUD, theme follows the OS
 // (the same prefers-color-scheme the site itself themes off) unless ?theme pins it.
 if (params.has('embed')) root.classList.add('embed');
+// ?clip=<stage px>: how much of the screen's bottom the embedding card cuts off.
+if (params.has('clip')) root.style.setProperty('--clip', `${parseFloat(params.get('clip'))}px`);
 const pinned = params.get('theme');
 const scheme = matchMedia('(prefers-color-scheme: dark)');
 const applyScheme = () => { root.dataset.theme = pinned || (scheme.matches ? 'dark' : 'light'); };
