@@ -490,8 +490,10 @@ export function Lightbox({
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
             >
-              {/* Relative container sizes to LightboxContent only */}
-              <div className="relative">
+              {/* Relative container sizes to LightboxContent only. z-10 keeps the media above the
+                  caption's backdrop, whose wash reaches up past the 1rem gap into the media's
+                  bottom edge; the caption comes later in the DOM and would otherwise paint over it. */}
+              <div className="relative z-10">
                 <LightboxContent
                   currentItem={normalizedItems[lightboxIndex]}
                   initialTransform={initialTransform}
