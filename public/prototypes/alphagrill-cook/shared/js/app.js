@@ -23,6 +23,9 @@
 
   const device = document.getElementById('device');
   const devbar = document.getElementById('devbar');
+  // portfolio, as the later shared/js/app.js does: in a frame smaller than 600 × 1024 (a carousel
+  // card) the stage's grid track must not grow to the device, or the fitted device sits off-centre
+  if (EMBED) device.parentElement.style.gridTemplate = 'minmax(0, 1fr) / minmax(0, 1fr)';
   const screens = Array.from(device.querySelectorAll('.screen'));
   const stack = [];
 
