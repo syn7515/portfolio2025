@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client"
 
-import { useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
@@ -198,6 +198,15 @@ function LightboxContent({
     return () => el.removeEventListener("contentready", markReady);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isContentItem, currentItem]);
+  // A live page keeps redrawing (its loop plays on) while the box shrinks back onto its card, and
+  // every redraw re-rasters the scaled frame mid-close. The copy is on its way out, so it's asked to
+  // hold still ("proto:pause"); a page that doesn't listen carries on as before.
+  useEffect(() => {
+    if (!exitTransform || !isContentItem) return;
+    contentRef.current?.querySelectorAll("iframe").forEach((frame) => {
+      frame.contentWindow?.postMessage("proto:pause", window.location.origin);
+    });
+  }, [exitTransform, isContentItem]);
 
   const motionProps = {
     initial: initialTransform ? toScale(initialTransform) : (false as const),
