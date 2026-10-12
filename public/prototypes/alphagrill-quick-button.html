@@ -154,6 +154,13 @@ let runId = 0, loopStart = 0, vt = 0, dry = false;
 let behind = true, shown = false;
 const announce = () => { if (parent !== window) parent.postMessage({ type: 'proto:ready', scene: SCENE }, location.origin); };
 addEventListener('message', e => { if (e.origin === location.origin && e.data === 'proto:ping' && shown) announce(); });
+// A lightbox closing asks its copy to hold still ("proto:pause"): the copy is on its way out, and
+// each step of the take would re-raster the shrinking frame. "proto:resume" joins the take again.
+addEventListener('message', e => {
+  if (e.origin !== location.origin) return;
+  if (e.data === 'proto:pause') runId++;
+  else if (e.data === 'proto:resume') { fallBehind(); loop(); }
+});
 function fallBehind() {
   behind = true;
   root.classList.add('no-anim');
