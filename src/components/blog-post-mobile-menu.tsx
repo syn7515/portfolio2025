@@ -21,10 +21,14 @@ const ITEM_RISE_MS = 500
 const ITEM_BASE_DELAY_MS = 60
 const ITEM_STAGGER_MS = 40
 
+// The press scale shared by the logo, the menu toggle and the menu's post links. It rides the
+// standalone `scale` property, so on the links it composes with the rise's inline `transform`.
+const PRESS_SCALE_TRANSITION = 'scale 150ms cubic-bezier(0.23, 1, 0.32, 1)'
+
 const riseTransition = (delayMs: number) =>
   ['opacity', 'transform', 'filter']
     .map(prop => `${prop} ${ITEM_RISE_MS}ms ${ITEM_RISE_EASE} ${delayMs}ms`)
-    .concat('color 300ms ease-out')
+    .concat('color 300ms ease-out', PRESS_SCALE_TRANSITION)
     .join(', ')
 
 export default function BlogPostMobileMenu() {
@@ -162,7 +166,7 @@ export default function BlogPostMobileMenu() {
                 // sits exactly where it did. The grey tap flash is off because across a full-width
                 // row it reads as a slab; the label's colour change is the press feedback.
                 className={cn(
-                  'block w-full py-[14px] text-[20px] font-[460] tracking-[-0.01em] !not-italic motion-reduce:!transform-none motion-reduce:!filter-none [-webkit-tap-highlight-color:transparent]',
+                  'block w-full py-[14px] text-[20px] font-[460] tracking-[-0.01em] !not-italic motion-safe:active:scale-[0.97] motion-reduce:!transform-none motion-reduce:!filter-none [-webkit-tap-highlight-color:transparent]',
                   isCurrent
                     ? '!text-stone-700 dark:!text-zinc-200'
                     : '!text-stone-500 dark:!text-zinc-400 !no-underline hover:!text-rose-700 active:!text-rose-700 dark:hover:!text-rose-400 dark:active:!text-rose-400'
@@ -175,7 +179,7 @@ export default function BlogPostMobileMenu() {
                   // Delay is held in the shorthand, not transitionDelay: React warns on mixing the two.
                   transition: menuOpen
                     ? riseTransition(ITEM_BASE_DELAY_MS + index * ITEM_STAGGER_MS)
-                    : 'color 300ms ease-out, opacity 200ms ease-out, filter 200ms ease-out, transform 0ms linear 250ms',
+                    : `color 300ms ease-out, opacity 200ms ease-out, filter 200ms ease-out, transform 0ms linear 250ms, ${PRESS_SCALE_TRANSITION}`,
                 }}
               >
                 {item.label}
@@ -185,25 +189,29 @@ export default function BlogPostMobileMenu() {
         </nav>
       </div>
 
-      {/* Persistent mobile top navigation: home logo on the left, menu toggle on the right. */}
+      {/* Persistent mobile top navigation: home logo on the left, menu toggle on the right. The bar
+          has no side padding of its own: each control fills the bar's full height and runs out to
+          its own edge of the viewport, carrying the old 24px inset as padding so the icons sit
+          where they did while the tap target grows into the corner. */}
       <nav
         aria-label="Primary"
         aria-hidden={!isProjectRoute}
         className={cn(
-          'fixed inset-x-0 top-0 z-[70] flex h-12 transform-gpu items-center justify-between px-6 pointer-events-none motion-safe:transition-transform motion-safe:duration-[400ms] motion-safe:ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none',
+          'fixed inset-x-0 top-0 z-[70] flex h-12 transform-gpu items-stretch justify-between pointer-events-none motion-safe:transition-transform motion-safe:duration-[400ms] motion-safe:ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none',
           isProjectRoute ? 'translate-y-0' : '-translate-y-full'
         )}
       >
+        {/* The press scale sits on the image, not the link: the link is now padded on one side
+            only, so scaling it would pull the mark off-centre toward the viewport edge. */}
         <Link
           href="/"
           aria-label="Sue Park — Home"
           tabIndex={!isProjectRoute || leaving ? -1 : undefined}
           onClick={(e) => handleLinkClick(e, '/', false)}
           className={cn(
-            'inline-flex h-9 items-center rounded !no-underline motion-safe:active:scale-[0.97]',
+            'group inline-flex items-center pl-6 pr-2 rounded !no-underline [-webkit-tap-highlight-color:transparent]',
             isProjectRoute && !leaving ? 'pointer-events-auto' : 'pointer-events-none'
           )}
-          style={{ transition: 'scale 150ms cubic-bezier(0.23, 1, 0.32, 1)' }}
         >
           {/* The same portrait the tab icon uses, so the mark is one asset in both places. Its
               squircle is baked into the PNG as transparent corners — a border-radius here would
@@ -218,10 +226,14 @@ export default function BlogPostMobileMenu() {
             width={28}
             height={28}
             draggable={false}
-            className="size-7 select-none"
+            className="size-7 select-none motion-safe:group-active:scale-[0.97]"
+            style={{ transition: PRESS_SCALE_TRANSITION }}
           />
         </Link>
 
+        {/* The bars keep their old 36px box, now nested so the button itself can fill the bar's
+            height and reach the viewport edge; pr-4 is the old 24px inset less the -8px pull. Like
+            the logo, the press scale goes on that inner box so it shrinks about the icon's centre. */}
         <button
           type="button"
           onClick={() => { if (!leaving) setOpen(v => !v) }}
@@ -229,23 +241,26 @@ export default function BlogPostMobileMenu() {
           aria-label={menuOpen && !leaving ? 'Close menu' : 'Open menu'}
           aria-expanded={menuOpen && !leaving}
           aria-controls="mobile-menu"
-          className="pointer-events-auto relative -mr-2 size-9 cursor-pointer disabled:pointer-events-none [-webkit-tap-highlight-color:transparent]"
+          className="group pointer-events-auto inline-flex items-center pr-4 cursor-pointer disabled:pointer-events-none [-webkit-tap-highlight-color:transparent]"
         >
-          {/* Top bar: rotates while sliding down to the center, forming the "\" diagonal (pointing top-left) */}
           <span
             aria-hidden
-            className={cn(BAR_CLASS, 'top-[10px]', menuOpen && !leaving && 'translate-y-[7px] rotate-45')}
-          />
-          {/* Middle bar: dissolves with a blur */}
-          <span
-            aria-hidden
-            className={cn(BAR_CLASS, 'top-[17px]', menuOpen && !leaving && 'opacity-0 blur-[3px]')}
-          />
-          {/* Bottom bar: rotates while sliding up to the center, forming the "/" diagonal */}
-          <span
-            aria-hidden
-            className={cn(BAR_CLASS, 'top-[24px]', menuOpen && !leaving && '-translate-y-[7px] -rotate-45')}
-          />
+            className="relative block size-9 motion-safe:group-active:scale-[0.97]"
+            style={{ transition: PRESS_SCALE_TRANSITION }}
+          >
+            {/* Top bar: rotates while sliding down to the center, forming the "\" diagonal (pointing top-left) */}
+            <span
+              className={cn(BAR_CLASS, 'top-[10px]', menuOpen && !leaving && 'translate-y-[7px] rotate-45')}
+            />
+            {/* Middle bar: dissolves with a blur */}
+            <span
+              className={cn(BAR_CLASS, 'top-[17px]', menuOpen && !leaving && 'opacity-0 blur-[3px]')}
+            />
+            {/* Bottom bar: rotates while sliding up to the center, forming the "/" diagonal */}
+            <span
+              className={cn(BAR_CLASS, 'top-[24px]', menuOpen && !leaving && '-translate-y-[7px] -rotate-45')}
+            />
+          </span>
         </button>
       </nav>
     </div>
