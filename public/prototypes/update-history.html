@@ -74,10 +74,9 @@
   /* the arrow to the next release straddles the column edge (Figma pads it -8px past the column) */
   .plan .hd .ic { margin-right: -8px; color: var(--muted-fg); opacity: 0.4; }
   .cell { gap: 12px; white-space: nowrap; }
-  .badge { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; padding: 1px 4.3px; border-radius: 4px; font-family: var(--mono); font-size: 12px; line-height: 16px; }
-  /* the HMI badge's stroke sits outside its box, as Figma draws it */
-  .badge.hmi { box-shadow: 0 0 0 1px var(--border); color: var(--fg); }
-  .badge.mcu { padding: 1px 3.3px; background: var(--secondary); color: var(--primary); }
+  /* both badges are the secondary kind: a muted fill, no stroke */
+  .badge { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; padding: 1px 4.3px; border-radius: 4px; font-family: var(--mono); font-size: 12px; line-height: 16px; background: var(--secondary); color: var(--primary); }
+  .badge.mcu { padding: 1px 3.3px; }
   /* Figma's separator is a zero-width box whose stroke falls just left of it */
   .sep { width: 1px; height: 12px; margin-left: -1px; background: var(--soft-border); }
   .fw { display: flex; align-items: center; gap: 2px; color: var(--muted-fg); }
