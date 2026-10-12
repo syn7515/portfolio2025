@@ -646,3 +646,7 @@ html .device:has(#app-menu:not([hidden]):not(.is-closed) .menu-backdrop:active) 
 /* The see-through backdrop (the card's tap target, D5) covers only the strip right of the
    80 % menu panel, top to bottom of the screen — the same area it could be tapped in before. */
 html #app-menu .menu-backdrop { left: 80%; }
+
+/* portfolio: Start cooking without the play icon, the label alone, as on the GRILL and CLEAN cards
+   (v0-4). */
+#primary-btn svg { display: none; }

@@ -273,3 +273,7 @@ html[data-from="v14"] :is(#qa-recipe, #qa-scrape) > svg { width: 44px; height: 4
 html[data-from="v14"] #cook-container.bg-cook-preparing :is(#qa-recipe, #qa-scrape) > svg { color: hsl(0 14% 66%); }
 html[data-from="v14"] #cook-container.bg-cook-ready-to-cook :is(#qa-recipe, #qa-scrape) > svg { color: hsl(150 12% 64%); }
 html[data-from="v14"] #qa-unload > svg { width: 52px; height: 52px; margin-block: -4px; opacity: .8; }
+
+/* portfolio: Start cooking without the play icon, the label alone, as on the GRILL and CLEAN cards
+   (v0-4). */
+#primary-btn svg { display: none; }
