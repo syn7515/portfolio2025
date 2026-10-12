@@ -387,29 +387,30 @@ export function useResponsiveSizing(
     : size;
 }
 
-// Prev/next buttons are 48px in diameter (p-3 padding + w-6 h-6 icon) once the
-// lightbox is enabled (>=768px viewport), and sit `buttonGap` away from the
-// media edge — 4px below the lg breakpoint, 16px at lg+ (see lightbox.tsx).
-// The reserved space must grow with that gap so the buttons keep breathing
-// room from the viewport edge instead of being pushed flush against it.
 const LIGHTBOX_OUTER_PADDING = 16;
-const LIGHTBOX_BUTTON_DIAMETER = 48;
 
-// Below this width the lightbox drops its prev/next buttons (lightbox.tsx) and gives their room to
-// the media: at 136px they left it no bigger than the card it opened from. The arrow keys still
-// step through. 820 is where the site's compact layout ends
-// (hamburger below, rail above); the lightbox itself only opens from 768.
-export const LIGHTBOX_NAV_BREAKPOINT = 820;
+// Under the media: a 16px gap and one line of text-sm caption.
+export const LIGHTBOX_CAPTION_GAP = 16;
+const LIGHTBOX_CAPTION_BELOW = LIGHTBOX_CAPTION_GAP + 24;
 
-// Room kept above and below the media: the outer padding, then the caption under it — a 16px gap
-// and one line of text-sm. The media is centred, so the caption's share is kept on both sides.
-const LIGHTBOX_VERTICAL_RESERVE = (LIGHTBOX_OUTER_PADDING + 16 + 24) * 2;
+// The prev/next pair sits side by side, floated this far off the viewport's bottom edge — 40px
+// buttons (p-2.5 padding + w-5 h-5 icon, see lightbox.tsx). Pinned to the viewport rather than
+// hung off the media, they hold still whatever the item and a repeated click keeps landing on the
+// same button.
+export const LIGHTBOX_NAV_BOTTOM = 24;
+const LIGHTBOX_NAV_ZONE = LIGHTBOX_NAV_BOTTOM + 40;
+
+// The media and its caption are centred as one stack in the room left above the buttons, so the
+// media's own centre sits this far above the viewport's. Everything that places the media — the
+// lightbox, its click hit test and the card-to-lightbox FLIP — measures from there.
+export const LIGHTBOX_MEDIA_LIFT = (LIGHTBOX_NAV_ZONE + LIGHTBOX_CAPTION_BELOW) / 2;
+
+// Room kept around that stack: the outer padding above it and between it and the buttons.
+const LIGHTBOX_VERTICAL_RESERVE =
+  LIGHTBOX_OUTER_PADDING * 2 + LIGHTBOX_CAPTION_BELOW + LIGHTBOX_NAV_ZONE;
 
 export function getLightboxMaxWidth(viewportWidth: number, viewportHeight = Infinity): number {
-  const reservedX =
-    viewportWidth < LIGHTBOX_NAV_BREAKPOINT
-      ? LIGHTBOX_OUTER_PADDING * 2
-      : (LIGHTBOX_OUTER_PADDING + (viewportWidth >= 1024 ? 16 : 4) + LIGHTBOX_BUTTON_DIAMETER) * 2;
+  const reservedX = LIGHTBOX_OUTER_PADDING * 2;
   // The frame is 16:9 off this width, so it is held to the height too: on a short viewport — a
   // phone on its side — width alone would push the frame and its caption off the screen.
   const heightBound = ((viewportHeight - LIGHTBOX_VERTICAL_RESERVE) * 16) / 9;

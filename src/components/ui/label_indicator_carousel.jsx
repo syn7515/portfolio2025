@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { CarouselCard } from "./carousel/carousel-card";
 import { Lightbox } from "./carousel/lightbox";
-import { normalizeItem, useResponsiveSizing, getLightboxMaxWidth, FALLBACK_ITEMS, useMediaQuery, useIsHydrated } from "./carousel/hooks";
+import { normalizeItem, useResponsiveSizing, getLightboxMaxWidth, LIGHTBOX_MEDIA_LIFT, FALLBACK_ITEMS, useMediaQuery, useIsHydrated } from "./carousel/hooks";
 import { scrollBehavior } from "@/lib/utils";
 
 // LabelIndicatorCarousel Component (always renders as a vertical stack)
@@ -64,9 +64,6 @@ export default function LabelIndicatorCarousel({
 
   // Viewport detection for disabling lightbox on sm and below
   const isSmOrBelow = useMediaQuery('(max-width: 767.98px)');
-
-  // Viewport detection for lg+ (1024px+)
-  const isLgOrAbove = useMediaQuery('(min-width: 1024px)');
 
   // Dark mode detection. Both read false on the server and through hydration (see useMediaQuery),
   // so the server markup is never branched on them.
@@ -135,9 +132,10 @@ export default function LabelIndicatorCarousel({
       return null;
     }
     
-    // Calculate final position (center of viewport)
+    // Calculate final position: centred across, and lifted above the viewport's centre to make room
+    // for the caption and buttons under it (LIGHTBOX_MEDIA_LIFT)
     const finalX = viewportWidth / 2;
-    const finalY = viewportHeight / 2;
+    const finalY = viewportHeight / 2 - LIGHTBOX_MEDIA_LIFT;
     
     // Calculate initial position (center of container bounding box)
     // Note: scrollbar compensation is now handled in the effect that calls this function
@@ -495,7 +493,6 @@ export default function LabelIndicatorCarousel({
         exitTransform={exitTransform}
         exitDuration={exitDuration}
         isDarkMode={isDarkMode}
-        isLgOrAbove={isLgOrAbove}
         onExitComplete={handleLightboxExitComplete}
         onContentReady={handleLightboxContentReady}
       />
