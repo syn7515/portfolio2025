@@ -581,7 +581,7 @@ export function Lightbox({
               duration: exitTransform ? exitDuration : 0.4,
               ease: [0.77, 0, 0.175, 1],
             }}
-            className={`fixed inset-0 z-[70] cursor-zoom-out ${isDarkMode ? 'bg-black/75' : 'bg-stone-100/90'}`}
+            className={`fixed inset-0 z-[70] cursor-zoom-out ${isDarkMode ? 'bg-black/80' : 'bg-stone-100/90'}`}
             onClick={closeLightbox}
             // Without it the backdrop blinks out as it lands and back in as it leaves — see
             // keepOnMainThread.
