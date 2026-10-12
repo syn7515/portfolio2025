@@ -7,6 +7,9 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   useLightboxDimensions,
   calculateImagePosition,
+  LIGHTBOX_CAPTION_GAP,
+  LIGHTBOX_MEDIA_LIFT,
+  LIGHTBOX_NAV_BOTTOM,
   type CarouselItem,
 } from "./hooks";
 import { GrillLines } from "./grill-lines";
@@ -17,10 +20,25 @@ import { keepOnMainThread } from "@/lib/motion";
 /* The nav buttons float over the backdrop, so their edge comes from the shadow's own hairline ring
    (smooth-shadow-ring) rather than a border or a blurred 1px layer standing in for one — a separate
    edge reads as a second, greyer line just outside the first. The light ring is tinted up from the
-   plugin's 5% default: these sit on a near-white stone-100/85 backdrop, where 5% black leaves a
-   white button barely detached from it. Dark mode keeps the plugin's white hairline. */
+   plugin's 5% default: these sit on a near-white stone-100/90 backdrop, where 5% black leaves a
+   white button barely detached from it. Dark mode keeps the plugin's white hairline. A disabled
+   button mutes its ring along with its fill and icon (navButtonColors). */
 const NAV_BUTTON_MOTION_CLASS =
-  "rounded-full p-2 sm:p-3 pointer-events-auto smooth-shadow-ring-sm smooth-ring-black/10 dark:smooth-ring-white/18 transition-[scale,background-color] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-safe:enabled:active:scale-[0.97] motion-reduce:transition-[background-color]";
+  "rounded-full p-2.5 pointer-events-auto smooth-shadow-ring-sm smooth-ring-black/10 dark:smooth-ring-white/18 disabled:smooth-ring-black/5 dark:disabled:smooth-ring-white/8 transition-[scale,background-color,color] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-safe:enabled:active:scale-[0.97] motion-reduce:transition-[background-color,color]";
+
+/* Disabled is a solid fill and icon colour rather than a fade: a faded button let the page behind
+   the backdrop show through it. The solids are the tones that 40% fade landed on over each
+   backdrop, so the disabled button reads the same, just opaque. */
+function navButtonColors(isDarkMode: boolean, isDisabled: boolean, isHovered: boolean): CSSProperties {
+  if (isDarkMode) {
+    return isDisabled
+      ? { backgroundColor: '#0e0e10', color: '#6e6e6f' }
+      : { backgroundColor: isHovered ? '#202023' : '#18181b', color: '#ffffff' };
+  }
+  return isDisabled
+    ? { backgroundColor: '#fafaf9', color: '#b1b0ad' }
+    : { backgroundColor: isHovered ? '#f4f4f4' : '#ffffff', color: '#44403c' };
+}
 
 export type TransformSnapshot = {
   x: number;
@@ -43,7 +61,6 @@ interface LightboxProps {
   exitTransform: TransformSnapshot | null;
   exitDuration: number;
   isDarkMode: boolean;
-  isLgOrAbove: boolean;
   onExitComplete?: () => void;
   onContentReady?: () => void;
 }
@@ -417,7 +434,6 @@ export function Lightbox({
   exitTransform,
   exitDuration,
   isDarkMode,
-  isLgOrAbove,
   onExitComplete,
   onContentReady,
 }: LightboxProps) {
@@ -439,7 +455,19 @@ export function Lightbox({
   // prev/next buttons and the arrow keys; a click anywhere outside the media closes.
   const isOverMedia = (e: React.MouseEvent) =>
     Math.abs(e.clientX - window.innerWidth / 2) <= dimensions.width / 2 &&
-    Math.abs(e.clientY - window.innerHeight / 2) <= dimensions.height / 2;
+    Math.abs(e.clientY - (window.innerHeight / 2 - LIGHTBOX_MEDIA_LIFT)) <= dimensions.height / 2;
+  // The caption hangs off the media's bottom edge.
+  const captionTop = `calc(50% - ${LIGHTBOX_MEDIA_LIFT}px + ${dimensions.height / 2}px + ${LIGHTBOX_CAPTION_GAP}px)`;
+  // The caption and the buttons drift in under the media as it opens and fade out as it closes.
+  const belowMediaMotion = {
+    initial: { opacity: 0, y: 4 },
+    animate: exitTransform ? { opacity: 0, y: 4 } : { opacity: 1, y: 0 },
+    transition: {
+      duration: exitTransform ? exitDuration : 0.4,
+      ease: [0.77, 0, 0.175, 1] as const,
+    },
+    onUpdate: keepOnMainThread,
+  };
 
   const handleMouseMove = (e: React.MouseEvent) => setCursorStyle(isOverMedia(e) ? 'default' : 'zoom-out');
 
@@ -467,7 +495,7 @@ export function Lightbox({
               duration: exitTransform ? exitDuration : 0.4,
               ease: [0.77, 0, 0.175, 1],
             }}
-            className={`fixed inset-0 z-[70] cursor-zoom-out ${isDarkMode ? 'bg-black/70' : 'bg-stone-100/85'}`}
+            className={`fixed inset-0 z-[70] cursor-zoom-out ${isDarkMode ? 'bg-black/75' : 'bg-stone-100/90'}`}
             onClick={closeLightbox}
             // Without it the backdrop blinks out as it lands and back in as it leaves — see
             // keepOnMainThread.
@@ -490,10 +518,11 @@ export function Lightbox({
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
             >
-              {/* Relative container sizes to LightboxContent only. z-10 keeps the media above the
-                  caption's backdrop, whose wash reaches up past the 1rem gap into the media's
-                  bottom edge; the caption comes later in the DOM and would otherwise paint over it. */}
-              <div className="relative z-10">
+              {/* Relative container sizes to LightboxContent only, lifted off centre to leave room
+                  for the caption and buttons under it. z-10 keeps the media above the caption's
+                  backdrop, whose wash reaches up past the 1rem gap into the media's bottom edge;
+                  the caption comes later in the DOM and would otherwise paint over it. */}
+              <div className="relative z-10" style={{ top: -LIGHTBOX_MEDIA_LIFT }}>
                 <LightboxContent
                   currentItem={normalizedItems[lightboxIndex]}
                   initialTransform={initialTransform}
@@ -512,18 +541,8 @@ export function Lightbox({
                 return (
                   <motion.div
                     className={`fixed left-0 right-0 text-center font-sans text-sm pointer-events-none ${isDarkMode ? '!text-white' : '!text-stone-600'}`}
-                    style={{ top: `calc(50% + ${dimensions.height / 2}px + 1rem)` }}
-                    initial={{ opacity: 0, y: 4 }}
-                    animate={
-                      exitTransform
-                        ? { opacity: 0, y: 4 }
-                        : { opacity: 1, y: 0 }
-                    }
-                    transition={{
-                      duration: exitTransform ? exitDuration : 0.4,
-                      ease: [0.77, 0, 0.175, 1],
-                    }}
-                    onUpdate={keepOnMainThread}
+                    style={{ top: captionTop }}
+                    {...belowMediaMotion}
                   >
                     {/* The backdrop hugs the text, so it wraps an inline box rather than spanning
                         the full-width row; it fades and drifts with the caption it backs. */}
@@ -535,18 +554,20 @@ export function Lightbox({
                 );
               })()}
 
-              {/* Prev/Next buttons - only when more than one item, and only from
-                  LIGHTBOX_NAV_BREAKPOINT (820px) up: below it the media takes their room and the
-                  arrow keys do the stepping. */}
-              {!exitTransform && normalizedItems.length > 1 && (
-                <>
+              {/* Prev/Next buttons - only when more than one item. They sit side by side, floated
+                  just off the viewport's bottom edge (LIGHTBOX_NAV_BOTTOM). The pair swallows its
+                  own clicks, so a press that lands in the gap between the two doesn't fall through
+                  to the backdrop and close the lightbox. */}
+              {normalizedItems.length > 1 && (
+                <motion.div
+                  className="fixed left-0 right-0 z-20 flex justify-center pointer-events-none"
+                  style={{ bottom: LIGHTBOX_NAV_BOTTOM }}
+                  inert={!!exitTransform}
+                  {...belowMediaMotion}
+                >
                   <div
-                    className="absolute z-20 pointer-events-none max-[820px]:hidden"
-                    style={{
-                      left: `calc(50% - ${dimensions.width / 2}px - ${isLgOrAbove ? 16 : 4}px)`,
-                      top: '50%',
-                      transform: 'translate(-100%, -50%)',
-                    }}
+                    className="flex gap-2 pointer-events-auto cursor-default"
+                    onClick={(e) => e.stopPropagation()}
                   >
                     <button
                       type="button"
@@ -554,43 +575,26 @@ export function Lightbox({
                       onMouseEnter={() => setIsPrevHovered(true)}
                       onMouseLeave={() => setIsPrevHovered(false)}
                       disabled={isPrevDisabled}
-                      className={`${NAV_BUTTON_MOTION_CLASS} ${isDarkMode ? 'text-white' : 'text-stone-700'} ${isPrevDisabled ? 'opacity-40 cursor-default' : 'cursor-pointer'}`}
-                      style={{
-                        backgroundColor: isDarkMode
-                          ? isPrevHovered && !isPrevDisabled ? '#202023' : '#18181b'
-                          : isPrevHovered && !isPrevDisabled ? '#f4f4f4' : '#ffffff',
-                      }}
+                      className={`${NAV_BUTTON_MOTION_CLASS} ${isPrevDisabled ? 'cursor-default' : 'cursor-pointer'}`}
+                      style={navButtonColors(isDarkMode, isPrevDisabled, isPrevHovered)}
                       aria-label="Previous"
                     >
-                      <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" style={{ transform: 'translateX(-1.5px)' }} />
+                      <ChevronLeft className="w-5 h-5" style={{ transform: 'translateX(-1.25px)' }} />
                     </button>
-                  </div>
-                  <div
-                    className="absolute z-20 pointer-events-none max-[820px]:hidden"
-                    style={{
-                      left: `calc(50% + ${dimensions.width / 2}px + ${isLgOrAbove ? 16 : 4}px)`,
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                    }}
-                  >
                     <button
                       type="button"
                       onClick={(e) => { e.stopPropagation(); nextLightbox(); }}
                       onMouseEnter={() => setIsNextHovered(true)}
                       onMouseLeave={() => setIsNextHovered(false)}
                       disabled={isNextDisabled}
-                      className={`${NAV_BUTTON_MOTION_CLASS} ${isDarkMode ? 'text-white' : 'text-stone-700'} ${isNextDisabled ? 'opacity-40 cursor-default' : 'cursor-pointer'}`}
-                      style={{
-                        backgroundColor: isDarkMode
-                          ? isNextHovered && !isNextDisabled ? '#202023' : '#18181b'
-                          : isNextHovered && !isNextDisabled ? '#f4f4f4' : '#ffffff',
-                      }}
+                      className={`${NAV_BUTTON_MOTION_CLASS} ${isNextDisabled ? 'cursor-default' : 'cursor-pointer'}`}
+                      style={navButtonColors(isDarkMode, isNextDisabled, isNextHovered)}
                       aria-label="Next"
                     >
-                      <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" style={{ transform: 'translateX(1.5px)' }} />
+                      <ChevronRight className="w-5 h-5" style={{ transform: 'translateX(1.25px)' }} />
                     </button>
                   </div>
-                </>
+                </motion.div>
               )}
             </div>
           </motion.div>
