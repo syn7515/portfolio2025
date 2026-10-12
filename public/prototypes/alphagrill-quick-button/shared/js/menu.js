@@ -331,12 +331,14 @@
   }
 
   // Switch variant="sm" color="gray" — the same markup as the header's 그릴/마감 청소 switch.
+  // portfolio: its track darker than the page (white/18 → black/26), as the clean screen's header
+  // switch has it.
   function segSwitch(key, left, right, value, render) {
     const checked = value === right;
     return `
       <div class="-my-5 inline-flex cursor-pointer py-5" data-setting="${key}" data-left="${left}" data-right="${right}">
         <button type="button" role="switch" aria-checked="${checked}" data-slot="switch" data-variant="sm" data-color="gray" ${checked ? 'data-checked=""' : 'data-unchecked=""'}
-          class="peer group/switch relative inline-flex h-15 w-[276px] shrink-0 overflow-hidden rounded-[12px] border-transparent bg-white/18 p-1.5 outline-none transition-colors duration-200 ease-out after:absolute after:-inset-y-4.5">
+          class="peer group/switch relative inline-flex h-15 w-[276px] shrink-0 overflow-hidden rounded-[12px] border-transparent bg-black/26 p-1.5 outline-none transition-colors duration-200 ease-out after:absolute after:-inset-y-4.5">
           <span class="absolute top-1.5 bottom-1.5 left-1.5 z-0 w-[calc(50%-6px)] rounded-[8px] bg-white/20 shadow-[0px_0px_12px_0px_rgba(0,0,0,0.5)] transition-transform duration-200 ease-out ${checked ? 'translate-x-full' : 'translate-x-0'}" aria-hidden="true"></span>
           <span class="relative z-0 flex min-h-0 flex-1 cursor-pointer items-center justify-center rounded-xl type-body2 text-white transition-all duration-200 ease-out ${checked ? 'opacity-70' : ''}" aria-hidden="true">${render(left)}</span>
           <span class="relative z-0 flex min-h-0 flex-1 cursor-pointer items-center justify-center rounded-xl type-body2 text-white transition-all duration-200 ease-out ${checked ? '' : 'opacity-70'}" aria-hidden="true">${render(right)}</span>
@@ -344,32 +346,38 @@
       </div>`;
   }
 
+  // portfolio: the rows sit closer, 12 above and below instead of 20 and 16 for the toggle rows,
+  // whose two lines of text want a little more (they lose their fixed 120 for it): 24 is left
+  // between the switches above and 32 between the toggle rows. The section titles get 16 under them,
+  // and the sections 56 between them rather than 48.
   function renderSetting() {
     const row = (label, control) => `
-      <div class="flex items-center justify-between py-5 pr-7 pl-10">
+      <div class="flex items-center justify-between py-3 pr-7 pl-10">
         <p class="type-body2 text-white">${label}</p>
         ${control}
       </div>`;
     const same = (v) => v;
     // FoodDetectionRow: the whole row is the button; the ToggleSwitch is display-only.
+    // portfolio: off, its track is black/26 like the switches above, rather than white/20.
     const toggleRow = (key, labelKey, descKey) => {
       const on = settings[key];
       return `
-              <button type="button" data-setting-toggle="${key}" aria-pressed="${on}" class="flex h-30 w-full items-center py-5 pr-7 pl-10 text-left active:bg-white/18">
+              <button type="button" data-setting-toggle="${key}" aria-pressed="${on}" class="flex w-full items-center py-4 pr-7 pl-10 text-left active:bg-white/18">
                 <div class="flex min-w-0 flex-1 flex-col gap-1 pr-5">
                   <p class="type-body2 truncate text-white">${t(labelKey)}</p>
                   <p class="type-body3 text-white/70">${t(descKey)}</p>
                 </div>
-                <div class="relative flex h-[54px] w-24 shrink-0 items-center rounded-full px-[3px] transition-colors duration-200 ${on ? 'bg-[#38B6FF]' : 'bg-white/20'}" aria-hidden="true">
+                <div class="relative flex h-[54px] w-24 shrink-0 items-center rounded-full px-[3px] transition-colors duration-200 ${on ? 'bg-[#38B6FF]' : 'bg-black/26'}" aria-hidden="true">
                   <div class="size-12 rounded-full bg-white transition-transform duration-200 ${on ? 'translate-x-[42px]' : ''}"></div>
                 </div>
               </button>`;
     };
-    // portfolio: the header bar without its white/20 band, straight on the page's black, and ‹ pressing
+    // portfolio: the header bar without its white/20 band, straight on the page's ground, and ‹ pressing
     // to white/10 as the menu's buttons do there (black/20 needed the band to show). ‹ sits 12 further
-    // in (pl 8 → 20), as v14 moved its header buttons.
+    // in (pl 8 → 20), as v14 moved its header buttons. The page is #222, the recipe sheet's grey,
+    // rather than black.
     setting.innerHTML = `
-      <div class="h-full bg-black">
+      <div class="h-full bg-[#222]">
         <div class="flex h-full flex-col overflow-hidden overflow-y-auto">
           <header class="relative flex h-[100px] min-w-0 shrink-0 items-center justify-between py-3 pl-5">
             <button type="button" data-setting-back class="inline-flex h-16 min-w-0 cursor-pointer items-center justify-center gap-0 overflow-hidden rounded-lg px-3 text-white transition-all active:bg-white/10">
@@ -377,15 +385,15 @@
               <span class="type-body1 min-w-0 truncate px-3 text-white">${t('settings')}</span>
             </button>
           </header>
-          <main class="flex flex-col gap-12 pt-12">
+          <main class="flex flex-col gap-14 pt-12">
             <section>
-              <h2 class="type-body3 pl-10 text-white/70">${t('unitAndLanguage')}</h2>
+              <h2 class="type-body3 pb-4 pl-10 text-white/70">${t('unitAndLanguage')}</h2>
               ${row(t('temperature'), segSwitch('temperatureUnit', '°C', '°F', settings.temperatureUnit, same))}
               ${row(t('length'), segSwitch('lengthUnit', 'mm', 'inch', settings.lengthUnit, same))}
               ${row(t('language'), segSwitch('locale', 'ko', 'en', lang(), (l) => LOCALE_LABELS[l]))}
             </section>
             <section>
-              <h2 class="type-body3 pl-10 text-white/70">${t('otherFeatures')}</h2>
+              <h2 class="type-body3 pb-4 pl-10 text-white/70">${t('otherFeatures')}</h2>
               ${toggleRow('foodDetection', 'foodDetection', 'foodDetectionDesc')}
               ${toggleRow('quickSelect', 'quickSelect', 'quickSelectDesc')}
             </section>

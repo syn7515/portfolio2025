@@ -136,7 +136,7 @@ const QS = '#app-setting [data-setting-toggle="quickSelect"]';
 function slideSwitch(f, on) {
   const row = $(f, QS), track = row.lastElementChild, knob = track.firstElementChild;
   track.classList.toggle('bg-[#38B6FF]', on);
-  track.classList.toggle('bg-white/20', !on);
+  track.classList.toggle('bg-black/26', !on);
   knob.classList.toggle('translate-x-[42px]', on);
   row.setAttribute('aria-pressed', on);
   F[f].win.AppMenu.settings.quickSelect = on;
