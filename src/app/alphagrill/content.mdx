@@ -4,6 +4,7 @@ import Heading from '@/components/ui/heading'
 import { Table } from '@/components/ui/table'
 import SupRef from '@/components/ui/sup-ref'
 import ExternalArrow from '@/components/ui/external-arrow'
+import CookScreenDemo from '@/components/ui/cook-screen-demo'
 import QuickButtonDemo from '@/components/ui/quick-button-demo'
 
 <div className="max-w-[var(--content-w)] mx-auto">
@@ -29,26 +30,12 @@ Commercial kitchens move fast and AlphaGrill automates one task: grilling pattie
       {
         label: "GRILL",
         caption: "The gauge shows degrees remaining until ready, rather than the current temperature<sup>1</sup>",
-        imageUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/grill-1.png",
-        videoUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/grill-1.mov",
-        imageSizePercent: 100,
-        imagePosition: { top: 12, left: "center" },
-        mobileImageSizePercent: 135,
-        mobileImagePosition: { top: 8, left: "center" },
-        mediaAspectRatio: "1120 / 1920",
-        withInsetShadow: true,
+        content: <CookScreenDemo scene="gauge" />
       },
       {
         label: "GRILL",
         caption: "Tap-first interaction reduced failed inputs with gloved hands<sup>2</sup>",
-        imageUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/grill-2.png",
-        videoUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/grill-2.mov",
-        imageSizePercent: 85,
-        imagePosition: { top: "center", left: "center" },
-        mobileImageSizePercent: 88,
-        mobileImagePosition: { top: "center", left: "center" },
-        mediaAspectRatio: "1120 / 1920",
-        withInsetShadow: true,
+        content: <CookScreenDemo scene="tap" />
       },
       {
         label: "GRILL",
@@ -95,26 +82,12 @@ Three findings from research shaped the newly added cleaning mode:
       {
         label: "CLEAN",
         caption: "The screen flags the risk of cleaning a still-hot grill, encouraging a brief wait<sup>3</sup>",
-        imageUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/clean-1.png",
-        videoUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/clean-1.mov",
-        imageSizePercent: 100,
-        imagePosition: { top: 12, left: "center" },
-        mobileImageSizePercent: 135,
-        mobileImagePosition: { top: 8, left: "center" },
-        mediaAspectRatio: "1120 / 1920",
-        withInsetShadow: true,
+        content: <CookScreenDemo scene="cool" />
       },
       {
         label: "CLEAN",
         caption: "Selecting a cleaning area repositions the grill so staff can reach hidden surfaces<sup>4</sup>",
-        imageUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/clean-2.png",
-        videoUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/clean-2.mov",
-        imageSizePercent: 85,
-        imagePosition: { top: "center", left: "center" },
-        mobileImageSizePercent: 88,
-        mobileImagePosition: { top: "center", left: "center" },
-        mediaAspectRatio: "1120 / 1920",
-        withInsetShadow: true,
+        content: <CookScreenDemo scene="area" />
       },
     ]}
   />

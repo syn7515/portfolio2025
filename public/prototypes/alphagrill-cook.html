@@ -1,0 +1,307 @@
+<!doctype html>
+<!-- AlphaGrill's cook screen, live in the portfolio carousels in place of its four recordings.
+
+     The prototype is alphagrill-cook/v0-4, copied from the Prototypes repo's quick button
+     (local/v0-4, cad981a): the build the GRILL and CLEAN recordings were made from, set in Inter
+     (portfolio edits are marked in it). This page frames it and replays one recording's demo on
+     a loop as long as the recording, ?scene=
+       gauge  grill-1: 6oz Pork preheating, 5 → 1 °F remaining while the ring fills, READY at
+              10.8s (14.6s)
+       tap    grill-2: 6oz Pork preheating; Recipe opens the sheet and 8oz Beef is tapped, then
+              the sheet opens again and 6oz Pork is tapped back, while the plate keeps heating
+              (15.9s)
+       cool   clean-1: the hot-grill guard, cooling from 318 toward the 300 °F limit (14.9s)
+       area   clean-2: the knob dragged from Grill to Side and confirmed, the grill moving there
+              for 5.8s; then back to Grill the same way (21.4s)
+     As in the quick button storyboard, a faint disc marks each touch (tap and area). The demos'
+     own timers only run from their start, so the page drives the screen through Cook.take
+     (cook.js) and the screen's own taps instead. -->
+<html lang="en" class="no-anim">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AlphaGrill cook screen — prototype</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #000; }
+  /* The frame scales its 600×1024 screen to fit itself. It takes no input: a real pointer (in the
+     lightbox) would only fight the take. */
+  iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; pointer-events: none; }
+  /* The finger, as in alphagrill-quick-button.html: a faint disc where a tap lands. Touch has no
+     hover, so it is only there for the tap: it fades in where it lands (no pop), dips a little on
+     the press and fades out in place. Sized in screen px (--s is the screen's scale). */
+  #touch {
+    position: absolute; z-index: 1; left: 0; top: 0; pointer-events: none;
+    width: calc(60px * var(--s, 1)); height: calc(60px * var(--s, 1));
+    margin: calc(-30px * var(--s, 1)) 0 0 calc(-30px * var(--s, 1));
+    border-radius: 50%;
+    /* white over a little black: about the same faint lift on the dark screen, and a light grey
+       that still shows on the light knob and the white buttons, with a hairline outside for those */
+    background: linear-gradient(rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.16)), rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 0 0 calc(1.5px * var(--s, 1)) rgba(255, 255, 255, 0.3), 0 0 0 calc(1px * var(--s, 1)) rgba(0, 0, 0, 0.12);
+    opacity: 0;
+    transition: opacity 280ms ease, scale 140ms ease;
+  }
+  #touch.on { opacity: 1; transition-duration: 200ms, 140ms; }
+  #touch.down { scale: 0.92; }
+  .no-anim #touch { transition: none !important; }   /* over a drag's own transition, too */
+</style>
+</head>
+<body>
+<iframe id="screen" src="alphagrill-cook/v0-4/index.html?embed&mode=grill&lang=en" title="AlphaGrill cook screen" tabindex="-1"></iframe>
+<div id="touch"></div>
+<script>
+const root = document.documentElement;
+const params = new URLSearchParams(location.search);
+const EMBED = params.has('embed');
+const SCENE = ['gauge', 'tap', 'cool', 'area'].includes(params.get('scene')) ? params.get('scene') : 'gauge';
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const frames = n => new Promise(r => { const step = () => (n-- > 0 ? requestAnimationFrame(step) : r()); step(); });
+const until = async test => { while (!test()) await sleep(30); };
+const frame = document.getElementById('screen');
+const touch = document.getElementById('touch');
+let win, doc, take;
+
+// The handoff page's trick, as in alphagrill-quick-button.html: copy every :active rule as
+// .is-pressed right after the original, so a scripted press shows the look a finger's would. The
+// Tailwind runtime rebuilds its <style> (a new sheet) whenever new classes appear, which drops the
+// copies, so copy again into each new sheet.
+function makePressable(doc) {
+  const seen = new WeakSet();
+  const walk = group => {
+    for (let i = group.cssRules.length - 1; i >= 0; i--) {
+      const rule = group.cssRules[i];
+      if (!rule.selectorText && rule.cssRules) walk(rule);
+      else if (rule.selectorText?.includes(':active')) group.insertRule(rule.cssText.replaceAll(':active', '.is-pressed'), i + 1);
+    }
+  };
+  const copy = () => {
+    for (const sheet of doc.styleSheets) {
+      if (seen.has(sheet)) continue;
+      seen.add(sheet);
+      try { walk(sheet); } catch (e) { /* unreadable sheet */ }
+    }
+  };
+  copy();
+  new doc.defaultView.MutationObserver(copy).observe(doc.head, { childList: true, subtree: true, characterData: true });
+}
+
+async function setUp() {
+  const isLoaded = () => frame.contentDocument?.readyState === 'complete' && frame.contentWindow.location.href !== 'about:blank';
+  if (!isLoaded()) await new Promise(r => frame.addEventListener('load', r, { once: true }));
+  win = frame.contentWindow; doc = frame.contentDocument;
+  // the Tailwind runtime compiles the classes after load
+  await until(() => win.Cook?.take && win.getComputedStyle(doc.getElementById('cook-container')).position === 'relative');
+  await doc.fonts.ready;
+  makePressable(doc);
+  take = win.Cook.take;
+  // Open the sheet once, unseen, so the Tailwind runtime has styled its rows before a take shows them.
+  if (SCENE === 'tap') {
+    take.reset();
+    doc.getElementById('qa-recipe').click();
+    await frames(3);
+    take.reset();
+  }
+}
+
+/* ---------- the four recordings ---------- */
+// start(): the screen as the take begins. plate(t): what changes all along (the plate's or the
+// grill's temperature) at t seconds in, set every 100ms — the demos' own formulas. steps(): the
+// moments that happen at a time (the touches, and what they open, pick and move).
+const $ = sel => doc.querySelector(sel) || console.warn(`[cook] no "${sel}"`);
+const pick = id => { $(`[data-select-recipe="${id}"]`)?.click(); plateNow(); };
+// Where the finger lands: the middle of an element, or of its text for a name in a wide row.
+function spot(el, text) {
+  let r = el.getBoundingClientRect();
+  if (text) {
+    const range = el.ownerDocument.createRange();
+    range.selectNodeContents(el);
+    r = range.getBoundingClientRect();
+  }
+  return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+}
+const place = p => { touch.style.translate = `${p.x}px ${p.y}px`; };
+// A tap: the finger sets down (220ms), holds while `press` shows the pressed look (`hold`), and
+// lifts, which is when `lift` acts. The frame fills this page, so its coordinates are this page's.
+async function tap(id, { at, text = false, hold = 130, press, lift }) {
+  act(() => { place(spot($(at), text)); touch.classList.add('on'); });
+  await wait(220, id);
+  act(() => { touch.classList.add('down'); press(); });
+  await wait(hold, id);
+  act(() => { touch.classList.remove('down', 'on'); lift(); });
+}
+// Recipe opens the sheet: a plain press, its own :active look, 350ms from set-down to the open.
+const openSheet = id => tap(id, {
+  at: '#qa-recipe',
+  press: () => $('#qa-recipe').classList.add('is-pressed'),
+  lift: () => { $('#qa-recipe').classList.remove('is-pressed'); $('#qa-recipe').click(); },
+});
+// A recipe row, as the demo taps one: its pressed band from the press for 300ms, then picked; the
+// band stays while the sheet slides away. 520ms from set-down to the pick.
+const tapRow = (id, recipe) => tap(id, {
+  at: `[data-select-recipe="${recipe}"] .truncate`, text: true, hold: 300,
+  press: () => take.press(recipe),
+  lift: () => pick(recipe),
+});
+// A drag on the cleaning controller: the finger sets down on the knob (220ms), slides with it to a
+// marker over `ms` on the knob's own curve, and lifts where it lands, which is when the area is
+// selected (ccDrag's moments, as steps).
+async function drag(id, to, ms) {
+  act(() => { place(spot($('#cc-knob'))); touch.classList.add('on'); });
+  await wait(220, id);
+  act(() => {
+    const knob = spot($('#cc-knob')), mark = spot($(`.cc-marker[data-pos="${to}"]`));
+    touch.classList.add('down');
+    touch.style.transition = `translate ${ms}ms cubic-bezier(.45,0,.35,1), opacity 200ms ease, scale 140ms ease`;
+    place({ x: mark.x, y: knob.y });
+    take.drag(to, ms);
+  });
+  await wait(ms, id);
+  act(() => { touch.style.transition = ''; touch.classList.remove('down', 'on'); take.cc({ selected: to }); });
+}
+// The controller's CTA: pressed for the demo's 180ms; lifting it starts the grill moving.
+const confirm = id => tap(id, {
+  at: '#cc-cta', hold: 180,
+  press: () => take.cc({ pressed: true }),
+  lift: () => take.cc({ pressed: false, positioning: true }),
+});
+const SCENES = {
+  gauge: {
+    start: () => take.reset(),
+    plate: t => (t < 10.8 ? take.hold(5.3 - (5.3 - 0.5) * (t / 10.8), 5.5) : take.ready()),
+    async steps(id) {
+      await wait(14600, id);
+    },
+  },
+  tap: {
+    start: () => take.reset(),
+    plate: t => take.hold(9.4 - (9.4 - 2) * (t / 15.9), 13),
+    // The demo's moments stay where the recording has them — the sheet opens at 3.8s and 11.6s,
+    // rows press at 4.9s and 12.9s and are picked 300ms later — and each finger sets down ahead.
+    async steps(id) {
+      await wait(3450, id);
+      await openSheet(id);                                 // 3.8s: the sheet slides up (320ms)
+      await wait(880, id);
+      await tapRow(id, 4);                                 // 8oz Beef: pressed 4.9s, picked 5.2s
+      await wait(300, id);
+      act(() => take.press(null));                         // the sheet has slid away (280ms)
+      await wait(5750, id);
+      await openSheet(id);                                 // 11.6s
+      await wait(1080, id);
+      await tapRow(id, 1);                                 // 6oz Pork: pressed 12.9s, picked 13.2s
+      await wait(300, id);
+      act(() => take.press(null));
+      await wait(2400, id);
+    },
+  },
+  cool: {
+    start: () => take.cooling(318.4, 318.4),
+    plate: t => take.cooling(318.4 - (318.4 - 300.6) * Math.min(1, t / 14.9), 318.4),
+    async steps(id) {
+      await wait(14900, id);
+    },
+  },
+  area: {
+    start: () => take.controller(),
+    plate: () => {},
+    // startDemoController's moments: the knob moves 1.0–2.1s and 10.4–11.4s, the CTA presses at
+    // 3.4s and 12.2s for 180ms, and the grill moves for 5.8s after each; fingers set down ahead.
+    async steps(id) {
+      await wait(780, id);
+      await drag(id, 'side', 1100);                        // Grill → Side, 1.0–2.1s
+      await wait(1080, id);
+      await confirm(id);                                   // pressed 3.4s, moving from 3.58s
+      await wait(5800, id);
+      act(() => take.cc({ positioning: false, current: 'side' }));
+      await wait(800, id);
+      await drag(id, 'grills', 1000);                      // Side → Grill, 10.4–11.4s
+      await wait(580, id);
+      await confirm(id);                                   // pressed 12.2s, moving from 12.38s
+      await wait(5800, id);
+      act(() => take.cc({ positioning: false, current: 'grills' }));
+      await wait(3220, id);
+    },
+  },
+};
+const scene = SCENES[SCENE];
+
+/* ---------- timeline ---------- */
+// Waits are scheduled against the wall clock, as in the other prototypes: step n of the take lands
+// at loopStart + (sum of waits up to n), and embedded copies derive loopStart from Date.now(), so
+// the carousel card and its lightbox copy always show the same moment. A wait whose time has
+// passed returns at once, which is how a copy that starts mid-take catches up.
+let runId = 0, loopStart = 0, vt = 0, dry = false, length = 0, playing = false;
+// While steps land late (loading, or a tab that slept) they run at once, and their motion is then
+// finished on the spot, so the take appears already in place rather than replaying at speed. Once
+// caught up, an embedding page is told the frame is ready to show (again if it asks "proto:ping").
+let behind = true, shown = false;
+const announce = () => { if (parent !== window) parent.postMessage({ type: 'proto:ready', scene: SCENE }, location.origin); };
+addEventListener('message', e => { if (e.origin === location.origin && e.data === 'proto:ping' && shown) announce(); });
+const finishMotion = () => doc.getAnimations().forEach(a => { try { a.finish(); } catch (e) { /* an endless one */ } });
+async function catchUp() {
+  finishMotion();
+  await frames(2);   // let the last steps paint, and the Tailwind runtime style what they rendered
+  finishMotion();
+  root.classList.remove('no-anim');
+  behind = false;
+  if (!shown) { shown = true; announce(); }
+}
+async function wait(ms, id) {
+  if (id !== runId) throw 'abort';
+  vt += ms;
+  if (dry) return;
+  while (true) {
+    if (id !== runId) throw 'abort';
+    const left = loopStart + vt - Date.now();
+    if (left <= 0) {
+      if (left < -250) { behind = true; root.classList.add('no-anim'); }
+      return;
+    }
+    if (behind) { await catchUp(); continue; }
+    await sleep(Math.min(left, 30));
+  }
+}
+const act = fn => { if (!dry) fn(); };
+const plateNow = () => { if (playing) scene.plate(Math.min(length, Math.max(0, Date.now() - loopStart)) / 1000); };
+(function tick() { plateNow(); setTimeout(tick, 100); })();
+
+async function playTake(id) {
+  if (!dry) {
+    touch.classList.remove('on', 'down');
+    touch.style.transition = '';
+    $('#qa-recipe').classList.remove('is-pressed');
+    scene.start();
+    plateNow();
+  }
+  await scene.steps(id);
+}
+async function loop() {
+  const id = ++runId;
+  try {
+    // Measure the take with a dry run (every wait returns at once, no step acts), so a synced copy can find its place in it.
+    dry = true; vt = 0; await playTake(id); dry = false;
+    length = vt;
+    while (true) {
+      const now = Date.now();
+      loopStart = EMBED ? now - (now % length) : now;
+      vt = 0;
+      playing = true;
+      await playTake(id);
+    }
+  } catch (e) { dry = false; if (e !== 'abort') throw e; }
+}
+
+const fit = () => root.style.setProperty('--s', Math.min(innerWidth / 600, innerHeight / 1024));
+addEventListener('resize', fit); fit();
+// A click into the lightbox's live copy moves keyboard focus into this page, so hand the lightbox's
+// own keys back to it.
+addEventListener('keydown', e => {
+  if (!EMBED) return;
+  if (e.key === 'Escape' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+    e.preventDefault();
+    parent.dispatchEvent(new KeyboardEvent('keydown', { key: e.key, code: e.code, bubbles: true, cancelable: true }));
+  }
+});
+setUp().then(loop);
+</script>
+</body>
+</html>
