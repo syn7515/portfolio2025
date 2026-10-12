@@ -75,12 +75,13 @@ export default function LivePrototype({ src, scene, title, frame, bare = false }
       aria-hidden
     >
       {/* The loading skeleton image and video cards show (.media-skeleton in globals.css), in the
-          frame's own box; the frame fades in over it once the page is ready. Card only: a lightbox
-          copy stays wholly transparent until ready and then has to stand in for the card in one
-          frame, so there it gets neither the skeleton nor the fade. */}
+          frame's own box; the frame fades in over it once the page is ready. A lightbox copy stays
+          wholly transparent until ready and then has to stand in for the card in one frame, so it
+          gets neither the skeleton nor the fade — unless the lightbox shows it before it's ready
+          (data-lightbox-waiting: a step to a page that's slow to load), when the skeleton shows. */}
       <div
         data-shown={ready ? "" : undefined}
-        className="media-skeleton transition-opacity duration-300 ease-[ease-out] [[data-lightbox-live]_&]:hidden"
+        className="media-skeleton transition-opacity duration-300 ease-[ease-out] [[data-lightbox-live]:not([data-lightbox-waiting])_&]:hidden"
         style={{ ...frame, opacity: ready ? 0 : 1 }}
       />
       <div
