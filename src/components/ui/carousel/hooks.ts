@@ -389,6 +389,11 @@ export function useResponsiveSizing(
 
 const LIGHTBOX_OUTER_PADDING = 16;
 
+// The least room kept to the media's left and right. Wider than the outer padding above and below
+// it: when the width is what holds the media back, 16px left it nearly touching the viewport's
+// edges.
+const LIGHTBOX_SIDE_PADDING = 40;
+
 // Under the media: a 16px gap and one line of text-sm caption.
 export const LIGHTBOX_CAPTION_GAP = 16;
 const LIGHTBOX_CAPTION_BELOW = LIGHTBOX_CAPTION_GAP + 24;
@@ -410,7 +415,7 @@ const LIGHTBOX_VERTICAL_RESERVE =
   LIGHTBOX_OUTER_PADDING * 2 + LIGHTBOX_CAPTION_BELOW + LIGHTBOX_NAV_ZONE;
 
 export function getLightboxMaxWidth(viewportWidth: number, viewportHeight = Infinity): number {
-  const reservedX = LIGHTBOX_OUTER_PADDING * 2;
+  const reservedX = LIGHTBOX_SIDE_PADDING * 2;
   // The frame is 16:9 off this width, so it is held to the height too: on a short viewport — a
   // phone on its side — width alone would push the frame and its caption off the screen.
   const heightBound = ((viewportHeight - LIGHTBOX_VERTICAL_RESERVE) * 16) / 9;
