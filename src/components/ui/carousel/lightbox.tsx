@@ -3,7 +3,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import {
   useLightboxDimensions,
   calculateImagePosition,
@@ -677,7 +677,7 @@ export function Lightbox({
                       style={navButtonColors(isDarkMode, isPrevDisabled, isPrevHovered)}
                       aria-label="Previous"
                     >
-                      <ChevronLeft className="w-5 h-5" style={{ transform: 'translateX(-1.25px)' }} />
+                      <ArrowLeft className="w-5 h-5" strokeWidth={1.75} />
                     </button>
                     <button
                       type="button"
@@ -689,7 +689,7 @@ export function Lightbox({
                       style={navButtonColors(isDarkMode, isNextDisabled, isNextHovered)}
                       aria-label="Next"
                     >
-                      <ChevronRight className="w-5 h-5" style={{ transform: 'translateX(1.25px)' }} />
+                      <ArrowRight className="w-5 h-5" strokeWidth={1.75} />
                     </button>
                   </div>
                 </motion.div>
