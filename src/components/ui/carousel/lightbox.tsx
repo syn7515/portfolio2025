@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client"
 
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
@@ -65,8 +65,14 @@ interface LightboxProps {
   onContentReady?: () => void;
 }
 
+/** The item the box has on show, and whether it's ready or standing in as its loading skeleton. */
+type ShownLayer = { index: number; ready: boolean };
+
 interface LightboxContentProps {
-  currentItem: CarouselItem;
+  items: CarouselItem[];
+  index: number;
+  shown: ShownLayer | null;
+  onShow: (index: number, ready: boolean) => void;
   initialTransform: TransformSnapshot | null;
   exitTransform: TransformSnapshot | null;
   exitDuration: number;
@@ -142,8 +148,201 @@ function LightboxVideo({
   );
 }
 
+// A live page counts as one when it's markup rather than an image or a video.
+const isLiveContent = (item: CarouselItem) => !!item.content && !item.imageUrl && !item.videoUrl;
+
+// How long a step holds the item before while a live page loads, before showing its skeleton.
+const SKELETON_AFTER_MS = 150;
+
+interface MediaLayerProps {
+  index: number;
+  item: CarouselItem;
+  isDarkMode: boolean;
+  /** On show before it's ready: a live page shows its loading skeleton (LivePrototype). */
+  waiting: boolean;
+  /** False while the open animation runs: a video stays unloaded (poster only) until it settles. */
+  load: boolean;
+  onReady: (index: number) => void;
+}
+
+/* One item's media inside the lightbox box: a live page, a positioned image or video over its card
+   background, or a full-cover one. It reports ready once it has something to show — a live page
+   when it fires "contentready", an image or a video's poster once it has loaded (or failed) — so
+   the box can keep the item before it on show until then. */
+function MediaLayer({ index, item, isDarkMode, waiting, load, onReady }: MediaLayerProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isContentItem = isLiveContent(item);
+  const hasPositionedImage = item.imageSizePercent != null && item.imageUrl;
+  const hasPositionedVideo = item.imageSizePercent != null && item.videoUrl;
+  const hasPositionedMedia = hasPositionedImage || hasPositionedVideo;
+  const hasVideo = !!item.videoUrl;
+  const withBackgroundLines = item.cardVariant === "with-background-lines";
+
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const ready = () => onReady(index);
+    if (isContentItem) {
+      // Live markup that loads asynchronously (an iframe) marks itself data-content-pending until
+      // it fires "contentready".
+      if (!el.querySelector("[data-content-pending]")) {
+        ready();
+        return;
+      }
+      el.addEventListener("contentready", ready);
+      return () => el.removeEventListener("contentready", ready);
+    }
+    const img = el.querySelector("img");
+    if (!img || img.complete) {
+      ready();
+      return;
+    }
+    img.addEventListener("load", ready);
+    img.addEventListener("error", ready);
+    return () => {
+      img.removeEventListener("load", ready);
+      img.removeEventListener("error", ready);
+    };
+  }, [index, isContentItem, onReady]);
+
+  if (isContentItem) {
+    // Live markup: laid out at the final 16:9 size like everything else, so its cqw/em sizing
+    // resolves once against the lightbox box and the FLIP scale carries it to and from the card.
+    return (
+      <div
+        ref={ref}
+        data-lightbox-live=""
+        data-lightbox-waiting={waiting ? "" : undefined}
+        className="absolute inset-0 overflow-hidden rounded-[4px]"
+        style={{ backgroundColor: isDarkMode ? '#232326' : '#fafafa' }}
+      >
+        {item.content}
+      </div>
+    );
+  }
+
+  if (hasPositionedMedia) {
+    // Positioned image or video mode with background layers
+    return (
+      <div ref={ref} className="absolute inset-0 overflow-hidden rounded-[4px]">
+        {withBackgroundLines ? (
+          <>
+            <div className="absolute inset-0 bg-stone-100 dark:bg-zinc-800" aria-hidden />
+            {item.backgroundLines === "grill" && (
+              <div className="absolute inset-0 pointer-events-none z-0 text-stone-300 dark:text-zinc-700" aria-hidden>
+                <GrillLines className="w-full h-full" />
+              </div>
+            )}
+            {hasPositionedVideo && (
+              <LightboxVideo
+                src={item.videoUrl!}
+                poster={item.imageUrl}
+                className="absolute object-contain z-[1]"
+                autoPlay={item.videoAutoplay ?? true}
+                loop={item.videoLoop ?? true}
+                muted={item.videoMuted ?? true}
+                controls={item.videoControls ?? false}
+                ariaLabel={item.alt || item.label || "Lightbox video"}
+                load={load}
+                style={{
+                  display: 'block',
+                  transformOrigin: 'center center',
+                  height: `${item.imageSizePercent}%`,
+                  width: 'auto',
+                  ...calculateImagePosition(item.imagePosition)
+                }}
+              />
+            )}
+          </>
+        ) : (
+          <>
+            <div
+              className="absolute inset-0"
+              style={{ backgroundColor: isDarkMode ? '#232326' : '#fafafa' }}
+            />
+            {hasPositionedVideo ? (
+              <LightboxVideo
+                src={item.videoUrl!}
+                poster={item.imageUrl}
+                className="absolute object-contain"
+                autoPlay={item.videoAutoplay ?? true}
+                loop={item.videoLoop ?? true}
+                muted={item.videoMuted ?? true}
+                controls={item.videoControls ?? false}
+                ariaLabel={item.alt || item.label || "Lightbox video"}
+                load={load}
+                style={{
+                  display: 'block',
+                  transformOrigin: 'center center',
+                  height: `${item.imageSizePercent}%`,
+                  width: 'auto',
+                  ...calculateImagePosition(item.imagePosition),
+                  ...(item.withInsetShadow ? {
+                    boxShadow: isDarkMode
+                      ? 'inset 0 1px 0 0 rgba(255,255,255,0.12), inset 0 0 0 1px rgba(255,255,255,0.10), 0px 0px 0px 1px rgba(0,0,0,0.22), 0px 4px 8px rgba(0,0,0,0.30)'
+                      : '0px 0px 0px 1px rgba(0,0,0,0.12), 0px 2px 3px -0.5px rgba(0,0,0,0.12), 0px 6px 6px -2px rgba(0,0,0,0.10)'
+                  } : {})
+                }}
+              />
+            ) : (
+              <img
+                src={item.imageUrl ?? "/placeholder.svg"}
+                alt={item.alt || item.label || "Lightbox image"}
+                className="absolute object-contain"
+                style={{
+                  opacity: 1,
+                  display: 'block',
+                  transformOrigin: 'center center',
+                  height: `${item.imageSizePercent}%`,
+                  width: 'auto',
+                  ...calculateImagePosition(item.imagePosition),
+                  ...(item.withInsetShadow ? {
+                    boxShadow: isDarkMode
+                      ? 'inset 0 1px 0 0 rgba(255,255,255,0.12), inset 0 0 0 1px rgba(255,255,255,0.10), 0px 0px 0px 1px rgba(0,0,0,0.22), 0px 4px 8px rgba(0,0,0,0.30)'
+                      : '0px 0px 0px 1px rgba(0,0,0,0.12), 0px 2px 3px -0.5px rgba(0,0,0,0.12), 0px 6px 6px -2px rgba(0,0,0,0.10)'
+                  } : {})
+                }}
+              />
+            )}
+          </>
+        )}
+      </div>
+    );
+  }
+
+  // Full-cover image or video mode
+  return (
+    <div ref={ref} className="absolute inset-0 overflow-hidden rounded-[4px]">
+      {hasVideo ? (
+        <LightboxVideo
+          src={item.videoUrl!}
+          poster={item.imageUrl}
+          className="absolute inset-0 object-contain w-full h-full"
+          autoPlay={item.videoAutoplay ?? true}
+          loop={item.videoLoop ?? true}
+          muted={item.videoMuted ?? true}
+          controls={item.videoControls ?? false}
+          ariaLabel={item.alt || item.label || "Lightbox video"}
+          load={load}
+          style={{ display: 'block', transformOrigin: 'center center' }}
+        />
+      ) : (
+        <img
+          src={item.imageUrl ?? "/placeholder.svg"}
+          alt={item.alt || item.label || "Lightbox image"}
+          className="object-contain w-full h-full"
+          style={{ opacity: 1, display: 'block', transformOrigin: 'center center' }}
+        />
+      )}
+    </div>
+  );
+}
+
 function LightboxContent({
-  currentItem,
+  items,
+  index,
+  shown,
+  onShow,
   initialTransform,
   exitTransform,
   exitDuration,
@@ -151,12 +350,6 @@ function LightboxContent({
   dimensions,
   onContentReady,
 }: LightboxContentProps) {
-  const hasPositionedImage = currentItem?.imageSizePercent != null && currentItem?.imageUrl;
-  const hasPositionedVideo = currentItem?.imageSizePercent != null && currentItem?.videoUrl;
-  const hasPositionedMedia = hasPositionedImage || hasPositionedVideo;
-  const hasVideo = !!currentItem?.videoUrl;
-  const withBackgroundLines = currentItem?.cardVariant === "with-background-lines";
-
   // FLIP: the box is laid out once at its final size and only x/y/scale animate, so the open/close
   // runs on the compositor instead of re-laying-out, re-clipping and re-painting the media and its
   // shadows every frame the way a width/height tween does.
@@ -172,263 +365,96 @@ function LightboxContent({
     scaleX: t.width / baseWidth,
     scaleY: t.height / baseHeight,
   });
-  // Live markup that loads asynchronously (an iframe) marks itself data-content-pending until it
-  // fires "contentready". Until then this copy stays transparent so the carousel card underneath
-  // keeps showing, and the card only hides (onContentReady) in the same commit the copy appears.
-  const isContentItem = !!currentItem?.content && !currentItem.imageUrl && !currentItem.videoUrl;
-  const contentRef = useRef<HTMLDivElement>(null);
-  const [isContentReady, setIsContentReady] = useState(false);
-  // Only the opening entrance holds for readiness; stepping to another card later must not snap the
-  // box back to where the first card was.
-  const hasEnteredRef = useRef(!isContentItem);
-  useLayoutEffect(() => {
-    const el = contentRef.current;
-    if (!isContentItem || !el) return;
-    const markReady = () => {
-      hasEnteredRef.current = true;
-      setIsContentReady(true);
-      onContentReady?.();
-    };
-    if (!el.querySelector("[data-content-pending]")) {
-      markReady();
-      return;
-    }
-    setIsContentReady(false);
-    el.addEventListener("contentready", markReady);
-    return () => el.removeEventListener("contentready", markReady);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isContentItem, currentItem]);
+  // The box stays put while the lightbox steps between items; only what's in it changes. The item
+  // on show (`shown`, kept by Lightbox so the caption follows it) stays until the next one has
+  // something to show, and only then gives way, so a step never leaves the box empty or replays the
+  // entrance. A live page that takes longer than SKELETON_AFTER_MS takes over sooner, as its loading
+  // skeleton, rather than holding the item before for long. Until the first item is ready the box
+  // isn't shown at all: it holds on its card, which keeps showing underneath (a live copy can take a
+  // few frames to load), and the card only hides (onContentReady) once the box can stand in.
+  const shownIndex = shown?.index ?? null;
+  const markReady = useCallback((i: number) => onShow(i, true), [onShow]);
+  const hasEntered = shown !== null;
+  const readyIndex = shown?.ready ? shown.index : null;
+  useEffect(() => {
+    if (readyIndex !== null) onContentReady?.();
+  }, [readyIndex, onContentReady]);
+  const steppingToLive = shownIndex !== null && shownIndex !== index && isLiveContent(items[index]);
+  useEffect(() => {
+    if (!steppingToLive) return;
+    const timer = window.setTimeout(() => onShow(index, false), SKELETON_AFTER_MS);
+    return () => window.clearTimeout(timer);
+  }, [steppingToLive, index, onShow]);
+  // The item on show, and over it (unseen until it's ready) the one being stepped to.
+  const layers = shownIndex !== null && shownIndex !== index ? [shownIndex, index] : [index];
+
   // A live page keeps redrawing (its loop plays on) while the box shrinks back onto its card, and
   // every redraw re-rasters the scaled frame mid-close. The copy is on its way out, so it's asked to
   // hold still ("proto:pause"); a page that doesn't listen carries on as before.
+  const boxRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (!exitTransform || !isContentItem) return;
-    contentRef.current?.querySelectorAll("iframe").forEach((frame) => {
+    if (!exitTransform) return;
+    boxRef.current?.querySelectorAll("iframe").forEach((frame) => {
       frame.contentWindow?.postMessage("proto:pause", window.location.origin);
     });
-  }, [exitTransform, isContentItem]);
+  }, [exitTransform]);
 
-  const motionProps = {
-    initial: initialTransform ? toScale(initialTransform) : (false as const),
-    // A pending live-content copy holds on the card until it's ready, so it takes over from the card
-    // in exactly the card's place and only then grows into the lightbox.
-    animate: isContentItem && !isContentReady && !hasEnteredRef.current && initialTransform
-      ? toScale(initialTransform)
-      : { x: 0, y: 0, scaleX: 1, scaleY: 1 },
-    exit: exitTransform ? toScale(exitTransform) : {},
-    transition: {
-      duration: exitTransform ? exitDuration : 0.4,
-      ease: [0.77, 0, 0.175, 1] as const,
-    },
-    onAnimationComplete: () => setIsSettled(true),
-  };
-  const motionStyle: CSSProperties = {
-    width: baseWidth,
-    height: baseHeight,
-    transformOrigin: 'center center',
-    willChange: 'transform',
-  };
-  
-  if (isContentItem) {
-    // Live markup: laid out at the final 16:9 size like everything else, so its cqw/em sizing
-    // resolves once against the lightbox box and the FLIP scale carries it to and from the card.
-    return (
-      <motion.div
-        className="relative pointer-events-auto rounded-[4px]"
-        {...motionProps}
-        style={{ ...motionStyle, aspectRatio: '16/9', boxSizing: 'border-box' }}
-      >
+  return (
+    <motion.div
+      ref={boxRef}
+      className="relative pointer-events-auto rounded-[4px]"
+      initial={initialTransform ? toScale(initialTransform) : false}
+      animate={!hasEntered && initialTransform ? toScale(initialTransform) : { x: 0, y: 0, scaleX: 1, scaleY: 1 }}
+      exit={exitTransform ? toScale(exitTransform) : {}}
+      transition={{
+        duration: exitTransform ? exitDuration : 0.4,
+        ease: [0.77, 0, 0.175, 1] as const,
+      }}
+      onAnimationComplete={() => setIsSettled(true)}
+      style={{
+        width: baseWidth,
+        height: baseHeight,
+        transformOrigin: 'center center',
+        willChange: 'transform',
+        aspectRatio: '16/9',
+        boxSizing: 'border-box',
+      }}
+    >
+      {layers.map((i) => (
         <div
-          ref={contentRef}
-          data-lightbox-live=""
-          className="absolute inset-0 overflow-hidden rounded-[4px]"
-          style={{ backgroundColor: isDarkMode ? '#232326' : '#fafafa', opacity: isContentReady ? 1 : 0 }}
+          key={i}
+          className="absolute inset-0"
+          style={{
+            opacity: i === shownIndex ? 1 : 0,
+            zIndex: i === index ? 1 : 0,
+            pointerEvents: i === shownIndex ? undefined : 'none',
+          }}
         >
-          {currentItem.content}
+          <MediaLayer
+            index={i}
+            item={items[i]}
+            isDarkMode={isDarkMode}
+            waiting={i === shownIndex && !shown?.ready}
+            load={isSettled}
+            onReady={markReady}
+          />
         </div>
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            opacity: isContentReady ? 1 : 0,
-            boxShadow: isDarkMode
-              ? 'inset 0 1px 0 0 rgba(255,255,255,0.03), inset 0 0 0 1px rgba(255,255,255,0.03), 0px 4px 12px rgba(0,0,0,0.4)'
-              : '0px 0px 1px 0px rgba(0,0,0,0.4), 0px 4px 8px 0px rgba(0,0,0,0.08)',
-            boxSizing: 'border-box',
-            borderRadius: '4px',
-            zIndex: 10,
-          }}
-        />
-      </motion.div>
-    );
-  }
-
-  if (hasPositionedMedia) {
-    // Positioned image or video mode with background layers
-    return (
-      <motion.div
-        className="relative pointer-events-auto rounded-[4px]"
-        {...motionProps}
+      ))}
+      {/* Border overlay above the media, so its shadow is not clipped */}
+      <div
+        className="absolute inset-0 pointer-events-none"
         style={{
-          ...motionStyle,
-          aspectRatio: '16/9',
+          opacity: hasEntered ? 1 : 0,
+          boxShadow: isDarkMode
+            ? 'inset 0 1px 0 0 rgba(255,255,255,0.03), inset 0 0 0 1px rgba(255,255,255,0.03), 0px 4px 12px rgba(0,0,0,0.4)'
+            : '0px 0px 1px 0px rgba(0,0,0,0.4), 0px 4px 8px 0px rgba(0,0,0,0.08)',
           boxSizing: 'border-box',
+          borderRadius: '4px',
+          zIndex: 10,
         }}
-      >
-        {/* overflow-hidden scoped to inner div so border overlay shadow is not clipped */}
-        <div className="absolute inset-0 overflow-hidden rounded-[4px]">
-          {withBackgroundLines ? (
-            <>
-              <div className="absolute inset-0 bg-stone-100 dark:bg-zinc-800" aria-hidden />
-              {currentItem?.backgroundLines === "grill" && (
-                <div className="absolute inset-0 pointer-events-none z-0 text-stone-300 dark:text-zinc-700" aria-hidden>
-                  <GrillLines className="w-full h-full" />
-                </div>
-              )}
-              {hasPositionedVideo && (
-                <LightboxVideo
-                  key={currentItem.videoUrl}
-                  src={currentItem.videoUrl!}
-                  poster={currentItem.imageUrl}
-                  className="absolute object-contain z-[1]"
-                  autoPlay={currentItem.videoAutoplay ?? true}
-                  loop={currentItem.videoLoop ?? true}
-                  muted={currentItem.videoMuted ?? true}
-                  controls={currentItem.videoControls ?? false}
-                  ariaLabel={currentItem.alt || currentItem.label || "Lightbox video"}
-                  load={isSettled}
-                  style={{
-                    display: 'block',
-                    transformOrigin: 'center center',
-                    height: `${currentItem.imageSizePercent}%`,
-                    width: 'auto',
-                    ...calculateImagePosition(currentItem.imagePosition)
-                  }}
-                />
-              )}
-            </>
-          ) : (
-            <>
-              <div
-                className="absolute inset-0"
-                style={{ backgroundColor: isDarkMode ? '#232326' : '#fafafa' }}
-              />
-              {hasPositionedVideo ? (
-                <LightboxVideo
-                  key={currentItem.videoUrl}
-                  src={currentItem.videoUrl!}
-                  poster={currentItem.imageUrl}
-                  className="absolute object-contain"
-                  autoPlay={currentItem.videoAutoplay ?? true}
-                  loop={currentItem.videoLoop ?? true}
-                  muted={currentItem.videoMuted ?? true}
-                  controls={currentItem.videoControls ?? false}
-                  ariaLabel={currentItem.alt || currentItem.label || "Lightbox video"}
-                  load={isSettled}
-                  style={{
-                    display: 'block',
-                    transformOrigin: 'center center',
-                    height: `${currentItem.imageSizePercent}%`,
-                    width: 'auto',
-                    ...calculateImagePosition(currentItem.imagePosition),
-                    ...(currentItem.withInsetShadow ? {
-                      boxShadow: isDarkMode
-                        ? 'inset 0 1px 0 0 rgba(255,255,255,0.12), inset 0 0 0 1px rgba(255,255,255,0.10), 0px 0px 0px 1px rgba(0,0,0,0.22), 0px 4px 8px rgba(0,0,0,0.30)'
-                        : '0px 0px 0px 1px rgba(0,0,0,0.12), 0px 2px 3px -0.5px rgba(0,0,0,0.12), 0px 6px 6px -2px rgba(0,0,0,0.10)'
-                    } : {})
-                  }}
-                />
-              ) : (
-                <img
-                  src={currentItem.imageUrl ?? "/placeholder.svg"}
-                  alt={currentItem.alt || currentItem.label || "Lightbox image"}
-                  className="absolute object-contain"
-                  style={{
-                    opacity: 1,
-                    display: 'block',
-                    transformOrigin: 'center center',
-                    height: `${currentItem.imageSizePercent}%`,
-                    width: 'auto',
-                    ...calculateImagePosition(currentItem.imagePosition),
-                    ...(currentItem.withInsetShadow ? {
-                      boxShadow: isDarkMode
-                        ? 'inset 0 1px 0 0 rgba(255,255,255,0.12), inset 0 0 0 1px rgba(255,255,255,0.10), 0px 0px 0px 1px rgba(0,0,0,0.22), 0px 4px 8px rgba(0,0,0,0.30)'
-                        : '0px 0px 0px 1px rgba(0,0,0,0.12), 0px 2px 3px -0.5px rgba(0,0,0,0.12), 0px 6px 6px -2px rgba(0,0,0,0.10)'
-                    } : {})
-                  }}
-                />
-              )}
-            </>
-          )}
-        </div>
-        {/* Border overlay outside overflow-hidden so shadow is not clipped */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            boxShadow: isDarkMode
-              ? 'inset 0 1px 0 0 rgba(255,255,255,0.03), inset 0 0 0 1px rgba(255,255,255,0.03), 0px 4px 12px rgba(0,0,0,0.4)'
-              : '0px 0px 1px 0px rgba(0,0,0,0.4), 0px 4px 8px 0px rgba(0,0,0,0.08)',
-            boxSizing: 'border-box',
-            borderRadius: '4px',
-            zIndex: 10,
-          }}
-        />
-      </motion.div>
-    );
-  } else {
-    // Full-cover image or video mode
-    return (
-      <motion.div
-        className="relative pointer-events-auto rounded-[4px]"
-        {...motionProps}
-        style={{
-          ...motionStyle,
-          aspectRatio: '16/9',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxSizing: 'border-box',
-        }}
-      >
-        {/* overflow-hidden scoped to inner div so border overlay shadow is not clipped */}
-        <div className="absolute inset-0 overflow-hidden rounded-[4px]">
-          {hasVideo ? (
-            <LightboxVideo
-              key={currentItem.videoUrl}
-              src={currentItem.videoUrl!}
-              poster={currentItem.imageUrl}
-              className="absolute inset-0 object-contain w-full h-full"
-              autoPlay={currentItem.videoAutoplay ?? true}
-              loop={currentItem.videoLoop ?? true}
-              muted={currentItem.videoMuted ?? true}
-              controls={currentItem.videoControls ?? false}
-              ariaLabel={currentItem.alt || currentItem.label || "Lightbox video"}
-              load={isSettled}
-              style={{ display: 'block', transformOrigin: 'center center' }}
-            />
-          ) : (
-            <img
-              src={currentItem?.imageUrl ?? "/placeholder.svg"}
-              alt={currentItem?.alt || currentItem?.label || "Lightbox image"}
-              className="object-contain w-full h-full"
-              style={{ opacity: 1, display: 'block', transformOrigin: 'center center' }}
-            />
-          )}
-        </div>
-        {/* Border overlay outside overflow-hidden so shadow is not clipped */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            boxShadow: isDarkMode
-              ? 'inset 0 1px 0 0 rgba(255,255,255,0.03), inset 0 0 0 1px rgba(255,255,255,0.03), 0px 4px 12px rgba(0,0,0,0.4)'
-              : '0px 0px 1px 0px rgba(0,0,0,0.4), 0px 4px 8px 0px rgba(0,0,0,0.08)',
-            boxSizing: 'border-box',
-            borderRadius: '4px',
-            zIndex: 10,
-          }}
-        />
-      </motion.div>
-    );
-  }
+      />
+    </motion.div>
+  );
 }
 
 export function Lightbox({
@@ -458,6 +484,19 @@ export function Lightbox({
   };
   const [isPrevHovered, setIsPrevHovered] = useState(false);
   const [isNextHovered, setIsNextHovered] = useState(false);
+  // What the box has on show (LightboxContent), kept here so the caption changes with it rather
+  // than ahead of it. It belongs to one opening — each opening brings a new initialTransform, and
+  // each close moves presenceKey on — so a value from an earlier one is left behind without an
+  // effect to clear it, even if the lightbox reopens before its close has finished.
+  const [shownState, setShownState] = useState<
+    (ShownLayer & { presenceKey: number; from: TransformSnapshot | null }) | null
+  >(null);
+  const shown = shownState?.presenceKey === presenceKey && shownState.from === initialTransform ? shownState : null;
+  const showLayer = useCallback(
+    (index: number, ready: boolean) => setShownState({ presenceKey, from: initialTransform, index, ready }),
+    [presenceKey, initialTransform]
+  );
+  const captionIndex = shown?.index ?? lightboxIndex;
 
   // The media itself is inert to clicks: live content inside it (a prototype) takes real hover and
   // shows its pressed states, so a click there must not also step or close. Stepping is the
@@ -533,7 +572,10 @@ export function Lightbox({
                   the caption comes later in the DOM and would otherwise paint over it. */}
               <div className="relative z-10" style={{ top: -LIGHTBOX_MEDIA_LIFT }}>
                 <LightboxContent
-                  currentItem={normalizedItems[lightboxIndex]}
+                  items={normalizedItems}
+                  index={lightboxIndex}
+                  shown={shown}
+                  onShow={showLayer}
                   initialTransform={initialTransform}
                   exitTransform={exitTransform}
                   exitDuration={exitDuration}
@@ -545,7 +587,7 @@ export function Lightbox({
 
               {/* Caption - fixed relative to viewport so it doesn't move during the open/close animation */}
               {(() => {
-                const caption = normalizedItems[lightboxIndex]?.caption?.trim();
+                const caption = normalizedItems[captionIndex]?.caption?.trim();
                 if (!caption) return null;
                 return (
                   <motion.div
