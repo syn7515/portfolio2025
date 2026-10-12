@@ -193,6 +193,13 @@
     #app-menu .menu-backdrop { transition: opacity 150ms; }
     #app-menu .menu-popup { transition: opacity 200ms; }
     #app-menu.is-closed .menu-backdrop, #app-menu.is-closed .menu-popup { opacity: 0; }
+    /* portfolio: Settings comes in over the menu, 80 in from the right as it fades in (v14's
+       drill-in shift, on the menu's 360ms curve), and ‹ sends it back out the same way in the
+       menu's 260ms close; without the slide when motion is reduced */
+    #app-setting { transition: opacity 360ms cubic-bezier(0.32, 0.72, 0, 1), transform 360ms cubic-bezier(0.32, 0.72, 0, 1); }
+    #app-setting:is(.is-entering, .is-leaving) { opacity: 0; transform: translateX(80px); }
+    #app-setting.is-leaving { transition-duration: 260ms; pointer-events: none; }
+    @media (prefers-reduced-motion: reduce) { #app-setting:is(.is-entering, .is-leaving) { transform: none; } }
     .proto-icon-10 svg { width: 40px; height: 40px; }
     .proto-icon-8 svg { width: 32px; height: 32px; }
     #app-recipe .rd-tabs::-webkit-scrollbar { display: none; }
@@ -1259,12 +1266,31 @@
     closeTimer = setTimeout(() => { menu.hidden = true; }, ms);
   }
   // The app navigates first and lets the menu fade out over the new page.
+  // portfolio: the page enters instead (see #app-setting above), so the menu stays as it is under
+  // it and shuts once the page is in; shutting at once would show the cook screen coming back
+  // through the fade. ‹ before then drops it at once. ‹ slides the page back out over the cook
+  // screen and hides it once it's gone.
+  const SETTING_IN_MS = 360, SETTING_OUT_MS = 260;
+  let settingTimer = null;
   function openSetting() {
+    clearTimeout(settingTimer);
     renderSetting();
+    setting.classList.remove('is-leaving');
+    setting.classList.add('is-entering');
     setting.hidden = false;
-    closeMenu();
+    requestAnimationFrame(() => requestAnimationFrame(() => setting.classList.remove('is-entering')));
+    clearTimeout(closeTimer);
+    closeTimer = setTimeout(closeMenu, SETTING_IN_MS);
   }
-  function closeSetting() { setting.hidden = true; }
+  function closeSetting() {
+    if (!menu.hidden) closeMenuInstantly();
+    if (setting.hidden || setting.classList.contains('is-leaving')) return;
+    setting.classList.add('is-leaving');
+    settingTimer = setTimeout(() => {
+      setting.hidden = true;
+      setting.classList.remove('is-leaving');
+    }, SETTING_OUT_MS);
+  }
   function openRecipe() {
     Object.assign(recipeView, { id: null, optionId: null, popover: false, mode: null });
     renderRecipe();
