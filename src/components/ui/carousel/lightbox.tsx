@@ -154,6 +154,9 @@ const isLiveContent = (item: CarouselItem) => !!item.content && !item.imageUrl &
 // How long a step holds the item before while a live page loads, before showing its skeleton.
 const SKELETON_AFTER_MS = 150;
 
+// How long the box rests with nothing loading before it loads a neighbouring item, unseen.
+const PRELOAD_AFTER_MS = 250;
+
 interface MediaLayerProps {
   index: number;
   item: CarouselItem;
@@ -373,20 +376,48 @@ function LightboxContent({
   // isn't shown at all: it holds on its card, which keeps showing underneath (a live copy can take a
   // few frames to load), and the card only hides (onContentReady) once the box can stand in.
   const shownIndex = shown?.index ?? null;
-  const markReady = useCallback((i: number) => onShow(i, true), [onShow]);
   const hasEntered = shown !== null;
   const readyIndex = shown?.ready ? shown.index : null;
   useEffect(() => {
     if (readyIndex !== null) onContentReady?.();
   }, [readyIndex, onContentReady]);
-  const steppingToLive = shownIndex !== null && shownIndex !== index && isLiveContent(items[index]);
+
+  // Every item the box has loaded this opening stays loaded (a carousel holds a handful), so a step
+  // back is as quick as a step on. Once the entrance has settled and nothing is loading, the box
+  // loads the next item along, unseen, then the one before: a step to it then swaps at once, with
+  // no load competing with it. The item stepped to always loads, preloaded or not.
+  const [loaded, setLoaded] = useState<number[]>([index]);
+  const [readyLayers, setReadyLayers] = useState<number[]>([]);
+  const markReady = useCallback((i: number) => setReadyLayers((r) => (r.includes(i) ? r : [...r, i])), []);
+  // Recorded as the render that steps to it runs (React's way for state that follows a prop), so the
+  // item's layer is in the same render.
+  if (!loaded.includes(index)) setLoaded([...loaded, index]);
+  const layers = loaded;
+  const isLoading = layers.some((i) => !readyLayers.includes(i));
+  useEffect(() => {
+    if (!isSettled || isLoading) return;
+    const neighbour = [index + 1, index - 1].find((i) => i >= 0 && i < items.length && !loaded.includes(i));
+    if (neighbour === undefined) return;
+    const timer = window.setTimeout(
+      () => setLoaded((l) => (l.includes(neighbour) ? l : [...l, neighbour])),
+      PRELOAD_AFTER_MS
+    );
+    return () => window.clearTimeout(timer);
+  }, [isSettled, isLoading, index, items.length, loaded]);
+
+  // The item stepped to goes on show as soon as it's ready — in the same frame, if it was preloaded
+  // — and the caption with it (a layout effect, so both land before the frame paints).
+  const currentReady = readyLayers.includes(index);
+  const isShowingCurrent = shownIndex === index && !!shown?.ready;
+  useLayoutEffect(() => {
+    if (currentReady && !isShowingCurrent) onShow(index, true);
+  }, [currentReady, isShowingCurrent, index, onShow]);
+  const steppingToLive = shownIndex !== null && shownIndex !== index && !currentReady && isLiveContent(items[index]);
   useEffect(() => {
     if (!steppingToLive) return;
     const timer = window.setTimeout(() => onShow(index, false), SKELETON_AFTER_MS);
     return () => window.clearTimeout(timer);
   }, [steppingToLive, index, onShow]);
-  // The item on show, and over it (unseen until it's ready) the one being stepped to.
-  const layers = shownIndex !== null && shownIndex !== index ? [shownIndex, index] : [index];
 
   // A live page keeps redrawing (its loop plays on) while the box shrinks back onto its card, and
   // every redraw re-rasters the scaled frame mid-close. The copy is on its way out, so it's asked to
@@ -420,6 +451,8 @@ function LightboxContent({
         boxSizing: 'border-box',
       }}
     >
+      {/* Only the item on show is seen; the one stepped to sits over it until it's ready, and
+          preloaded ones wait under both. */}
       {layers.map((i) => (
         <div
           key={i}
@@ -429,6 +462,7 @@ function LightboxContent({
             zIndex: i === index ? 1 : 0,
             pointerEvents: i === shownIndex ? undefined : 'none',
           }}
+          aria-hidden={i === shownIndex ? undefined : true}
         >
           <MediaLayer
             index={i}
