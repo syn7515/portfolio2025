@@ -58,13 +58,16 @@
 /* v0-2: Pretendard Variable (weights 45–920 in one file) for the whole canvas, in place of
    the shared static Medium. A separate family name, so it never mixes with the shared
    "Pretendard" face; every existing weight (font-medium = 500 …) maps onto it unchanged. */
+/* portfolio: Inter (the site's own InterVariable, also variable) in place of Pretendard
+   Variable, whose Latin it is drawn from, at the same weights; Korean falls back to the shared
+   Pretendard. */
 @font-face {
-  font-family: "Pretendard Variable";
-  src: url("../font/PretendardVariable.ttf") format("truetype");
-  font-weight: 45 920;
+  font-family: "Inter";
+  src: url("/fonts/InterVariable.woff2") format("woff2");
+  font-weight: 100 900;
   font-style: normal;
 }
-.device { font-family: "Pretendard Variable", "Pretendard", system-ui, sans-serif; }
+.device { font-family: "Inter", "Pretendard", system-ui, sans-serif; }
 /* PREPARING / READY TO COOK a step lighter: 500 → 400. */
 #phase-label { font-weight: 400; }
 /* …and tracked wider for the caps: 0.56px (0.02em) → 0.16em. Letter-spacing also trails the
@@ -227,7 +230,7 @@ svg:has(> use[href="#i-recipe-change"]), svg:has(> use[href="#i-unload"]), svg:h
 /* The app's type-* classes set font-family themselves, so the variable font only reached
    elements without one — their lighter weights (400, 350) fell back to the static Medium.
    Put it on everything in the canvas. */
-.device * { font-family: "Pretendard Variable", "Pretendard", system-ui, sans-serif; }
+.device * { font-family: "Inter", "Pretendard", system-ui, sans-serif; }   /* portfolio: Inter, as above */
 /* PREPARING only (not READY TO COOK) tracked wider still: 0.2 → 0.28em, centring to match. */
 #cook-container.bg-cook-preparing #phase-label { letter-spacing: 0.28em; padding-left: 0.28em; }
 /* Quick-action buttons' pressed scrim rounder: 12 → 24. */

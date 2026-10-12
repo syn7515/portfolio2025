@@ -900,7 +900,85 @@
     });
   }
 
+  // ── portfolio: the video demos on someone else's clock ──────────────────
+  // public/prototypes/alphagrill-cook.html plays the grill and clean demos as live carousel cards,
+  // on a wall-clock loop that a second copy (the lightbox) can join mid-take. The demos run on
+  // timers from their own start, so the page drives the screen through these instead.
+  // Grill (startDemo / startDemo2):
+  //   take.reset()           6oz Pork preheating with the sheet shut, as both demos begin
+  //   take.hold(f, base)     the plate f °F short of ready, the ring's t0 `base` °C under the ready
+  //                          threshold (demo 1: 5.5, demo 2: 13), for whichever recipe is on
+  //   take.ready()           demo 1's switch to READY
+  //   take.press(id)         a sheet row's pressed band, kept through re-renders (null: none)
+  // While a take runs the sim never drifts on its own (stepSim skips while `demo` is set). The
+  // sheet opens and rows are picked by the screen's own taps (#qa-recipe, [data-select-recipe]).
+  // Clean (startDemoClean / startDemoController):
+  //   take.cooling(f, t0)    the hot-grill guard at f °F, its ring measured from t0 °F
+  //   take.controller()      the position controller on Grill, nothing moving
+  //   take.drag(id, ms)      the knob slides to a marker as a finger drags it, over ms
+  //   take.cc(patch)         the controller's state at once: the drag landing (selected), the CTA
+  //                          pressed, the grill moving (positioning) and arriving (current)
+  // ccDrag / ccConfirm set state from timers of their own; here each change is a step of the take.
+  const take = {
+    reset() {
+      const r = RECIPES[0];
+      Object.assign(state, { mode: 'grill', scenario: 'preheatAlmost', recipeId: r.id, cookOptionId: r.cookOptions[0].id, withoutArm: false });
+      clearTimeout(closingTimer);
+      $('recipe-sheet').classList.remove('is-closing');
+      state.sheet.open = false;
+      state.sheet.depthRecipeId = null;
+      demoPressedId = null;
+      demo = { kind: 'take' };
+      render();
+    },
+    hold(f, base) {
+      const o = derive().option;
+      const c = f * 5 / 9 + READY_MARGIN.lower;   // °F to go → °C below target, as the demos do
+      const t0 = (target) => target - READY_MARGIN.lower - base;
+      sim = { temp: { 0: o.bot - c, 1: o.top - c, 4: o.bot - c, 5: o.top - c },
+              t0: { 0: t0(o.bot), 1: t0(o.top), 4: t0(o.bot), 5: t0(o.top) },
+              phase: 'preheat', heat: { 0: 1, 1: 1 } };
+      render();
+    },
+    ready() {
+      const o = derive().option;
+      const at = { 0: o.bot, 1: o.top, 4: o.bot, 5: o.top };
+      sim = { temp: at, t0: sim ? sim.t0 : { ...at }, phase: 'ready', heat: {} };
+      render();
+    },
+    press(id) { demoPressedId = id; render(); },
+    cooling(f, t0) {
+      Object.assign(state, { mode: 'clean', cleanStage: 'hot', tempModalOpen: false });
+      state.sheet.open = false;
+      state.clean.tempF = f;
+      cleanT0 = t0;
+      demo = { kind: 'take' };
+      render();
+    },
+    controller() {
+      Object.assign(state, { mode: 'clean', cleanStage: 'controller', tempModalOpen: false });
+      state.sheet.open = false;
+      clearTimeout(ccTimer);
+      ccDragging = false;
+      $('cc-knob').style.transition = '';
+      state.cc = { current: 'grills', selected: 'grills', positioning: false, pressed: false };
+      demo = { kind: 'take' };
+      render();
+    },
+    drag(id, ms) {
+      const knob = $('cc-knob');
+      ccDragging = true;
+      knob.style.transition = `transform ${ms}ms cubic-bezier(.45,0,.35,1)`;
+      knob.style.transform = `translateX(${CC_CENTER(CC_POS.findIndex((p) => p.id === id)) - 40}px)`;
+    },
+    cc(patch) {
+      if ('selected' in patch) { ccDragging = false; $('cc-knob').style.transition = ''; }
+      Object.assign(state.cc, patch);
+      render();
+    },
+  };
+
   render();
 
-  window.Cook = { startDemo, startDemo2, startDemoClean, startDemoController, state, SCENARIOS, RECIPES, setScenario, setLang, render, get sim() { return sim; } };
+  window.Cook = { startDemo, startDemo2, startDemoClean, startDemoController, take, state, SCENARIOS, RECIPES, setScenario, setLang, render, get sim() { return sim; } };
 })();
