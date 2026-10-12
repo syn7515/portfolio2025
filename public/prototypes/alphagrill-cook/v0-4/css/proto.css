@@ -1,0 +1,395 @@
+/* ==========================================================================
+   Prototype-only styles (quick button feature).
+   Nothing in this file comes from the app; keep new-feature CSS here so the
+   verbatim app classes in alphagrill.css stay untouched.
+   ========================================================================== */
+
+@layer components {
+  /* Floating dock. The state colour lives on the screen background (the app's
+     .bg-cook-* halo, concentrated at the top), so the dock carries none of it: it is a
+     translucent white surface, which is what lifts it off the dark bottom of the screen. */
+  .quick-dock {
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+  }
+  /* 1 px outline, brighter along the top edge as if lit by the background's halo.
+     35 / 20 picked by eye. */
+  .quick-dock::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.2) 100%);
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  /* Divider between two rows of the quick list: same white/10 as a hairline, but fading
+     out at both ends on the same 0 / 15 / 85 / 100 stops as the selected row's scrim. */
+  .quick-divider {
+    background-image: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.1) 15%,
+      rgba(255, 255, 255, 0.1) 85%,
+      rgba(255, 255, 255, 0) 100%
+    );
+  }
+
+  /* Selected row in the quick list: a white scrim that fades out at both ends instead of
+     ending on a hard edge (same 0 / 15 / 85 / 100 stops as the app's .line-white gradient).
+     8% picked by eye — the dock names the current recipe, so this only has to mark it. */
+  .quick-row-on {
+    background-image: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.08) 15%,
+      rgba(255, 255, 255, 0.08) 85%,
+      rgba(255, 255, 255, 0) 100%
+    );
+  }
+}
+
+/* v0-2: Pretendard Variable (weights 45–920 in one file) for the whole canvas, in place of
+   the shared static Medium. A separate family name, so it never mixes with the shared
+   "Pretendard" face; every existing weight (font-medium = 500 …) maps onto it unchanged. */
+@font-face {
+  font-family: "Pretendard Variable";
+  src: url("../font/PretendardVariable.ttf") format("truetype");
+  font-weight: 45 920;
+  font-style: normal;
+}
+.device { font-family: "Pretendard Variable", "Pretendard", system-ui, sans-serif; }
+/* PREPARING / READY TO COOK a step lighter: 500 → 400. */
+#phase-label { font-weight: 400; }
+/* …and tracked wider for the caps: 0.56px (0.02em) → 0.16em. Letter-spacing also trails the
+   last letter, so the same 0.16em goes on the left to keep the word centred. */
+#phase-label { letter-spacing: 0.16em; padding-left: 0.16em; }
+/* A step smaller: 28 → 24px (tracking and centring follow, being in em). */
+#phase-label { font-size: 24px; letter-spacing: 0.2em; padding-left: 0.2em; }   /* tracking 0.16 → 0.2em */
+/* Phase label tinted with the state's hue instead of white/opacity: a light red (hue 0) on
+   preheat, a light green (hue 150) on ready, both at 70 % so they stay quiet. */
+#cook-container.bg-cook-preparing #phase-label { color: hsl(0 100% 86% / 70%); }
+#cook-container.bg-cook-ready-to-cook #phase-label { color: hsl(150 80% 80% / 70%); }
+
+/* Ring 8 higher (box top 280 → 272; the markup sets it inline, hence !important). Its
+   sector mask is on the box, so it moves with it. */
+#tick-ring-box { top: 272px !important; }
+/* The quieter supporting text also drops to 400: "Heating ·" / "remaining" around the
+   temperature, and the ready guidance ("Place food on the grill and start"). The
+   temperature value itself stays 500 so it keeps the emphasis. */
+#temp-hint-state, #temp-hint-remaining, #ready-guidance { font-weight: 400; }
+
+/* Ring fade as a sector instead of the app's ellipse (.tick-ring-mask).
+   - The ring itself (#tick-ring-box) fades by angle around its own centre: 0° = 6 o'clock,
+     gone within ±60° of the bottom, fully there beyond ±150°.
+   - The frame's ellipse mask moves to the blur/dim layer alone (the ProgressiveBlurOverlay
+     wrapper), so the dim still clears at the bottom exactly as in the app and never darkens
+     the quick-action buttons it sits above. Masking the ring alone avoids a wedge under
+     the text. Both backgrounds. */
+#tick-ring-frame { -webkit-mask-image: none; mask-image: none; }
+#tick-ring-frame > div:last-child {
+  -webkit-mask-image: radial-gradient(129.2% 101.61% at 50% 1%, rgb(0, 0, 0) 48%, rgba(0, 0, 0, 0.1) 65%, rgba(0, 0, 0, 0) 78%);
+  mask-image: radial-gradient(129.2% 101.61% at 50% 1%, rgb(0, 0, 0) 48%, rgba(0, 0, 0, 0.1) 65%, rgba(0, 0, 0, 0) 78%);
+}
+/* --ring-gap: half-angle of the hidden sector around 6 o'clock (60°); --ring-fade: how
+   many degrees the fade takes after it (90°), so the ring is whole from ±150°. */
+#tick-ring-box {
+  --ring-gap: 60deg;
+  --ring-fade: 90deg;
+  -webkit-mask-image: conic-gradient(from 180deg at 50% 50%, transparent 0deg, transparent var(--ring-gap), #000 calc(var(--ring-gap) + var(--ring-fade)), #000 calc(360deg - var(--ring-gap) - var(--ring-fade)), transparent calc(360deg - var(--ring-gap)), transparent 360deg);
+  mask-image: conic-gradient(from 180deg at 50% 50%, transparent 0deg, transparent var(--ring-gap), #000 calc(var(--ring-gap) + var(--ring-fade)), #000 calc(360deg - var(--ring-gap) - var(--ring-fade)), transparent calc(360deg - var(--ring-gap)), transparent 360deg);
+}
+
+/* Quick actions (Change recipe / Unload / Scrape) a touch closer: row gap 20 → 16. */
+#action-panel .gap-5:has(#qa-recipe) { gap: 16px; }
+
+/* Lighter quick-action icons (recipe change, unload, scrape): they are filled shapes, so
+   they are thinned with #icon-thin rather than by a stroke width. */
+svg:has(> use[href="#i-recipe-change"]), svg:has(> use[href="#i-unload"]), svg:has(> use[href="#i-scrape"]) { filter: url(#icon-thin); }
+
+/* Recipe bottom sheet opens with motion: the scrim fades in (200ms) while the sheet rises
+   from below the screen (320ms, decelerating). Runs each time #recipe-sheet leaves
+   `hidden` (display none → block restarts the animations). Closing stays instant. */
+#recipe-sheet:not(.hidden) > [data-action="sheet-close"] { animation: sheet-scrim-in 200ms ease-out both; }
+#recipe-sheet:not(.hidden) > [data-testid="recipe-bottom-sheet"] { animation: sheet-rise-in 320ms cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes sheet-scrim-in { from { opacity: 0; } }
+@keyframes sheet-rise-in { from { transform: translateY(100%); } }
+@media (prefers-reduced-motion: reduce) {
+  #recipe-sheet > * { animation: none !important; }
+}
+
+/* iOS-style sheet presentation: while the recipe sheet is open, the screen behind it (cook
+   content + ring layer) shrinks to 92 %, drops 16 and rounds its corners, so it reads as a
+   card pushed back under the sheet. Same 320ms curve as the sheet; it eases back on close.
+   The screen's wrapper is black, which shows around the shrunken card. */
+#cook-container, #tick-ring-slot {
+  transform-origin: 50% 0;
+  transition: transform 320ms cubic-bezier(.2, .8, .2, 1), border-radius 320ms cubic-bezier(.2, .8, .2, 1);
+}
+.screen:has(#recipe-sheet:not(.hidden)) :is(#cook-container, #tick-ring-slot) {
+  transform: translateY(16px) scale(.92);
+  border-radius: 24px;
+}
+@media (prefers-reduced-motion: reduce) {
+  #cook-container, #tick-ring-slot { transition: none; }
+}
+
+/* Recipe sheet rows. Selected: a dark scrim (black/35) with a check after the name, instead
+   of the app's white/30 fill and 2px white outline. Recipes with cook options show "N ›"
+   instead of "N setups". */
+/* Rows run edge to edge of the screen (the list's 28 side padding is taken back with a
+   negative margin and returned as padding), so the selected band reaches both edges while
+   the numbers and names stay where they were. */
+#sheet-list > button { margin-inline: -28px; width: calc(100% + 56px); padding-left: 34px; padding-right: 56px; }
+/* Pressed rows use the same band (a little darker, 45 %) instead of the app's solid
+   black/40 box — selected rows included, which no longer just fade to 70 %. */
+#sheet-list > button:active {
+  opacity: 1;
+  border-radius: 0;
+  background: linear-gradient(to right, rgb(0 0 0 / 0) 0%, rgb(0 0 0 / 45%) 15%, rgb(0 0 0 / 45%) 85%, rgb(0 0 0 / 0) 100%);
+}
+/* …as a band: the scrim fades out at both ends on 0 / 15 / 85 / 100 stops, no corners. */
+.sheet-row-on {
+  border-radius: 0;
+  background: linear-gradient(to right, rgb(0 0 0 / 0) 0%, rgb(0 0 0 / 35%) 15%, rgb(0 0 0 / 35%) 85%, rgb(0 0 0 / 0) 100%);
+}
+.sheet-check { width: 28px; height: 28px; flex-shrink: 0; color: rgb(255 255 255 / 85%); }
+.sheet-count { display: inline-flex; align-items: center; }
+.sheet-count svg { width: 32px; height: 32px; margin-left: 2px; }
+
+/* Bottom sheet edge light, from the reference values: a hairline highlight along the top
+   (inset 0 .5px 0 white/10) plus a faint all-round inner edge (inset 0 0 .5px white/30). */
+[data-testid="recipe-bottom-sheet"] {
+  box-shadow: inset 0 .5px 0 rgba(255, 255, 255, .1), inset 0 0 .5px rgba(255, 255, 255, .3);
+}
+
+/* Helper line ("Heating · 95°C remaining" / "Place food on the grill and start") 4 higher,
+   drawn in place so nothing else moves. */
+#temp-hint, #ready-guidance { position: relative; top: -8px; }   /* -4, then 4 more */
+/* The temperature takes the same white/70 as "Heating ·" / "remaining" around it; it keeps
+   its 500 weight, so it still reads first. */
+#temp-hint-value { color: rgb(255 255 255 / 70%); }
+/* Recipe name tracked a little wider: 0 → 0.02em (≈1px at 54px). */
+#recipe-name { letter-spacing: 0.02em; }
+
+/* Ring ticks glow in their own colour (#tick-glow: 3px blur at 0.7× alpha under each tick),
+   so filled red ticks bloom and the faint empty ones barely do. */
+#tick-ring { filter: url(#tick-glow); }
+
+/* Backgrounds built from several hues within one family, like the reference's blue
+   (periwinkle top → saturated blue → navy → black), instead of the app's single red /
+   green fading to black. Kept about as dark as the app's so the text still sits on it.
+   - Preheat: warm coral top → crimson → wine → black.
+   - Ready:   mint top → green → deep teal → black.
+   A soft radial on top lightens the upper centre, as in the reference. */
+#cook-container.bg-cook-preparing {
+  background:
+    radial-gradient(90% 45% at 50% 0%, hsl(8 70% 60% / 22%) 0%, hsl(8 70% 60% / 0) 100%),
+    linear-gradient(180deg,
+      hsl(8 52% 34%) 0%,
+      hsl(356 58% 27%) 26%,
+      hsl(344 55% 16%) 56%,
+      hsl(336 45% 7%) 68%,
+      hsl(336 40% 3%) 73%,
+      #000 100%);
+}
+#cook-container.bg-cook-ready-to-cook {
+  background:
+    radial-gradient(90% 45% at 50% 0%, hsl(140 55% 62% / 22%) 0%, hsl(140 55% 62% / 0) 100%),
+    linear-gradient(180deg,
+      hsl(140 38% 38%) 0%,
+      hsl(152 50% 27%) 26%,
+      hsl(166 55% 14%) 56%,
+      hsl(176 45% 6%) 68%,
+      hsl(176 40% 3%) 73%,
+      #000 100%);
+}
+
+
+/* Lighter quick-action icons: 64 → 44px, so the labels lead and the icons only support
+   them; the button boxes and the row's height are unchanged. */
+#qa-recipe > svg, #qa-unload > svg, #qa-scrape > svg { width: 44px; height: 44px; }
+/* Start cooking's play icon in grey instead of the label's black, so the word leads. */
+#primary-btn svg { color: #8a8a8a; }
+/* The unload arrow is a thin glyph inside a lot of empty viewBox, so at 44 it reads lighter
+   than the book and scraper; give it 52 (same stroke look, just larger). */
+#qa-unload > svg { width: 52px; height: 52px; margin-block: -4px; }
+/* Start cooking without the play icon: the label alone. */
+#primary-btn svg { display: none; }
+/* Ready guidance a touch lighter again: 400 → 350 (variable font). */
+#ready-guidance { font-weight: 350; }
+/* The app's type-* classes set font-family themselves, so the variable font only reached
+   elements without one — their lighter weights (400, 350) fell back to the static Medium.
+   Put it on everything in the canvas. */
+.device * { font-family: "Pretendard Variable", "Pretendard", system-ui, sans-serif; }
+/* PREPARING only (not READY TO COOK) tracked wider still: 0.2 → 0.28em, centring to match. */
+#cook-container.bg-cook-preparing #phase-label { letter-spacing: 0.28em; padding-left: 0.28em; }
+/* Quick-action buttons' pressed scrim rounder: 12 → 24. */
+#qa-recipe, #qa-unload, #qa-scrape { border-radius: 24px; }
+
+/* Filled quick-action icons carry a lot more ink, so they are toned down to sit under their
+   labels: book and scraper at white/55 (labels are white/70), the unload arrow keeps its
+   state colour but at 80 %. */
+[data-qa-icons="fill"] :is(#qa-recipe, #qa-scrape) > svg { color: rgb(255 255 255 / 55%); }
+[data-qa-icons="fill"] #qa-unload > svg { opacity: .8; }
+/* …as greys tinted with the state's hue instead of plain white/55: a reddish grey on
+   preheat, a greenish grey on ready (low saturation, about the same lightness). */
+#cook-container.bg-cook-preparing [data-qa-icons="fill"] :is(#qa-recipe, #qa-scrape) > svg { color: hsl(0 14% 66%); }
+#cook-container.bg-cook-ready-to-cook [data-qa-icons="fill"] :is(#qa-recipe, #qa-scrape) > svg { color: hsl(150 12% 64%); }
+/* On / Off in the same white/70 as "Unload" (it was full white). */
+#qa-unload-state { color: rgb(255 255 255 / 70%); }
+
+/* Upper stage vs controls, by colour rather than a line: the state gradient holds its colour
+   through the upper area and falls to near-black by 68–73 % (≈y700–745), where the controls
+   begin, so the lower area reads as its own dark ground. The quick-action row sits 16 lower
+   to settle into it. */
+#action-panel > div:first-child { transform: translateY(16px); }
+/* Helper line in the same tinted colour as the phase label above: light red on preheat
+   ("Heating · 95°C remaining", all three parts), light green on ready ("Place food…"). */
+#cook-container.bg-cook-preparing :is(#temp-hint-state, #temp-hint-value, #temp-hint-remaining) { color: hsl(0 100% 86% / 70%); }
+#cook-container.bg-cook-ready-to-cook #ready-guidance { color: hsl(150 80% 80% / 70%); }
+/* Quick-action labels (Recipe / Unload On / Scrape) as the same hue-tinted greys as their
+   icons, a step lighter so the words still lead: reddish on preheat, greenish on ready. */
+#cook-container.bg-cook-preparing :is(#qa-recipe, #qa-unload, #qa-scrape) > span,
+#cook-container.bg-cook-preparing #qa-unload-state { color: hsl(0 16% 76%); }
+#cook-container.bg-cook-ready-to-cook :is(#qa-recipe, #qa-unload, #qa-scrape) > span,
+#cook-container.bg-cook-ready-to-cook #qa-unload-state { color: hsl(150 14% 74%); }
+/* The text group inside the ring (phase, recipe name, helper line) 4 higher, in place. */
+#status-wrap { position: relative; top: -4px; }
+
+/* Recipe sheet header: title and close button 8 lower (drawn in place), and the title in
+   tracked caps ("RECIPE"), centred against its own trailing tracking. */
+#sheet-title, [data-action="sheet-header-close"] { transform: translateY(8px); }
+#sheet-title { text-transform: uppercase; letter-spacing: 0.16em; padding-left: 0.16em; }
+/* …a step lighter and smaller: 500 → 400, 28 → 24px (tracking follows, being in em). */
+#sheet-title { font-weight: 400; font-size: 24px; line-height: 32px; }
+
+/* Sheet closing (v0-2): slides back down and the scrim fades, over 280ms. */
+#recipe-sheet.is-closing > [data-action="sheet-close"] { animation: sheet-scrim-out 280ms ease-in both; }
+#recipe-sheet.is-closing > [data-testid="recipe-bottom-sheet"] { animation: sheet-rise-out 280ms cubic-bezier(.4, 0, 1, 1) both; }
+@keyframes sheet-scrim-out { to { opacity: 0; } }
+@keyframes sheet-rise-out { to { transform: translateY(100%); } }
+/* A scripted tap (video demo) shows the same pressed band as a real press. */
+#sheet-list > button.is-pressed {
+  border-radius: 0;
+  background: linear-gradient(to right, rgb(0 0 0 / 0) 0%, rgb(0 0 0 / 45%) 15%, rgb(0 0 0 / 45%) 85%, rgb(0 0 0 / 0) 100%);
+}
+
+@font-face { font-family: "Barlow Semi Condensed"; src: url("../font/BarlowSemiCondensed-Medium.ttf") format("truetype"); font-weight: 500; font-display: block; }
+/* ── v0-3: Clean mode (clean-1.mov) ─────────────────────────────────────────
+   Zinc-800 ground and the v14 header (switch on CLEAN). Everything below the header is
+   the app's clean screen (fw-app-tauri-AlphaGrill main: cook-clean-mode.tsx and friends),
+   kept as is — sizes, positions, colours, ring logic — except the type, which follows
+   v0-2: Pretendard Variable at v0-2's lighter weights. */
+#cook-container.is-clean { background: #27272a; }   /* Tailwind zinc-800 */
+#cook-container.is-clean :is(#status-wrap, #select-guidance, #action-panel) { visibility: hidden; }
+#clean-view { position: absolute; inset: 0; z-index: 10; pointer-events: none; }
+#clean-view .clean-warning { pointer-events: auto; }
+#cook-container.is-clean #clean-switch { background-color: rgb(0 0 0 / 26%); box-shadow: none; }
+#cook-container.is-clean #switch-slide { background-color: rgb(255 255 255 / 12%); }
+#cook-container.is-clean :is(#switch-left, #switch-right) { color: rgb(255 255 255 / 60%); opacity: 1 !important; }
+#cook-container.is-clean #switch-right { color: rgb(255 255 255 / 95%); }
+
+/* Ring slot as the app's TickRingSlot: ring top 180 (280 inside the -100 mask frame), the
+   Rect 54 radial mask on the frame, no v0-2 sector mask or glow. */
+#cook-container.is-clean #tick-ring-box { top: 280px !important; -webkit-mask-image: none; mask-image: none; }
+#cook-container.is-clean #tick-ring-frame {
+  -webkit-mask-image: radial-gradient(129.2% 101.61% at 50% 1%, rgba(0,0,0,1) 48%, rgba(0,0,0,0.1) 65%, rgba(0,0,0,0) 78%);
+  mask-image: radial-gradient(129.2% 101.61% at 50% 1%, rgba(0,0,0,1) 48%, rgba(0,0,0,0.1) 65%, rgba(0,0,0,0) 78%);
+}
+#cook-container.is-clean #tick-ring-frame > div:last-child { -webkit-mask-image: none; mask-image: none; }
+#cook-container.is-clean #tick-ring { filter: none; }
+#tick-ring rect { transition: fill-opacity .25s ease; }
+
+/* CleanTickRingCenterLabel: flex column, gap-2, 184 below the ring top (180). */
+.clean-center { position: absolute; left: 0; right: 0; top: 364px; z-index: 10; display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none; }
+.clean-temp { font-family: "Barlow Semi Condensed", system-ui, sans-serif !important; font-size: 96px; line-height: 130%; font-weight: 500; color: #fff; font-variant-numeric: lining-nums tabular-nums; }   /* type-numeric3, the app's own numeral face */
+.clean-temp-unit { position: absolute; top: 20px; left: 100%; font-size: 32px; line-height: 140%; font-weight: 350; color: rgb(255 255 255 / 60%); white-space: nowrap; }   /* type-body0 */
+.clean-sub { font-size: 28px; line-height: 130%; font-weight: 350; color: rgb(255 255 255 / 60%); }   /* type-body2 */
+
+/* CookCleanLayer → CleanHotWarning: bottom-33.75, px-7.5; card + "Clean anyway" gap-7. */
+.clean-warning { position: absolute; left: 0; right: 0; bottom: 135px; z-index: 20; padding: 0 30px; display: flex; flex-direction: column; align-items: center; gap: 28px; }
+.clean-card { width: 100%; display: flex; flex-direction: column; align-items: flex-start; gap: 20px; border-radius: 20px; border: 1px solid rgb(255 255 255 / 18%); background: rgb(102 102 102 / 20%); padding: 24px 32px 20px; -webkit-backdrop-filter: blur(25px); backdrop-filter: blur(25px); }
+.clean-card-title, .clean-card-body { width: 100%; font-size: 24px; line-height: 130%; }   /* type-body3 */
+.clean-card-title { font-weight: 400; color: #fff; }
+.clean-card-body { font-weight: 350; color: rgb(255 255 255 / 60%); }
+.clean-anyway { display: flex; align-items: center; justify-content: center; padding: 24px 100px; font-size: 24px; line-height: 130%; font-weight: 350; color: rgb(255 255 255 / 60%); text-decoration: underline; white-space: nowrap; }
+
+/* ── v0-4: Clean position controller (clean-2.mov) ───────────────────────────
+   The app's CleanController as is (clean-controller*.tsx, SLIDER_LAYOUT): markers 140 wide
+   at Side / Grills / Bottom (centres 80, 300, 520 on the 600 canvas), a 460×12 black track at
+   87, an 80 knob at 62.5 that springs between them, the guide and a 3-state CTA. Type in
+   v0-2's Pretendard Variable at its lighter weights. */
+#clean-view:not([data-stage="controller"]) .cc { display: none; }
+#clean-view[data-stage="controller"] :is(.clean-center, .clean-warning) { display: none; }
+.cc { position: absolute; left: 0; right: 0; bottom: 0; z-index: 20; background: #000; pointer-events: auto; }
+.cc-panel { position: relative; display: flex; height: 580px; flex-direction: column; align-items: center; justify-content: space-between; gap: 40px; border-top: 2px solid rgb(255 255 255 / 18%); background: rgb(255 255 255 / 20%); padding: 80px 0 40px; }
+.cc-top { display: flex; width: 100%; flex-direction: column; align-items: center; gap: 60px; }
+.cc-title { font-size: 24px; line-height: 130%; font-weight: 400; color: #fff; text-align: center; }
+.cc-selector { position: relative; width: 100%; height: 140px; }
+.cc-marker { position: absolute; top: 0; width: 140px; height: 140px; margin-left: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.cc-marker { transform: translateX(0); }
+.cc-selector .cc-marker[data-pos="side"] { left: 10px !important; }
+.cc-selector .cc-marker[data-pos="grills"] { left: 230px !important; }
+.cc-selector .cc-marker[data-pos="bottom"] { left: 450px !important; }
+.cc-label { font-size: 28px; line-height: 130%; font-weight: 400; white-space: nowrap; color: rgb(255 255 255 / 60%); transition: color .2s; }
+.cc-tick { width: 1px; height: 36px; background: rgb(255 255 255 / 40%); transition: background-color .2s; }
+.cc-marker.is-active .cc-label { color: #fff; }
+.cc-marker.is-active .cc-tick { background: #fff; }
+.cc-track { position: absolute; left: 50%; top: 87px; width: 460px; height: 12px; transform: translateX(-50%); border-radius: 999px; background: #000; pointer-events: none; }
+/* Knob: left = marker centre − 40; the app springs it (stiffness 400, damping 32) — here a
+   matching ease-out; the demo's drag sets a slower transition of its own. */
+.cc-knob { position: absolute; top: 62.5px; left: 0; width: 80px; height: 80px; border-radius: 999px; border: 2px solid rgb(255 255 255 / 40%); background: linear-gradient(to bottom, #a1a1a1, #cbcbcb); box-shadow: 0 10px 40px 0 rgb(0 0 0 / 80%), 0 0 30px 0 rgb(0 0 0 / 25%); overflow: hidden; transition: transform .35s cubic-bezier(.2,.9,.3,1), background .2s, border-color .2s; }
+.cc-knob-arrow { position: absolute; top: 9px; left: 50%; width: 0; height: 0; transform: translateX(-50%); border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 9px solid #fff; }
+.cc-knob.is-disabled { background: linear-gradient(to bottom, #3c3c3c, #5f5f5f); border-color: rgb(255 255 255 / 18%); }
+.cc-knob.is-disabled .cc-knob-arrow { border-bottom-color: #8c8c8c; left: calc(50% - 1px); }
+.cc-bottom { display: flex; width: 100%; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
+.cc-guide { font-size: 24px; line-height: 130%; font-weight: 350; color: rgb(255 255 255 / 60%); text-align: center; }
+.cc-cta { display: flex; height: 80px; width: calc(100% - 60px); max-width: 540px; align-items: center; justify-content: center; border-radius: 999px; padding: 0 24px; font-size: 28px; line-height: 130%; font-weight: 400; background: #666; color: rgb(0 0 0 / 40%); transition: background-color .15s; }
+.cc-cta.is-go { background: #fff; color: #000; }
+.cc-cta.is-go:active, .cc-cta.is-pressed { background: #aaa; }
+/* Positioning: TextShimmer — white/40 text with a white band sweeping right → left, 1.8s. */
+.cc-cta.is-positioning span { background-image: linear-gradient(90deg, transparent calc(50% - var(--spread)), #fff, transparent calc(50% + var(--spread))), linear-gradient(rgb(255 255 255 / 40%), rgb(255 255 255 / 40%)); background-size: 250% 100%, auto; background-repeat: no-repeat; -webkit-background-clip: text; background-clip: text; color: transparent; --spread: 22px; animation: cc-shimmer 1.8s linear infinite; }
+@keyframes cc-shimmer { from { background-position: 100% center; } to { background-position: 0% center; } }
+/* Header navigation is blocked while the grill repositions (cook-header navDisabled). */
+#cook-container.is-positioning header { opacity: .4; pointer-events: none; transition: opacity .2s; }
+
+/* v0-4 (to match clean-2.mov): no slab behind the slider — panel and underlay transparent,
+   no top border; the guide above the button is gone and an explanation pill sits in the ring.
+   Positions from the video on the 600 canvas: pill 396–472, "I'm cleaning" ≈646, labels 706,
+   track 781, CTA 898–977. */
+#clean-view:not([data-stage="controller"]) .cc-explain { display: none; }
+.cc { background: none; }
+.cc-panel { height: auto; justify-content: flex-end; gap: 0; border-top: 0; background: none; padding: 0 0 47px; }
+.cc-top { gap: 27px; }
+.cc-bottom { margin-top: 70px; }
+.cc-knob { top: 50px; }
+.cc-cta { width: calc(100% - 54px); max-width: 546px; gap: 12px; }
+.cc-cta.is-positioning span { animation: none; background: none; color: rgb(255 255 255 / 40%); }
+.cc-spinner { width: 30px; height: 30px; color: rgb(255 255 255 / 40%); animation: cc-spin 1s linear infinite; }
+.cc-spinner[hidden] { display: none; }
+@keyframes cc-spin { to { transform: rotate(360deg); } }
+.cc-explain { position: absolute; left: 50%; top: 396px; z-index: 10; transform: translateX(-50%); width: 490px; height: 76px; display: flex; align-items: center; justify-content: center; border-radius: 16px; border: 1px solid rgb(255 255 255 / 15%); background: rgb(255 255 255 / 7%); font-size: 28px; line-height: 36px; font-weight: 400; color: rgb(255 255 255 / 90%); white-space: nowrap; pointer-events: none; }
+/* Repositioning: the labels dim with the header. */
+#cook-container.is-positioning ~ * .cc-label, .cc-marker:disabled .cc-label { color: rgb(255 255 255 / 40%); }
+.cc-marker:disabled .cc-tick { background: rgb(255 255 255 / 25%); }
+
+/* Header as v14: no scrim behind the menu / temperature icons (the app's white/20 square
+   only while pressed), the app's 100px header and switch, its labels and colours. The icon
+   buttons sit 12 further in from the screen edges, with the tap area reaching the viewport
+   edge: the 12 outer margin becomes padding (8 + 12 + 12 = 32 on the outer side). */
+#menu-btn { margin-left: 0; padding-left: 32px; }
+#temp-btn { margin-right: 0; padding-right: 32px; }
+/* The header switch's knob (and its track) change colour with the background on the same
+   600ms ease; the knob's slide keeps its own 200ms. */
+#switch-slide { transition: transform 200ms ease-out, background-color 600ms ease, box-shadow 600ms ease; }
+#clean-switch { transition: background-color 600ms ease, box-shadow 600ms ease; }
+@media (prefers-reduced-motion: reduce) { #switch-slide { transition: transform 200ms ease-out; } #clean-switch { transition: none; } }
+/* On red the switch track's inner shadow a touch lighter: black 50 % → 20 % (same 12px blur). */
+#cook-container.bg-cook-preparing #clean-switch { box-shadow: inset 0 0 12px 0 rgb(0 0 0 / 20%); }

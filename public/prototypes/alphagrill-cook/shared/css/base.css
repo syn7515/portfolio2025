@@ -1,0 +1,119 @@
+/* ==========================================================================
+   Base: reset, stage, 600 x 1024 device canvas, screen stacking, dev bar
+   No visual styling for UI components lives here — that comes with tokens.
+   ========================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: #1a1b1e;   /* stage colour outside the device */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Stage + device -----------------------------------------------------------
+   .device is always laid out at exactly 600 x 1024 CSS px. The dev bar
+   scales it with transform so it fits any monitor without reflowing. */
+
+.stage {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.device {
+  position: relative;
+  width: var(--screen-w);
+  height: var(--screen-h);
+  overflow: hidden;
+  flex: none;
+  background: var(--canvas-bg);
+  color: var(--canvas-text);
+  transform: scale(var(--scale, 1));
+  transform-origin: center center;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 30px 80px rgba(0, 0, 0, 0.6);
+
+  /* Behave like a touch panel, not a web page */
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  cursor: default;
+}
+
+/* Screens ------------------------------------------------------------------
+   Each <section class="screen" data-screen="id"> is stacked absolutely.
+   Only .is-active is visible. Navigate with data-go="id" or App.go('id'). */
+
+.screen {
+  position: absolute;
+  inset: 0;
+  display: none;
+}
+
+.screen.is-active {
+  display: block;
+}
+
+/* Hide scrollbars inside the canvas so it feels like a panel */
+.device ::-webkit-scrollbar { display: none; }
+.device * { scrollbar-width: none; }
+
+/* 8px grid overlay (dev bar toggle) ---------------------------------------- */
+
+.device.show-grid::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background-image:
+    linear-gradient(to right, rgba(255, 0, 128, 0.14) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 0, 128, 0.14) 1px, transparent 1px);
+  background-size: 8px 8px;
+}
+
+/* Dev bar ------------------------------------------------------------------
+   Lives outside the device. Hidden with the "h" key or ?bare in the URL. */
+
+.devbar {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 10000;
+  display: flex;
+  flex-wrap: wrap;
+  max-width: calc(100vw - 32px);
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: rgba(30, 32, 36, 0.92);
+  color: #d4d6db;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  font: 12px/1 ui-monospace, "SF Mono", Menlo, monospace;
+  backdrop-filter: blur(8px);
+}
+
+.devbar.is-hidden { display: none; }
+
+.devbar select,
+.devbar button {
+  font: inherit;
+  color: inherit;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  padding: 6px 8px;
+  cursor: pointer;
+}
+
+.devbar button.is-on { background: #2563eb; border-color: #2563eb; color: #fff; }
+.devbar .devbar__dim { opacity: 0.6; }
