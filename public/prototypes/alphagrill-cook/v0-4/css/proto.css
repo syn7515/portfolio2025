@@ -439,6 +439,14 @@ svg:has(> use[href="#i-recipe-change"]), svg:has(> use[href="#i-unload"]), svg:h
   border-radius: 0;
   box-shadow: none;
 }
+/* …and, as on v14's pushed card, what's on it fades back to 40 % on the same curve; the card's
+   rim and shadow don't. */
+#cook-container > * { transition: opacity 320ms cubic-bezier(.2, .8, .2, 1); }
+#tick-ring-slot {
+  transition: transform 320ms cubic-bezier(.2, .8, .2, 1), border-radius 320ms cubic-bezier(.2, .8, .2, 1), opacity 320ms cubic-bezier(.2, .8, .2, 1);
+}
+.screen:has(#recipe-sheet:not(.hidden)) :is(#cook-container > *, #tick-ring-slot) { opacity: 0.4; }
+.screen:has(#recipe-sheet.is-closing) :is(#cook-container > *, #tick-ring-slot) { opacity: 1; }
 @media (prefers-reduced-motion: reduce) {
-  #cook-container { transition: none; }
+  #cook-container, #cook-container > *, #tick-ring-slot { transition: none; }
 }
