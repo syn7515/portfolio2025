@@ -541,9 +541,13 @@ export function Lightbox({
   // The caption hangs off the media's bottom edge.
   const captionTop = `calc(50% - ${LIGHTBOX_MEDIA_LIFT}px + ${dimensions.height / 2}px + ${LIGHTBOX_CAPTION_GAP}px)`;
   // The caption and the buttons drift in under the media as it opens and fade out as it closes.
+  // The box holds on its card until its item is ready (a live copy takes a few frames to load), so
+  // the backdrop, the caption and the buttons wait for it too and set off with the box: a backdrop
+  // fading in over a card that hasn't moved yet read as a blink before the open.
+  const hasEntered = shown !== null;
   const belowMediaMotion = {
     initial: { opacity: 0, y: 4 },
-    animate: exitTransform ? { opacity: 0, y: 4 } : { opacity: 1, y: 0 },
+    animate: exitTransform || !hasEntered ? { opacity: 0, y: 4 } : { opacity: 1, y: 0 },
     transition: {
       duration: exitTransform ? exitDuration : 0.4,
       ease: [0.77, 0, 0.175, 1] as const,
@@ -570,7 +574,7 @@ export function Lightbox({
           {/* Background overlay with opacity */}
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            animate={{ opacity: hasEntered ? 1 : 0 }}
             style={{ willChange: 'opacity' }}
             exit={{ opacity: 0 }}
             transition={{
