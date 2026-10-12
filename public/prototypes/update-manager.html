@@ -74,8 +74,8 @@
   .fw { display: flex; align-items: center; gap: 2px; color: var(--muted-fg); }
   .fw .at { opacity: 0.5; }
   .badge { display: inline-flex; align-items: center; padding: 1px 4px; min-width: 18px; border-radius: 4px; font-family: var(--mono); font-size: 10.69px; line-height: 14.25px; white-space: nowrap; }
-  .badge.hmi { box-shadow: inset 0 0 0 1px var(--border); color: var(--fg); }
-  .badge.mcu { background: var(--secondary); color: var(--primary); }
+  /* both filled badges are the secondary kind: a muted fill, no stroke */
+  .badge.hmi, .badge.mcu { background: var(--secondary); color: var(--primary); transition: background-color 90ms ease; }
   .badge.slot { box-shadow: none; border: 1px dashed var(--focus); padding: 0 3px; color: var(--muted-fg); }
   .cfg { font-family: var(--mono); font-size: 12px; line-height: 16px; color: var(--muted-fg); }
   .trigger { border-radius: 4px; transition: background-color 90ms ease; }
@@ -110,7 +110,7 @@
   html { -webkit-user-select: none; user-select: none; cursor: default; }
   /* Hover only where a pointer can hover: on a touch screen a tap would leave it stuck on. */
   @media (hover: hover) and (pointer: fine) {
-    .sb-btn:not(.on):hover, .trigger:hover { background: var(--border); }
+    .sb-btn:not(.on):hover, .trigger:hover, .trigger:hover .badge.hmi { background: var(--border); }
     .btn:hover { opacity: 0.9; }
   }
   .sb-btn:active, .btn:active, .trigger:active, .m-item:active { filter: brightness(0.9); }
