@@ -62,9 +62,8 @@ const touch = document.getElementById('touch');
 let win, doc, take;
 
 // The handoff page's trick, as in alphagrill-quick-button.html: copy every :active rule as
-// .is-pressed right after the original, so a scripted press shows the look a finger's would. The
-// Tailwind runtime rebuilds its <style> (a new sheet) whenever new classes appear, which drops the
-// copies, so copy again into each new sheet.
+// .is-pressed right after the original, so a scripted press shows the look a finger's would. A sheet
+// added later (menu.js adds its own) gets its copies when it arrives.
 function makePressable(doc) {
   const seen = new WeakSet();
   const walk = group => {
@@ -89,18 +88,10 @@ async function setUp() {
   const isLoaded = () => frame.contentDocument?.readyState === 'complete' && frame.contentWindow.location.href !== 'about:blank';
   if (!isLoaded()) await new Promise(r => frame.addEventListener('load', r, { once: true }));
   win = frame.contentWindow; doc = frame.contentDocument;
-  // the Tailwind runtime compiles the classes after load
   await until(() => win.Cook?.take && win.getComputedStyle(doc.getElementById('cook-container')).position === 'relative');
   await doc.fonts.ready;
   makePressable(doc);
   take = win.Cook.take;
-  // Open the sheet once, unseen, so the Tailwind runtime has styled its rows before a take shows them.
-  if (SCENE === 'tap') {
-    take.reset();
-    doc.getElementById('qa-recipe').click();
-    await frames(3);
-    take.reset();
-  }
 }
 
 /* ---------- the four recordings ---------- */
@@ -239,7 +230,7 @@ addEventListener('message', e => { if (e.origin === location.origin && e.data ==
 const finishMotion = () => doc.getAnimations().forEach(a => { try { a.finish(); } catch (e) { /* an endless one */ } });
 async function catchUp() {
   finishMotion();
-  await frames(2);   // let the last steps paint, and the Tailwind runtime style what they rendered
+  await frames(2);   // let the last steps paint
   finishMotion();
   root.classList.remove('no-anim');
   behind = false;

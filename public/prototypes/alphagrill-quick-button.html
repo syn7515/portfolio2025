@@ -68,8 +68,8 @@ const F = {};   // 'v14' | 'v0' → { el, win, doc, device }
 const EN = { '불고기 패티': 'Bulgogi Patty', '레어': 'Rare', '미디엄 레어': 'Medium rare', '미디엄': 'Medium', '미디엄웰던': 'Medium well', '웰던': 'Well done' };
 
 // The handoff page's trick: copy every :active rule as .is-pressed right after the original, so a
-// scripted press shows the look a finger's would. The Tailwind runtime rebuilds its <style> (a new
-// sheet) whenever new classes appear, which drops the copies, so copy again into each new sheet.
+// scripted press shows the look a finger's would. A sheet added later (menu.js adds its own) gets
+// its copies when it arrives.
 function makePressable(doc) {
   const seen = new WeakSet();
   const walk = group => {
@@ -95,7 +95,7 @@ async function setUp(name) {
   const isLoaded = () => el.contentDocument?.readyState === 'complete' && el.contentWindow.location.href !== 'about:blank';
   if (!isLoaded()) await new Promise(r => el.addEventListener('load', r, { once: true }));
   const win = el.contentWindow, doc = el.contentDocument, device = doc.getElementById('device');
-  // menu.js arrives a task after cook.js, and the Tailwind runtime compiles the classes after load
+  // menu.js arrives a task after cook.js
   await until(() => win.AppMenu && win.Cook && win.getComputedStyle(doc.getElementById('cook-container')).position === 'relative');
   await doc.fonts.ready;
   device.classList.add('no-motion');
@@ -105,14 +105,6 @@ async function setUp(name) {
     r.cookOptions.forEach(o => { o.name = EN[o.name] || o.name; });
   });
   win.Cook.render();
-  // Open the menu and settings once (unseen), so the Tailwind runtime has styled what they render —
-  // the switch's blue too — before a take shows them.
-  win.AppMenu.open();
-  win.AppMenu.settings.quickSelect = true;
-  win.AppMenu.openSetting();
-  await frames(3);
-  win.AppMenu.closeSetting();
-  await sleep(300);   // the menu's close timer hides it
   F[name] = { el, win, doc, device };
 }
 
@@ -168,7 +160,7 @@ function fallBehind() {
   for (const k in F) F[k].device.classList.add('no-motion');
 }
 async function catchUp() {
-  await frames(4);   // let the last steps paint, and the Tailwind runtime style what they rendered
+  await frames(2);   // let the last steps paint
   for (const k in F) F[k].device.classList.remove('no-motion');
   root.classList.remove('no-anim');
   behind = false;

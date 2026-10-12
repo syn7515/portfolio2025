@@ -11,21 +11,10 @@
   <link rel="stylesheet" href="../shared/css/base.css">
   <link rel="stylesheet" href="../shared/css/alphagrill.css">
   <link rel="stylesheet" href="css/proto.css">
-  <!-- Tailwind v4 browser runtime (vendored from @tailwindcss/browser 4.3.3).
-       Compiles the utility classes in this document at load time, so markup
-       copied from the app keeps its class names verbatim. -->
-  <script src="../shared/vendor/tailwind-browser.js"></script>
-  <style type="text/tailwindcss">
-    /* Theme tokens from the app's global.css that these screens rely on. */
-    :root { --radius: 0.625rem; }
-    @theme inline {
-      --radius-sm: calc(var(--radius) - 4px);
-      --radius-md: calc(var(--radius) - 2px);
-      --radius-lg: var(--radius);
-      --radius-xl: calc(var(--radius) + 4px);
-      --shadow-switch-red: inset 0 0 12px 0 rgb(0 0 0 / 0.5);
-    }
-  </style>
+  <!-- portfolio: the Tailwind classes compiled ahead of time (shared/css/tailwind.css, by the
+       vendored shared/vendor/tailwind-browser.js) in place of the browser runtime, which compiled
+       them at load and rescanned the whole page on every class change. -->
+  <link rel="stylesheet" href="../shared/css/tailwind.css">
 </head>
 <body>
 
