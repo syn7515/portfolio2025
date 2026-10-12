@@ -40,26 +40,25 @@
   .month { position: relative; height: 25.77px; }
   .dr-group + .dr-group .month { height: 26.63px; }
   .month span { position: absolute; left: 0; top: 6px; padding: 2px 24px; font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.06em; color: var(--muted-fg); opacity: 0.7; }
-  /* the picked card gets a stone scrim and stroke (drawn outside it as Figma does, so picking moves
-     nothing) and a filled check at the end of its name row */
-  .pkg { display: flex; flex-direction: column; gap: 12px; padding: 18px 24px 16px; border-radius: 8px; background: var(--bg); transition: background-color 90ms ease, box-shadow 90ms ease; }
-  .pkg.on { background: #f1efef; box-shadow: 0 0 0 1px var(--ring); }
+  /* the picked card lifts on a faint ring and a soft shadow, both drawn outside it, so picking moves
+     nothing */
+  .pkg { display: flex; flex-direction: column; gap: 12px; padding: 18px 24px 16px; border-radius: 12px; background: var(--bg); transition: background-color 90ms ease, box-shadow 90ms ease; }
+  .pkg.on { /* smooth-shadow-ring-sm, its hairline the stone ring at 50% (the plugin's smooth-ring-*-400/50) */
+            box-shadow: 0 18px 47px rgba(0, 0, 0, 0.03), 0 7.5px 19px rgba(0, 0, 0, 0.02), 0 4px 10.5px rgba(0, 0, 0, 0.02),
+                        0 2.3px 5.8px rgba(0, 0, 0, 0.01), 0 1.2px 3.1px rgba(0, 0, 0, 0.01), 0 0.5px 1.3px rgba(0, 0, 0, 0.01),
+                        0 0 0 1px color-mix(in srgb, var(--ring) 50%, transparent); }
   .pkg .info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .pkg .head { display: flex; align-items: center; gap: 8px; }
-  .pkg .name { flex: 1; min-width: 0; font-weight: 500; color: var(--fg-light); }
-  .pkg .check { flex-shrink: 0; color: var(--primary); opacity: 0; transition: opacity 90ms ease; }
-  .pkg.on .check { opacity: 1; }
+  .pkg .name { font-weight: 500; color: var(--fg-light); }
   .pkg .name, .pkg .note { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .pkg .note { color: var(--muted-fg); }
   .sw { display: flex; align-items: center; gap: 8px; white-space: nowrap; opacity: 0.8; transition: opacity 90ms ease; }
   .pkg.on .sw { opacity: 1; }
   /* Figma's text boxes run a little past the glyphs (the mono ones ~1px), so the badges, the dot and
-     the "@" keep that room and everything after them lands where Figma has it. The HMI badge's
-     stroke sits outside its box, as Figma draws it. */
-  .badge { display: inline-flex; align-items: center; padding: 1px 4px; min-width: 18px; border-radius: 4px; font-family: var(--mono); font-size: 12px; line-height: 16px; }
-  .badge.hmi { padding-right: 4.91px; box-shadow: 0 0 0 1px var(--border); color: var(--fg-light); }
-  .d-group + .d-group .hmi, .dr-group + .dr-group .hmi { color: var(--fg); }
-  .badge.mcu { padding-right: 6px; background: var(--muted); color: var(--primary); }
+     the "@" keep that room and everything after them lands where Figma has it. Both badges are the
+     secondary kind: a muted fill, no stroke. */
+  .badge { display: inline-flex; align-items: center; padding: 1px 4px; min-width: 18px; border-radius: 4px; font-family: var(--mono); font-size: 12px; line-height: 16px; background: var(--muted); color: var(--primary); }
+  .badge.hmi { padding-right: 4.91px; }
+  .badge.mcu { padding-right: 6px; }
   .dot { width: 4px; color: var(--ring); }
   .fw { display: flex; align-items: center; gap: 2px; color: var(--muted-fg); }
   .fw .ver { display: flex; align-items: center; gap: 2.4px; }
@@ -201,7 +200,7 @@ const MONTHS = [
 const card = ([name, note, fw, cfg, mono]) => `
   <div class="pkg">
     <div class="info">
-      <div class="head"><div class="name">${name}</div><svg class="check" width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="currentColor"/><path d="M4.75 8.25 6.9 10.4 11.25 6" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="name">${name}</div>
       <div class="note">${note}</div>
     </div>
     <div class="sw"><span class="badge hmi">3.5.8</span><span class="dot">·</span><span class="fw"><span class="ver${mono ? ' mono' : ''}">${fw}<span class="at">@</span></span><span class="badge mcu">${cfg}</span></span></div>
