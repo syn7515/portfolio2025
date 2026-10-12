@@ -24,20 +24,29 @@ import { keepOnMainThread } from "@/lib/motion";
    white button barely detached from it. Dark mode keeps the plugin's white hairline. A disabled
    button mutes its ring along with its fill and icon (navButtonColors). */
 const NAV_BUTTON_MOTION_CLASS =
-  "rounded-full p-2.5 pointer-events-auto smooth-shadow-ring-sm smooth-ring-black/10 dark:smooth-ring-white/18 disabled:smooth-ring-black/5 dark:disabled:smooth-ring-white/8 transition-[scale,background-color,color] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-safe:enabled:active:scale-[0.97] motion-reduce:transition-[background-color,color]";
+  "rounded-full p-2.5 pointer-events-auto smooth-shadow-ring-sm smooth-ring-black/10 dark:smooth-ring-white/18 disabled:smooth-ring-black/5 dark:disabled:smooth-ring-white/8 transition-[scale,background-color,color,box-shadow] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-safe:enabled:active:scale-[0.97] motion-reduce:transition-[background-color,color,box-shadow]";
 
 /* Disabled is a solid fill and icon colour rather than a fade: a faded button let the page behind
    the backdrop show through it. The solids are the tones that 40% fade landed on over each
-   backdrop, so the disabled button reads the same, just opaque. */
+   backdrop, so the disabled button reads the same, just opaque.
+   Hover leaves the fill alone and takes the site's rose accent — rose-700 in light, rose-400 in
+   dark, as on the project rows and links — on the icon, tinting the hairline ring with it. */
 function navButtonColors(isDarkMode: boolean, isDisabled: boolean, isHovered: boolean): CSSProperties {
-  if (isDarkMode) {
-    return isDisabled
+  if (isDisabled) {
+    return isDarkMode
       ? { backgroundColor: '#0e0e10', color: '#6e6e6f' }
-      : { backgroundColor: isHovered ? '#202023' : '#18181b', color: '#ffffff' };
+      : { backgroundColor: '#fafaf9', color: '#b1b0ad' };
   }
-  return isDisabled
-    ? { backgroundColor: '#fafaf9', color: '#b1b0ad' }
-    : { backgroundColor: isHovered ? '#f4f4f4' : '#ffffff', color: '#44403c' };
+  const backgroundColor = isDarkMode ? '#18181b' : '#ffffff';
+  if (isHovered) {
+    const rose = isDarkMode ? 'var(--color-rose-400)' : 'var(--color-rose-700)';
+    return {
+      backgroundColor,
+      color: rose,
+      '--smooth-ring-color': `color-mix(in srgb, ${rose} ${isDarkMode ? 40 : 30}%, transparent)`,
+    } as CSSProperties;
+  }
+  return { backgroundColor, color: isDarkMode ? '#ffffff' : '#44403c' };
 }
 
 export type TransformSnapshot = {
