@@ -919,6 +919,11 @@
   //   take.cc(patch)         the controller's state at once: the drag landing (selected), the CTA
   //                          pressed, the grill moving (positioning) and arriving (current)
   // ccDrag / ccConfirm set state from timers of their own; here each change is a step of the take.
+  // The page sets the temperature every 100ms, but the readout and the ring only move a few times a
+  // second, so hold / ready / cooling render only when what they show has changed (takeShown); the
+  // other steps always render.
+  let takeShown = null;
+  const takeRender = (key = null) => { if (key !== null && key === takeShown) return; takeShown = key; render(); };
   const take = {
     reset() {
       const r = RECIPES[0];
@@ -929,7 +934,7 @@
       state.sheet.depthRecipeId = null;
       demoPressedId = null;
       demo = { kind: 'take' };
-      render();
+      takeRender();
     },
     hold(f, base) {
       const o = derive().option;
@@ -938,22 +943,27 @@
       sim = { temp: { 0: o.bot - c, 1: o.top - c, 4: o.bot - c, 5: o.top - c },
               t0: { 0: t0(o.bot), 1: t0(o.top), 4: t0(o.bot), 5: t0(o.top) },
               phase: 'preheat', heat: { 0: 1, 1: 1 } };
-      render();
+      const d = derive();
+      const filled = Math.round((d.temps.preheatPercent / 100) * (RING.PROGRESS_ZONE_END - RING.ALWAYS_FILLED_END));
+      takeRender(['hold', d.recipe.id, Math.round(toFDelta(Math.max(d.temps.remainingDeltaTemp, d.temps.overshootDeltaTemp))), filled].join());
     },
     ready() {
       const o = derive().option;
       const at = { 0: o.bot, 1: o.top, 4: o.bot, 5: o.top };
       sim = { temp: at, t0: sim ? sim.t0 : { ...at }, phase: 'ready', heat: {} };
-      render();
+      takeRender(['ready', state.recipeId].join());
     },
-    press(id) { demoPressedId = id; render(); },
+    press(id) { demoPressedId = id; takeRender(); },
     cooling(f, t0) {
       Object.assign(state, { mode: 'clean', cleanStage: 'hot', tempModalOpen: false });
       state.sheet.open = false;
       state.clean.tempF = f;
       cleanT0 = t0;
       demo = { kind: 'take' };
-      render();
+      // the readout, and the tick the ring's fill ends on (as paintCleanRing works it out)
+      const { targetF } = state.clean;
+      const pct = t0 <= targetF ? 0 : Math.max(0, Math.min(100, (f - targetF) / (t0 - targetF) * 100));
+      takeRender(['cool', Math.round(f), Math.round(pct / 100 * (CLEAN.END - CLEAN.MARKER))].join());
     },
     controller() {
       Object.assign(state, { mode: 'clean', cleanStage: 'controller', tempModalOpen: false });
@@ -963,7 +973,7 @@
       $('cc-knob').style.transition = '';
       state.cc = { current: 'grills', selected: 'grills', positioning: false, pressed: false };
       demo = { kind: 'take' };
-      render();
+      takeRender();
     },
     drag(id, ms) {
       const knob = $('cc-knob');
@@ -974,7 +984,7 @@
     cc(patch) {
       if ('selected' in patch) { ccDragging = false; $('cc-knob').style.transition = ''; }
       Object.assign(state.cc, patch);
-      render();
+      takeRender();
     },
   };
 
