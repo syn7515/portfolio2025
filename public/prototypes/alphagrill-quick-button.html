@@ -36,8 +36,10 @@
     width: calc(60px * var(--s, 1)); height: calc(60px * var(--s, 1));
     margin: calc(-30px * var(--s, 1)) 0 0 calc(-30px * var(--s, 1));
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.16);
-    box-shadow: inset 0 0 0 calc(1.5px * var(--s, 1)) rgba(255, 255, 255, 0.3);
+    /* white over a little black: a faint lift on dark surfaces, a light grey on light ones (the
+       same disc as alphagrill-cook.html), with a hairline outside for those */
+    background: linear-gradient(rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.16)), rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 0 0 calc(1.5px * var(--s, 1)) rgba(255, 255, 255, 0.3), 0 0 0 calc(1px * var(--s, 1)) rgba(0, 0, 0, 0.12);
     opacity: 0;
     transition: opacity 280ms ease, scale 140ms ease;
   }
