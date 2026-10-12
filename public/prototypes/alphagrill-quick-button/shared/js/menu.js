@@ -358,11 +358,14 @@
                 </div>
               </button>`;
     };
+    // portfolio: the header bar without its white/20 band, straight on the page's black, and ‹ pressing
+    // to white/10 as the menu's buttons do there (black/20 needed the band to show). ‹ sits 12 further
+    // in (pl 8 → 20), as v14 moved its header buttons.
     setting.innerHTML = `
       <div class="h-full bg-black">
         <div class="flex h-full flex-col overflow-hidden overflow-y-auto">
-          <header class="relative flex h-[100px] min-w-0 shrink-0 items-center justify-between bg-white/20 py-3 pl-2">
-            <button type="button" data-setting-back class="inline-flex h-16 min-w-0 cursor-pointer items-center justify-center gap-0 overflow-hidden rounded-lg px-3 text-white transition-all active:bg-black/20">
+          <header class="relative flex h-[100px] min-w-0 shrink-0 items-center justify-between py-3 pl-5">
+            <button type="button" data-setting-back class="inline-flex h-16 min-w-0 cursor-pointer items-center justify-center gap-0 overflow-hidden rounded-lg px-3 text-white transition-all active:bg-white/10">
               <div class="proto-icon-10 flex size-10 min-w-0 shrink-0 items-center justify-center text-white">${ICON.chevronLeft}</div>
               <span class="type-body1 min-w-0 truncate px-3 text-white">${t('settings')}</span>
             </button>
