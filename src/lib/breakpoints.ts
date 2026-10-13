@@ -38,25 +38,46 @@ const SHEET_MIN_LEFT = 40
 export const PAPER_BREAKPOINT = 1200
 
 /**
- * The widest the sheet gets (--paper-max-w in globals.css). It reaches this at ~1365px; past that
- * a right margin opens up, and from PAPER_CENTERED_BREAKPOINT the sheet sits centred with its
- * contents at a fixed inset.
+ * The widest the sheet gets (--paper-max-w in globals.css). It reaches this at
+ * PAPER_CENTERED_BREAKPOINT, and from there the sheet sits centred with its contents at a fixed
+ * inset.
  */
 export const PAPER_MAX_WIDTH = 1120
 
-/** Where the right margin catches up with the 280px left one and the sheet starts centring. */
-export const PAPER_CENTERED_BREAKPOINT = PAPER_MAX_WIDTH + 2 * 280
+/**
+ * Where the sheet reaches PAPER_MAX_WIDTH and a right margin would open — the width at which
+ * `vw - sidebarWidthAt(vw)` comes to 1120 (8/11 vw + 129.09px = 1120px). From here the sheet
+ * centres on the viewport instead of leaving all the extra width on its right.
+ *
+ * Centring here is a step, not a ramp: the right margin starts from 0 while the left one is ~243px,
+ * so the sheet moves ~121px left as it crosses. Nothing continuous could centre it that early.
+ *
+ * Repeated literally in the centred media query in globals.css, the sidebar in
+ * blog-post-layout.tsx and the rail in blog-post-rail-nav.tsx and its module CSS.
+ */
+export const PAPER_CENTERED_BREAKPOINT = 1362.5
+
+/**
+ * Where the centred sheet's left margin is back up to the text sidebar's 220px minimum. Below it,
+ * from PAPER_CENTERED_BREAKPOINT, the margin (121–220px) can't hold the sidebar's labels, so posts
+ * show the compact rail in its place, as they do across the sheet band. Repeated with
+ * PAPER_CENTERED_BREAKPOINT.
+ */
+export const SIDEBAR_RETURN_BREAKPOINT = PAPER_MAX_WIDTH + 2 * 220
 
 /** Where --sidebar-w stops growing: globals.css clamps it to its 280px maximum from here up. */
 export const SIDEBAR_SETTLED_BREAKPOINT = 1500
 
 /**
- * JS mirror of --sidebar-w (globals.css). The paper's left edge sits here, so anything that centres
- * on the viewport — the carousel's cards — has to measure against it to stay on the sheet.
+ * JS mirror of --sidebar-w (globals.css). The paper's left edge sits here until the sheet centres,
+ * so anything that centres on the viewport — the carousel's cards — has to measure against it to
+ * stay on the sheet. Once the sheet is centred the strip is no wider than the margin it sits in.
  */
 export function sidebarWidthAt(viewportWidth: number): number {
   if (viewportWidth < PAPER_BREAKPOINT) return 0
-  return Math.min(280, Math.max(220, 0.27273 * viewportWidth - 129.09))
+  const width = Math.min(280, Math.max(220, 0.27273 * viewportWidth - 129.09))
+  if (viewportWidth < PAPER_CENTERED_BREAKPOINT) return width
+  return Math.min(width, (viewportWidth - PAPER_MAX_WIDTH) / 2)
 }
 
 /** JS mirror of --paper-left (globals.css): where the paper's left edge sits. */
@@ -66,7 +87,8 @@ export function paperLeftAt(viewportWidth: number): number {
     const t = (viewportWidth - SHEET_BREAKPOINT) / (PAPER_BREAKPOINT - SHEET_BREAKPOINT)
     return SHEET_MIN_LEFT + t * (sidebarWidthAt(PAPER_BREAKPOINT) - SHEET_MIN_LEFT)
   }
-  return Math.max(sidebarWidthAt(viewportWidth), (viewportWidth - PAPER_MAX_WIDTH) / 2)
+  if (viewportWidth < PAPER_CENTERED_BREAKPOINT) return sidebarWidthAt(viewportWidth)
+  return (viewportWidth - PAPER_MAX_WIDTH) / 2
 }
 
 /** The paper's width: the viewport less its left margin, up to PAPER_MAX_WIDTH. */

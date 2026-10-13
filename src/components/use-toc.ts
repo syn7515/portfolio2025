@@ -26,9 +26,10 @@ function slugify(text: string): string {
 /**
  * Reads the post's headings out of the rendered DOM and tracks which one is currently in view.
  *
- * Shared by the sidebar list (≥1200px) and the compact rail (820–1024px, 1064–1200px) so both render the same
- * entries and agree on the active one. Both are mounted at every width — only one is ever displayed
- * — so this deliberately stays cheap: one observer per instance over a handful of headings.
+ * Shared by the sidebar list (1200–1362.5px, ≥1560px) and the compact rail (820–1024px, 1064–1200px,
+ * 1362.5–1560px) so both render the same entries and agree on the active one. Both are mounted at
+ * every width — only one is ever displayed — so this deliberately stays cheap: one observer per
+ * instance over a handful of headings.
  */
 export function useToc(contentSelector: string = CONTENT_SELECTOR) {
   const [items, setItems] = React.useState<TocItem[]>([])

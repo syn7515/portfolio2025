@@ -32,14 +32,15 @@ const RAIL_EXIT_MS = 180
 const TITLE_HOVER_SESSION_MS = 2500
 
 /**
- * Home + table of contents for 820–1024px and 1064–1200px.
+ * Home + table of contents for 820–1024px, 1064–1200px and 1362.5–1560px.
  *
- * At ≥1200px this is the fixed text sidebar; below 820px it's the hamburger overlay. In between,
- * --sidebar-w collapses to 0px, so there is no gutter wide enough for a text rail — the outline
- * collapses to tick marks that expand on hover, and Home becomes a ghost icon button sitting above
- * them. Up to 1024px it floats over the full-bleed paper; from there it sits on the drafting grid in
- * the sheet's left margin, and between 1024 and 1064px, where that margin is too narrow to hold it
- * (RAIL_BREAKPOINT below), it is not shown at all.
+ * At 1200–1362.5px and from 1560px this is the fixed text sidebar; below 820px it's the hamburger
+ * overlay. Below 1200px --sidebar-w collapses to 0px, and from 1362.5px the centred sheet's left
+ * margin is too narrow for the text sidebar until 1560px, so in both there is no gutter wide enough
+ * for a text rail — the outline collapses to tick marks that expand on hover, and Home becomes a
+ * ghost icon button sitting above them. Up to 1024px it floats over the full-bleed paper; from
+ * there it sits on the drafting grid in the sheet's left margin, and between 1024 and 1064px, where
+ * that margin is too narrow to hold it (RAIL_BREAKPOINT below), it is not shown at all.
  *
  * Everything floats over body copy, which is why the labels carry DescriptionBackdrop.
  */
@@ -162,7 +163,10 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
         // light the ticks. What shows sits well inside that margin — the marks end 48px in, 57px
         // with a tick fanned out on hover. Below that, within the sheet band, it steps aside.
         // Repeated in the entrance media query in blog-post-rail-nav.module.css.
-        'hidden min-[820px]:flex sheet:hidden min-[1064px]:flex paper:hidden',
+        // It comes back from 1362.5px to 1560px, where the sheet has centred but its left margin
+        // (121–220px) can't yet hold the text sidebar — see SIDEBAR_RETURN_BREAKPOINT in
+        // src/lib/breakpoints.ts. Its 80px reach fits there with room to spare.
+        'hidden min-[820px]:flex sheet:hidden min-[1064px]:flex paper:hidden min-[1362.5px]:flex min-[1560px]:hidden',
         // Vertically centred so the cluster stays reachable at any scroll position without being
         // fixed to an edge. 24px from the viewport edge throughout: over the full-bleed paper
         // below 1024px, and on the grid in the sheet's left margin from 1064px.

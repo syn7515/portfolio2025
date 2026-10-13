@@ -119,21 +119,19 @@
     --sidebar-w: clamp(220px, calc(27.273vw - 129.09px), 280px);
 
     /* Wide screens (PAPER_MAX_WIDTH in src/lib/breakpoints.ts): the sheet stops growing at 1120px,
-       which it reaches at ~1365px; from there the extra width opens up a right margin while the
-       left one holds at --sidebar-w, and once the two are equal — 280px each at 1680px — the sheet
-       centres on the viewport and both grow together. Nothing steps: the paper's width, both its
-       margins and everything on it move continuously through the whole range.
+       which it reaches at 1362.5px. Up to there its left edge holds at --sidebar-w and it runs to
+       the viewport's right edge; from there it centres (the block below).
        The column formulas in page.tsx and blog-post-layout.tsx centre on the viewport measured
        from --paper-left, so once the sheet is centred they resolve to a fixed inset on it with no
        change of their own. The text sidebar is placed against --paper-left too, so it stays
        beside the sheet rather than at the viewport's edge. */
     --paper-max-w: 1120px;
-    --paper-left: max(var(--sidebar-w), calc((100vw - var(--paper-max-w)) / 2));
+    --paper-left: var(--sidebar-w);
     --paper-right: max(0px, calc(100vw - var(--paper-left) - var(--paper-max-w)));
 
     /* On the wide sheet 560px of text starts to look narrow on it, so the column opens up with the
-       sheet: 560px up to 1280px, 640px by 1680px where the sheet centres, and fixed from there
-       with the rest of its insets. 80px over 400px = 20vw; intercept 560px - 256px = 304px. */
+       sheet: 560px up to 1280px, 640px by 1680px, and fixed from there. 80px over 400px = 20vw;
+       intercept 560px - 256px = 304px. */
     --content-w: clamp(560px, calc(20vw + 304px), 640px);
 
     /* Mirror of the card width useResponsiveSizing computes (carousel/hooks.ts): a ramp from the
@@ -147,9 +145,9 @@
     /* Cards centre on the viewport, but the paper's left edge is inset by --paper-left, so a card
        that centred naively would hang off the sheet. The carousel pushes itself right by whatever
        it takes to keep 48px (CARD_EDGE_GAP) from that edge, which leaves the text column — centred
-       on the viewport — sitting off that axis by the same amount: 60px at 1200px, ~41px at 1400px,
-       nothing once the viewport is wide enough (~1536px) that a centred card already clears the
-       edge. The text rides the same offset so body, header and cards share one centre line.
+       on the viewport — sitting off that axis by the same amount: 60px at 1200px, ~49px at
+       1362px, and nothing once the sheet centres, where a centred card already clears the edge.
+       The text rides the same offset so body, header and cards share one centre line.
 
        Home has no carousel, but its column rides the offset too, so its text starts at the same
        x as a post's and the two sheets read as one. */
@@ -157,6 +155,23 @@
       0px,
       calc(var(--paper-left) + 48px - (100vw - var(--carousel-card-w)) / 2)
     );
+  }
+}
+
+/* From the width where the sheet reaches its 1120px maximum, it centres on the viewport rather than
+   leaving all the extra width on its right. The literal is PAPER_CENTERED_BREAKPOINT in
+   src/lib/breakpoints.ts — the width at which 100vw - --sidebar-w comes to 1120px — and crossing it
+   moves the sheet ~121px left, since its right margin starts from nothing. --paper-right follows on
+   its own, the same as --paper-left now, and --paper-center-offset drops to 0: a centred card
+   already clears the sheet's edge.
+   The text sidebar's strip can be no wider than the margin it sits in, or it would push the
+   sidebar off the viewport's left edge. Below 1560px (SIDEBAR_RETURN_BREAKPOINT) that margin is
+   too narrow for its labels and the compact rail stands in; from there the strip grows with the
+   margin to its usual 280px at 1680px and rides beside the sheet as before. */
+@media (min-width: 1362.5px) {
+  :root {
+    --paper-left: calc((100vw - var(--paper-max-w)) / 2);
+    --sidebar-w: min(clamp(220px, calc(27.273vw - 129.09px), 280px), var(--paper-left));
   }
 }
 

@@ -280,16 +280,19 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
         }}
       />
 
-      {/* Compact rail: Home + tick-mark TOC, for 820–1024px and 1064–1200px, where there is no
-          gutter for the text sidebar below. Hidden between 1024 and 1064px, where the sheet's
-          left margin can't hold even the rail — see blog-post-rail-nav.tsx. */}
+      {/* Compact rail: Home + tick-mark TOC, for 820–1024px, 1064–1200px and 1362.5–1560px,
+          where there is no gutter for the text sidebar below. Hidden between 1024 and 1064px,
+          where the sheet's left margin can't hold even the rail — see blog-post-rail-nav.tsx. */}
       <BlogPostRailNav />
 
       {/* Fixed side nav: back + TOC, from the paper breakpoint up. Its box is the --sidebar-w strip
           just left of the sheet, which is the viewport's left edge until wide screens centre the
-          sheet (globals.css) — from there it travels with the sheet instead of staying behind. */}
+          sheet (globals.css) — from there it travels with the sheet instead of staying behind.
+          It steps aside from 1362.5px, where the sheet first centres and its left margin is too
+          narrow for the labels, and returns at 1560px (SIDEBAR_RETURN_BREAKPOINT in
+          src/lib/breakpoints.ts), where that margin is back to the 220px it has here at 1200. */}
       <aside
-        className="hidden paper:block fixed left-[calc(var(--paper-left)_-_var(--sidebar-w))] top-0 bottom-0 z-60 pointer-events-none"
+        className="hidden paper:block min-[1362.5px]:hidden min-[1560px]:block fixed left-[calc(var(--paper-left)_-_var(--sidebar-w))] top-0 bottom-0 z-60 pointer-events-none"
         aria-label="Post navigation"
       >
         {/* Background layer at 10% opacity */}

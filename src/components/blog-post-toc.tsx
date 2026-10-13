@@ -10,8 +10,9 @@ interface BlogPostTocProps {
 }
 
 /**
- * The sidebar's text table of contents, shown at ≥1200px where the rail has room for full labels.
- * Below that width the same entries are rendered as tick marks by blog-post-rail-nav.
+ * The sidebar's text table of contents, shown at 1200–1362.5px and from 1560px, where the sheet's
+ * left margin has room for full labels. Elsewhere the same entries are rendered as tick marks by
+ * blog-post-rail-nav.
  */
 export default function BlogPostToc({ contentSelector, className }: BlogPostTocProps) {
   const { items, activeId, goTo } = useToc(contentSelector)
