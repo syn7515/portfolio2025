@@ -18,6 +18,14 @@ const PAPER_EXIT_BLUR_PX = 10
 // because the *entrance* is pure CSS and has the same problem, and the two must agree.
 export const PAPER_EXIT_TRANSFORM_ORIGIN = 'var(--paper-swing-origin)'
 
+// The sheet rests flush with the bottom of the page, which on Home is the bottom of the viewport.
+// Lifted 32px and swung 2deg, its bottom edge came up into view and opened a strip of background
+// under it on the way out. So the departing sheet hangs this far below the page, inside a wrapper
+// that clips it at the page's bottom edge: it reaches the bottom of the viewport all the way through
+// its arc. Its edge rises at most ~55px (the 32px lift, plus ~20px of swing at the left corner of a
+// 1120px sheet), and the 10px blur softens another ~30px above that.
+export const PAPER_EXIT_OVERHANG_PX = 120
+
 export const PAPER_EXIT_REST = { x: 0, y: 0, rotate: 0, filter: 'blur(0px)', opacity: 1 }
 export const PAPER_EXIT_OFFSCREEN = {
   x: PAPER_EXIT_OFFSET_X,

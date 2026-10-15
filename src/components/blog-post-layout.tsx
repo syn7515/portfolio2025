@@ -24,6 +24,7 @@ import {
   PAPER_EXIT_TRANSITION,
   PAPER_EXIT_TRANSITION_REDUCED,
   PAPER_EXIT_TRANSFORM_ORIGIN,
+  PAPER_EXIT_OVERHANG_PX,
   markPaperBackNav,
   isPaperBackNav,
   clearPaperBackNav,
@@ -552,18 +553,20 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
             context), so without one the carousel would paint above the departing sheet. z-[55]
             stays below the sidebar (z-60). */}
         {exitEntrance && !exitDone && (
-          <motion.div
-            aria-hidden
-            className="absolute inset-0 sheet:top-[100px] overflow-x-clip pointer-events-none z-[55]"
-            style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--paper-left)', maxWidth: 'var(--paper-max-w)', transformOrigin: PAPER_EXIT_TRANSFORM_ORIGIN }}
-            initial={PAPER_EXIT_REST}
-            animate={PAPER_EXIT_OFFSCREEN}
-            transition={exitTransition}
-            onAnimationComplete={() => setExitDone(true)}
-            // Without it the sheet flashes back to full opacity just before it unmounts — see
-            // keepOnMainThread.
-            onUpdate={keepOnMainThread}
-          />
+          // Clips the sheet's overhang at the bottom of the page — see PAPER_EXIT_OVERHANG_PX.
+          <div aria-hidden className="absolute inset-0 overflow-clip pointer-events-none z-[55]">
+            <motion.div
+              className="absolute inset-0 sheet:top-[100px] overflow-x-clip"
+              style={{ bottom: -PAPER_EXIT_OVERHANG_PX, backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--paper-left)', maxWidth: 'var(--paper-max-w)', transformOrigin: PAPER_EXIT_TRANSFORM_ORIGIN }}
+              initial={PAPER_EXIT_REST}
+              animate={PAPER_EXIT_OFFSCREEN}
+              transition={exitTransition}
+              onAnimationComplete={() => setExitDone(true)}
+              // Without it the sheet flashes back to full opacity just before it unmounts — see
+              // keepOnMainThread.
+              onUpdate={keepOnMainThread}
+            />
+          </div>
         )}
       </div>
     </>
