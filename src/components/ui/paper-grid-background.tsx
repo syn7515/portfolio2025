@@ -20,8 +20,11 @@ export default function PaperGridBackground() {
     // its own (globals.css explains why), so it can't read the position off this element — it needs
     // the pointer in its own box's coordinates. It's always a sibling: this component and the paper
     // sit next to each other under <main> on the home page and under the paper wrapper on a post.
-    const paper = grid.parentElement?.querySelector<HTMLElement>('.paper-grid-bottom') ?? null;
-    const targets = paper ? [grid, paper] : [grid];
+    // A post's reveal footer, which takes that grid over below 1024px, sits under the same wrapper.
+    const targets = [
+      grid,
+      ...(grid.parentElement?.querySelectorAll<HTMLElement>('.paper-grid-bottom, [data-paper-grid-pointer]') ?? []),
+    ];
 
     let frameId = 0;
     let pointerX = 0;
