@@ -104,6 +104,9 @@ export default function LivePrototype({ src, scene, title, frame, bare = false }
           // the two differ the browser paints the iframe opaque white, so pin it to light to match.
           style={{ colorScheme: "light" }}
         />
+        {/* A black scrim over the screen while another page on its card has the turn
+            (prototype-turns.tsx), fading once the card has settled which page that is. */}
+        <div className="absolute inset-0 pointer-events-none bg-black opacity-0 [[data-turn-waiting]_&]:opacity-50 [[data-turn-fade]_&]:transition-opacity [[data-turn-fade]_&]:duration-500 [[data-turn-fade]_&]:ease-out" />
         {/* Outline drawn above the iframe: an inset shadow on the wrapper would sit under it. */}
         {!bare && (
           <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_0_1px_rgba(0,0,0,0.10)] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)]" />
