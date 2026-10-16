@@ -68,9 +68,11 @@ export default function LivePrototype({ src, scene, title, frame, bare = false }
   }, [src, scene]);
 
   return (
+    // Clipped rather than hidden, so nothing (find in page, scrollIntoView) can scroll a frame that
+    // runs past the card's edge back into view.
     <div
       ref={rootRef}
-      className="relative w-full h-full overflow-hidden [container-type:size]"
+      className="relative w-full h-full overflow-clip [container-type:size]"
       data-content-pending={ready ? undefined : ""}
       aria-hidden
     >
