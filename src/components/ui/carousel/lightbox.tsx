@@ -17,36 +17,54 @@ import { renderCaptionWithBadges } from "@/components/ui/sup-caption-badge";
 import { DescriptionBackdrop } from "@/components/ui/description-backdrop";
 import { keepOnMainThread } from "@/lib/motion";
 
-/* The nav buttons float over the backdrop, so their edge comes from the shadow's own hairline ring
-   (smooth-shadow-ring) rather than a border or a blurred 1px layer standing in for one — a separate
-   edge reads as a second, greyer line just outside the first. The light ring is tinted up from the
-   plugin's 5% default: these sit on a near-white stone-100/90 backdrop, where 5% black leaves a
-   white button barely detached from it. Dark mode keeps the plugin's white hairline. A disabled
-   button mutes its ring along with its fill and icon (navButtonColors). */
-const NAV_BUTTON_MOTION_CLASS =
-  "rounded-full p-2.5 pointer-events-auto smooth-shadow-ring-sm smooth-ring-black/10 dark:smooth-ring-white/18 disabled:smooth-ring-black/5 dark:disabled:smooth-ring-white/8 transition-[scale,background-color,color,box-shadow] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-safe:enabled:active:scale-[0.97] motion-reduce:transition-[background-color,color,box-shadow]";
+/* Prev and next are one pill split down the middle by a hairline. It floats over the backdrop, so
+   its edge comes from the shadow's own hairline ring (smooth-shadow-ring) rather than a border or a
+   blurred 1px layer standing in for one — a separate edge reads as a second, greyer line just
+   outside the first. The light ring is tinted up from the plugin's 5% default: the pill sits on a
+   near-white stone-100/90 backdrop, where 5% black leaves it barely detached from it. Dark mode
+   keeps the plugin's white hairline. The divider takes the ring's tones, so it reads as the same
+   line carried across the middle. */
+const NAV_PILL_CLASS =
+  "flex rounded-full pointer-events-auto cursor-default smooth-shadow-ring-sm smooth-ring-black/10 dark:smooth-ring-white/18";
+const NAV_DIVIDER_CLASS = "w-px self-stretch bg-black/10 dark:bg-white/18";
+/* Each half rounds its own outer end, so a disabled half's fill keeps to the pill's shape, and sits
+   its arrow nearer the divider than the end (the padding on each half is set where it's used).
+   Each half also carries a hairline ring of its own, transparent until it's hovered (navButtonColors):
+   it lies over the pill's ring along that half's edge and over the divider beside it, so hover tints
+   just the edge around the half. Positioned, so the divider doesn't paint over it. The rounding
+   would also cut the half's corners out of what a click can hit, and a press there fell through to
+   the backdrop and closed the lightbox, so a bare ::before fills out the half's whole rectangle as
+   its target. A press scales the arrow rather than the half: the half would only shrink into a fill
+   of its own colour. */
+const NAV_BUTTON_CLASS =
+  "group relative py-3 before:absolute before:inset-0 transition-[background-color,color,box-shadow] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)]";
+const NAV_ICON_CLASS =
+  "w-[18px] h-[18px] transition-[scale] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-safe:group-enabled:group-active:scale-90";
 
-/* Disabled is a solid fill and icon colour rather than a fade: a faded button let the page behind
+const navFill = (isDarkMode: boolean) => (isDarkMode ? '#18181b' : '#ffffff');
+const navRing = (color: string) => `0 0 0 var(--smooth-ring-width, 1px) ${color}`;
+
+/* Disabled is a solid fill and icon colour rather than a fade: a faded half let the page behind
    the backdrop show through it. The solids are the tones that 40% fade landed on over each
-   backdrop, so the disabled button reads the same, just opaque.
+   backdrop, so the disabled half reads the same, just opaque.
    Hover leaves the fill alone and takes the site's rose accent — rose-700 in light, rose-400 in
-   dark, as on the project rows and links — on the icon, tinting the hairline ring with it. */
+   dark, as on the project rows and links — on the icon, tinting the half's ring with it. */
 function navButtonColors(isDarkMode: boolean, isDisabled: boolean, isHovered: boolean): CSSProperties {
   if (isDisabled) {
     return isDarkMode
-      ? { backgroundColor: '#0e0e10', color: '#6e6e6f' }
-      : { backgroundColor: '#fafaf9', color: '#b1b0ad' };
+      ? { backgroundColor: '#0e0e10', color: '#6e6e6f', boxShadow: navRing('transparent') }
+      : { backgroundColor: '#fafaf9', color: '#b1b0ad', boxShadow: navRing('transparent') };
   }
-  const backgroundColor = isDarkMode ? '#18181b' : '#ffffff';
+  const backgroundColor = navFill(isDarkMode);
   if (isHovered) {
     const rose = isDarkMode ? 'var(--color-rose-400)' : 'var(--color-rose-700)';
     return {
       backgroundColor,
       color: rose,
-      '--smooth-ring-color': `color-mix(in srgb, ${rose} ${isDarkMode ? 40 : 30}%, transparent)`,
-    } as CSSProperties;
+      boxShadow: navRing(`color-mix(in srgb, ${rose} ${isDarkMode ? 40 : 30}%, transparent)`),
+    };
   }
-  return { backgroundColor, color: isDarkMode ? '#ffffff' : '#44403c' };
+  return { backgroundColor, color: isDarkMode ? '#ffffff' : '#44403c', boxShadow: navRing('transparent') };
 }
 
 export type TransformSnapshot = {
@@ -652,10 +670,10 @@ export function Lightbox({
                 );
               })()}
 
-              {/* Prev/Next buttons - only when more than one item. They sit side by side, floated
-                  just off the viewport's bottom edge (LIGHTBOX_NAV_BOTTOM). The pair swallows its
-                  own clicks, so a press that lands in the gap between the two doesn't fall through
-                  to the backdrop and close the lightbox. */}
+              {/* Prev/Next pill - only when more than one item, floated just off the viewport's
+                  bottom edge (LIGHTBOX_NAV_BOTTOM). The pill swallows its own clicks, so a press
+                  that lands on the divider doesn't fall through to the backdrop and close the
+                  lightbox. */}
               {normalizedItems.length > 1 && (
                 <motion.div
                   className="fixed left-0 right-0 z-20 flex justify-center pointer-events-none"
@@ -664,7 +682,8 @@ export function Lightbox({
                   {...belowMediaMotion}
                 >
                   <div
-                    className="flex gap-2 pointer-events-auto cursor-default"
+                    className={NAV_PILL_CLASS}
+                    style={{ backgroundColor: navFill(isDarkMode) }}
                     onClick={(e) => e.stopPropagation()}
                   >
                     <button
@@ -673,23 +692,24 @@ export function Lightbox({
                       onMouseEnter={() => setIsPrevHovered(true)}
                       onMouseLeave={() => setIsPrevHovered(false)}
                       disabled={isPrevDisabled}
-                      className={`${NAV_BUTTON_MOTION_CLASS} ${isPrevDisabled ? 'cursor-default' : 'cursor-pointer'}`}
+                      className={`${NAV_BUTTON_CLASS} pl-[15px] pr-[11px] rounded-l-full ${isPrevDisabled ? 'cursor-default' : 'cursor-pointer'}`}
                       style={navButtonColors(isDarkMode, isPrevDisabled, isPrevHovered)}
                       aria-label="Previous"
                     >
-                      <ArrowLeft className="w-5 h-5" strokeWidth={1.75} />
+                      <ArrowLeft className={NAV_ICON_CLASS} strokeWidth={1.75} />
                     </button>
+                    <span aria-hidden className={NAV_DIVIDER_CLASS} />
                     <button
                       type="button"
                       onClick={(e) => { e.stopPropagation(); nextLightbox(); }}
                       onMouseEnter={() => setIsNextHovered(true)}
                       onMouseLeave={() => setIsNextHovered(false)}
                       disabled={isNextDisabled}
-                      className={`${NAV_BUTTON_MOTION_CLASS} ${isNextDisabled ? 'cursor-default' : 'cursor-pointer'}`}
+                      className={`${NAV_BUTTON_CLASS} pl-[11px] pr-[15px] rounded-r-full ${isNextDisabled ? 'cursor-default' : 'cursor-pointer'}`}
                       style={navButtonColors(isDarkMode, isNextDisabled, isNextHovered)}
                       aria-label="Next"
                     >
-                      <ArrowRight className="w-5 h-5" strokeWidth={1.75} />
+                      <ArrowRight className={NAV_ICON_CLASS} strokeWidth={1.75} />
                     </button>
                   </div>
                 </motion.div>
