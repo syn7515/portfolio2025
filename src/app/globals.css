@@ -122,7 +122,7 @@
        which it reaches at 1362.5px. Up to there its left edge holds at --sidebar-w and it runs to
        the viewport's right edge; from there it centres (the block below).
        The column formulas in page.tsx and blog-post-layout.tsx centre on the viewport measured
-       from --paper-left, so once the sheet is centred they resolve to a fixed inset on it with no
+       from --paper-left, so once the sheet is centred they resolve to its centre line with no
        change of their own. The text sidebar is placed against --paper-left too, so it stays
        beside the sheet rather than at the viewport's edge. */
     --paper-max-w: 1120px;
@@ -160,16 +160,22 @@
 
 /* From the width where the sheet reaches its 1120px maximum, it centres on the viewport rather than
    leaving all the extra width on its right. The literal is PAPER_CENTERED_BREAKPOINT in
-   src/lib/breakpoints.ts — the width at which 100vw - --sidebar-w comes to 1120px — and crossing it
-   moves the sheet ~121px left, since its right margin starts from nothing. --paper-right follows on
-   its own, the same as --paper-left now, and --paper-center-offset drops to 0: a centred card
-   already clears the sheet's edge.
+   src/lib/breakpoints.ts — the width at which 100vw - --sidebar-w comes to 1120px. --paper-right
+   follows on its own, the same as --paper-left now, and --paper-center-offset drops to 0: a centred
+   card already clears the sheet's edge.
+   Centred at its full 1120px here, the sheet left only ~121px either side against ~270px of paper
+   between its edge and Home's text, so the margins read as an afterthought next to the padding.
+   It comes in narrower instead and grows back as the margins open: ~1041px here, 1120px by 1560px
+   (SIDEBAR_RETURN_BREAKPOINT), where its margins are 220px as before. 80px over 200px = 40vw;
+   intercept 1120px - 624px = 496px. Crossing the breakpoint moves the sheet's left edge ~82px left
+   and narrows it by ~79px. The JS mirror is paperMaxWidthAt in src/lib/breakpoints.ts.
    The text sidebar's strip can be no wider than the margin it sits in, or it would push the
-   sidebar off the viewport's left edge. Below 1560px (SIDEBAR_RETURN_BREAKPOINT) that margin is
-   too narrow for its labels and the compact rail stands in; from there the strip grows with the
-   margin to its usual 280px at 1680px and rides beside the sheet as before. */
+   sidebar off the viewport's left edge. Below 1560px that margin is too narrow for its labels and
+   the compact rail stands in; from there the strip grows with the margin to its usual 280px at
+   1680px and rides beside the sheet as before. */
 @media (min-width: 1362.5px) {
   :root {
+    --paper-max-w: clamp(1040px, calc(40vw + 496px), 1120px);
     --paper-left: calc((100vw - var(--paper-max-w)) / 2);
     --sidebar-w: min(clamp(220px, calc(27.273vw - 129.09px), 280px), var(--paper-left));
   }
