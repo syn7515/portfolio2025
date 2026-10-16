@@ -64,8 +64,9 @@ const touch = document.getElementById('touch');
 /* ---------- the two frames ---------- */
 const F = {};   // 'v14' | 'v0' → { el, win, doc, device }
 
-// The mock recipes that only have Korean names get English ones: this is the English app.
-const EN = { '불고기 패티': 'Bulgogi Patty', '레어': 'Rare', '미디엄 레어': 'Medium rare', '미디엄': 'Medium', '미디엄웰던': 'Medium well', '웰던': 'Well done' };
+// The mock recipes that only have Korean names get English ones: this is the English app. The
+// first is named after the recipe the cook screen beside it on the card starts on.
+const EN = { '불고기 패티': '6oz Pork', '레어': 'Rare', '미디엄 레어': 'Medium rare', '미디엄': 'Medium', '미디엄웰던': 'Medium well', '웰던': 'Well done' };
 
 // The handoff page's trick: copy every :active rule as .is-pressed right after the original, so a
 // scripted press shows the look a finger's would. A sheet added later (menu.js adds its own) gets
@@ -261,7 +262,7 @@ const MENU = '#menu-btn', MENU_ICON = '#menu-btn > div';
 const SETTINGS = '#app-menu [data-menu="setting"]', SETTINGS_LABEL = SETTINGS + ' p';
 const BACK = '#app-setting [data-setting-back]';
 const SWITCH = QS + ' > div:last-child';
-const BEEF_BURGER = '#quick-list [data-quick-recipe="2"]';       // beside the selected Bulgogi Patty
+const BEEF_BURGER = '#quick-list [data-quick-recipe="2"]';       // beside the selected 6oz Pork
 
 async function take(id) {
   if (!dry) reset();
