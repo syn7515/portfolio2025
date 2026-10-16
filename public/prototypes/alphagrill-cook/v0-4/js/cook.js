@@ -790,7 +790,9 @@
   });
 
   // Boundary tick blink (useBoundaryBlink, 500ms)
+  // portfolio: held (lit) while state.blinkHeld, set by an embedding page holding the screen still
   setInterval(() => {
+    if (state.blinkHeld) return;
     state.blink = !state.blink;
     if (derive().isPreheat || state.mode === 'clean') paintRing(derive());
   }, 500);

@@ -273,8 +273,15 @@ const act = fn => { if (!dry) fn(); };
 const plateNow = () => { if (playing) scene.plate(Math.min(length, Math.max(0, Date.now() - loopStart)) / 1000); };
 (function tick() { plateNow(); setTimeout(tick, 100); })();
 
+// Resting through the other page's turn, under its scrim, the ring holds still: the tick that blinks
+// (the cooling marker's tip, the preheat boundary) stays lit until the take plays again.
+function holdStill(on) {
+  win.Cook.state.blinkHeld = on;
+  if (on) { win.Cook.state.blink = true; win.Cook.render(); }
+}
 async function playTake(id) {
   if (!dry) {
+    holdStill(false);
     touch.classList.remove('on', 'down');
     touch.style.transition = '';
     $('#qa-recipe').classList.remove('is-pressed');
@@ -296,7 +303,10 @@ async function loop() {
       vt = 0;
       playing = true;
       await playTake(id);
-      if (turn) await wait(turn.period - length, id);      // the other page's turn
+      if (turn) {                                          // the other page's turn
+        holdStill(true);
+        await wait(turn.period - length, id);
+      }
     }
   } catch (e) { dry = false; if (e !== 'abort') throw e; }
 }
