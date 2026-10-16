@@ -4,11 +4,11 @@
      The prototype itself is in alphagrill-quick-button/, copied as it is from the Prototypes repo's
      "quick button" motion-proto (67b2882): v14 (the cook screen with quick recipe buttons), v0 (the
      app's cook screen as it ships) and the shared/ files both load. This page frames the two in
-     English and plays one take over them: from the quick buttons, open the menu, turn Quick recipe
-     select off in Settings and back out to the app's own cook screen, then turn it on again and land
-     back on the quick buttons.
+     English and plays one take over them: from the app's own cook screen, open the menu, turn Quick
+     recipe select on in Settings and back out to the quick buttons, then change the recipe with one
+     of them.
 
-     The prototype swaps pages when the setting changes (v14 → v0?from=v14 and back). Here both pages
+     The prototype swaps pages when the setting changes (v0 → v14 and back). Here both pages
      are loaded from the start and stacked, and the swap is which frame is on top: it happens under
      the settings page, which is the same in both, so it doesn't show.
 
@@ -122,13 +122,24 @@ function settle(f, on) {
   F[f].win.AppMenu.settings.quickSelect = on;
   F[f].win.AppMenu.openSetting();
 }
-// The quick buttons on top at rest, and v0 waiting beneath with the setting off.
+// Settings shut at once, with no slide out: the last take left v0's open beneath the quick buttons.
+function hideSetting(f) {
+  const setting = F[f].doc.getElementById('app-setting');
+  setting.hidden = true;
+  setting.classList.remove('is-entering', 'is-leaving');
+}
+// v0's own cook screen on top at rest with the setting off, and the quick buttons waiting beneath in
+// Settings with it on, back on the first recipe (setScenario drops the heat-up a pick starts).
 function reset() {
-  F.v14.win.AppMenu.settings.quickSelect = true;
-  F.v14.win.AppMenu.closeSetting();
-  hideMenu('v14');
-  settle('v0', false);
-  show('v14');
+  F.v0.win.AppMenu.settings.quickSelect = false;
+  hideSetting('v0');
+  hideMenu('v0');
+  const cook = F.v14.win.Cook;
+  cook.state.recipeId = 1;
+  cook.state.cookOptionId = 1;
+  cook.setScenario('ready');
+  settle('v14', true);
+  show('v0');
 }
 // The switch slides the way the app's ToggleSwitch does (200ms). The prototype re-renders the
 // settings page on a toggle, which snaps it, and then swaps pages; the take does the swap itself.
@@ -239,31 +250,23 @@ const MENU = '#menu-btn', MENU_ICON = '#menu-btn > div';
 const SETTINGS = '#app-menu [data-menu="setting"]', SETTINGS_LABEL = SETTINGS + ' p';
 const BACK = '#app-setting [data-setting-back]';
 const SWITCH = QS + ' > div:last-child';
+const BEEF_BURGER = '#quick-list [data-quick-recipe="2"]';       // beside the selected Bulgogi Patty
 
 async function take(id) {
   if (!dry) reset();
-  await wait(2200, id);                                           // the quick buttons on the cook screen
-  await tap('v14', MENU, id, { at: MENU_ICON });
-  await wait(900, id);                                            // the menu pushes the screen aside (360ms)
-  await tap('v14', SETTINGS, id, { at: SETTINGS_LABEL, text: true });
-  await wait(1000, id);
-  await tap('v14', QS, id, { at: SWITCH, act: () => slideSwitch('v14', false) });
-  await wait(220, id);                                            // the prototype's own beat before it swaps pages
-  if (!dry) show('v0');
-  await wait(700, id);
-  await tap('v0', BACK, id);
-  await wait(2600, id);                                           // the app's own cook screen
-  if (!dry) settle('v14', true);                                  // waiting beneath for the way back
+  await wait(2200, id);                                           // the app's own cook screen
   await tap('v0', MENU, id, { at: MENU_ICON });
-  await wait(900, id);
+  await wait(900, id);                                            // the menu pushes the screen aside (360ms)
   await tap('v0', SETTINGS, id, { at: SETTINGS_LABEL, text: true });
   await wait(1000, id);
   await tap('v0', QS, id, { at: SWITCH, act: () => slideSwitch('v0', true) });
-  await wait(220, id);
+  await wait(220, id);                                            // the prototype's own beat before it swaps pages
   if (!dry) show('v14');
   await wait(700, id);
   await tap('v14', BACK, id);
-  await wait(1200, id);
+  await wait(1600, id);                                           // the quick buttons on the cook screen
+  await tap('v14', BEEF_BURGER, id);                              // one tap changes the recipe
+  await wait(2600, id);                                           // Beef Burger heats toward its own targets
 }
 
 async function loop() {
