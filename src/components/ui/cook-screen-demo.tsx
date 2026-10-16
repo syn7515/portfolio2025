@@ -25,7 +25,7 @@ const SCENES = {
   area: WHOLE,   // clean-2: cleaning areas picked on the controller
 } satisfies Record<string, CSSProperties>;
 
-// On a card it shares (recipe-select-demo.tsx), `frame` places the screen elsewhere and `turns` has
+// On a card it shares (prototype-turns.tsx), `frame` places the screen elsewhere and `turns` has
 // its take wait for its turn.
 export default function CookScreenDemo({ scene, frame, turns = false }: { scene: keyof typeof SCENES; frame?: CSSProperties; turns?: boolean }) {
   return (

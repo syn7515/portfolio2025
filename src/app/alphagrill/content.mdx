@@ -6,6 +6,7 @@ import SupRef from '@/components/ui/sup-ref'
 import ExternalArrow from '@/components/ui/external-arrow'
 import CookScreenDemo from '@/components/ui/cook-screen-demo'
 import RecipeSelectDemo from '@/components/ui/recipe-select-demo'
+import CleaningModeDemo from '@/components/ui/cleaning-mode-demo'
 
 <div className="max-w-[var(--content-w)] mx-auto">
 
@@ -72,17 +73,12 @@ Three findings from research shaped the newly added cleaning mode:
   <LabelIndicatorCarousel
     showIndicators={false}
     mobileAspect="4/3"
-    supCardMap={{ 3: 0, 4: 1 }}
+    supCardMap={{ 3: 0, 4: 0 }}
     items={[
       {
         label: "CLEAN",
-        caption: "The screen flags the risk of cleaning a still-hot grill, encouraging a brief wait<sup>3</sup>",
-        content: <CookScreenDemo scene="cool" />
-      },
-      {
-        label: "CLEAN",
-        caption: "Selecting a cleaning area repositions the grill so staff can reach hidden surfaces<sup>4</sup>",
-        content: <CookScreenDemo scene="area" />
+        caption: "Cleaning starts with a cooldown<sup>3</sup>, then the grill moves so staff can reach hidden surfaces<sup>4</sup>",
+        content: <CleaningModeDemo />
       },
     ]}
   />

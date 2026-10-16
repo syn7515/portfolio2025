@@ -234,7 +234,7 @@ addEventListener('message', e => {
   if (e.data === 'proto:pause') { runId++; playing = false; }
   else if (e.data === 'proto:resume' && !playing) { behind = true; root.classList.add('no-anim'); loop(); }
 });
-// Sharing its card with another page (?turns, recipe-select-demo.tsx), the two take turns. The page
+// Sharing its card with another page (?turns, prototype-turns.tsx), the two take turns. The page
 // tells the card its take's length ("proto:length", again if pinged), and the card answers with its
 // turn, {type: 'proto:turn', period, offset}: the pair's whole cycle and where in it this take
 // starts. The take then plays once a cycle from there and holds its last frame through the other's

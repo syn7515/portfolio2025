@@ -5,7 +5,7 @@ import LivePrototype from "./live-prototype";
    button prototype in English, turning the setting off and on again from the menu. The 600×1024
    screen sits where the GRILL screen beside it does, centred at 85% of the card's height on the
    16:9 card and 88% on the 4:3 mobile one. 97cqh − 6.75cqw is that line through both aspects.
-   On a card it shares (recipe-select-demo.tsx), `frame` places it elsewhere and `turns` has its
+   On a card it shares (prototype-turns.tsx), `frame` places it elsewhere and `turns` has its
    take wait for its turn. */
 const HEIGHT = "(97cqh - 6.75cqw)";
 
