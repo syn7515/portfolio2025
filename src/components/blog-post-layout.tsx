@@ -102,6 +102,89 @@ function preventWidow(text: string): React.ReactNode {
   )
 }
 
+type ProjectNavigationHandler = (
+  event: React.MouseEvent<HTMLAnchorElement>,
+  href: string,
+  direction: BlogPostMaskDirection
+) => void
+
+// The Previous/Next pair. The layout renders it twice — on the sheet from 1024px, and in the reveal
+// footer under the paper below that — and only one copy is ever displayed, so the hidden one is out
+// of the tab order and the accessibility tree.
+function ProjectNavigationLinks({
+  previousProject,
+  nextProject,
+  onNavigate,
+}: ProjectNavigation & { onNavigate: ProjectNavigationHandler }) {
+  return (
+    // Below 640px each link is just its one-line label, a 21px-tall target. Each carries py-3
+    // there, cancelled by an equal negative margin, which takes the target to 45px without moving
+    // the label or the rows around it — the same trade the home footer's social links make. From
+    // 640px the description joins the link and makes the target tall enough on its own.
+    <div className="flex justify-between items-start gap-8">
+      {/* Previous Project */}
+      {previousProject ? (
+        <Link
+          href={`/${previousProject.slug}`}
+          className="flex-1 group cursor-pointer py-3 -my-3 sm:py-0 sm:my-0"
+          style={{ textDecoration: 'none' }}
+          onClick={(event) => onNavigate(event, `/${previousProject.slug}`, 'previous')}
+        >
+          <div className="text-[14px] text-stone-500 dark:text-zinc-400 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 transition-colors duration-150 font-[400] sm:font-normal not-italic mb-0 sm:mb-1.5 opacity-80 font-sans">
+            <span className="relative inline-flex items-center -translate-x-3 sm:translate-x-0">
+              <ChevronLeft
+                className="absolute left-0 sm:-left-4 size-4 sm:size-3.5 text-stone-400 dark:text-zinc-500 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 opacity-100 sm:opacity-0 blur-none sm:blur-[1px] sm:translate-x-1 transition-colors duration-150 motion-safe:transition-[color,opacity,filter,translate] motion-safe:duration-[150ms,300ms,300ms,300ms] motion-safe:ease-out sm:group-hover:opacity-100 sm:group-hover:blur-none sm:group-hover:translate-x-0 sm:group-active:opacity-100 sm:group-active:blur-none sm:group-active:translate-x-0 sm:group-focus-visible:opacity-100 sm:group-focus-visible:blur-none sm:group-focus-visible:translate-x-0 sm:motion-reduce:opacity-100 sm:motion-reduce:blur-none sm:motion-reduce:translate-x-0"
+                aria-hidden
+              />
+              <span className="relative z-10 translate-x-5 sm:translate-x-0">
+                Previous
+              </span>
+            </span>
+          </div>
+          <p
+            className="hidden sm:block mt-0 not-italic project-nav-description transition-colors duration-150 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400"
+            style={{ fontFamily: 'var(--font-crimson-pro), serif', fontSize: '19px', fontWeight: 450, lineHeight: '130%', letterSpacing: '-0.02em', textWrap: 'balance' }}
+          >
+            {preventWidow(previousProject.description)}
+          </p>
+        </Link>
+      ) : (
+        <div className="flex-1" />
+      )}
+
+      {/* Next Project */}
+      {nextProject ? (
+        <Link
+          href={`/${nextProject.slug}`}
+          className="flex-1 text-right group cursor-pointer py-3 -my-3 sm:py-0 sm:my-0"
+          style={{ textDecoration: 'none' }}
+          onClick={(event) => onNavigate(event, `/${nextProject.slug}`, 'next')}
+        >
+          <div className="text-[14px] text-stone-500 dark:text-zinc-400 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 transition-colors duration-150 font-[400] sm:font-normal not-italic mb-0 sm:mb-1.5 opacity-80 font-sans">
+            <span className="relative inline-flex items-center justify-end translate-x-3 sm:translate-x-0">
+              <ChevronRight
+                className="absolute right-0 sm:-right-4 size-4 sm:size-3.5 text-stone-400 dark:text-zinc-500 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 opacity-100 sm:opacity-0 blur-none sm:blur-[1px] sm:-translate-x-1 transition-colors duration-150 motion-safe:transition-[color,opacity,filter,translate] motion-safe:duration-[150ms,300ms,300ms,300ms] motion-safe:ease-out sm:group-hover:opacity-100 sm:group-hover:blur-none sm:group-hover:translate-x-0 sm:group-active:opacity-100 sm:group-active:blur-none sm:group-active:translate-x-0 sm:group-focus-visible:opacity-100 sm:group-focus-visible:blur-none sm:group-focus-visible:translate-x-0 sm:motion-reduce:opacity-100 sm:motion-reduce:blur-none sm:motion-reduce:translate-x-0"
+                aria-hidden
+              />
+              <span className="relative z-10 -translate-x-5 sm:translate-x-0">
+                Next
+              </span>
+            </span>
+          </div>
+          <p
+            className="hidden sm:block mt-0 not-italic project-nav-description transition-colors duration-150 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400"
+            style={{ fontFamily: 'var(--font-crimson-pro), serif', fontSize: '19px', fontWeight: 450, lineHeight: '130%', letterSpacing: '-0.02em', textWrap: 'balance' }}
+          >
+            {preventWidow(nextProject.description)}
+          </p>
+        </Link>
+      ) : (
+        <div className="flex-1" />
+      )}
+    </div>
+  )
+}
+
 // The paper entrance (sheet slides in from the top-right with a blur-in, then content is revealed
 // on the landing frame) is defined entirely in blog-post.module.css. It has no dynamic inputs, so
 // CSS can run it on the first painted frame instead of waiting for the JS bundle to download and
@@ -242,11 +325,9 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
     cancelBackToTopRef.current = startInterruptibleScrollToTop()
   }, [])
 
-  const handleProjectNavigation = (
-    event: React.MouseEvent<HTMLAnchorElement>,
-    href: string,
-    direction: BlogPostMaskDirection
-  ) => {
+  const hasProjectNavigation = Boolean(previousProject || nextProject)
+
+  const handleProjectNavigation: ProjectNavigationHandler = (event, href, direction) => {
     if (
       event.button !== 0 ||
       event.metaKey ||
@@ -280,11 +361,6 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           background: 'var(--blog-top-fade-gradient, linear-gradient(to bottom, var(--top-fade-from) 0%, transparent 100%))',
         }}
       />
-
-      {/* Compact rail: Home + tick-mark TOC, for 820–1024px, 1064–1200px and 1362.5–1560px,
-          where there is no gutter for the text sidebar below. Hidden between 1024 and 1064px,
-          where the sheet's left margin can't hold even the rail — see blog-post-rail-nav.tsx. */}
-      <BlogPostRailNav />
 
       {/* Fixed side nav: back + TOC, from the paper breakpoint up. Its box is the --sidebar-w strip
           just left of the sheet, which is the viewport's left edge until wide screens centre the
@@ -386,11 +462,35 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
             paper-grid-bottom composites the drafting grid into this element's own background below
             1024px, where the full-bleed paper leaves PaperGridBackground nothing to peek out of. It
             has to be a background rather than a child layer precisely because this element isn't a
-            stacking context — see globals.css. */}
+            stacking context — see globals.css. When the reveal footer below is there, the grid is
+            on it instead and .revealPaper takes it off the paper; the class stays regardless, as
+            the hook other components find the paper by. */}
         <div
-          className="paper-grid-bottom flex-1 sheet:mt-[100px] overflow-x-clip relative"
+          className={cn(
+            'paper-grid-bottom flex-1 sheet:mt-[100px] overflow-x-clip relative',
+            hasProjectNavigation && styles.revealPaper
+          )}
           style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--paper-left)', maxWidth: 'var(--paper-max-w)' }}
         >
+          {/* Compact rail: Home + tick-mark TOC, for 820–1024px, 1064–1200px and 1362.5–1560px,
+              where there is no gutter for the text sidebar below. Hidden between 1024 and 1064px,
+              where the sheet's left margin can't hold even the rail — see blog-post-rail-nav.tsx.
+              It sits on the paper, in a viewport-tall sticky box spanning it, because below 1024px
+              it belongs to the paper rather than to the screen: when the paper's bottom edge
+              scrolls up off the reveal footer, the box runs out of paper and is pushed up with it,
+              so the rail leaves at the paper's pace instead of hanging over the footer. Sticky
+              rather than measured, so it moves on the compositor in step with the scroll. dvh so
+              the box ends where the visible viewport does, which is where the reveal starts.
+              From 1024px the rail is fixed instead, which also takes it out of this element's
+              overflow clip — it lives in the sheet's margin there, outside the paper.
+              The box carries the rail's z-60 itself: a sticky element is always a stacking
+              context, so the rail's own z-index only counts inside it, and without one here the
+              carousel and everything else later on the paper would paint over the rail. */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="sticky top-0 h-dvh z-60">
+              <BlogPostRailNav />
+            </div>
+          </div>
           <div
             className="pt-20 xs:pt-20 min-[640px]:pt-24 sheet:pt-[100px] paper:pt-[clamp(6.25rem,calc(13.333vw_-_3.75rem),8.75rem)]"
           >
@@ -429,104 +529,73 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                     long article and the mark is what says it has ended. */}
                 <Dinkus className={cn('mt-10 sheet:mt-14', styles.contentBlurRevealItem)} />
 
-                {/* Project Navigation Footer — inside paper */}
-                {(previousProject || nextProject) ? (
-                  <div
-                    className={cn(
-                      // The dinkus above closes the article; this margin is the space between it
-                      // and the navigation, and is exactly twice the one above the dinkus at both
-                      // widths (40/80 and 56/112) so the mark sits with the text it ends rather
-                      // than heading these rows. The sheet still gets the larger pair: below
-                      // 1024px the full-bleed paper carries the drafting grid along its bottom edge
-                      // (paper-grid-bottom), which helps separate the two, while on the sheet
-                      // there is nothing but the gap.
-                      // Both values are the whole gap: the children's own top margins collapse into
-                      // this one, which is why neither row below sets a margin of its own.
-                      'max-w-[var(--content-w)] mx-auto sheet:max-w-none mt-20 sheet:mt-28 pb-[28px] min-[640px]:pb-16 sheet:pb-[120px] overflow-x-visible',
-                      styles.contentBlurRevealItem
-                    )}
-                  >
-                    {/* Below 640px each link is just its one-line label, a 21px-tall target. Each
-                        carries py-3 there, cancelled by an equal negative margin, which takes the
-                        target to 45px without moving the label or the rows around it — the same
-                        trade the home footer's social links make. From 640px the description
-                        joins the link and makes the target tall enough on its own. */}
-                    <div className="flex justify-between items-start gap-8">
-                      {/* Previous Project */}
-                      {previousProject ? (
-                        <Link
-                          href={`/${previousProject.slug}`}
-                          className="flex-1 group cursor-pointer py-3 -my-3 sm:py-0 sm:my-0"
-                          style={{ textDecoration: 'none' }}
-                          onClick={(event) => handleProjectNavigation(
-                            event,
-                            `/${previousProject.slug}`,
-                            'previous'
-                          )}
-                        >
-                          <div className="text-[14px] text-stone-500 dark:text-zinc-400 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 transition-colors duration-150 font-[400] sm:font-normal not-italic mb-0 sm:mb-1.5 opacity-80 font-sans">
-                            <span className="relative inline-flex items-center -translate-x-3 sm:translate-x-0">
-                              <ChevronLeft
-                                className="absolute left-0 sm:-left-4 size-4 sm:size-3.5 text-stone-400 dark:text-zinc-500 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 opacity-100 sm:opacity-0 blur-none sm:blur-[1px] sm:translate-x-1 transition-colors duration-150 motion-safe:transition-[color,opacity,filter,translate] motion-safe:duration-[150ms,300ms,300ms,300ms] motion-safe:ease-out sm:group-hover:opacity-100 sm:group-hover:blur-none sm:group-hover:translate-x-0 sm:group-active:opacity-100 sm:group-active:blur-none sm:group-active:translate-x-0 sm:group-focus-visible:opacity-100 sm:group-focus-visible:blur-none sm:group-focus-visible:translate-x-0 sm:motion-reduce:opacity-100 sm:motion-reduce:blur-none sm:motion-reduce:translate-x-0"
-                                aria-hidden
-                              />
-                              <span className="relative z-10 translate-x-5 sm:translate-x-0">
-                                Previous
-                              </span>
-                            </span>
-                          </div>
-                          <p
-                            className="hidden sm:block mt-0 not-italic project-nav-description transition-colors duration-150 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400"
-                            style={{ fontFamily: 'var(--font-crimson-pro), serif', fontSize: '19px', fontWeight: 450, lineHeight: '130%', letterSpacing: '-0.02em', textWrap: 'balance' }}
-                          >
-                            {preventWidow(previousProject.description)}
-                          </p>
-                        </Link>
-                      ) : (
-                        <div className="flex-1" />
+                {hasProjectNavigation ? (
+                  <>
+                    {/* Project navigation on the sheet. The dinkus above closes the article; this
+                        margin is the space between it and the navigation, and is exactly twice the
+                        one above the dinkus (56/112) so the mark sits with the text it ends rather
+                        than heading these rows. The margin is the whole gap: the children's own top
+                        margins collapse into it, which is why neither row sets a margin of its own.
+                        Below 1024px these rows leave the paper for the reveal footer after it. */}
+                    <div
+                      className={cn(
+                        'hidden sheet:block mt-28 pb-[120px] overflow-x-visible',
+                        styles.contentBlurRevealItem
                       )}
-
-                      {/* Next Project */}
-                      {nextProject ? (
-                        <Link
-                          href={`/${nextProject.slug}`}
-                          className="flex-1 text-right group cursor-pointer py-3 -my-3 sm:py-0 sm:my-0"
-                          style={{ textDecoration: 'none' }}
-                          onClick={(event) => handleProjectNavigation(
-                            event,
-                            `/${nextProject.slug}`,
-                            'next'
-                          )}
-                        >
-                          <div className="text-[14px] text-stone-500 dark:text-zinc-400 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 transition-colors duration-150 font-[400] sm:font-normal not-italic mb-0 sm:mb-1.5 opacity-80 font-sans">
-                            <span className="relative inline-flex items-center justify-end translate-x-3 sm:translate-x-0">
-                              <ChevronRight
-                                className="absolute right-0 sm:-right-4 size-4 sm:size-3.5 text-stone-400 dark:text-zinc-500 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 opacity-100 sm:opacity-0 blur-none sm:blur-[1px] sm:-translate-x-1 transition-colors duration-150 motion-safe:transition-[color,opacity,filter,translate] motion-safe:duration-[150ms,300ms,300ms,300ms] motion-safe:ease-out sm:group-hover:opacity-100 sm:group-hover:blur-none sm:group-hover:translate-x-0 sm:group-active:opacity-100 sm:group-active:blur-none sm:group-active:translate-x-0 sm:group-focus-visible:opacity-100 sm:group-focus-visible:blur-none sm:group-focus-visible:translate-x-0 sm:motion-reduce:opacity-100 sm:motion-reduce:blur-none sm:motion-reduce:translate-x-0"
-                                aria-hidden
-                              />
-                              <span className="relative z-10 -translate-x-5 sm:translate-x-0">
-                                Next
-                              </span>
-                            </span>
-                          </div>
-                          <p
-                            className="hidden sm:block mt-0 not-italic project-nav-description transition-colors duration-150 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400"
-                            style={{ fontFamily: 'var(--font-crimson-pro), serif', fontSize: '19px', fontWeight: 450, lineHeight: '130%', letterSpacing: '-0.02em', textWrap: 'balance' }}
-                          >
-                            {preventWidow(nextProject.description)}
-                          </p>
-                        </Link>
-                      ) : (
-                        <div className="flex-1" />
-                      )}
+                    >
+                      <ProjectNavigationLinks
+                        previousProject={previousProject}
+                        nextProject={nextProject}
+                        onNavigate={handleProjectNavigation}
+                      />
                     </div>
-                  </div>
+                    {/* Below 1024px the paper ends here instead, in the straight edge the reveal
+                        footer slides out from under. The same doubling as the sheet's (40/80), so
+                        the mark still reads as the article signing off rather than as a last line
+                        crowding the edge. */}
+                    <div className="pb-20 sheet:hidden" aria-hidden />
+                  </>
                 ) : (
                   <div className="pb-12 sheet:pb-[148px]" aria-hidden />
                 )}
               </div>
           </div>
         </div>
+
+        {/* Reveal footer, below 1024px: the desk under the paper, holding the drafting grid and
+            the Previous/Next pair. It stays put while the paper scrolls up off it, so the end of
+            the post reads as the sheet being lifted away rather than as one more block arriving.
+            The paper can't simply be raised over a fixed footer — a z-index on it would make it the
+            stacking context it must never be (see above) — so nothing here overlaps at all: this is
+            an ordinary block after the paper, and its content is pinned to the viewport's bottom
+            inside it and clipped to it. How the pinning works is in blog-post.module.css. */}
+        {hasProjectNavigation && (
+          <div className={styles.revealFooter}>
+            <div className={styles.revealFooterTrack}>
+              <div className={styles.revealFooterPinned}>
+                <div aria-hidden data-paper-grid-pointer className={styles.revealFooterGrid} />
+                {/* Weighted toward the paper, half the room above that it has below, so the links
+                    read as hanging off the edge they were uncovered from rather than floating
+                    mid-desk, and clear the grid's fade into the bottom of the viewport. */}
+                <div
+                  className={cn(
+                    'relative px-6 pt-10 pb-20 min-[640px]:pt-12 min-[640px]:pb-24',
+                    styles.contentBlurRevealItem
+                  )}
+                >
+                  <div className="max-w-[var(--content-w)] mx-auto">
+                    <ProjectNavigationLinks
+                      previousProject={previousProject}
+                      nextProject={nextProject}
+                      onNavigate={handleProjectNavigation}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div aria-hidden className={styles.revealFooterEdge} />
+          </div>
+        )}
 
         {/* Decorative entrance overlay: plays the slide-in-from-top-right-corner-with-a-blur-in visual
             on top of the real paper above, covering it while it travels, then retires itself on the

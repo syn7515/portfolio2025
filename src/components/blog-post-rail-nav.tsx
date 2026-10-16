@@ -170,7 +170,11 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
         // Vertically centred so the cluster stays reachable at any scroll position without being
         // fixed to an edge. 24px from the viewport edge throughout: over the full-bleed paper
         // below 1024px, and on the grid in the sheet's left margin from 1064px.
-        'fixed left-2 min-[820px]:left-6 top-1/2 -translate-y-1/2 z-60',
+        // Below 1024px it isn't fixed but absolute, inside the viewport-tall sticky box the layout
+        // gives it on the paper — the same place on screen, except that it leaves with the paper
+        // when the paper scrolls up off the reveal footer (blog-post-layout.tsx). That box passes
+        // no pointer events, so the rail takes them back.
+        'absolute sheet:fixed left-2 min-[820px]:left-6 top-1/2 -translate-y-1/2 z-60 pointer-events-auto',
         'flex-col items-start gap-5'
       )}
       aria-label="Post navigation"
