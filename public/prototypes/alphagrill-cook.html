@@ -7,9 +7,9 @@
      a loop as long as the recording, ?scene=
        gauge  grill-1: 6oz Pork preheating, 5 → 1 °F remaining while the ring fills, READY at
               10.8s (14.6s)
-       tap    grill-2: 6oz Pork preheating; Recipe opens the sheet and 8oz Beef is tapped, then
-              the sheet opens again and 6oz Pork is tapped back, while the plate keeps heating
-              (15.9s)
+       tap    grill-2: 6oz Pork preheating; Recipe opens the sheet and 8oz Beef is tapped, and the
+              screen rests on it while the plate keeps heating (8.5s; the recording went on to tap
+              6oz Pork back)
        cool   clean-1: the hot-grill guard, cooling from 318 toward the 300 °F limit (14.9s)
        area   clean-2: the knob dragged from Grill to Side and confirmed, the grill moving there
               for 5.8s; then back to Grill the same way (21.4s)
@@ -166,8 +166,9 @@ const SCENES = {
   tap: {
     start: () => take.reset(),
     plate: t => take.hold(9.4 - (9.4 - 2) * (t / 15.9), 13),
-    // The demo's moments stay where the recording has them — the sheet opens at 3.8s and 11.6s,
-    // rows press at 4.9s and 12.9s and are picked 300ms later — and each finger sets down ahead.
+    // The demo's moments stay where the recording has them — the sheet opens at 3.8s, 8oz Beef
+    // presses at 4.9s and is picked 300ms later, and the plate heats at the recording's rate — and
+    // the finger sets down ahead. It stops at the one pick, resting on 8oz Beef for 3s.
     async steps(id) {
       await wait(3450, id);
       await openSheet(id);                                 // 3.8s: the sheet slides up (320ms)
@@ -175,13 +176,7 @@ const SCENES = {
       await tapRow(id, 4);                                 // 8oz Beef: pressed 4.9s, picked 5.2s
       await wait(300, id);
       act(() => take.press(null));                         // the sheet has slid away (280ms)
-      await wait(5750, id);
-      await openSheet(id);                                 // 11.6s
-      await wait(1080, id);
-      await tapRow(id, 1);                                 // 6oz Pork: pressed 12.9s, picked 13.2s
-      await wait(300, id);
-      act(() => take.press(null));
-      await wait(2400, id);
+      await wait(3000, id);
     },
   },
   cool: {
