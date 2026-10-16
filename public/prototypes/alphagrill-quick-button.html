@@ -141,6 +141,17 @@ function reset() {
   settle('v14', true);
   show('v0');
 }
+// The heat-up a pick starts runs on the screen's own 200ms clock and reaches the new targets in
+// about 3s. By the time this is called it has, so this only lands a copy that caught up to here (or a
+// tab that slept) on Ready too.
+function heated(f) {
+  const { sim, RECIPES, state, render } = F[f].win.Cook;
+  const option = RECIPES.find(r => r.id === state.recipeId)?.cookOptions.find(o => o.id === state.cookOptionId);
+  if (!sim || !option) return;
+  Object.assign(sim.temp, { 1: option.top, 5: option.top, 0: option.bot, 4: option.bot });
+  sim.phase = 'ready';
+  render();
+}
 // The switch slides the way the app's ToggleSwitch does (200ms). The prototype re-renders the
 // settings page on a toggle, which snaps it, and then swaps pages; the take does the swap itself.
 const QS = '#app-setting [data-setting-toggle="quickSelect"]';
@@ -266,7 +277,9 @@ async function take(id) {
   await tap('v14', BACK, id);
   await wait(1600, id);                                           // the quick buttons on the cook screen
   await tap('v14', BEEF_BURGER, id);                              // one tap changes the recipe
-  await wait(2600, id);                                           // Beef Burger heats toward its own targets
+  await wait(3400, id);                                           // Beef Burger heats toward its own targets
+  if (!dry) heated('v14');
+  await wait(3000, id);                                           // and rests on Ready before the take ends
 }
 
 async function loop() {
