@@ -214,13 +214,19 @@ function MediaLayer({ index, item, isDarkMode, waiting, load, onReady }: MediaLa
     const ready = () => onReady(index);
     if (isContentItem) {
       // Live markup that loads asynchronously (an iframe) marks itself data-content-pending until
-      // it fires "contentready".
-      if (!el.querySelector("[data-content-pending]")) {
+      // it fires "contentready". A card with more than one such page is ready with the last of them.
+      const pending = new Set(el.querySelectorAll("[data-content-pending]"));
+      if (!pending.size) {
         ready();
         return;
       }
-      el.addEventListener("contentready", ready);
-      return () => el.removeEventListener("contentready", ready);
+      const onContentReady = (e: Event) => {
+        pending.delete(e.target as Element);
+        for (const p of pending) if (!p.isConnected || !p.hasAttribute("data-content-pending")) pending.delete(p);
+        if (!pending.size) ready();
+      };
+      el.addEventListener("contentready", onContentReady);
+      return () => el.removeEventListener("contentready", onContentReady);
     }
     const img = el.querySelector("img");
     if (!img || img.complete) {

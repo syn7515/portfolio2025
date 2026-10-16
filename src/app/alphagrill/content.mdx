@@ -5,7 +5,7 @@ import { Table } from '@/components/ui/table'
 import SupRef from '@/components/ui/sup-ref'
 import ExternalArrow from '@/components/ui/external-arrow'
 import CookScreenDemo from '@/components/ui/cook-screen-demo'
-import QuickButtonDemo from '@/components/ui/quick-button-demo'
+import RecipeSelectDemo from '@/components/ui/recipe-select-demo'
 
 <div className="max-w-[var(--content-w)] mx-auto">
 
@@ -34,13 +34,8 @@ Commercial kitchens move fast and AlphaGrill automates one task: grilling pattie
       },
       {
         label: "GRILL",
-        caption: "Tap-first interaction reduced failed inputs with gloved hands<sup>2</sup>",
-        content: <CookScreenDemo scene="tap" />
-      },
-      {
-        label: "GRILL",
-        caption: "Quick recipe select puts recipes on the cook screen as one-tap buttons",
-        content: <QuickButtonDemo />
+        caption: "Changing recipes takes taps, not swipes — and just one with quick select<sup>2</sup>",
+        content: <RecipeSelectDemo />
       },
     ]}
   />
