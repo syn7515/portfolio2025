@@ -234,6 +234,22 @@ addEventListener('message', e => {
   if (e.data === 'proto:pause') { runId++; playing = false; }
   else if (e.data === 'proto:resume' && !playing) { behind = true; root.classList.add('no-anim'); loop(); }
 });
+// Sharing its card with another page (?turns, recipe-select-demo.tsx), the two take turns. The page
+// tells the card its take's length ("proto:length", again if pinged), and the card answers with its
+// turn, {type: 'proto:turn', period, offset}: the pair's whole cycle and where in it this take
+// starts. The take then plays once a cycle from there and holds its last frame through the other's
+// turn. Until it has a turn it doesn't play, so it isn't shown either.
+const TURNS = params.has('turns');
+let turn = null;
+const tellLength = () => { if (TURNS && length && parent !== window) parent.postMessage({ type: 'proto:length', scene: SCENE, length }, location.origin); };
+addEventListener('message', e => {
+  if (e.origin !== location.origin) return;
+  if (e.data === 'proto:ping') tellLength();
+  else if (e.data?.type === 'proto:turn' && (e.data.period !== turn?.period || e.data.offset !== turn?.offset)) {
+    turn = { period: e.data.period, offset: e.data.offset };
+    behind = true; root.classList.add('no-anim'); loop();
+  }
+});
 const finishMotion = () => doc.getAnimations().forEach(a => { try { a.finish(); } catch (e) { /* an endless one */ } });
 async function catchUp() {
   finishMotion();
@@ -278,12 +294,14 @@ async function loop() {
     // Measure the take with a dry run (every wait returns at once, no step acts), so a synced copy can find its place in it.
     dry = true; vt = 0; await playTake(id); dry = false;
     length = vt;
+    if (TURNS && !turn) { tellLength(); return; }          // its turn starts it
     while (true) {
       const now = Date.now();
-      loopStart = EMBED ? now - (now % length) : now;
+      loopStart = turn ? now - ((now - turn.offset) % turn.period) : EMBED ? now - (now % length) : now;
       vt = 0;
       playing = true;
       await playTake(id);
+      if (turn) await wait(turn.period - length, id);      // the other page's turn
     }
   } catch (e) { dry = false; if (e !== 'abort') throw e; }
 }

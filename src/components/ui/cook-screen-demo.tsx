@@ -25,11 +25,12 @@ const SCENES = {
   area: WHOLE,   // clean-2: cleaning areas picked on the controller
 } satisfies Record<string, CSSProperties>;
 
-// `frame` places the screen elsewhere, for a card it shares (recipe-select-demo.tsx).
-export default function CookScreenDemo({ scene, frame }: { scene: keyof typeof SCENES; frame?: CSSProperties }) {
+// On a card it shares (recipe-select-demo.tsx), `frame` places the screen elsewhere and `turns` has
+// its take wait for its turn.
+export default function CookScreenDemo({ scene, frame, turns = false }: { scene: keyof typeof SCENES; frame?: CSSProperties; turns?: boolean }) {
   return (
     <LivePrototype
-      src={`/prototypes/alphagrill-cook.html?embed&scene=${scene}`}
+      src={`/prototypes/alphagrill-cook.html?embed&scene=${scene}${turns ? "&turns" : ""}`}
       scene={scene}
       title="AlphaGrill cook screen prototype"
       frame={frame ?? SCENES[scene]}
