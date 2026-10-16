@@ -38,9 +38,9 @@ const SHEET_MIN_LEFT = 40
 export const PAPER_BREAKPOINT = 1200
 
 /**
- * The widest the sheet gets (--paper-max-w in globals.css). It reaches this at
- * PAPER_CENTERED_BREAKPOINT, and from there the sheet sits centred with its contents at a fixed
- * inset.
+ * The widest the sheet gets (--paper-max-w in globals.css). The sheet held against the sidebar
+ * reaches this at PAPER_CENTERED_BREAKPOINT; the centred one comes in narrower there and grows back
+ * to it by SIDEBAR_RETURN_BREAKPOINT (paperMaxWidthAt below).
  */
 export const PAPER_MAX_WIDTH = 1120
 
@@ -49,8 +49,9 @@ export const PAPER_MAX_WIDTH = 1120
  * `vw - sidebarWidthAt(vw)` comes to 1120 (8/11 vw + 129.09px = 1120px). From here the sheet
  * centres on the viewport instead of leaving all the extra width on its right.
  *
- * Centring here is a step, not a ramp: the right margin starts from 0 while the left one is ~243px,
- * so the sheet moves ~121px left as it crosses. Nothing continuous could centre it that early.
+ * Centring here is a step, not a ramp: the right margin starts from 0 while the left one is ~243px.
+ * The sheet also narrows to ~1041px as it crosses (paperMaxWidthAt), so its left edge moves ~82px
+ * left. Nothing continuous could centre it that early.
  *
  * Repeated literally in the centred media query in globals.css, the sidebar in
  * blog-post-layout.tsx and the rail in blog-post-rail-nav.tsx and its module CSS.
@@ -58,12 +59,22 @@ export const PAPER_MAX_WIDTH = 1120
 export const PAPER_CENTERED_BREAKPOINT = 1362.5
 
 /**
- * Where the centred sheet's left margin is back up to the text sidebar's 220px minimum. Below it,
- * from PAPER_CENTERED_BREAKPOINT, the margin (121–220px) can't hold the sidebar's labels, so posts
- * show the compact rail in its place, as they do across the sheet band. Repeated with
- * PAPER_CENTERED_BREAKPOINT.
+ * Where the centred sheet's left margin is back up to the text sidebar's 220px minimum, and where
+ * the sheet is back to PAPER_MAX_WIDTH. Below it, from PAPER_CENTERED_BREAKPOINT, the margin
+ * (161–220px) can't hold the sidebar's labels, so posts show the compact rail in its place, as they
+ * do across the sheet band. Repeated with PAPER_CENTERED_BREAKPOINT.
  */
 export const SIDEBAR_RETURN_BREAKPOINT = PAPER_MAX_WIDTH + 2 * 220
+
+/**
+ * JS mirror of --paper-max-w (globals.css). PAPER_MAX_WIDTH until the sheet centres; from there a
+ * ramp from ~1041px at PAPER_CENTERED_BREAKPOINT to PAPER_MAX_WIDTH at SIDEBAR_RETURN_BREAKPOINT,
+ * so the centred sheet's margins open up rather than starting at ~121px against the padding inside.
+ */
+export function paperMaxWidthAt(viewportWidth: number): number {
+  if (viewportWidth < PAPER_CENTERED_BREAKPOINT) return PAPER_MAX_WIDTH
+  return Math.min(PAPER_MAX_WIDTH, Math.max(1040, 0.4 * viewportWidth + 496))
+}
 
 /** Where --sidebar-w stops growing: globals.css clamps it to its 280px maximum from here up. */
 export const SIDEBAR_SETTLED_BREAKPOINT = 1500
@@ -77,7 +88,7 @@ export function sidebarWidthAt(viewportWidth: number): number {
   if (viewportWidth < PAPER_BREAKPOINT) return 0
   const width = Math.min(280, Math.max(220, 0.27273 * viewportWidth - 129.09))
   if (viewportWidth < PAPER_CENTERED_BREAKPOINT) return width
-  return Math.min(width, (viewportWidth - PAPER_MAX_WIDTH) / 2)
+  return Math.min(width, (viewportWidth - paperMaxWidthAt(viewportWidth)) / 2)
 }
 
 /** JS mirror of --paper-left (globals.css): where the paper's left edge sits. */
@@ -88,11 +99,11 @@ export function paperLeftAt(viewportWidth: number): number {
     return SHEET_MIN_LEFT + t * (sidebarWidthAt(PAPER_BREAKPOINT) - SHEET_MIN_LEFT)
   }
   if (viewportWidth < PAPER_CENTERED_BREAKPOINT) return sidebarWidthAt(viewportWidth)
-  return (viewportWidth - PAPER_MAX_WIDTH) / 2
+  return (viewportWidth - paperMaxWidthAt(viewportWidth)) / 2
 }
 
-/** The paper's width: the viewport less its left margin, up to PAPER_MAX_WIDTH. */
+/** The paper's width: the viewport less its left margin, up to paperMaxWidthAt. */
 export function paperWidthAt(viewportWidth: number): number {
   const width = viewportWidth - paperLeftAt(viewportWidth)
-  return viewportWidth < PAPER_BREAKPOINT ? width : Math.min(width, PAPER_MAX_WIDTH)
+  return viewportWidth < PAPER_BREAKPOINT ? width : Math.min(width, paperMaxWidthAt(viewportWidth))
 }
