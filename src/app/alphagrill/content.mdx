@@ -46,7 +46,7 @@ Two decisions anchored the redesign:
 
 **Showing readiness, not raw data<SupRef id={1} />** The current temperature reading didn't tell chefs much—they wanted to know when the robot would be ready. I replaced numeric readings with a circular progress gauge that visualized the countdown to readiness, directly answering what they actually needed.
 
-**Tapping instead of swiping<SupRef id={2} />** Swipe-based recipe selection failed often with oily gloved hands. Tap won on reliability. Swipe requires recognizing both position and direction; tap needs only position — which lowers both the time per action and the failure rate.
+**Tapping instead of swiping<SupRef id={2} />** Swipe-based recipe selection failed often with oily gloved hands. Tap won on reliability. Swipe requires recognizing both position and direction; tap needs only position. I built every screen on the same principle: taps rather than scrolls or drags, and as few of them as possible.
 <Table
   columns={['', 'Action time', 'Avg. attempts', 'Total time']}
   rows={[
