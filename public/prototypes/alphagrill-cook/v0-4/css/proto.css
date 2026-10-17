@@ -379,6 +379,9 @@ svg:has(> use[href="#i-recipe-change"]), svg:has(> use[href="#i-unload"]), svg:h
 .cc-spinner[hidden] { display: none; }
 @keyframes cc-spin { to { transform: rotate(360deg); } }
 .cc-explain { position: absolute; left: 50%; top: 396px; z-index: 10; transform: translateX(-50%); width: 490px; height: 76px; display: flex; align-items: center; justify-content: center; border-radius: 16px; border: 1px solid rgb(255 255 255 / 15%); background: rgb(255 255 255 / 7%); font-size: 28px; line-height: 36px; font-weight: 400; color: rgb(255 255 255 / 90%); white-space: nowrap; pointer-events: none; }
+/* portfolio: the clean ring is drawn at the grill ring's size (cook.js), 12.5 in on each side, so the
+   pill narrows by as much (490 → 465) to keep its top corners as far off the ticks. */
+.cc-explain { width: 465px; }
 /* Repositioning: the labels dim with the header. */
 #cook-container.is-positioning ~ * .cc-label, .cc-marker:disabled .cc-label { color: rgb(255 255 255 / 40%); }
 .cc-marker:disabled .cc-tick { background: rgb(255 255 255 / 25%); }
