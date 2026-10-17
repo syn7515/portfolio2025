@@ -550,10 +550,10 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                       />
                     </div>
                     {/* Below 1024px the paper ends here instead, in the straight edge the reveal
-                        footer slides out from under. The same doubling as the sheet's (40/80), so
-                        the mark still reads as the article signing off rather than as a last line
+                        footer slides out from under. 112px, the sheet's own gap below the mark, so
+                        it still reads as the article signing off rather than as a last line
                         crowding the edge. */}
-                    <div className="pb-20 sheet:hidden" aria-hidden />
+                    <div className="pb-28 sheet:hidden" aria-hidden />
                   </>
                 ) : (
                   <div className="pb-12 sheet:pb-[148px]" aria-hidden />
