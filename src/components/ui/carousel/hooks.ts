@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback, useSyncExternalStore } from "react";
 
 import {
   PAPER_BREAKPOINT,
+  PAPER_CENTERED_BREAKPOINT,
   SHEET_BREAKPOINT,
   paperWidthAt,
 } from "@/lib/breakpoints";
@@ -304,6 +305,11 @@ const CARD_BAND_WIDTH = 784;
 // The widest a card gets. Mirrored by the clamp in --carousel-card-w (globals.css).
 const CARD_MAX_WIDTH = 880;
 
+// Where the card's ramp starts once the sheet centres (PAPER_CENTERED_BREAKPOINT). The sheet comes
+// in narrower there (paperMaxWidthAt), so the card does too, back to CARD_MAX_WIDTH at
+// SIDEBAR_RETURN_BREAKPOINT. Mirrored by the centred block's --carousel-card-w (globals.css).
+const CARD_CENTERED_WIDTH = 840;
+
 // Below the sheet, how far a card keeps from the viewport's edges: the compact rail from 820px
 // sits 24px in with a 56px hit area, so its reach ends at 80px; 8px past that keeps the two apart.
 // Mirrored by the md: fallback width in label_indicator_carousel.jsx.
@@ -361,9 +367,13 @@ export function useResponsiveSizing(
         // A ramp from CARD_BAND_WIDTH at the paper breakpoint, rising 0.8px per px of viewport to
         // CARD_MAX_WIDTH at 1320px, and held at that 784px across the sheet band so the card keeps
         // its place on the sheet as it slides. --carousel-card-w in globals.css mirrors this.
+        // Once the sheet centres the card starts over, from CARD_CENTERED_WIDTH, rising 0.2px per
+        // px back to CARD_MAX_WIDTH at 1560px.
         const rampW = Math.max(w, PAPER_BREAKPOINT);
         const idealWidth = Math.round(
-          Math.min(CARD_MAX_WIDTH, CARD_BAND_WIDTH + (rampW - PAPER_BREAKPOINT) * 0.8)
+          w >= PAPER_CENTERED_BREAKPOINT
+            ? Math.min(CARD_MAX_WIDTH, Math.max(CARD_CENTERED_WIDTH, 0.2 * w + 568))
+            : Math.min(CARD_MAX_WIDTH, CARD_BAND_WIDTH + (rampW - PAPER_BREAKPOINT) * 0.8)
         );
         // Cards centre on the column they sit in, which already rides --paper-center-offset and is
         // therefore far enough from the paper's left edge — nothing to shift here. Only shrink if
