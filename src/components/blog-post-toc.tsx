@@ -10,7 +10,7 @@ interface BlogPostTocProps {
 }
 
 /**
- * The sidebar's text table of contents, shown at 1200–1362.5px and from 1560px, where the sheet's
+ * The sidebar's text table of contents, shown at 1200–1362.5px and from 1520px, where the sheet's
  * left margin has room for full labels. Elsewhere the same entries are rendered as tick marks by
  * blog-post-rail-nav.
  */

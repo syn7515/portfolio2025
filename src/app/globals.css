@@ -118,9 +118,9 @@
   :root {
     --sidebar-w: clamp(220px, calc(27.273vw - 129.09px), 280px);
 
-    /* Wide screens (PAPER_MAX_WIDTH in src/lib/breakpoints.ts): the sheet stops growing at 1120px,
-       which it reaches at 1362.5px. Up to there its left edge holds at --sidebar-w and it runs to
-       the viewport's right edge; from there it centres (the block below).
+    /* Wide screens (PAPER_ANCHORED_MAX_WIDTH in src/lib/breakpoints.ts): the sheet stops growing
+       at 1120px, which it reaches at 1362.5px. Up to there its left edge holds at --sidebar-w and it
+       runs to the viewport's right edge; from there it centres (the block below), narrower.
        The column formulas in page.tsx and blog-post-layout.tsx centre on the viewport measured
        from --paper-left, so once the sheet is centred they resolve to its centre line with no
        change of their own. The text sidebar is placed against --paper-left too, so it stays
@@ -166,23 +166,24 @@
    card already clears the sheet's edge.
    Centred at its full 1120px here, the sheet left only ~121px either side against ~270px of paper
    between its edge and Home's text, so the margins read as an afterthought next to the padding.
-   It comes in narrower instead and grows back as the margins open: ~1001px here, 1120px by 1560px
-   (SIDEBAR_RETURN_BREAKPOINT), where its margins are 220px as before. 120px over 200px = 60vw;
-   intercept 1120px - 936px = 184px. Crossing the breakpoint moves the sheet's left edge ~62px left
-   and narrows it by ~119px. The JS mirror is paperMaxWidthAt in src/lib/breakpoints.ts.
+   It comes in narrower instead and grows as the margins open: ~1001px here, to its 1080px maximum
+   (PAPER_MAX_WIDTH) by 1520px (SIDEBAR_RETURN_BREAKPOINT), where its margins are 220px. 80px over
+   160px = 50vw; intercept 1080px - 760px = 320px. Crossing the breakpoint moves the sheet's left
+   edge ~62px left and narrows it by ~119px. The JS mirror is paperMaxWidthAt in
+   src/lib/breakpoints.ts.
    The carousel's cards come in with it, or the narrower sheet would leave them only ~60px from its
-   edge: ~840px here, back to 880px by 1560px, holding them ~80px inside the sheet at the start and
-   120px by the end. 40px over 200px = 20vw; intercept 880px - 312px = 568px. The JS mirror is the
+   edge: ~840px here, back to 880px by 1520px, holding them ~80px inside the sheet at the start and
+   100px by the end. 40px over 160px = 25vw; intercept 880px - 380px = 500px. The JS mirror is the
    centred branch of useResponsiveSizing (carousel/hooks.ts).
    The text sidebar's strip can be no wider than the margin it sits in, or it would push the
-   sidebar off the viewport's left edge. Below 1560px that margin is too narrow for its labels and
+   sidebar off the viewport's left edge. Below 1520px that margin is too narrow for its labels and
    the compact rail stands in; from there the strip grows with the margin to its usual 280px at
-   1680px and rides beside the sheet as before. */
+   1640px and rides beside the sheet as before. */
 @media (min-width: 1362.5px) {
   :root {
-    --paper-max-w: clamp(1000px, calc(60vw + 184px), 1120px);
+    --paper-max-w: clamp(1000px, calc(50vw + 320px), 1080px);
     --paper-left: calc((100vw - var(--paper-max-w)) / 2);
-    --carousel-card-w: clamp(840px, calc(20vw + 568px), 880px);
+    --carousel-card-w: clamp(840px, calc(25vw + 500px), 880px);
     --sidebar-w: min(clamp(220px, calc(27.273vw - 129.09px), 280px), var(--paper-left));
   }
 }

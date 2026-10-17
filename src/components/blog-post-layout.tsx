@@ -366,10 +366,10 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           just left of the sheet, which is the viewport's left edge until wide screens centre the
           sheet (globals.css) — from there it travels with the sheet instead of staying behind.
           It steps aside from 1362.5px, where the sheet first centres and its left margin is too
-          narrow for the labels, and returns at 1560px (SIDEBAR_RETURN_BREAKPOINT in
+          narrow for the labels, and returns at 1520px (SIDEBAR_RETURN_BREAKPOINT in
           src/lib/breakpoints.ts), where that margin is back to the 220px it has here at 1200. */}
       <aside
-        className="hidden paper:block min-[1362.5px]:hidden min-[1560px]:block fixed left-[calc(var(--paper-left)_-_var(--sidebar-w))] top-0 bottom-0 z-60 pointer-events-none"
+        className="hidden paper:block min-[1362.5px]:hidden min-[1520px]:block fixed left-[calc(var(--paper-left)_-_var(--sidebar-w))] top-0 bottom-0 z-60 pointer-events-none"
         aria-label="Post navigation"
       >
         {/* Background layer at 10% opacity */}
@@ -472,7 +472,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           )}
           style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--paper-left)', maxWidth: 'var(--paper-max-w)' }}
         >
-          {/* Compact rail: Home + tick-mark TOC, for 820–1024px, 1064–1200px and 1362.5–1560px,
+          {/* Compact rail: Home + tick-mark TOC, for 820–1024px, 1064–1200px and 1362.5–1520px,
               where there is no gutter for the text sidebar below. Hidden between 1024 and 1064px,
               where the sheet's left margin can't hold even the rail — see blog-post-rail-nav.tsx.
               It sits on the paper, in a viewport-tall sticky box spanning it, because below 1024px
