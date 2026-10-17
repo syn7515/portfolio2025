@@ -11,20 +11,23 @@ export default function BlogPostHeader({ title, subtitle }: BlogPostHeaderProps)
     <header className="max-w-[var(--content-w)] mx-auto pt-4 sm:pt-0 mb-14 sm:mb-20 lg:mb-[100px] text-left">
       {/* Title. 40px on the sheet (1024px up) — the display size, since that is where the case
           study becomes a sheet with a margin around it and the title is the only thing on it above
-          the fold. Below the sheet it slides from 36px at 1024px to the 26px phone size by 640px
-          and holds there, leaving a small 36-to-40px step for the sheet's arrival. Slope is 10px
-          over 384px = 2.6042vw; the intercept is 26px - 640px * 0.026042 = 9.333px.
+          the fold. Below the sheet it slides from 40px at 1024px down to 32px at 640px, then
+          steps to the 26px phone size. From 640px the column and body copy are already the
+          sheet's (560px, 15px), so a title well under 40 there read as undersized against them; the
+          step lands at 640px because the rest of this header changes there too (spacing, the
+          subtitle), and it keeps the ramp continuous into the sheet. Slope is 8px over 384px =
+          2.0833vw; the intercept is 32px - 640px * 0.020833 = 18.667px.
 
-          It ends where the home name does (26px at 640px, see the h1 in app/page.tsx), so on a
-          phone a reader arriving from home meets the same voice at the same scale; above that the
-          title runs larger than the name, which never has the page to itself.
+          On a phone it matches the home name (26px, see the h1 in app/page.tsx), so a reader
+          arriving from home meets the same voice at the same scale; above that the title runs
+          larger than the name, which never has the page to itself.
 
           Tracking is -0.03em at every size: -1.2px at 40px, -0.78px at 26px, which is where the
           home name's flat -0.75px sits. A flat px value would read noticeably loose at the top of
           the ramp. It lives on the utility rather than the inline style only to keep the type
           settings in one place. */}
       <h1
-        className="!mt-0 !text-[clamp(26px,calc(2.6042vw_+_9.333px),36px)] sheet:!text-[2.5rem] !tracking-[-0.03em] !text-stone-700 dark:!text-zinc-200 !mb-0 whitespace-pre-line"
+        className="!mt-0 !text-[26px] sm:!text-[clamp(32px,calc(2.0833vw_+_18.667px),40px)] !tracking-[-0.03em] !text-stone-700 dark:!text-zinc-200 !mb-0 whitespace-pre-line"
         style={{
           fontFamily: 'var(--font-crimson-pro), serif',
           lineHeight: '120%',
