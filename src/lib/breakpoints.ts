@@ -50,7 +50,7 @@ export const PAPER_MAX_WIDTH = 1120
  * centres on the viewport instead of leaving all the extra width on its right.
  *
  * Centring here is a step, not a ramp: the right margin starts from 0 while the left one is ~243px.
- * The sheet also narrows to ~1041px as it crosses (paperMaxWidthAt), so its left edge moves ~82px
+ * The sheet also narrows to ~1001px as it crosses (paperMaxWidthAt), so its left edge moves ~62px
  * left. Nothing continuous could centre it that early.
  *
  * Repeated literally in the centred media query in globals.css, the sidebar in
@@ -61,19 +61,19 @@ export const PAPER_CENTERED_BREAKPOINT = 1362.5
 /**
  * Where the centred sheet's left margin is back up to the text sidebar's 220px minimum, and where
  * the sheet is back to PAPER_MAX_WIDTH. Below it, from PAPER_CENTERED_BREAKPOINT, the margin
- * (161–220px) can't hold the sidebar's labels, so posts show the compact rail in its place, as they
+ * (181–220px) can't hold the sidebar's labels, so posts show the compact rail in its place, as they
  * do across the sheet band. Repeated with PAPER_CENTERED_BREAKPOINT.
  */
 export const SIDEBAR_RETURN_BREAKPOINT = PAPER_MAX_WIDTH + 2 * 220
 
 /**
  * JS mirror of --paper-max-w (globals.css). PAPER_MAX_WIDTH until the sheet centres; from there a
- * ramp from ~1041px at PAPER_CENTERED_BREAKPOINT to PAPER_MAX_WIDTH at SIDEBAR_RETURN_BREAKPOINT,
+ * ramp from ~1001px at PAPER_CENTERED_BREAKPOINT to PAPER_MAX_WIDTH at SIDEBAR_RETURN_BREAKPOINT,
  * so the centred sheet's margins open up rather than starting at ~121px against the padding inside.
  */
 export function paperMaxWidthAt(viewportWidth: number): number {
   if (viewportWidth < PAPER_CENTERED_BREAKPOINT) return PAPER_MAX_WIDTH
-  return Math.min(PAPER_MAX_WIDTH, Math.max(1040, 0.4 * viewportWidth + 496))
+  return Math.min(PAPER_MAX_WIDTH, Math.max(1000, 0.6 * viewportWidth + 184))
 }
 
 /** Where --sidebar-w stops growing: globals.css clamps it to its 280px maximum from here up. */

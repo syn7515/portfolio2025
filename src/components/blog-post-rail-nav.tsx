@@ -164,7 +164,7 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
         // with a tick fanned out on hover. Below that, within the sheet band, it steps aside.
         // Repeated in the entrance media query in blog-post-rail-nav.module.css.
         // It comes back from 1362.5px to 1560px, where the sheet has centred but its left margin
-        // (161–220px) can't yet hold the text sidebar — see SIDEBAR_RETURN_BREAKPOINT in
+        // (181–220px) can't yet hold the text sidebar — see SIDEBAR_RETURN_BREAKPOINT in
         // src/lib/breakpoints.ts. Its 80px reach fits there with room to spare.
         'hidden min-[820px]:flex sheet:hidden min-[1064px]:flex paper:hidden min-[1362.5px]:flex min-[1560px]:hidden',
         // Vertically centred so the cluster stays reachable at any scroll position without being
