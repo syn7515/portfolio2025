@@ -370,7 +370,10 @@
   // 3 wide), white ticks at /20; a 115px gradient marker + "300" label at 12 o'clock
   // (index 75); everything left of it at /60, and a right-hand fill from 12 toward 4 o'clock
   // (index 125) that shrinks as the grill cools from T0 to the marker, its tip blinking.
-  const CLEAN = { OUTER_R: 312.5, LEN: 40, WIDTH: 3, MARKER: 75, END: 125, MARKER_LEN: 115, LABEL_OFFSET: 101 };
+  // portfolio: drawn at the grill ring's v0-2 size instead (outer 300, 40 long, 2.5 wide) on the
+  // same centre, so the ring doesn't grow when the screen turns to CLEAN; the marker and its label
+  // hang from the ring's top, so they come down with it.
+  const CLEAN = { OUTER_R: RING.OUTER_R, LEN: RING.OUTER_R - RING.INNER_R, WIDTH: RING.WIDTH, MARKER: 75, END: 125, MARKER_LEN: 115, LABEL_OFFSET: 101 };
   let cleanMarks = null, cleanT0 = null, ringGeom = null;
   function setRingGeometry(kind) {
     if (ringGeom === kind) return;
