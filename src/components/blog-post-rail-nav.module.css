@@ -1,5 +1,5 @@
 /* Compact rail nav for 820–1024px and 1064–1200px, where --sidebar-w collapses to 0, leaving no
-   gutter for the text sidebar, and for 1362.5–1560px, where the centred sheet's left margin is
+   gutter for the text sidebar, and for 1362.5–1520px, where the centred sheet's left margin is
    still too narrow for it. The outline is reduced to tick marks that reveal their
    label on hover.
 
@@ -23,7 +23,7 @@
 
 @media (min-width: 820px) and (max-width: 1023.98px) and (prefers-reduced-motion: no-preference),
     (min-width: 1064px) and (max-width: 1199.98px) and (prefers-reduced-motion: no-preference),
-    (min-width: 1362.5px) and (max-width: 1559.98px) and (prefers-reduced-motion: no-preference) {
+    (min-width: 1362.5px) and (max-width: 1519.98px) and (prefers-reduced-motion: no-preference) {
     :global(html[data-paper-nav='home']) .railNav {
         animation: rail-blur-in 350ms cubic-bezier(0.23, 1, 0.32, 1) both;
         will-change: opacity, filter;

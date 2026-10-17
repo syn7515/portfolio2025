@@ -38,14 +38,20 @@ const SHEET_MIN_LEFT = 40
 export const PAPER_BREAKPOINT = 1200
 
 /**
- * The widest the sheet gets (--paper-max-w in globals.css). The sheet held against the sidebar
- * reaches this at PAPER_CENTERED_BREAKPOINT; the centred one comes in narrower there and grows back
- * to it by SIDEBAR_RETURN_BREAKPOINT (paperMaxWidthAt below).
+ * The widest the sheet held against the sidebar gets (--paper-max-w in the paper block of
+ * globals.css). It reaches this at PAPER_CENTERED_BREAKPOINT, where it centres instead and comes in
+ * narrower (paperMaxWidthAt below).
  */
-export const PAPER_MAX_WIDTH = 1120
+export const PAPER_ANCHORED_MAX_WIDTH = 1120
 
 /**
- * Where the sheet reaches PAPER_MAX_WIDTH and a right margin would open — the width at which
+ * The widest the centred sheet gets (the ceiling of --paper-max-w in the centred block of
+ * globals.css). It grows to this by SIDEBAR_RETURN_BREAKPOINT and holds it from there.
+ */
+export const PAPER_MAX_WIDTH = 1080
+
+/**
+ * Where the sheet reaches PAPER_ANCHORED_MAX_WIDTH and a right margin would open — the width at which
  * `vw - sidebarWidthAt(vw)` comes to 1120 (8/11 vw + 129.09px = 1120px). From here the sheet
  * centres on the viewport instead of leaving all the extra width on its right.
  *
@@ -60,20 +66,21 @@ export const PAPER_CENTERED_BREAKPOINT = 1362.5
 
 /**
  * Where the centred sheet's left margin is back up to the text sidebar's 220px minimum, and where
- * the sheet is back to PAPER_MAX_WIDTH. Below it, from PAPER_CENTERED_BREAKPOINT, the margin
+ * the centred sheet reaches PAPER_MAX_WIDTH. Below it, from PAPER_CENTERED_BREAKPOINT, the margin
  * (181–220px) can't hold the sidebar's labels, so posts show the compact rail in its place, as they
  * do across the sheet band. Repeated with PAPER_CENTERED_BREAKPOINT.
  */
 export const SIDEBAR_RETURN_BREAKPOINT = PAPER_MAX_WIDTH + 2 * 220
 
 /**
- * JS mirror of --paper-max-w (globals.css). PAPER_MAX_WIDTH until the sheet centres; from there a
- * ramp from ~1001px at PAPER_CENTERED_BREAKPOINT to PAPER_MAX_WIDTH at SIDEBAR_RETURN_BREAKPOINT,
- * so the centred sheet's margins open up rather than starting at ~121px against the padding inside.
+ * JS mirror of --paper-max-w (globals.css). PAPER_ANCHORED_MAX_WIDTH until the sheet centres; from
+ * there a ramp from ~1001px at PAPER_CENTERED_BREAKPOINT to PAPER_MAX_WIDTH at
+ * SIDEBAR_RETURN_BREAKPOINT, so the centred sheet's margins open up rather than starting at ~121px
+ * against the padding inside.
  */
 export function paperMaxWidthAt(viewportWidth: number): number {
-  if (viewportWidth < PAPER_CENTERED_BREAKPOINT) return PAPER_MAX_WIDTH
-  return Math.min(PAPER_MAX_WIDTH, Math.max(1000, 0.6 * viewportWidth + 184))
+  if (viewportWidth < PAPER_CENTERED_BREAKPOINT) return PAPER_ANCHORED_MAX_WIDTH
+  return Math.min(PAPER_MAX_WIDTH, Math.max(1000, 0.5 * viewportWidth + 320))
 }
 
 /** Where --sidebar-w stops growing: globals.css clamps it to its 280px maximum from here up. */
