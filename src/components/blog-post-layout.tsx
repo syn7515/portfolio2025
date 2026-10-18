@@ -12,6 +12,7 @@ import BlogPostRailNav from '@/components/blog-post-rail-nav'
 import useScrollDepth from '@/components/use-scroll-depth'
 import PaperGridBackground from '@/components/ui/paper-grid-background'
 import Dinkus from '@/components/ui/dinkus'
+import RevealFooter, { revealPaperClassName } from '@/components/ui/reveal-footer'
 import { PROJECTS } from '@/lib/projects'
 import {
   isBlogPostMaskNavigation,
@@ -463,12 +464,12 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
             1024px, where the full-bleed paper leaves PaperGridBackground nothing to peek out of. It
             has to be a background rather than a child layer precisely because this element isn't a
             stacking context — see globals.css. When the reveal footer below is there, the grid is
-            on it instead and .revealPaper takes it off the paper; the class stays regardless, as
-            the hook other components find the paper by. */}
+            on it instead and revealPaperClassName takes it off the paper; the class stays
+            regardless, as the hook other components find the paper by. */}
         <div
           className={cn(
             'paper-grid-bottom flex-1 sheet:mt-[100px] overflow-x-clip relative',
-            hasProjectNavigation && styles.revealPaper
+            hasProjectNavigation && revealPaperClassName
           )}
           style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--paper-left)', maxWidth: 'var(--paper-max-w)' }}
         >
@@ -565,36 +566,15 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
         {/* Reveal footer, below 1024px: the desk under the paper, holding the drafting grid and
             the Previous/Next pair. It stays put while the paper scrolls up off it, so the end of
             the post reads as the sheet being lifted away rather than as one more block arriving.
-            The paper can't simply be raised over a fixed footer — a z-index on it would make it the
-            stacking context it must never be (see above) — so nothing here overlaps at all: this is
-            an ordinary block after the paper, and its content is pinned to the viewport's bottom
-            inside it and clipped to it. How the pinning works is in blog-post.module.css. */}
+            How it does that without raising the paper is in ui/reveal-footer. */}
         {hasProjectNavigation && (
-          <div className={styles.revealFooter}>
-            <div className={styles.revealFooterTrack}>
-              <div className={styles.revealFooterPinned}>
-                <div aria-hidden data-paper-grid-pointer className={styles.revealFooterGrid} />
-                {/* Weighted toward the paper, half the room above that it has below, so the links
-                    read as hanging off the edge they were uncovered from rather than floating
-                    mid-desk, and clear the grid's fade into the bottom of the viewport. */}
-                <div
-                  className={cn(
-                    'relative px-6 pt-10 pb-20 min-[640px]:pt-12 min-[640px]:pb-24',
-                    styles.contentBlurRevealItem
-                  )}
-                >
-                  <div className="max-w-[var(--content-w)] mx-auto">
-                    <ProjectNavigationLinks
-                      previousProject={previousProject}
-                      nextProject={nextProject}
-                      onNavigate={handleProjectNavigation}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div aria-hidden className={styles.revealFooterEdge} />
-          </div>
+          <RevealFooter className={styles.contentBlurRevealItem}>
+            <ProjectNavigationLinks
+              previousProject={previousProject}
+              nextProject={nextProject}
+              onNavigate={handleProjectNavigation}
+            />
+          </RevealFooter>
         )}
 
         {/* Decorative entrance overlay: plays the slide-in-from-top-right-corner-with-a-blur-in visual
