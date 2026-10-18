@@ -88,6 +88,9 @@
      list moves. */
   .scroller { position: absolute; inset: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
   .scroller::-webkit-scrollbar { display: none; }
+  /* On the carousel card the lists take no touch, so a swipe there scrolls the site (.inert, set in the
+     script); a script still scrolls them. */
+  .inert .scroller { overflow-y: hidden; }
   .bar { position: absolute; top: 0; right: 0; bottom: 0; width: 16px; opacity: 0; pointer-events: none; transition: opacity 300ms ease; }
   .bar.on { opacity: 1; transition-duration: 100ms; }
   .thumb { position: absolute; top: 0; right: 2px; width: 6px; border-radius: 3px; background: var(--scroll); transition: background-color 90ms ease; }
@@ -1042,6 +1045,13 @@ const params = new URLSearchParams(location.search);
 if (params.has('embed')) root.classList.add('embed');
 // ?clip=<stage px>: how much of the screen's bottom the embedding card cuts off.
 if (params.has('clip')) root.style.setProperty('--clip', `${parseFloat(params.get('clip'))}px`);
+// Inert on the carousel card. The site gives the frame no pointer there (pointer-events: none on the
+// iframe; only the lightbox's copy, inside [data-lightbox-live], takes one), but iOS Safari still
+// hands a swipe that starts on the open build popover's list to that list, whose overscroll
+// containment then keeps it from the site, so the post wouldn't scroll under the reader's finger.
+// Inert, the lists stop taking touches (.inert above). frameElement is null when the page isn't
+// framed, or is framed by another site.
+if (frameElement && !frameElement.closest('[data-lightbox-live]')) root.classList.add('inert');
 const pinned = params.get('theme');
 const scheme = matchMedia('(prefers-color-scheme: dark)');
 const applyScheme = () => { root.dataset.theme = pinned || (scheme.matches ? 'dark' : 'light'); };
