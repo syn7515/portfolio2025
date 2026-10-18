@@ -51,8 +51,9 @@ export default function LabelIndicatorCarousel({
   openLightboxOnCardClick = true,
   // Sup navigation: maps supId (number) → cardIndex
   supCardMap,
-  // Card ratio below 640px. "4/3" suits portrait screens, which 16:9 leaves too short to read;
-  // landscape screenshots are width-bound there, so they stay 16:9.
+  // Card ratio below 640px, where 16:9 leaves screens too small to read. "4/3" suits portrait
+  // screens, and landscape ones whose frames are sized off the card's height, which then show a
+  // third larger, cropped at the sides.
   mobileAspect = "16/9",
 } = {}) {
   const sourceItems = items ?? FALLBACK_ITEMS;

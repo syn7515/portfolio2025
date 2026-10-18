@@ -340,8 +340,8 @@ export function useResponsiveSizing(
       );
 
       if (w < 640) {
-        // Carousels of portrait screens opt into 4:3 here — 16:9 at this width leaves them too
-        // short to read. Mirrored by the aspect classes on the card (carousel-card.tsx).
+        // Carousels can opt into 4:3 here — 16:9 at this width leaves their screens too small to
+        // read. Mirrored by the aspect classes on the card (carousel-card.tsx).
         const width = Math.max(120, w - 40);
         const height = Math.round(mobileAspect === "4/3" ? (width * 3) / 4 : (width * 9) / 16);
         setSize({ cardWidth: width, cardHeight: height, gap: 8 });

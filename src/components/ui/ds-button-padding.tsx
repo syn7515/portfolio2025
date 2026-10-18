@@ -2,9 +2,10 @@ import type { CSSProperties, ReactNode } from "react";
 
 /* Live recreation of the "ds-2" Figma frame: the button with and without an icon, each beside a
    copy that paints its padding in red. Everything is sized in em off a font-size tied to the card
-   width (cqw), so the composition scales with the card like the image it replaces did. Figma's
-   text is 64 units in a ~1724-unit frame, hence 64/1724 ≈ 3.71cqw; the em values below are the
-   Figma numbers divided by 64. */
+   height (cqh), so the composition scales with the card like the image it replaces did, and comes
+   out a third larger on the 4:3 phone card. Figma's text is 64 units in a ~1724-unit frame, hence
+   64/1724 ≈ 3.71% of the 16:9 card's width, 16/9 of that in cqh; the em values below are the Figma
+   numbers divided by 64. */
 
 const vars = {
   "--ds-btn-bg": "#ffffff",
@@ -98,7 +99,7 @@ export default function DsButtonPadding() {
     <div className="ds-button-padding w-full h-full [container-type:size]" style={vars} aria-hidden>
       <div
         className="w-full h-full grid place-content-center justify-items-center items-center"
-        style={{ fontSize: "3.71cqw", gridTemplateColumns: "auto auto", columnGap: "1.4em", rowGap: "0.65em" }}
+        style={{ fontSize: `${(3.71 * 16) / 9}cqh`, gridTemplateColumns: "auto auto", columnGap: "1.4em", rowGap: "0.65em" }}
       >
         <Button icon />
         <AnnotatedButton icon />
