@@ -386,6 +386,12 @@
     );
 }
 
+/* Body copy wraps the browser's default way rather than with the page-wide `pretty` (globals.css);
+   anything that sets its own text-wrap, like the carousel captions' text-balance, keeps it. */
+.mdxContent {
+    text-wrap: wrap;
+}
+
 .mdxContent h1 {
     color: rgb(68 64 60) !important;
     /* stone-700 */
