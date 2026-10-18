@@ -178,9 +178,11 @@
                   </div>
                 </div>
               </div>
-              <!-- ProgressiveBlurOverlay variant="fadeDown" -->
+              <!-- ProgressiveBlurOverlay variant="fadeDown". portfolio: no transform-gpu or
+                   will-change-[backdrop-filter], which kept it a layer of its own, as its blur
+                   did (shared/css/alphagrill.css). -->
               <div class="pointer-events-none absolute left-1/2 z-[1] -translate-x-1/2" style="top:3px;width:642px;height:1021px;opacity:0.8">
-                <div class="tick-ring-fade absolute inset-0 transform-gpu will-change-[backdrop-filter]"></div>
+                <div class="tick-ring-fade absolute inset-0"></div>
               </div>
             </div>
           </div>

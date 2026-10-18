@@ -235,9 +235,13 @@
     mask-image: radial-gradient(129.2% 101.61% at 50% 1%, rgb(0, 0, 0) 48%, rgba(0, 0, 0, 0.1) 65%, rgba(0, 0, 0, 0) 78%);
     -webkit-mask-image: radial-gradient(129.2% 101.61% at 50% 1%, rgb(0, 0, 0) 48%, rgba(0, 0, 0, 0.1) 65%, rgba(0, 0, 0, 0) 78%);
   }
+  /* portfolio: without the app's 10px backdrop blur, which made the fade a layer of its own.
+     Safari draws a layer inside the scaled canvas at the canvas's full 600×1024, not at the size
+     it shows on the page, and this one covers the whole screen (taking the canvas and the ring's
+     mask with it), in every frame on the page at once: enough to run iOS Safari out of memory.
+     The dim and mask stay, and with them the look: the ticks the blur softened are the ones the
+     dim takes nearly to black. */
   .tick-ring-fade {
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
     background-image: linear-gradient(rgba(0, 0, 0, 0.01) 0%, rgba(0, 0, 0, 0.02) 11.79%, rgba(0, 0, 0, 0.043) 21.38%, rgba(0, 0, 0, 0.08) 29.12%, rgba(0, 0, 0, 0.13) 35.34%, rgba(0, 0, 0, 0.19) 40.37%, rgba(0, 0, 0, 0.26) 44.56%, rgba(0, 0, 0, 0.333) 48.24%, rgba(0, 0, 0, 0.416) 51.76%, rgba(0, 0, 0, 0.5) 55.44%, rgba(0, 0, 0, 0.59) 59.63%, rgba(0, 0, 0, 0.68) 64.66%, rgba(0, 0, 0, 0.765) 70.88%, rgba(0, 0, 0, 0.847) 78.62%, rgba(0, 0, 0, 0.925) 88.21%, rgb(0, 0, 0) 100%);
     mask-image: linear-gradient(rgba(0, 0, 0, 0.01) 0%, rgba(0, 0, 0, 0.02) 11.79%, rgba(0, 0, 0, 0.043) 21.38%, rgba(0, 0, 0, 0.08) 29.12%, rgba(0, 0, 0, 0.13) 35.34%, rgba(0, 0, 0, 0.19) 40.37%, rgba(0, 0, 0, 0.26) 44.56%, rgba(0, 0, 0, 0.333) 48.24%, rgba(0, 0, 0, 0.416) 51.76%, rgba(0, 0, 0, 0.5) 55.44%, rgba(0, 0, 0, 0.59) 59.63%, rgba(0, 0, 0, 0.68) 64.66%, rgba(0, 0, 0, 0.765) 70.88%, rgba(0, 0, 0, 0.847) 78.62%, rgba(0, 0, 0, 0.925) 88.21%, rgb(0, 0, 0) 100%);
     -webkit-mask-image: linear-gradient(rgba(0, 0, 0, 0.01) 0%, rgba(0, 0, 0, 0.02) 11.79%, rgba(0, 0, 0, 0.043) 21.38%, rgba(0, 0, 0, 0.08) 29.12%, rgba(0, 0, 0, 0.13) 35.34%, rgba(0, 0, 0, 0.19) 40.37%, rgba(0, 0, 0, 0.26) 44.56%, rgba(0, 0, 0, 0.333) 48.24%, rgba(0, 0, 0, 0.416) 51.76%, rgba(0, 0, 0, 0.5) 55.44%, rgba(0, 0, 0, 0.59) 59.63%, rgba(0, 0, 0, 0.68) 64.66%, rgba(0, 0, 0, 0.765) 70.88%, rgba(0, 0, 0, 0.847) 78.62%, rgba(0, 0, 0, 0.925) 88.21%, rgb(0, 0, 0) 100%);
