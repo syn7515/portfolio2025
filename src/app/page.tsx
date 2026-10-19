@@ -11,7 +11,7 @@ import styles from './page.module.css';
 import { trackOutboundClick } from '@/lib/analytics';
 import {
   PAPER_EXIT_REST,
-  PAPER_EXIT_OFFSCREEN,
+  paperExitOffscreen,
   PAPER_EXIT_TRANSITION,
   PAPER_EXIT_TRANSITION_REDUCED,
   PAPER_EXIT_TRANSFORM_ORIGIN,
@@ -35,7 +35,7 @@ let hasVisitedHome = false;
 // timeline, so a tab opened in the background arrives already settled instead of stuck hidden.
 
 // Stagger, in ms, applied per element on top of the base offset. The sequence now starts while the
-// sheet is still approaching rest, giving the first text block 270ms of overlap with the 450ms slide.
+// sheet is still approaching rest, giving the first text block 320ms of overlap with the 500ms slide.
 const CONTENT_BASE_DELAY_MS = 180;
 const DELAY = {
   name: 0,
@@ -419,7 +419,7 @@ export default function Home() {
               className="absolute inset-0 sheet:top-[100px] overflow-x-clip"
               style={{ bottom: -PAPER_EXIT_OVERHANG_PX, backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--paper-left)', maxWidth: 'var(--paper-max-w)', transformOrigin: PAPER_EXIT_TRANSFORM_ORIGIN }}
               initial={PAPER_EXIT_REST}
-              animate={PAPER_EXIT_OFFSCREEN}
+              animate={paperExitOffscreen()}
               transition={exitTransition}
               onAnimationComplete={() => setExitDone(true)}
               // Without it the sheet flashes back to full opacity just before it unmounts — see
