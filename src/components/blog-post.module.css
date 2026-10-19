@@ -15,26 +15,44 @@
    Timings here are the source of truth for the entrance; the *exit* (backwards navigation) is
    still Framer-driven and lives in src/lib/paper-exit-transition.ts. */
 
-@keyframes paper-entrance {
+/* The slide and the tilt are separate animations on the individual `translate` and `rotate`
+   properties, because they have to finish at different times. Wound into one transform they
+   unwound on one curve, so the sheet was still tilted over its last few pixels of travel, which is
+   where the eye judges a landing. Wherever the paper has a margin beside it, that put a leaning
+   edge right next to the underlay's straight one, swinging upright like a wiper as the two met.
+   Now the tilt is spent by 300ms and the last 200ms is a pure slide: the sheet squares up to the
+   stack first and then glides into register, the way friction stops a real sheet turning before
+   it stops it moving. */
+@keyframes paper-slide {
+    from {
+        translate: 40px -32px;
+    }
+}
+
+/* From the shared, height-fitted angle. See --paper-swing-angle in globals.css. */
+@keyframes paper-square {
+    from {
+        rotate: var(--paper-swing-angle);
+    }
+}
+
+/* Per-property pacing: opacity clears first (the sheet materializes quickly, by 260ms), blur clears
+   before the slide finishes (sharp and solid while still approaching rest, by 360ms). */
+@keyframes paper-materialize {
     0% {
-        transform: translate(40px, -32px) rotate(2deg);
         filter: blur(10px);
         opacity: 0;
     }
 
-    /* Per-property pacing: opacity clears first (the sheet materializes quickly), blur clears
-       before the slide finishes (sharp and solid while still approaching rest), translate and
-       rotate use the full duration. */
-    55% {
+    52% {
         opacity: 1;
     }
 
-    75% {
+    72% {
         filter: blur(0);
     }
 
     100% {
-        transform: translate(0, 0) rotate(0deg);
         filter: blur(0);
         opacity: 1;
     }
@@ -94,16 +112,18 @@
     .paperEntranceOverlay {
         display: block;
         /* See --paper-swing-origin in globals.css: this overlay is `absolute inset-0`, so its
-           height is the whole post. Without this the 2deg above swings by page length. */
+           height is the whole post. Without this the tilt above swings by page length. */
         transform-origin: var(--paper-swing-origin);
         animation:
-            paper-entrance 450ms cubic-bezier(0.23, 1, 0.32, 1) both,
-            paper-entrance-dismiss 1ms linear 450ms forwards;
+            paper-slide 500ms cubic-bezier(0.23, 1, 0.32, 1) both,
+            paper-square 300ms cubic-bezier(0.23, 1, 0.32, 1) both,
+            paper-materialize 500ms cubic-bezier(0.23, 1, 0.32, 1) both,
+            paper-entrance-dismiss 1ms linear 500ms forwards;
     }
 
     .paperUnderlay {
         opacity: 1;
-        animation: paper-underlay-retire 500ms ease-out 450ms forwards;
+        animation: paper-underlay-retire 500ms ease-out 500ms forwards;
     }
 
     /* Opacity overlaps the paper's final 190ms for responsiveness. Blur starts closer to the
@@ -113,8 +133,8 @@
     .contentBlurReveal > * > :not(:has([data-carousel])),
     .contentBlurReveal [data-carousel-layer] {
         animation:
-            content-opacity-reveal 350ms cubic-bezier(0.23, 1, 0.32, 1) 260ms backwards,
-            content-blur-reveal 300ms cubic-bezier(0.23, 1, 0.32, 1) 400ms backwards;
+            content-opacity-reveal 350ms cubic-bezier(0.23, 1, 0.32, 1) 310ms backwards,
+            content-blur-reveal 300ms cubic-bezier(0.23, 1, 0.32, 1) 450ms backwards;
     }
 }
 

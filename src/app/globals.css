@@ -39,6 +39,15 @@
      post. Pinning the pivot to the middle of the viewport makes the rotation read identically on
      every page. 50vh is what Home was already effectively using, so it stays as it was. */
   --paper-swing-origin: 50% 50vh;
+  /* Starting tilt for every paper slide, entrance and exit alike. A fixed 2deg sweeps the sheet's
+     top edge sideways by 50vh × tan(2deg): 16px on a 900px-tall window, but 25px at 1440px and
+     38px at 2160px, against a slide that stays 40px everywhere. On tall windows the rotation
+     outran the slide, and the sheet read as swinging around a point near the bottom-right of the
+     screen rather than sliding in. The angle is fitted to hold that sweep at 16px instead, so every
+     window gets the 900px motion: 2deg up to there, 1.27deg at 1440px, 0.85deg at 2160px. This is
+     the fallback for browsers without CSS trig functions; the fitted value is in the @supports
+     block after this one. The Framer-driven exit mirrors it in src/lib/paper-exit-transition.ts. */
+  --paper-swing-angle: 2deg;
   --sidebar-w: 0px;
   /* The paper's left edge, its widest size and the margin it leaves on the right. The paper is
      full-bleed until the sheet and paper blocks below say otherwise. */
@@ -58,6 +67,13 @@
      than the card even with the hover scrim up, so it still reads as a shape under the pointer. */
   --media-skeleton: rgb(231 229 228 / 0.75); /* stone-200 */
   --media-skeleton-sheen: rgb(255 255 255 / 0.6);
+}
+
+/* See --paper-swing-angle above: the angle whose 50vh lever sweeps 16px, capped at 2deg. */
+@supports (rotate: atan2(16px, 50vh)) {
+  :root {
+    --paper-swing-angle: min(2deg, atan2(16px, 50vh));
+  }
 }
 
 @theme inline {

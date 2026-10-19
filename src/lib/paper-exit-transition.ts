@@ -6,8 +6,19 @@
 
 const PAPER_EXIT_OFFSET_X = 40
 const PAPER_EXIT_OFFSET_Y = -32
-const PAPER_EXIT_ROTATE_DEG = 2
 const PAPER_EXIT_BLUR_PX = 10
+
+// JS mirror of --paper-swing-angle in globals.css, which the Framer-driven exit can't read: the
+// tilt whose 50vh lever sweeps the sheet's top edge 16px sideways, capped at 2deg. Without it the
+// sheet would leave with the same tall-window swing the entrance no longer has.
+const PAPER_SWING_SWEEP_PX = 16
+const PAPER_SWING_MAX_DEG = 2
+
+function paperSwingAngleDeg() {
+  if (typeof window === 'undefined') return PAPER_SWING_MAX_DEG
+  const fitted = (Math.atan2(PAPER_SWING_SWEEP_PX, window.innerHeight / 2) * 180) / Math.PI
+  return Math.min(PAPER_SWING_MAX_DEG, fitted)
+}
 
 // The departing sheet is `absolute inset-0`, so its height is the destination document's height —
 // ~890px on Home but ~8800px on a long blog post. transform-origin defaults to the element's own
@@ -27,12 +38,25 @@ export const PAPER_EXIT_TRANSFORM_ORIGIN = 'var(--paper-swing-origin)'
 export const PAPER_EXIT_OVERHANG_PX = 120
 
 export const PAPER_EXIT_REST = { x: 0, y: 0, rotate: 0, filter: 'blur(0px)', opacity: 1 }
-export const PAPER_EXIT_OFFSCREEN = {
-  x: PAPER_EXIT_OFFSET_X,
-  y: PAPER_EXIT_OFFSET_Y,
-  rotate: PAPER_EXIT_ROTATE_DEG,
-  filter: `blur(${PAPER_EXIT_BLUR_PX}px)`,
-  opacity: 0,
+
+type PaperExitTarget = typeof PAPER_EXIT_REST
+let paperExitOffscreenTarget: PaperExitTarget | null = null
+
+// The angle depends on the window's height, so the target is built on demand rather than once at
+// module load. It is reused for as long as that height holds, so a re-render hands Framer Motion
+// the same object instead of a fresh one for the in-flight tween.
+export function paperExitOffscreen(): PaperExitTarget {
+  const rotate = paperSwingAngleDeg()
+  if (paperExitOffscreenTarget?.rotate !== rotate) {
+    paperExitOffscreenTarget = {
+      x: PAPER_EXIT_OFFSET_X,
+      y: PAPER_EXIT_OFFSET_Y,
+      rotate,
+      filter: `blur(${PAPER_EXIT_BLUR_PX}px)`,
+      opacity: 0,
+    }
+  }
+  return paperExitOffscreenTarget
 }
 
 // Launch the slide/rotate/blur decisively, then let the motion settle over the remaining duration.
@@ -43,7 +67,17 @@ const EXIT_DURATION = 0.7
 // Keep the sheet solid briefly, then fade over the remaining 500ms of the departure.
 const EXIT_OPACITY_DELAY = 0.2
 
+// Hold the tilt back while the sheet starts to slide, so it leaves as a straight glide and only then
+// begins to turn: the entrance in reverse, which squares up before it lands. It still ends on the
+// same 700ms frame as everything else.
+const EXIT_ROTATE_DELAY = 0.12
+
 const EXIT_TRANSITION_FULL = { duration: EXIT_DURATION, ease: EXIT_EASE }
+const EXIT_ROTATE_TRANSITION_FULL = {
+  duration: EXIT_DURATION - EXIT_ROTATE_DELAY,
+  ease: EXIT_EASE,
+  delay: EXIT_ROTATE_DELAY,
+}
 const EXIT_OPACITY_TRANSITION_FULL = {
   duration: EXIT_DURATION - EXIT_OPACITY_DELAY,
   ease: EXIT_OPACITY_EASE,
@@ -51,10 +85,14 @@ const EXIT_OPACITY_TRANSITION_FULL = {
 }
 const EXIT_TRANSITION_REDUCED = { duration: 0 }
 
-// Per-property transition map: x/y/rotate/filter use `default`, opacity gets its own delayed
-// pacing. Kept as stable module-level references (not built inline at each call site) so an
-// unrelated re-render never hands Framer Motion a new object reference for an in-flight tween.
-export const PAPER_EXIT_TRANSITION = { default: EXIT_TRANSITION_FULL, opacity: EXIT_OPACITY_TRANSITION_FULL }
+// Per-property transition map: x/y/filter use `default`, rotate starts late, and opacity gets its
+// own delayed pacing. Kept as stable module-level references (not built inline at each call site)
+// so an unrelated re-render never hands Framer Motion a new object reference for an in-flight tween.
+export const PAPER_EXIT_TRANSITION = {
+  default: EXIT_TRANSITION_FULL,
+  rotate: EXIT_ROTATE_TRANSITION_FULL,
+  opacity: EXIT_OPACITY_TRANSITION_FULL,
+}
 export const PAPER_EXIT_TRANSITION_REDUCED = { default: EXIT_TRANSITION_REDUCED, opacity: EXIT_TRANSITION_REDUCED }
 
 // Backwards-navigation signal, carried on two channels because it has to survive both kinds of

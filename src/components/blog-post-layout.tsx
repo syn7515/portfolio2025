@@ -21,7 +21,7 @@ import {
 } from '@/lib/blog-post-mask-transition'
 import {
   PAPER_EXIT_REST,
-  PAPER_EXIT_OFFSCREEN,
+  paperExitOffscreen,
   PAPER_EXIT_TRANSITION,
   PAPER_EXIT_TRANSITION_REDUCED,
   PAPER_EXIT_TRANSFORM_ORIGIN,
@@ -36,13 +36,13 @@ import {
 import { keepOnMainThread } from '@/lib/motion'
 
 // The last thing the entrance in blog-post.module.css finishes is the underlay retiring — a 500ms
-// fade that starts on the sheet's 450ms landing frame. (Content reveal ends earlier, at 700ms.)
+// fade that starts on the sheet's 500ms landing frame. (Content reveal ends earlier, at 750ms.)
 // Once that has run, the entrance classes are inert *unless* a media query flips their computed
 // animation-name from `none` back to a real name, which is exactly what crossing the 640px
 // breakpoint does: the phone block suppresses all of them below that width, so resizing back up
 // replayed the whole entrance — the empty sheet slid in again and every content block re-hid.
 // Pinning .paperNoEntrance once this elapses makes the entrance run once per page load, full stop.
-const ENTRANCE_TOTAL_MS = 950
+const ENTRANCE_TOTAL_MS = 1000
 
 interface BlogPostLayoutProps {
   children: React.ReactNode
@@ -440,7 +440,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
             top of it, it's fully redundant — left at full opacity, its shadow would sit exactly
             underneath the real paper's identical shadow and compound into a darker edge than either
             shadow alone, so it fades out as soon as the real content is revealed. Its timing is in
-            blog-post.module.css (.paperUnderlay), keyed off the same 450ms landing frame. */}
+            blog-post.module.css (.paperUnderlay), keyed off the same 500ms landing frame. */}
         <div
           aria-hidden
           className={cn('absolute inset-0 sheet:top-[100px]', styles.paperUnderlay)}
@@ -608,7 +608,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
               className="absolute inset-0 sheet:top-[100px] overflow-x-clip"
               style={{ bottom: -PAPER_EXIT_OVERHANG_PX, backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--paper-left)', maxWidth: 'var(--paper-max-w)', transformOrigin: PAPER_EXIT_TRANSFORM_ORIGIN }}
               initial={PAPER_EXIT_REST}
-              animate={PAPER_EXIT_OFFSCREEN}
+              animate={paperExitOffscreen()}
               transition={exitTransition}
               onAnimationComplete={() => setExitDone(true)}
               // Without it the sheet flashes back to full opacity just before it unmounts — see
