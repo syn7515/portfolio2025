@@ -2,6 +2,7 @@ import LabelIndicatorCarousel from '@/components/ui/label_indicator_carousel'
 import Divider from '@/components/ui/divider'
 import InlineLinkPreview from '@/components/ui/inline-link-preview'
 import SupRef from '@/components/ui/sup-ref'
+import AthenaPortalDemo from '@/components/ui/athena-portal-demo'
 
 <div className="max-w-[var(--content-w)] mx-auto">
 
@@ -18,17 +19,18 @@ I focused on improving how the system guides payer actions at critical decision 
 <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] my-16 sm:my-20">
   <LabelIndicatorCarousel
     showIndicators={false}
+    mobileAspect="4/3"
     supCardMap={{ 1: 0, 2: 1 }}
     items={[
       { 
         label: "", 
         caption: "Color-coded status tags indicating invoice urgency<sup>1</sup>",
-        imageUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/athena-1.jpg" 
+        content: <AthenaPortalDemo />
       },
       { 
         label: "", 
         caption: "Chat-based communication for faster claim resolution<sup>2</sup>",
-        imageUrl: "https://f5uskgwhyu2fi170.public.blob.vercel-storage.com/athena-2.jpg"
+        content: <AthenaPortalDemo scene="messages" />
       },
     ]}
   />

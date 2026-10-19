@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="en" class="no-anim">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Partner PayOnline — prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600&display=block" />
+<style>
+  /* The "athena-1" (?scene=home) and "athena-2" (?scene=messages) Figma frames: AthenaHealth's
+     Partner PayOnline billing portal, 1221×762 on a 1600×900 sky-blue backdrop (Figma's 2× export,
+     as a JPEG). Built at Figma's 1:1 size; the stage scales to fit. Figma's strokes sit inside their
+     boxes and take no room, so rules here are inset shadows or overlays rather than borders. */
+  :root {
+    --brand: #4e2d82;
+    --link: #0466b4;
+    --fg: #373738;
+    --muted: #5d5e5e;
+    --light: #7c7d7d;
+    --cell: #333;
+    --rule: #d5d7d7;
+    --field: #b3b3b3;
+    --peacock: #5ab7ce;
+    --row-hover: #ecf5fd;
+    --option-hover: rgba(217, 235, 250, 0.5);
+    --sans: "Source Sans Pro", "Source Sans 3", -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+  /* The backdrop covers the frame, as the stage does when the frame is 16:9 like it, and past the
+     stage's sides when the frame is narrower (fit, below). */
+  body { background: #8fd0e6 url("athena-portal/background.jpg") center / cover no-repeat;
+         font-family: var(--sans); font-size: 14px; line-height: 20px; color: var(--fg); -webkit-font-smoothing: antialiased; }
+  svg { display: block; flex-shrink: 0; }
+  .ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  #stage { position: absolute; left: 50%; top: 50%; width: 1600px; height: 900px; margin: -450px 0 0 -800px; transform-origin: center; }
+  .app { position: absolute; left: 190px; top: 69px; width: 1221px; height: 762px; display: flex; flex-direction: column; overflow: hidden; background: #e9e9ea; }
+  .shell { flex: 1; min-height: 0; display: flex; }
+
+  /* ---------- side nav ---------- */
+  .side { width: 179px; flex-shrink: 0; background: #fff; display: flex; flex-direction: column; align-items: center; padding-top: 24px; }
+  .logo { position: relative; width: 150px; height: 40px; overflow: hidden; }
+  .logo img { position: absolute; left: calc(50% + 0.5px); top: calc(50% + 0.14px); width: 150px; height: 24.277px; transform: translate(-50%, -50%); object-fit: cover; }
+  /* one rule between the links, half a pixel up as Figma draws them */
+  .menu { width: 100%; margin-top: 23.5px; box-shadow: inset 0 1px 0 var(--rule); }
+  .menu a { display: block; padding: 10px 10px 10px 14px; color: var(--link); text-decoration: none; box-shadow: inset 0 -1px 0 var(--rule); }
+  .menu a.on { padding: 8px 10px 8px 14px; line-height: 24px; font-weight: 600; color: var(--fg); }
+
+  /* ---------- top nav ---------- */
+  .col { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .top { height: 48px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 24px 0 34px; background: var(--brand); color: #fff; }
+  .top .acct { line-height: 28px; }
+  .top .tools { display: flex; align-items: center; gap: 24px; }
+  .tb { display: flex; align-items: center; gap: 8px; height: 33px; padding: 1px; border-radius: 3px; }
+  .help-ic { width: 16px; height: 16px; display: grid; place-items: center; opacity: 0.8; }
+  .cart { display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border-radius: 4px; background: var(--peacock); color: #000; font-weight: 600; line-height: 28px; }
+
+  /* ---------- page card ----------
+     The side nav's rule runs down the well's left edge, under the top nav. */
+  .well { position: relative; flex: 1; min-height: 0; display: flex; padding: 10px; box-shadow: inset 1px 0 0 var(--rule); }
+  .card { position: relative; flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; background: #fff; border-radius: 4px; }
+  .card::after { content: ""; position: absolute; inset: 0; z-index: 10; border: 1px solid var(--rule); border-radius: 4px; pointer-events: none; }
+  .h1 { font-size: 18px; line-height: 1.3; font-weight: 600; }
+  .h2 { font-size: 16px; line-height: 24px; font-weight: 600; }
+  .sec-head { display: flex; align-items: center; justify-content: space-between; }
+  .link { color: var(--link); text-decoration: none; text-underline-offset: 2px; }
+
+  .foot { height: 36px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 24px 0 16px; background: var(--brand); color: #fff; }
+  .foot img { width: 227px; height: 36px; object-fit: cover; }
+
+  /* status tags: 12px caps centred in a 20px pill */
+  .tag { display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 16px; background: #bde2eb; font-size: 12px; line-height: 15px; font-weight: 600; text-transform: uppercase; color: var(--fg); white-space: nowrap; }
+  .tag.overdue { background: #fbd1ce; }
+  .tag.paid { background: #d3edce; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--peacock); flex-shrink: 0; }
+  .dot.read { opacity: 0; }
+
+  /* ---------- Home ---------- */
+  .home { display: flex; flex-direction: column; gap: 20px; padding: 16px 24px; }
+  .overview { display: flex; gap: 18px; }
+  .ov { width: 308px; height: 122px; padding: 20px 24px 0; border-radius: 4px; box-shadow: inset 0 0 0 1px #dbdddd; text-align: center; }
+  .ov .k { line-height: 18px; color: var(--light); }
+  .ov .v { margin-top: 8px; font-size: 26px; line-height: 30px; font-weight: 600; color: var(--brand); }
+  .ov .d { margin-top: 4px; line-height: 18px; }
+  .block { display: flex; flex-direction: column; gap: 8px; }
+
+  .inv { display: grid; grid-template-columns: 129px 156px 156px 1fr 180px 180px; }
+  .inv > div { display: contents; }
+  .inv > div > span { display: flex; align-items: center; height: 28px; padding: 0 24px; color: var(--cell); white-space: nowrap; box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15); transition: background-color 60ms ease; }
+  .inv .th > span { background: #f6f6f6; color: #000; box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.1), inset 0 -1px 0 rgba(0, 0, 0, 0.1); }
+  .inv .r { justify-content: flex-end; }
+  .inv .st { padding-left: 16px; }
+  .inv .th .st { padding-left: 24px; }
+
+  .msgs { box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.15); }
+  .msg { position: relative; display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 8px; color: var(--muted); box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15); transition: background-color 60ms ease; }
+  .msg .subj { width: 160px; flex-shrink: 0; }
+  .msg .body { flex: 1; min-width: 0; line-height: 24px; }
+  .msg .meta { width: 200px; flex-shrink: 0; display: flex; justify-content: space-between; line-height: 18px; }
+  .msg .main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; }
+  .msg .dot { align-self: flex-start; margin-top: 11px; }
+  .msg.unread .subj { font-weight: 600; line-height: 24px; color: var(--fg); }
+  .msg.unread .body, .msg.unread .date { color: var(--fg); }
+
+  /* ---------- Messages ---------- */
+  .mhead { height: 60px; flex-shrink: 0; padding: 16px 24px; box-shadow: inset 0 -1px 0 var(--rule); }
+  .split { flex: 1; min-height: 0; display: flex; }
+  .inbox { width: 230px; flex-shrink: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 16px 0; box-shadow: inset -1px 0 0 var(--rule); }
+  .seg { display: flex; margin: 0 24px 16px; }
+  .seg span { width: 91px; height: 28px; display: grid; place-items: center; line-height: 18px; }
+  .seg .on { border: 1px solid rgba(0, 0, 0, 0.2); border-radius: 4px 0 0 4px; background: #f1f8fd; font-weight: 600; }
+  .seg span:not(.on) { border: 1px solid rgba(0, 0, 0, 0.2); border-left: 0; border-radius: 0 4px 4px 0; }
+  /* the list's rules sit half a pixel up, as Figma draws them */
+  .threads { margin-top: -0.5px; margin-right: 1px; box-shadow: inset 0 1px 0 var(--rule); }
+  .thread { height: 51px; padding: 6px 28px 0 24px; box-shadow: inset 0 -1px 0 var(--rule); transition: background-color 60ms ease; }
+  .thread .t { line-height: 20px; }
+  .thread .d { margin-top: 2px; font-size: 12px; line-height: 15px; color: var(--muted); }
+  .thread.unread { padding-left: 12px; }
+  .thread.unread .t { display: flex; align-items: center; gap: 4px; font-weight: 600; }
+  .thread.unread .d { padding-left: 12px; }
+  .pager { display: flex; align-items: center; justify-content: center; gap: 4px; height: 25px; color: var(--cell); }
+  .pager .ctl { width: 24px; height: 24px; display: grid; place-items: center; opacity: 0.5; }
+  .pager .n { width: 92px; text-align: center; }
+
+  /* The compose pane scrolls (in the lightbox) down to the invoice it's about, below the card. */
+  .detail { position: relative; flex: 1; min-width: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
+  .detail::-webkit-scrollbar { display: none; }
+  .compose { display: flex; flex-direction: column; gap: 20px; padding: 16px 24px; }
+  .form { display: flex; flex-direction: column; gap: 16px; }
+  .fields { position: relative; z-index: 3; display: flex; flex-direction: column; gap: 12px; margin-left: -15px; }
+  .field { display: flex; align-items: center; }
+  .field.start { align-items: flex-start; }
+  .label { width: 150px; flex-shrink: 0; padding: 0 15px; line-height: 18px; color: var(--muted); white-space: nowrap; }
+  .select { position: relative; display: flex; align-items: center; gap: 10px; width: 609px; height: 34px; padding-right: 12px; border-radius: 3px; background: #fff; box-shadow: inset 0 0 0 1px var(--field); color: var(--fg); }
+  .select.grow { width: auto; flex: 1; min-width: 0; }
+  .select .val { flex: 1; min-width: 0; }
+  /* the required-field bar covers the field's left edge */
+  .bar { width: 6px; height: 34px; flex-shrink: 0; border-radius: 3px 0 0 3px; background: var(--link); }
+  .radios { position: relative; width: 106px; height: 32px; }
+  .radio { position: absolute; top: 8px; display: flex; gap: 8px; line-height: 16px; }
+  .multi { position: relative; display: flex; align-items: center; gap: 4px; width: 609px; height: 34px; margin: -1px 0; padding-right: 12px; border-radius: 3px; background: #fff; box-shadow: inset 0 0 0 1px var(--field); }
+  /* focused: a 2px ring 2px out */
+  .multi::after { content: ""; position: absolute; inset: -4px; border: 2px solid rgba(4, 102, 180, 0.8); border-radius: 4px; pointer-events: none; }
+  .chips { flex: 1; min-width: 0; display: flex; align-items: center; gap: 4px; height: 25px; overflow: hidden; }
+  .chip { display: flex; align-items: flex-start; gap: 6px; height: 23px; padding: 1px 12px 0; border-radius: 16px; background: rgba(219, 219, 219, 0.5); color: var(--cell); white-space: pre; }
+  .chip .x { align-self: center; width: 12px; height: 12px; display: grid; place-items: center; opacity: 0.7; }
+  .input { flex: 1; min-width: 0; height: 32px; padding: 6px 5px 6px 10px; border-radius: 3px; box-shadow: inset 0 0 0 1px var(--field); }
+  .dropdown { position: absolute; right: 0; top: 130px; width: 609px; overflow: hidden; border-radius: 4px; background: #fff;
+              box-shadow: 0 4px 6px -1px rgba(120, 113, 108, 0.1), 0 2px 4px -2px rgba(120, 113, 108, 0.1); }
+  .dropdown::after { content: ""; position: absolute; inset: 0; border: 1px solid #dbdbdb; border-radius: 4px; pointer-events: none; }
+  .opt { display: flex; align-items: center; gap: 8px; padding: 7px 16px 7px 12px; color: #000; transition: background-color 60ms ease; }
+  .textarea { height: 164px; padding: 8px 12px; border-radius: 3px; box-shadow: inset 0 0 0 1px #b6b7b7; color: var(--light); }
+  .send { align-self: flex-start; display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 16px 0 12px; border-radius: 3px; background: var(--link); color: #fff; transition: filter 90ms ease; }
+
+  .viewer { display: flex; flex-direction: column; gap: 20px; padding: 16px 24px; box-shadow: inset 0 1px 0 var(--rule); }
+  .viewer-body { display: flex; flex-direction: column; gap: 16px; }
+  .invoice { display: flex; flex-direction: column; gap: 12px; padding: 16px 24px; border-radius: 4px; background: #f2ebf3; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05); }
+  .invoice .no { font-size: 16px; font-weight: 600; color: var(--link); }
+  .invoice .facts { display: flex; gap: 24px; margin-top: 8px; }
+  .invoice .facts > div { flex: 1; }
+  .invoice .sums { display: flex; }
+  .invoice .sums > div { flex: 1; display: flex; flex-direction: column; gap: 4px; font-size: 16px; }
+  .invoice .sums .bal { flex-direction: row; justify-content: space-between; }
+  .invoice .sums .bal > div { width: 132px; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+  .invoice .amt { font-size: 24px; line-height: 31px; font-weight: 600; }
+  .bill { display: grid; grid-template-columns: 120px 100px 120px 80px 112px 112px 112px 112px; width: max-content; font-size: 16px; }
+  .bill > div { display: contents; }
+  .bill > div > span { display: flex; align-items: center; padding: 4px 8px; color: var(--cell); white-space: nowrap; box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.25); }
+  .bill .th > span { height: 32px; line-height: 21px; background: #f6f6f6; color: #000; box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.15), inset 0 -1px 0 rgba(0, 0, 0, 0.15); }
+  .bill .r { justify-content: flex-end; }
+  .bill .f { justify-content: space-between; }
+
+  /* ---------- the Figma frame's pointer ----------
+     The frame draws a hand over the row or option it hovers. Real pointer input (the lightbox's
+     copy; the carousel card's is inert) takes over from it: the hand goes and hover follows the
+     pointer, until it leaves the page and the frame's picture comes back. */
+  .hand { position: absolute; z-index: 20; pointer-events: none; }
+  .live .hand { display: none; }
+  :root:not(.live) .inv .demo > span, :root:not(.live) .opt.demo { background-color: var(--row-hover); }
+  :root:not(.live) .opt.demo { background-color: var(--option-hover); }
+
+  /* ---------- real pointer input ----------
+     Hover and press show, but nothing acts on a click. Text doesn't select. */
+  html { -webkit-user-select: none; user-select: none; cursor: default; }
+  .menu a:not(.on), .link, .inv > div:not(.th), .msg, .thread, .opt, .send, .cart, .tb, .chip .x, .viewer .close { cursor: pointer; }
+  @media (hover: hover) and (pointer: fine) {
+    .menu a:not(.on):hover, .link:hover { text-decoration: underline; }
+    .inv > div:not(.th):hover > span, .msg:hover, .thread:hover { background-color: var(--row-hover); }
+    .opt:hover { background-color: var(--option-hover); }
+    .send:hover { filter: brightness(1.1); }
+  }
+  .send:active, .cart:active { filter: brightness(0.92); }
+  .no-anim, .no-anim * { transition: none !important; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="app">
+    <div class="shell">
+      <aside class="side">
+        <div class="logo"><img src="athena-portal/chs-logo.png" alt="Community Health Systems" /></div>
+        <nav class="menu">
+          <a data-page="home">Home</a>
+          <a data-page="invoices">Invoices</a>
+          <a data-page="messages">Messages</a>
+        </nav>
+      </aside>
+      <div class="col">
+        <header class="top">
+          <span class="acct">Acme Inc</span>
+          <div class="tools">
+            <div class="tb"><i data-icon="switch"></i><span>CBW SMOKE TEST* - IDN - Grp 3</span></div>
+            <div class="tb"><span class="help-ic"><i data-icon="help"></i></span><span>Help</span></div>
+            <div class="cart"><i data-icon="cart"></i><span style="padding: 0 1px">$733.00</span></div>
+            <div class="tb"><i data-icon="profile"></i><span>Sue Park</span></div>
+          </div>
+        </header>
+        <div class="well">
+          <main class="card" id="card">
+
+            <!-- Home: the account at a glance, the latest invoices tagged by urgency -->
+            <section class="scene home" data-scene="home">
+              <h1 class="h1">Home</h1>
+              <div class="overview">
+                <div class="ov"><p class="k">Recent transaction</p><p class="v">$1000.00</p><p class="d">Date: 03/13/2023</p></div>
+                <div class="ov"><p class="k">Account balance</p><p class="v">$7,100.00</p></div>
+              </div>
+              <div class="block">
+                <div class="sec-head"><h2 class="h2">Latest invoices</h2><a class="link">View all</a></div>
+                <div class="inv" id="invoices"></div>
+              </div>
+              <div class="block">
+                <div class="sec-head"><h2 class="h2">Recent messages</h2><a class="link">View all</a></div>
+                <div class="msgs" id="recent"></div>
+              </div>
+            </section>
+
+            <!-- Messages: disputing items on an invoice from a new message, the invoice beside it -->
+            <section class="scene messages" data-scene="messages" style="display: contents">
+              <div class="mhead"><h1 class="h1">Messages</h1></div>
+              <div class="split">
+                <div class="inbox">
+                  <div>
+                    <div class="seg"><span class="on">Inbox</span><span>Sent</span></div>
+                    <div class="threads" id="threads"></div>
+                  </div>
+                  <div class="pager">
+                    <span class="ctl" style="padding-right: 2px"><i data-icon="left"></i></span>
+                    <span class="n">1 / 1</span>
+                    <span class="ctl" style="padding-left: 2px"><i data-icon="right"></i></span>
+                  </div>
+                </div>
+                <div class="detail" id="detail">
+                  <div class="compose">
+                    <h2 class="h2">New message</h2>
+                    <div class="form">
+                      <div class="fields">
+                        <div class="field">
+                          <span class="label">Related invoice</span>
+                          <div class="select"><span class="bar"></span><span class="val">122333</span><i data-icon="expand"></i></div>
+                        </div>
+                        <div class="field start" style="gap: 60px">
+                          <div class="field">
+                            <span class="label">Dispute</span>
+                            <div class="radios">
+                              <span class="radio" style="left: 0"><i data-icon="radio-off"></i>No</span>
+                              <span class="radio" style="left: 63px"><i data-icon="radio-on"></i>Yes</span>
+                            </div>
+                          </div>
+                          <div class="field" style="flex: 1; min-width: 0; height: 34px">
+                            <span class="label">Dispute for</span>
+                            <div class="select grow"><span class="bar"></span><span class="val">EM - Incorrect Employee or Patient</span><i data-icon="expand"></i></div>
+                          </div>
+                        </div>
+                        <div class="field" style="height: 32px">
+                          <span class="label">Disputing item</span>
+                          <div class="multi">
+                            <span class="bar"></span>
+                            <div class="chips">
+                              <span class="chip">Procedure  94640<span class="x"><i data-icon="x"></i></span></span>
+                              <span class="chip">Procedure 95934<span class="x"><i data-icon="x"></i></span></span>
+                            </div>
+                            <i data-icon="expand"></i>
+                          </div>
+                        </div>
+                        <div class="field">
+                          <span class="label">Subject</span>
+                          <div class="input">Dispute: Invoice 122333 - EM</div>
+                        </div>
+                        <div class="dropdown">
+                          <div class="opt"><i data-icon="check"></i>Procedure 94640</div>
+                          <div class="opt demo"><i data-icon="check"></i>Procedure 95934</div>
+                        </div>
+                        <span data-hand style="left: 424.3px; top: 188.73px"></span>
+                      </div>
+                      <div class="textarea">Your message</div>
+                      <div class="send"><i data-icon="send"></i>Send and dispute</div>
+                    </div>
+                  </div>
+                  <div class="viewer">
+                    <div class="sec-head"><h2 class="h2">Invoice viewer</h2><span class="close"><i data-icon="close"></i></span></div>
+                    <div class="viewer-body">
+                    <div class="invoice">
+                      <div>
+                        <p class="no">122333</p>
+                        <div class="facts">
+                          <div><p>Patient: Doe, John</p><p>DOB: 10/10/1960</p><p>Service Date: 02/14/2023</p><p>SSN: ***-**-9999</p></div>
+                          <div><p>Responsible: WORK COMP 1ST...</p><p>Provider: ALFREDO, DAVID</p><p>Location: DOCTOR’S OFFICE</p></div>
+                        </div>
+                      </div>
+                      <div class="sums">
+                        <div><p>Status</p><p><span class="tag">Due now</span></p></div>
+                        <div class="bal">
+                          <div><p>Original Balance</p><p class="amt">$757.00</p></div>
+                          <div><p>Balance</p><p class="amt">$757.00</p></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="bill" id="bill"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+          </main>
+        </div>
+      </div>
+    </div>
+    <footer class="foot"><img src="athena-portal/partner-payonline.png" alt="Partner PayOnline | athenahealth" /><span>@2023 WC Holding LLC.</span></footer>
+  </div>
+</div>
+
+<script>
+/* ---------- icons (Figma's vectors) ---------- */
+const ICONS = {
+  switch: [16, 16, '<path d="M12 8.5L15 5.5L12.01 2.5M15 5.5H7M4 13.5L1 10.5L3.99 7.5M1 10.5H9" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>'],
+  help: [15.6, 15.6, '<path d="M5.8 5.68C5.813 5.51 5.847 5.342 5.9 5.18C6.01 4.858 6.199 4.569 6.449 4.339C6.698 4.108 7.001 3.943 7.331 3.859C7.66 3.775 8.005 3.774 8.335 3.856C8.665 3.938 8.969 4.101 9.22 4.33C9.396 4.503 9.535 4.709 9.63 4.937C9.726 5.164 9.775 5.408 9.775 5.655C9.775 5.902 9.726 6.146 9.63 6.373C9.535 6.601 9.396 6.807 9.22 6.98C8.93 7.27 8.56 7.46 8.22 7.72C8.053 7.844 7.919 8.007 7.832 8.196C7.745 8.385 7.706 8.593 7.72 8.8M14.8 7.8C14.8 11.666 11.666 14.8 7.8 14.8C3.934 14.8 0.8 11.666 0.8 7.8C0.8 3.934 3.934 0.8 7.8 0.8C11.666 0.8 14.8 3.934 14.8 7.8Z" stroke="#fff" stroke-width="1.6" stroke-miterlimit="10" stroke-linecap="round"/><circle cx="7.8" cy="11.8" r="1" fill="#fff"/>'],
+  cart: [16, 16, '<path d="M1.367 1.367H2.7L4.473 9.647C4.538 9.95 4.707 10.221 4.95 10.413C5.194 10.606 5.496 10.707 5.807 10.7H12.327C12.63 10.7 12.924 10.596 13.161 10.405C13.397 10.215 13.561 9.95 13.627 9.653L14.727 4.7H3.413M6 14C6 14.368 5.701 14.667 5.333 14.667C4.965 14.667 4.667 14.368 4.667 14C4.667 13.632 4.965 13.333 5.333 13.333C5.701 13.333 6 13.632 6 14ZM13.333 14C13.333 14.368 13.035 14.667 12.667 14.667C12.298 14.667 12 14.368 12 14C12 13.632 12.298 13.333 12.667 13.333C13.035 13.333 13.333 13.632 13.333 14Z" stroke="#000" stroke-opacity="0.5" stroke-width="1.66" stroke-linecap="round" stroke-linejoin="round"/>'],
+  profile: [16, 16, '<path opacity="0.8" fill="#fff" d="M3.50286 15H2.70286C2.70286 15.4418 3.06103 15.8 3.50286 15.8V15ZM3.50286 11.8501H4.30286C4.30286 11.8408 4.3027 11.8315 4.30237 11.8222L3.50286 11.8501ZM12.4964 11.8501L11.6968 11.8222C11.6965 11.8315 11.6964 11.8408 11.6964 11.8501H12.4964ZM12.4964 12H11.6964C11.6964 12.0134 11.6967 12.0269 11.6974 12.0403L12.4964 12ZM9.79836 15V15.8C9.81296 15.8 9.82755 15.7996 9.84213 15.7988L9.79836 15ZM3.50286 15H4.30286V11.8501H3.50286H2.70286V15H3.50286ZM3.50286 11.8501L4.30237 11.8222C4.26649 10.7943 4.63876 9.79403 5.33763 9.04026L4.75098 8.49634L4.16434 7.95242C3.17788 9.01636 2.65272 10.4278 2.70335 11.878L3.50286 11.8501ZM4.75098 8.49634L5.33763 9.04026C6.0365 8.28648 7.00513 7.84038 8.03155 7.79936L7.99961 7L7.96767 6.20064C6.51824 6.25856 5.15078 6.88848 4.16434 7.95242L4.75098 8.49634ZM7.99961 7L7.96767 7.79936C8.99409 7.84038 9.96272 8.28648 10.6616 9.04026L11.2482 8.49634L11.8349 7.95242C10.8484 6.88848 9.48098 6.25856 8.03155 6.20064L7.99961 7ZM11.2482 8.49634L10.6616 9.04026C11.3605 9.79403 11.7327 10.7943 11.6968 11.8222L12.4964 11.8501L13.2959 11.878C13.3465 10.4278 12.8213 9.01636 11.8349 7.95242L11.2482 8.49634ZM12.4964 11.8501H11.6964V12H12.4964H13.2964V11.8501H12.4964ZM12.4964 12L11.6974 12.0403C11.7248 12.5846 11.5357 13.1177 11.1715 13.5227L11.7663 14.0576L12.3611 14.5926C13.0082 13.873 13.3441 12.9263 13.2953 11.9597L12.4964 12ZM11.7663 14.0576L11.1715 13.5227C10.8073 13.9276 10.2979 14.1714 9.75459 14.2012L9.79836 15L9.84213 15.7988C10.8083 15.7459 11.714 15.3122 12.3611 14.5926L11.7663 14.0576ZM9.79836 15V14.2H3.50286V15V15.8H9.79836V15ZM10.9974 4H10.1974C10.1974 5.21559 9.21288 6.2 7.99961 6.2V7V7.8C10.0977 7.8 11.7974 6.09812 11.7974 4H10.9974ZM7.99961 7V6.2C6.78631 6.2 5.80172 5.21555 5.80172 4H5.00172H4.20172C4.20172 6.09816 5.9016 7.8 7.99961 7.8V7ZM5.00172 4H5.80172C5.80172 2.78443 6.78627 1.8 7.99956 1.8V1V0.2C5.90152 0.2 4.20172 1.90186 4.20172 4H5.00172ZM7.99956 1V1.8C9.21284 1.8 10.1974 2.78443 10.1974 4H10.9974H11.7974C11.7974 1.90186 10.0976 0.2 7.99956 0.2V1Z"/>'],
+  left: [14, 12, '<path d="M9.5 1L4.5 6L9.5 11" stroke="#0466B4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>'],
+  right: [14, 12, '<path d="M4.5 1L9.5 6L4.5 11" stroke="#0466B4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>'],
+  expand: [12, 12, '<path d="M11 3.5L6 8.5L1 3.5" stroke="#373738" stroke-opacity="0.8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>'],
+  'radio-on': [16, 16, '<circle cx="8" cy="8" r="7.5" stroke="#0466B4"/><circle cx="8" cy="8" r="4" fill="#0466B4"/>'],
+  'radio-off': [16, 16, '<circle cx="8" cy="8" r="7.5" stroke="#B3B3B3"/>'],
+  x: [10, 10, '<path d="M1 9L5 5M5 5L1 1M5 5L9 9M5 5L9 1" stroke="#373738" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>'],
+  close: [10, 10, '<path d="M1 9L5 5M5 5L1 1M5 5L9 9M5 5L9 1" stroke="#373738" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>'],
+  check: [16, 22, '<rect y="3" width="16" height="16" rx="3" fill="#0466B4"/><path d="M4 11.2825L6.79 13.8125L12 8.8125" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'],
+  send: [14, 14, '<path d="M7.201 11.025L5.644 12.906V9.284L9.625 5.25M11.148 11.725L13.125 1.094L0.875 7L11.148 11.725Z" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>'],
+  filter: [16, 16, '<path d="M15 1H1L6.25 6.25V15L9.75 12.98V6.25L15 1Z" stroke="#7C7D7D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'],
+};
+const icon = name => { const [w, h, body] = ICONS[name]; return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none">${body}</svg>`; };
+// Figma's "Cursor / Hand", its drop shadow included, drawn where the frame's sits.
+const HAND = `<svg class="hand" width="22.07" height="23.87" viewBox="0 0 22.0722 23.8667" fill="none">
+  <defs><filter id="hand-shadow" x="0" y="0" width="22.0722" height="23.8667" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="bg"/><feColorMatrix in="SourceAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="a"/><feOffset dx="-0.666667" dy="0.666667"/><feGaussianBlur stdDeviation="0.933333"/><feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.6 0"/><feBlend in2="bg" result="s"/><feBlend in="SourceGraphic" in2="s"/></filter></defs>
+  <path filter="url(#hand-shadow)" d="M9.23 20.933H13.048C13.092 20.933 13.135 20.916 13.166 20.884L14.262 19.789C14.383 19.668 14.547 19.6 14.718 19.6C14.963 19.6 15.186 19.738 15.296 19.957L15.759 20.884C15.775 20.914 15.805 20.933 15.839 20.933H17.412C17.618 20.933 17.784 20.767 17.784 20.562C17.784 19.052 18.135 17.564 18.81 16.214C19.675 14.485 20.727 12.734 20.417 10.716L20.175 9.134C20.098 8.635 19.669 8.267 19.164 8.267H18.98C18.517 8.267 18.142 8.642 18.142 9.105V9.765C18.142 9.864 18.062 9.944 17.963 9.944C17.864 9.944 17.784 9.864 17.784 9.765V8.267C17.784 7.53 17.187 6.933 16.451 6.933C15.714 6.933 15.117 7.53 15.117 8.267V9.794C15.117 9.978 14.968 10.127 14.784 10.127C14.6 10.127 14.451 9.978 14.451 9.794V8.267C14.451 7.53 13.854 6.933 13.117 6.933C12.381 6.933 11.784 7.53 11.784 8.267V10.188C11.784 10.24 11.772 10.291 11.749 10.337C11.626 10.583 11.275 10.583 11.153 10.337C11.129 10.291 11.117 10.24 11.117 10.188V3.6C11.117 2.731 10.409 1.6 9.451 1.6C8.492 1.6 7.784 2.731 7.784 3.6V11.844C7.784 12.077 7.595 12.267 7.361 12.267C7.21 12.267 7.071 12.187 6.994 12.057C6.737 11.626 6.14 10.649 5.784 10.267C5.583 10.051 5.181 9.897 4.789 9.792C4.181 9.629 3.565 9.929 3.216 10.452C2.771 11.12 2.859 12.008 3.426 12.576L4.521 13.671C4.913 14.063 5.209 14.541 5.384 15.067L5.451 15.267C5.67 15.924 6.039 16.522 6.529 17.012L8.254 18.737C8.807 19.29 9.117 20.039 9.117 20.821C9.117 20.883 9.168 20.933 9.23 20.933Z" fill="#fff" stroke="#000" stroke-width="0.8"/>
+  <path d="M11.487 12.744V17.875M14.119 12.744V17.875M16.815 12.744V17.875" stroke="#000" stroke-width="0.8"/>
+</svg>`;
+const $ = id => document.getElementById(id);
+
+/* ---------- scene ---------- */
+const params = new URLSearchParams(location.search);
+const SCENE = params.get('scene') === 'messages' ? 'messages' : 'home';
+document.querySelectorAll('.scene').forEach(s => { if (s.dataset.scene !== SCENE) s.remove(); });
+document.querySelector(`.menu [data-page="${SCENE}"]`).classList.add('on');
+
+if (SCENE === 'home') {
+  // Invoice, invoice date, due by, status, original balance, balance. Figma's hand rests on the
+  // overdue one.
+  const INVOICES = [
+    ['122333', '04/10/2023', 'Due now', '$757.00', '$757.00'],
+    ['023231', '04/10/2023', 'Due now', '$135.00', '$135.00'],
+    ['778444', '04/06/2023', 'Due now', '$41.00', '$41.00'],
+    ['667444', '04/05/2023', 'Overdue', '$427.00', '$377.00'],
+    ['663322', '04/05/2023', 'Paid', '$128.00', '$0.00'],
+  ];
+  $('invoices').innerHTML =
+    '<div class="th"><span>Invoice</span><span>Invoice date</span><span>Due by</span><span class="st">Status</span><span class="r">Original balance</span><span class="r">Balance</span></div>' +
+    INVOICES.map(([no, date, status, orig, bal]) => `
+      <div${status === 'Overdue' ? ' class="demo"' : ''}><span>${no}</span><span>${date}</span><span>08/10/2023</span>
+        <span class="st" style="position: relative"><span class="tag ${status.toLowerCase().replace(' ', '-')}">${status}</span>${status === 'Overdue' ? '<span data-hand style="left: 62.3px; top: 18.73px"></span>' : ''}</span>
+        <span class="r">${orig}</span><span class="r">${bal}</span></div>`).join('');
+
+  const HI_KELLY = 'Hi, Kelly. Can you double check if the patient name is correct? It doesn’t seems so to me';
+  const RECENT = [
+    [true, '102513', 'We made relevant changes to your claim. Check this out and proceed to payment accordingly.', '06/08/2023'],
+    [false, '203040', HI_KELLY, '05/28/2023'],
+    [true, '304082', HI_KELLY, '05/28/2023'],
+    [false, '874383', HI_KELLY, '05/28/2023'],
+    [false, '172319', HI_KELLY, '05/28/2023'],
+  ];
+  $('recent').innerHTML = RECENT.map(([unread, no, body, date]) => `
+    <div class="msg${unread ? ' unread' : ''}"><span class="dot${unread ? '' : ' read'}"></span>
+      <div class="main"><span class="subj ellipsis">Re: Invoice: ${no}</span><span class="body ellipsis">${body}</span>
+        <span class="meta"><span>Invoice: <a class="link">${no}</a></span><span class="date">${date}</span></span></div></div>`).join('');
+} else {
+  const THREADS = [[true, 'RE: Invoice: 102513'], [false, 'RE: Invoice: 203040'], [true, 'RE: RE: Invoice: 304082'], [false, 'RE: Invoice: 874383'], [false, 'RE: Invoice: 172319'], [false, 'RE: Invoice: 187294']];
+  $('threads').innerHTML = THREADS.map(([unread, subj]) => `
+    <div class="thread${unread ? ' unread' : ''}"><p class="t">${unread ? '<span class="dot"></span>' : ''}${subj}</p><p class="d">06/28/2023</p></div>`).join('');
+
+  // Due by, status, procedure, units, charge, adjustment, payment, balance: the two procedures the
+  // message disputes.
+  const BILL = [['94640', '1', '$557.00'], ['95934', '4', '$200.00']];
+  $('bill').innerHTML =
+    `<div class="th"><span class="f">Due By${icon('filter')}</span><span>Status</span><span class="f">Procedure${icon('filter')}</span><span>Units</span><span class="r">Charge</span><span class="r">Adjustment</span><span class="r">Payment</span><span class="r">Balance</span></div>` +
+    BILL.map(([proc, units, charge]) => `
+      <div><span>11/14/2022</span><span><span class="tag">Due now</span></span><span>${proc}</span><span>${units}</span><span class="r">${charge}</span><span class="r">$0.00</span><span class="r">$0.00</span><span class="r">${charge}</span></div>`).join('');
+}
+document.querySelectorAll('i[data-icon]').forEach(i => { i.outerHTML = icon(i.dataset.icon); });
+document.querySelectorAll('[data-hand]').forEach(el => { el.outerHTML = HAND.replace('class="hand"', `class="hand" style="${el.getAttribute('style')}"`); });
+
+/* ---------- real pointer input ----------
+   A mouse moving over the page (only the lightbox's copy takes one) puts it live: the frame's hand
+   and the hover it draws give way to the real pointer's, and come back once it leaves. */
+const root = document.documentElement;
+addEventListener('pointermove', e => { if (e.pointerType !== 'touch') root.classList.add('live'); }, { passive: true });
+root.addEventListener('pointerleave', () => root.classList.remove('live'));
+
+/* ---------- scrolling ----------
+   The compose pane scrolls. Embedded, a scroll is posted to the parent, which moves the page's
+   other copies (the carousel card under its lightbox copy) to the same place and starts a newly
+   loaded copy there, so the swap between them doesn't jump. Another copy's scroll lands silently:
+   it isn't posted back. */
+const lists = {};
+function syncedScroll(name, scroller) {
+  let syncedTop = null;
+  scroller.addEventListener('scroll', () => {
+    if (syncedTop !== null && scroller.scrollTop === syncedTop) { syncedTop = null; return; }
+    syncedTop = null;
+    if (parent !== window) parent.postMessage({ type: 'proto:scroll', scene: SCENE, list: name, top: scroller.scrollTop }, location.origin);
+  }, { passive: true });
+  lists[name] = {
+    sync(top) {
+      const before = scroller.scrollTop;
+      scroller.scrollTop = top;
+      if (scroller.scrollTop !== before) syncedTop = scroller.scrollTop;
+    },
+  };
+}
+if ($('detail')) syncedScroll('detail', $('detail'));
+
+/* ---------- embedding ----------
+   Same handshake as the other prototypes: once the fonts and the backdrop are in and the first
+   frame has painted, transitions come back and an embedding page is told this one is ready to show
+   (and told again if it asks with "proto:ping", in case it only started listening after the page
+   had loaded). */
+if (params.has('embed')) root.classList.add('embed');
+let shown = false;
+const announce = () => { if (parent !== window) parent.postMessage({ type: 'proto:ready', scene: SCENE }, location.origin); };
+addEventListener('message', e => {
+  if (e.origin !== location.origin) return;
+  if (e.data === 'proto:ping' && shown) announce();
+  if (e.data?.type === 'proto:scroll') lists[e.data.list]?.sync(e.data.top);
+});
+const backdrop = new Image();
+backdrop.src = getComputedStyle(document.body).backgroundImage.slice(5, -2);
+Promise.all([
+  document.fonts.load('400 14px "Source Sans Pro"'),
+  document.fonts.load('600 14px "Source Sans Pro"'),
+  backdrop.decode().catch(() => {}),
+  ...[...document.images].map(img => img.decode().catch(() => {})),
+]).then(() => document.fonts.ready).then(() => requestAnimationFrame(() => requestAnimationFrame(() => {
+  root.classList.remove('no-anim');
+  shown = true;
+  announce();
+})));
+
+// Figma's composition fills a 16:9 frame. A narrower one (the 4:3 phone card) crops the backdrop's
+// sides rather than shrinking the portal, down to the portal filling 92% of its width.
+function fit() {
+  const st = $('stage'), portal = document.querySelector('.app');
+  st.style.transform = `scale(${Math.min(innerWidth * 0.92 / portal.offsetWidth, innerHeight / st.offsetHeight)})`;
+}
+addEventListener('resize', fit); fit();
+addEventListener('keydown', e => {
+  if (!root.classList.contains('embed')) return;
+  // A click into the lightbox's live copy moves keyboard focus into this page, so hand the
+  // lightbox's own keys back to it.
+  if (e.key === 'Escape' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+    e.preventDefault();
+    parent.dispatchEvent(new KeyboardEvent('keydown', { key: e.key, code: e.code, bubbles: true, cancelable: true }));
+  }
+});
+</script>
+</body>
+</html>
