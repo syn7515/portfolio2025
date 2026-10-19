@@ -127,6 +127,9 @@
   /* The compose pane scrolls (in the lightbox) down to the invoice it's about, below the card. */
   .detail { position: relative; flex: 1; min-width: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
   .detail::-webkit-scrollbar { display: none; }
+  /* On the carousel card the pane takes no touch, so a swipe there scrolls the site (.inert, set in
+     the script); a script still scrolls it. */
+  .inert .detail { overflow-y: hidden; }
   .compose { display: flex; flex-direction: column; gap: 20px; padding: 16px 24px; }
   .form { display: flex; flex-direction: column; gap: 16px; }
   .fields { position: relative; z-index: 3; display: flex; flex-direction: column; gap: 12px; margin-left: -15px; }
@@ -447,6 +450,13 @@ if ($('detail')) syncedScroll('detail', $('detail'));
    (and told again if it asks with "proto:ping", in case it only started listening after the page
    had loaded). */
 if (params.has('embed')) root.classList.add('embed');
+// Inert on the carousel card. The site gives the frame no pointer there (pointer-events: none on the
+// iframe; only the lightbox's copy, inside [data-lightbox-live], takes one), but iOS Safari still
+// hands a swipe that starts on the compose pane to it, whose overscroll containment then keeps it
+// from the site, so the post wouldn't scroll under the reader's finger. Inert, the pane stops taking
+// touches (.inert above). frameElement is null when the page isn't framed, or is framed by another
+// site.
+if (frameElement && !frameElement.closest('[data-lightbox-live]')) root.classList.add('inert');
 let shown = false;
 const announce = () => { if (parent !== window) parent.postMessage({ type: 'proto:ready', scene: SCENE }, location.origin); };
 addEventListener('message', e => {
