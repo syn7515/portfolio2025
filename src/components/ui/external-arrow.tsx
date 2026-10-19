@@ -36,7 +36,7 @@ export default function ExternalArrow({ className }: { className?: string }) {
     <span
       aria-hidden
       className={cn(
-        'relative -top-[0.34em] inline-block not-italic text-[11px] leading-none font-sans pl-[2px]',
+        'relative -top-[0.34em] inline-block not-italic text-[calc(11*var(--text-px))] leading-none font-sans pl-[2px]',
         '!text-stone-400 dark:!text-zinc-500 transition-colors duration-150',
         'group-hover:!text-rose-700 group-active:!text-rose-700 group-focus-visible:!text-rose-700',
         'dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 dark:group-focus-visible:!text-rose-400',

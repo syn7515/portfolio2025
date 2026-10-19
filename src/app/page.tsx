@@ -88,21 +88,21 @@ function HomeFooterLinks() {
           rel="noopener noreferrer"
           data-social-link-trigger
           onClick={() => trackOutboundClick("https://x.com/sue_park__", "X")}
-          className="sm:text-[14px] px-2 py-3 -mx-2 -my-3 !text-stone-500 dark:!text-zinc-400 hover:!text-rose-700 active:!text-rose-700 dark:hover:!text-rose-400 dark:active:!text-rose-400 motion-safe:active:scale-[0.97]"
+          className="sm:text-[calc(14*var(--text-px))] px-2 py-3 -mx-2 -my-3 !text-stone-500 dark:!text-zinc-400 hover:!text-rose-700 active:!text-rose-700 dark:hover:!text-rose-400 dark:active:!text-rose-400 motion-safe:active:scale-[0.97]"
           style={{
             transition: 'scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
           }}
         >
           X
         </a>
-        <span className="sm:text-[14px] !text-stone-400 dark:!text-zinc-600">·</span>
+        <span className="sm:text-[calc(14*var(--text-px))] !text-stone-400 dark:!text-zinc-600">·</span>
         <a
           href="https://www.linkedin.com/in/sooyeonp/"
           target="_blank"
           rel="noopener noreferrer"
           data-social-link-trigger
           onClick={() => trackOutboundClick("https://www.linkedin.com/in/sooyeonp/", "LinkedIn")}
-          className="sm:text-[14px] px-2 py-3 -mx-2 -my-3 !text-stone-500 dark:!text-zinc-400 hover:!text-rose-700 active:!text-rose-700 dark:hover:!text-rose-400 dark:active:!text-rose-400 motion-safe:active:scale-[0.97]"
+          className="sm:text-[calc(14*var(--text-px))] px-2 py-3 -mx-2 -my-3 !text-stone-500 dark:!text-zinc-400 hover:!text-rose-700 active:!text-rose-700 dark:hover:!text-rose-400 dark:active:!text-rose-400 motion-safe:active:scale-[0.97]"
           style={{
             transition: 'scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
           }}
@@ -111,7 +111,7 @@ function HomeFooterLinks() {
         </a>
       </div>
       <div
-        className="text-right text-[14px] text-stone-400 dark:text-zinc-500 font-normal font-sans [text-wrap:nowrap]"
+        className="text-right text-[calc(14*var(--text-px))] text-stone-400 dark:text-zinc-500 font-normal font-sans [text-wrap:nowrap]"
       >
         © Sue Park {new Date().getFullYear()}
       </div>
@@ -244,12 +244,13 @@ export default function Home() {
               1024px, sliding to the 26px phone size by 640px and holding there. Both ends land on
               existing breakpoints, so there is no step at 640px and no change at 1024px when the
               sheet comes in. Slope is 6px over 384px = 1.5625vw; the intercept is
-              26px - 640px * 0.015625 = 16px. Crimson Pro carries a far larger x-height than the
-              Biro Script it replaced, so it runs ~0.8x the old 32-40px ramp to hold the same
-              optical size. */}
+              26px - 640px * 0.015625 = 16px. From 1280px the 32px cap rises with the column, to
+              ~34px by 1680px where the column stops widening (--text-px in globals.css). Crimson
+              Pro carries a far larger x-height than the Biro Script it replaced, so it runs ~0.8x
+              the old 32-40px ramp to hold the same optical size. */}
           <div>
             <h1
-              className={`!mt-0 !text-[clamp(26px,calc(1.5625vw_+_16px),32px)] !text-stone-700 dark:!text-zinc-200 !mb-0 md:!mb-0${riseClass}`}
+              className={`!mt-0 !text-[clamp(26px,calc(1.5625vw_+_16px),calc(32*var(--text-px)))] !text-stone-700 dark:!text-zinc-200 !mb-0 md:!mb-0${riseClass}`}
               style={{
                 fontFamily: 'var(--font-crimson-pro), serif',
                 lineHeight: '120%',

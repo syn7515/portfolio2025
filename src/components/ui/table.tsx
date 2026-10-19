@@ -18,9 +18,9 @@ export interface TableProps {
 
 const theadBorderClasses = 'border-b border-stone-200 dark:border-zinc-800'
 const thClasses =
-  'pt-2 pb-2 pr-6 sm:pr-4 last:pr-0 whitespace-nowrap text-[13px] sm:text-[12px] uppercase text-stone-400 dark:text-zinc-500 font-[420] tracking-wider'
+  'pt-2 pb-2 pr-6 sm:pr-4 last:pr-0 whitespace-nowrap text-[13px] sm:text-[calc(12*var(--text-px))] uppercase text-stone-400 dark:text-zinc-500 font-[420] tracking-wider'
 const tdBaseClasses =
-  'py-1 pr-6 sm:pr-4 last:pr-0 whitespace-nowrap text-[14px] text-stone-700 dark:text-zinc-300 dark:opacity-90 font-[420]'
+  'py-1 pr-6 sm:pr-4 last:pr-0 whitespace-nowrap text-[calc(14*var(--text-px))] text-stone-700 dark:text-zinc-300 dark:opacity-90 font-[420]'
 const tdFirstRowClasses = 'pt-2'
 const tdHighlightClasses = 'font-medium'
 

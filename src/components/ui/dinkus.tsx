@@ -22,7 +22,7 @@ const DINKUS_FONT_SIZE_PX = 16
 const DINKUS_INK_OFFSET_EM = 0.178
 const DINKUS_STYLE: CSSProperties = {
   fontFamily: 'var(--font-crimson-pro), serif',
-  fontSize: `${DINKUS_FONT_SIZE_PX}px`,
+  fontSize: `calc(${DINKUS_FONT_SIZE_PX} * var(--text-px))`,
   lineHeight: 1,
   transform: `translateY(${DINKUS_INK_OFFSET_EM}em)`,
 }
