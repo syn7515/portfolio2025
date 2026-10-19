@@ -16,7 +16,8 @@ export default function BlogPostHeader({ title, subtitle }: BlogPostHeaderProps)
           sheet's (560px, 15px), so a title well under 40 there read as undersized against them; the
           step lands at 640px because the rest of this header changes there too (spacing, the
           subtitle), and it keeps the ramp continuous into the sheet. Slope is 8px over 384px =
-          2.0833vw; the intercept is 32px - 640px * 0.020833 = 18.667px.
+          2.0833vw; the intercept is 32px - 640px * 0.020833 = 18.667px. From 1280px the 40px cap
+          rises with the column, to ~42.7px by 1680px (--text-px in globals.css).
 
           On a phone it matches the home name (26px, see the h1 in app/page.tsx), so a reader
           arriving from home meets the same voice at the same scale; above that the title runs
@@ -27,7 +28,7 @@ export default function BlogPostHeader({ title, subtitle }: BlogPostHeaderProps)
           the ramp. It lives on the utility rather than the inline style only to keep the type
           settings in one place. */}
       <h1
-        className="!mt-0 !text-[26px] sm:!text-[clamp(32px,calc(2.0833vw_+_18.667px),40px)] !tracking-[-0.03em] !text-stone-700 dark:!text-zinc-200 !mb-0 whitespace-pre-line"
+        className="!mt-0 !text-[26px] sm:!text-[clamp(32px,calc(2.0833vw_+_18.667px),calc(40*var(--text-px)))] !tracking-[-0.03em] !text-stone-700 dark:!text-zinc-200 !mb-0 whitespace-pre-line"
         style={{
           fontFamily: 'var(--font-crimson-pro), serif',
           lineHeight: '120%',
@@ -48,7 +49,7 @@ export default function BlogPostHeader({ title, subtitle }: BlogPostHeaderProps)
           All the type values are unprefixed because the element only ever exists at 640px and up —
           a `sm:` prefix on them would describe a state that never renders. */}
       {subtitle && (
-        <p className="hidden sm:block !text-sm !font-[460] !leading-[165%] !tracking-normal !mt-3 !mb-0 !text-stone-500 dark:!text-zinc-400">
+        <p className="hidden sm:block !text-[calc(0.875*var(--text-rem))] !font-[460] !leading-[165%] !tracking-normal !mt-3 !mb-0 !text-stone-500 dark:!text-zinc-400">
           {subtitle}
         </p>
       )}

@@ -63,7 +63,7 @@
 }
 
 .introParagraph {
-    font-size: 15px !important;
+    font-size: calc(15 * var(--text-px)) !important;
     font-weight: 460 !important;
     letter-spacing: normal !important;
     line-height: 165% !important;

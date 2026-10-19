@@ -50,6 +50,16 @@
   /* Width of the reading column: text, header, lists and footer all cap at it. 560px everywhere
      but wide screens — see the paper breakpoint block below. */
   --content-w: 560px;
+  /* Type grows with the column, so the wider measure on a wide sheet doesn't leave the text looking
+     small in it. A size inside the column is written as `calc(15 * var(--text-px))`: 15px while the
+     column is 560px, which is every width up to 1280px, rising with it to 16px by the time it
+     reaches 640px. That is 1/15 more type for 1/7 more column, so the text grows about half as fast
+     as the measure and each line still gains a few characters. 80px of column over 1200 = 1/15px.
+     Sizes in rem use --text-rem instead, the same ramp scaled to 16px, so a reader's own default
+     font size still carries through them.
+     Phone sizes stay literal: the column is never wider than 560px there. */
+  --text-px: calc(1px + (var(--content-w) - 560px) / 1200);
+  --text-rem: calc(1rem + (var(--content-w) - 560px) / 75);
   --paper-grid-minor: rgb(120 113 108 / 0.1);
   --paper-grid-major: rgb(120 113 108 / 0.12);
   --paper-grid-hover-minor: rgb(120 113 108 / 0.12);
@@ -912,7 +922,7 @@ sup:not(.sup-badge) {
 .sup-badge {
   font-feature-settings: normal;
   vertical-align: baseline;
-  font-size: 10px;
+  font-size: calc(10 * var(--text-px));
   line-height: 1;
 }
 
