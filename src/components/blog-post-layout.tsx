@@ -12,7 +12,7 @@ import BlogPostRailNav from '@/components/blog-post-rail-nav'
 import useScrollDepth from '@/components/use-scroll-depth'
 import PaperGridBackground from '@/components/ui/paper-grid-background'
 import Dinkus from '@/components/ui/dinkus'
-import RevealFooter, { revealPaperClassName } from '@/components/ui/reveal-footer'
+import RevealFooter, { RevealDesk, revealPaperClassName } from '@/components/ui/reveal-footer'
 import { PROJECTS } from '@/lib/projects'
 import {
   isBlogPostMaskNavigation,
@@ -109,9 +109,8 @@ type ProjectNavigationHandler = (
   direction: BlogPostMaskDirection
 ) => void
 
-// The Previous/Next pair. The layout renders it twice — on the sheet from 1024px, and in the reveal
-// footer under the paper below that — and only one copy is ever displayed, so the hidden one is out
-// of the tab order and the accessibility tree.
+// The Previous/Next pair, which the post ends on: the layout puts it in the reveal footer under the
+// paper, at every width.
 function ProjectNavigationLinks({
   previousProject,
   nextProject,
@@ -423,7 +422,11 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
 
       <div
         className={cn(
-          'w-full min-h-screen overflow-x-clip flex flex-col relative',
+          // A one-column grid rather than a flex column, for the reveal footer: the page in the
+          // first row, the footer in the second, and RevealDesk sharing the footer's cell while
+          // sitting before the paper in the DOM (see ui/reveal-footer). minmax(0, 1fr) holds the
+          // column to the viewport; a plain auto column would widen to the carousel's track.
+          'w-full min-h-screen overflow-x-clip grid grid-cols-[minmax(0,1fr)] grid-rows-[1fr_auto] relative',
           (exitEntrance ||
             maskSuppressedSlug === slug ||
             reloadSuppressedSlug === slug ||
@@ -452,7 +455,11 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           }}
         />
 
-        {/* Real paper: holds the actual header/content/footer, floats after sidebar at ≥1500px. This
+        {/* From 1024px, holds the desk still while the sheet slides up off the reveal footer. Here,
+            between the desk's own grid and the paper, so it paints under the sheet. */}
+        {hasProjectNavigation && <RevealDesk />}
+
+        {/* Real paper: holds the actual header and content, floats after sidebar at ≥1500px. This
             element and its content wrapper are never transformed or faded — transform, filter, and
             opacity below 1 create stacking contexts that would trap descendants (e.g. the carousel's
             z-[50]) below page-level fixed overlays like the top-edge fade regardless of their own
@@ -468,7 +475,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
             regardless, as the hook other components find the paper by. */}
         <div
           className={cn(
-            'paper-grid-bottom flex-1 sheet:mt-[100px] overflow-x-clip relative',
+            'paper-grid-bottom row-start-1 col-start-1 sheet:mt-[100px] overflow-x-clip relative',
             hasProjectNavigation && revealPaperClassName
           )}
           style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--paper-left)', maxWidth: 'var(--paper-max-w)' }}
@@ -530,45 +537,26 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
                     long article and the mark is what says it has ended. */}
                 <Dinkus className={cn('mt-10 sheet:mt-14', styles.contentBlurRevealItem)} />
 
-                {hasProjectNavigation ? (
-                  <>
-                    {/* Project navigation on the sheet. The dinkus above closes the article; this
-                        margin is the space between it and the navigation, and is exactly twice the
-                        one above the dinkus (56/112) so the mark sits with the text it ends rather
-                        than heading these rows. The margin is the whole gap: the children's own top
-                        margins collapse into it, which is why neither row sets a margin of its own.
-                        Below 1024px these rows leave the paper for the reveal footer after it. */}
-                    <div
-                      className={cn(
-                        'hidden sheet:block mt-28 pb-[120px] overflow-x-visible',
-                        styles.contentBlurRevealItem
-                      )}
-                    >
-                      <ProjectNavigationLinks
-                        previousProject={previousProject}
-                        nextProject={nextProject}
-                        onNavigate={handleProjectNavigation}
-                      />
-                    </div>
-                    {/* Below 1024px the paper ends here instead, in the straight edge the reveal
-                        footer slides out from under. 112px, the sheet's own gap below the mark, so
-                        it still reads as the article signing off rather than as a last line
-                        crowding the edge. */}
-                    <div className="pb-28 sheet:hidden" aria-hidden />
-                  </>
-                ) : (
-                  <div className="pb-12 sheet:pb-[148px]" aria-hidden />
-                )}
+                {/* The paper ends here, in the straight edge the reveal footer slides out from
+                    under. 112px, twice the gap above the mark at the sheet's size, so it reads as
+                    the article signing off rather than as a last line crowding the edge. With no
+                    footer the paper runs on to the bottom of the page instead. */}
+                <div
+                  className={hasProjectNavigation ? 'pb-28' : 'pb-12 sheet:pb-[148px]'}
+                  aria-hidden
+                />
               </div>
           </div>
         </div>
 
-        {/* Reveal footer, below 1024px: the desk under the paper, holding the drafting grid and
-            the Previous/Next pair. It stays put while the paper scrolls up off it, so the end of
-            the post reads as the sheet being lifted away rather than as one more block arriving.
-            How it does that without raising the paper is in ui/reveal-footer. */}
+        {/* Reveal footer: the Previous/Next pair, under the paper, holding still while the paper
+            scrolls up off it, so the end of the post reads as the sheet being lifted away rather
+            than as one more block arriving. Below 1024px it is a surface of its own under the
+            full-bleed paper, with the drafting grid; from there (fromSheet) it is just the text,
+            on the desk around the sheet, which RevealDesk holds still. Home keeps its footer on
+            the sheet. How it all works without raising the paper is in ui/reveal-footer. */}
         {hasProjectNavigation && (
-          <RevealFooter className={styles.contentBlurRevealItem}>
+          <RevealFooter fromSheet className={styles.contentBlurRevealItem}>
             <ProjectNavigationLinks
               previousProject={previousProject}
               nextProject={nextProject}

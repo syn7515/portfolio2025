@@ -148,3 +148,134 @@
         transparent 100%
     );
 }
+
+/* ── From the sheet ─────────────────────────────────────────────────────────────────────────────
+   Opt-in (RevealFooter's `fromSheet`, with RevealDesk): from 1024px too, where the paper is a
+   floating sheet on the desk, the page's footer comes out from under the sheet instead of sitting
+   on it. Used by the case studies; Home keeps its footer on the sheet.
+
+   This is a different reveal from the full-bleed one above. There the paper is the whole screen,
+   so the footer is a surface of its own under it, with its own grid and the edge's shadow. Here the
+   desk is already on screen around the sheet, so nothing new comes out but the footer's text: the
+   sheet alone slides up, and the desk around and under it holds still for the length of the
+   reveal, as do the side navigation (fixed) and the drafting grid. The only shadow is the sheet's
+   own, under its bottom edge.
+
+   Holding the desk still is RevealDesk's job, below. The desk's grid (PaperGridBackground) scrolls
+   with the page; for the last stretch of it RevealDesk lays an exact, opaque copy of that grid over
+   it and pins the copy to the screen, so the grid stops while the sheet goes on.
+
+   Both expect the page wrapper to be a one-column grid with the page in its first row and the
+   footer in its second: RevealDesk takes the footer's row as its own so that it sizes to the footer
+   with no measuring, and it has to come before the paper in the DOM to paint under it, while the
+   footer's text stays after the article. Grid placement moves it without changing either order. */
+.footer.fromSheet {
+    grid-row: 2;
+    grid-column: 1;
+}
+
+@media (min-width: 1024px) {
+    .footer.fromSheet {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        clip-path: inset(0);
+    }
+
+    /* Just the text: the desk under it is RevealDesk's, and the sheet's own shadow is the edge. */
+    .fromSheet .grid,
+    .fromSheet .edge {
+        display: none;
+    }
+}
+
+/* RevealDesk. Its track is the footer's grid cell stretched a viewport up behind the sheet (a grid
+   item stretches to its area less its margins, so the negative margin adds exactly that). The copy
+   of the desk is a viewport tall at the track's foot, held to the screen's bottom edge by
+   `bottom: 0` — so, as with the footer's text, it scrolls with the page until the reveal starts and
+   is pinned for its length, ending wherever the footer's text does, since the two share a cell. */
+.deskTrack {
+    display: none;
+}
+
+@media (min-width: 1024px) {
+    .deskTrack {
+        grid-row: 2;
+        grid-column: 1;
+        display: flex;
+        flex-direction: column;
+        margin-top: -100vh;
+        pointer-events: none;
+    }
+
+    /* Opaque, so that once it pins, the scrolling grid under it is out of sight. */
+    .desk {
+        position: sticky;
+        bottom: 0;
+        height: 100vh;
+        margin-top: auto;
+        background-color: var(--background);
+    }
+
+    /* .paper-grid-background's layers, sizes, side fades and x position (globals.css), so that
+       until it pins the copy is indistinguishable from the grid it covers. Its y position needs
+       where the copy sits on the page, which CSS can't know: RevealDesk measures it into
+       --reveal-desk-top. No top fade — that one belongs to the top of the page. */
+    .deskGrid {
+        position: absolute;
+        inset: 0;
+        background-image:
+            linear-gradient(to right, var(--paper-grid-major) 1px, transparent 1px),
+            linear-gradient(to bottom, var(--paper-grid-major) 1px, transparent 1px),
+            linear-gradient(to right, var(--paper-grid-minor) 1px, transparent 1px),
+            linear-gradient(to bottom, var(--paper-grid-minor) 1px, transparent 1px);
+        background-position: calc(var(--paper-left) - 0.5px) calc(99.5px - var(--reveal-desk-top, 0px));
+        background-size:
+            100px 100px,
+            100px 100px,
+            20px 20px,
+            20px 20px;
+        -webkit-mask-image:
+            linear-gradient(to right, transparent 0, rgb(0 0 0 / 0.25) min(80px, calc(var(--paper-left) * 0.4)), black calc(var(--paper-left) - 1px)),
+            linear-gradient(to left, transparent 0, rgb(0 0 0 / 0.25) min(80px, calc(var(--paper-right) * 0.4)), black calc(var(--paper-right) - 1px));
+        -webkit-mask-composite: source-in;
+        mask-image:
+            linear-gradient(to right, transparent 0, rgb(0 0 0 / 0.25) min(80px, calc(var(--paper-left) * 0.4)), black calc(var(--paper-left) - 1px)),
+            linear-gradient(to left, transparent 0, rgb(0 0 0 / 0.25) min(80px, calc(var(--paper-right) * 0.4)), black calc(var(--paper-right) - 1px));
+        mask-composite: intersect;
+    }
+}
+
+/* The desk's pointer spotlight, copied the same way (.paper-grid-background::after). */
+@media (min-width: 1024px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .deskGrid::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        background-image:
+            linear-gradient(to right, var(--paper-grid-hover-major) 1px, transparent 1px),
+            linear-gradient(to bottom, var(--paper-grid-hover-major) 1px, transparent 1px),
+            linear-gradient(to right, var(--paper-grid-hover-minor) 1px, transparent 1px),
+            linear-gradient(to bottom, var(--paper-grid-hover-minor) 1px, transparent 1px);
+        background-position: inherit;
+        background-size: inherit;
+        -webkit-mask-image: radial-gradient(
+            circle 150px at var(--paper-grid-pointer-x, 0px) var(--paper-grid-pointer-y, 0px),
+            black 0,
+            rgb(0 0 0 / 0.75) 35%,
+            transparent 100%
+        );
+        mask-image: radial-gradient(
+            circle 150px at var(--paper-grid-pointer-x, 0px) var(--paper-grid-pointer-y, 0px),
+            black 0,
+            rgb(0 0 0 / 0.75) 35%,
+            transparent 100%
+        );
+        transition: opacity 180ms ease-out;
+    }
+
+    .deskGrid[data-pointer-active='true']::after {
+        opacity: 1;
+    }
+}
