@@ -4,13 +4,13 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { cn, scrollBehavior } from '@/lib/utils'
 import Link from 'next/link'
 import { ArrowUp, ChevronLeft, ChevronRight, Undo2 } from 'lucide-react'
-import { motion, useReducedMotion } from 'framer-motion'
 import styles from './blog-post.module.css'
 import BlogPostHeader from '@/components/blog-post-header'
 import BlogPostToc from '@/components/blog-post-toc'
 import BlogPostRailNav from '@/components/blog-post-rail-nav'
 import useScrollDepth from '@/components/use-scroll-depth'
 import PaperGridBackground from '@/components/ui/paper-grid-background'
+import PaperExitSheet from '@/components/ui/paper-exit-sheet'
 import Dinkus from '@/components/ui/dinkus'
 import RevealFooter, { RevealDesk, revealPaperClassName } from '@/components/ui/reveal-footer'
 import { PROJECTS } from '@/lib/projects'
@@ -20,15 +20,6 @@ import {
   type BlogPostMaskDirection,
 } from '@/lib/blog-post-mask-transition'
 import {
-  PAPER_EXIT_REST,
-  PAPER_EXIT_OFFSCREEN,
-  PAPER_EXIT_SHADE_REST,
-  PAPER_EXIT_SHADE_LIFTED,
-  PAPER_EXIT_SHADE_TRANSITION,
-  PAPER_EXIT_TRANSITION,
-  PAPER_EXIT_TRANSITION_REDUCED,
-  PAPER_EXIT_TRANSFORM_ORIGIN,
-  PAPER_EXIT_PERSPECTIVE,
   markPaperBackNav,
   isPaperBackNav,
   clearPaperBackNav,
@@ -36,7 +27,6 @@ import {
   clearPageReload,
   shouldSkipPaperPageTransition,
 } from '@/lib/paper-exit-transition'
-import { keepOnMainThread } from '@/lib/motion'
 
 // The last thing the entrance in blog-post.module.css finishes is the underlay retiring — a 500ms
 // fade that starts on the sheet's 400ms landing frame, done by 900ms. (Content reveal ends
@@ -195,10 +185,10 @@ function ProjectNavigationLinks({
 // hydrate — which is what used to gate this page's First Contentful Paint. See the comment block
 // at the top of that stylesheet.
 //
-// The lift-away (backwards navigation, footer Previous or sidebar Home) is still Framer-driven: it's
-// triggered by an interaction, so it's post-hydration by definition and costs nothing at load. Its
-// easing/duration/opacity pacing live in src/lib/paper-exit-transition.ts, shared with app/page.tsx
-// so both exits feel identical.
+// The departing sheet (backwards navigation, footer Previous or sidebar Home) is still
+// Framer-driven: it's triggered by an interaction, so it's post-hydration by definition and costs
+// nothing at load. It is ui/paper-exit-sheet, shared with app/page.tsx so both exits feel
+// identical, its pacing in src/lib/paper-exit-transition.ts.
 
 function startInterruptibleScrollToTop(): () => void {
   if (scrollBehavior() === 'auto') {
@@ -348,12 +338,6 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
     event.preventDefault()
     requestBlogPostMaskNavigation(href, direction)
   }
-
-  // Only the exit needs this now — the entrance handles reduced motion in CSS, where the media
-  // query resolves at paint time and can't disagree with the server the way this hook can.
-  const shouldReduceMotion = useReducedMotion()
-  const exitTransition = shouldReduceMotion ? PAPER_EXIT_TRANSITION_REDUCED : PAPER_EXIT_TRANSITION
-  const exitShadeTransition = shouldReduceMotion ? PAPER_EXIT_TRANSITION_REDUCED : PAPER_EXIT_SHADE_TRANSITION
 
   return (
     <>
@@ -589,40 +573,10 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--paper-left)', maxWidth: 'var(--paper-max-w)' }}
         />
 
-        {/* Departing-sheet overlay (backwards navigation): the page that was open turning back. The
-            content is already revealed underneath (instant-reveal in the mount effect), and this
-            sheet starts at the paper's rest position and lifts away about its right edge
-            (src/lib/paper-exit-transition.ts). Needs an
-            explicit z-index: the content below is visible during the exit, and carousel children
-            use z-[50] at the root stacking level (the real paper deliberately isn't a stacking
-            context), so without one the carousel would paint above the departing sheet. z-[55]
-            stays below the sidebar (z-60). */}
-        {exitEntrance && !exitDone && (
-          // Clips the lifted sheet to the page, so it can't stretch the document while it tilts.
-          <div aria-hidden className="absolute inset-0 overflow-clip pointer-events-none z-[55]" style={PAPER_EXIT_PERSPECTIVE}>
-            {/* As tall as the screen rather than the page: only what is on screen can be seen
-                lifting, and a post's 8800px sheet would be a needlessly huge layer to tilt and blur. */}
-            <motion.div
-              className="absolute inset-x-0 top-0 h-[100lvh] sheet:top-[100px] sheet:h-[calc(100lvh_-_100px)]"
-              style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--paper-left)', maxWidth: 'var(--paper-max-w)', transformOrigin: PAPER_EXIT_TRANSFORM_ORIGIN }}
-              initial={PAPER_EXIT_REST}
-              animate={PAPER_EXIT_OFFSCREEN}
-              transition={exitTransition}
-              onAnimationComplete={() => setExitDone(true)}
-              // Without it the sheet flashes back to full opacity just before it unmounts — see
-              // keepOnMainThread.
-              onUpdate={keepOnMainThread}
-            >
-              <motion.div
-                className="absolute inset-0"
-                style={{ background: 'var(--paper-exit-shade)' }}
-                initial={PAPER_EXIT_SHADE_REST}
-                animate={PAPER_EXIT_SHADE_LIFTED}
-                transition={exitShadeTransition}
-              />
-            </motion.div>
-          </div>
-        )}
+        {/* Departing sheet (backwards navigation): the page that was open, leaving. The content is
+            already revealed underneath (instant-reveal in the mount effect). See
+            ui/paper-exit-sheet. */}
+        {exitEntrance && !exitDone && <PaperExitSheet onDone={() => setExitDone(true)} />}
       </div>
     </>
   )

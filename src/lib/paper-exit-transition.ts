@@ -3,9 +3,19 @@
 // the way the page you are reading goes back over a notebook's spine: its outer edge lifts toward
 // you, and before it can stand up it is gone, blurred out, revealing the destination's content
 // already sitting on the paper underneath. It is only the start of a page turn, the way the
-// entrance's slide-in is only the end of one, and that is enough to read as one without drawing
-// the eye off the page. Shared between blog-post-layout.tsx and app/page.tsx so both exits feel
-// identical.
+// entrance's settle is only the end of one, and that is enough to read as one without drawing
+// the eye off the page. Played by ui/paper-exit-sheet.tsx, for blog-post-layout.tsx and
+// app/page.tsx alike.
+//
+// That is wherever the paper runs off the right of the screen. From the centred breakpoint it sits
+// whole on the desk, a margin either side, and reads as a loose printed sheet rather than a page:
+// there it is lifted off the desk instead (PAPER_LIFTOFF_* below), its entrance there, being laid
+// down rather than turned (page.module.css, blog-post.module.css), run backwards.
+
+import { PAPER_CENTERED_BREAKPOINT } from '@/lib/breakpoints'
+
+/** Where the sheet reads as a loose sheet rather than a notebook's page. */
+export const PAPER_LOOSE_SHEET_QUERY = `(min-width: ${PAPER_CENTERED_BREAKPOINT}px)`
 
 /** How far the sheet lifts before it is gone. At 22deg its outer edge has come ~420px off the page
     toward you and looks a fifth taller, its top corner standing ~65px over the paper's top edge,
@@ -60,6 +70,35 @@ export const PAPER_EXIT_TRANSITION = {
 }
 export const PAPER_EXIT_TRANSITION_REDUCED = { default: EXIT_TRANSITION_REDUCED }
 export const PAPER_EXIT_SHADE_TRANSITION = EXIT_LIFT_TRANSITION_FULL
+
+// The loose sheet's shadow, none of its own while it lies on the desk (the paper's box-shadow
+// covers that) and spread wide once it is off it.
+const LOOSE_SHADOW_DOWN = 'drop-shadow(0px 0px 0px rgba(0, 0, 0, 0))'
+const LOOSE_SHADOW_UP = 'drop-shadow(0px 40px 48px rgba(0, 0, 0, 0.14))'
+
+// The loose sheet, lifted straight off the desk: its entrance there (being laid down,
+// page.module.css) run backwards. It comes up 2.5% larger and turns 0.8deg out of square about the
+// middle of what is on screen, its shadow spreading and its focus going as it comes toward you,
+// both from the start on the lift's pacing; then it fades, as the page does.
+export const PAPER_LIFTOFF_TRANSFORM_ORIGIN = '50% 50%'
+export const PAPER_LIFTOFF_REST = {
+  scale: 1,
+  rotate: 0,
+  filter: `blur(0px) ${LOOSE_SHADOW_DOWN}`,
+  opacity: 1,
+}
+export const PAPER_LIFTOFF_OFFSCREEN = {
+  scale: 1.025,
+  rotate: 0.8,
+  filter: `blur(${PAPER_EXIT_BLUR_PX}px) ${LOOSE_SHADOW_UP}`,
+  opacity: 0,
+}
+export const PAPER_LIFTOFF_TRANSITION = {
+  scale: EXIT_LIFT_TRANSITION_FULL,
+  rotate: EXIT_LIFT_TRANSITION_FULL,
+  filter: EXIT_LIFT_TRANSITION_FULL,
+  opacity: EXIT_FADE_TRANSITION_FULL,
+}
 
 // Backwards-navigation signal, carried on two channels because it has to survive both kinds of
 // navigation and be readable before the destination's first paint:

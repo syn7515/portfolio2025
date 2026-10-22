@@ -34,6 +34,9 @@
   --paper-box-shadow: none;
   /* The departing sheet's shade once it has lifted away (src/lib/paper-exit-transition.ts). */
   --paper-exit-shade: rgb(0 0 0 / 0.04);
+  /* The extra shadow a loose sheet throws while it is still off the desk, as it is laid down (the
+     entrance from the centred breakpoint, page.module.css and blog-post.module.css). */
+  --paper-lift-shadow: rgb(0 0 0 / 0.14);
   /* An arriving sheet settles the way the end of a page turn does: hinged at its right edge, the
      notebook's spine, its outer edge coming down the last --paper-settle-angle onto the page (the
      settle in page.module.css and blog-post.module.css; the lift-away going back is its start, in
@@ -109,6 +112,7 @@
     --paper-drop-shadow: rgba(0, 0, 0, 0.55);
     --paper-bg: #18181b; /* zinc-900 */
     --paper-exit-shade: rgb(0 0 0 / 0.25);
+    --paper-lift-shadow: rgb(0 0 0 / 0.5);
     --paper-grid-minor: rgb(161 161 170 / 0.08);
     --paper-grid-major: rgb(161 161 170 / 0.1);
     --paper-grid-hover-minor: rgb(161 161 170 / 0.06);
