@@ -31,12 +31,12 @@
 
 /* From the centred breakpoint the sheet sits whole on the desk, a margin either side, and reads as
    a loose printed sheet rather than a notebook's page: it is laid down instead of turned. It comes
-   from a little above the desk and off to the top right, where sheets come from: 32px right, 24px
+   from a little above the desk and off to the top right, where sheets come from: 16px right, 12px
    up, 2.5% larger and 0.8deg off square, with a wide soft shadow under it, and the shadow closes
    in as it lands. The values are kept in step with page.module.css. */
 @keyframes paper-place {
     from {
-        transform: translate(32px, -24px) scale(1.025) rotate(0.8deg);
+        transform: translate(16px, -12px) scale(1.025) rotate(0.8deg);
     }
 }
 
