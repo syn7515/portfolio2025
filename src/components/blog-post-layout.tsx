@@ -21,11 +21,14 @@ import {
 } from '@/lib/blog-post-mask-transition'
 import {
   PAPER_EXIT_REST,
-  paperExitOffscreen,
+  PAPER_EXIT_OFFSCREEN,
+  PAPER_EXIT_SHADE_REST,
+  PAPER_EXIT_SHADE_LIFTED,
+  PAPER_EXIT_SHADE_TRANSITION,
   PAPER_EXIT_TRANSITION,
   PAPER_EXIT_TRANSITION_REDUCED,
   PAPER_EXIT_TRANSFORM_ORIGIN,
-  PAPER_EXIT_OVERHANG_PX,
+  PAPER_EXIT_PERSPECTIVE,
   markPaperBackNav,
   isPaperBackNav,
   clearPaperBackNav,
@@ -36,7 +39,8 @@ import {
 import { keepOnMainThread } from '@/lib/motion'
 
 // The last thing the entrance in blog-post.module.css finishes is the underlay retiring — a 500ms
-// fade that starts on the sheet's 500ms landing frame. (Content reveal ends earlier, at 750ms.)
+// fade that starts on the sheet's 400ms landing frame, done by 900ms. (Content reveal ends
+// earlier, at 650ms.)
 // Once that has run, the entrance classes are inert *unless* a media query flips their computed
 // animation-name from `none` back to a real name, which is exactly what crossing the 640px
 // breakpoint does: the phone block suppresses all of them below that width, so resizing back up
@@ -185,13 +189,13 @@ function ProjectNavigationLinks({
   )
 }
 
-// The paper entrance (sheet slides in from the top-right with a blur-in, then content is revealed
-// on the landing frame) is defined entirely in blog-post.module.css. It has no dynamic inputs, so
+// The paper entrance (sheet settles onto the stack about its right edge with a blur-in, then
+// content is revealed on the landing frame) is defined entirely in blog-post.module.css. It has no dynamic inputs, so
 // CSS can run it on the first painted frame instead of waiting for the JS bundle to download and
 // hydrate — which is what used to gate this page's First Contentful Paint. See the comment block
 // at the top of that stylesheet.
 //
-// Slide-out (backwards navigation, footer Previous or sidebar Home) is still Framer-driven: it's
+// The lift-away (backwards navigation, footer Previous or sidebar Home) is still Framer-driven: it's
 // triggered by an interaction, so it's post-hydration by definition and costs nothing at load. Its
 // easing/duration/opacity pacing live in src/lib/paper-exit-transition.ts, shared with app/page.tsx
 // so both exits feel identical.
@@ -242,8 +246,8 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
   const [showBackToTop, setShowBackToTop] = useState(false)
   const [viewportTall, setViewportTall] = useState(false)
   // Backwards navigation (footer "Previous" or sidebar "Home"): instead of a new paper sliding in,
-  // the current top sheet slides OUT to the top-right, revealing this post's content already sitting
-  // on the paper underneath. The CSS half of that branch reads the <html> attribute directly on the
+  // the current top sheet lifts away about its right edge, revealing this post's content already
+  // sitting on the paper underneath. The CSS half of that branch reads the <html> attribute directly on the
   // first frame; this state only decides whether to mount the departing sheet, which is a
   // post-hydration concern, so reading it in an effect is fine (and keeps SSR output from ever
   // branching on client-only state).
@@ -349,6 +353,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
   // query resolves at paint time and can't disagree with the server the way this hook can.
   const shouldReduceMotion = useReducedMotion()
   const exitTransition = shouldReduceMotion ? PAPER_EXIT_TRANSITION_REDUCED : PAPER_EXIT_TRANSITION
+  const exitShadeTransition = shouldReduceMotion ? PAPER_EXIT_TRANSITION_REDUCED : PAPER_EXIT_SHADE_TRANSITION
 
   return (
     <>
@@ -463,7 +468,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
             element and its content wrapper are never transformed or faded — transform, filter, and
             opacity below 1 create stacking contexts that would trap descendants (e.g. the carousel's
             z-[50]) below page-level fixed overlays like the top-edge fade regardless of their own
-            z-index. The slide-in visual therefore lives on a separate, disposable overlay below,
+            z-index. The settle visual therefore lives on a separate, disposable overlay below,
             which covers this element while it travels.
             This element is never hidden: it and its text are what FCP and LCP are measured on, so
             anything that withheld them until JS ran would be measuring the bundle, not the page.
@@ -565,10 +570,12 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           </RevealFooter>
         )}
 
-        {/* Decorative entrance overlay: plays the slide-in-from-top-right-corner-with-a-blur-in visual
+        {/* Decorative entrance overlay: plays the settle-about-the-right-edge-with-a-blur-in visual
             on top of the real paper above, covering it while it travels, then retires itself on the
             landing frame. Has no real children, so it's safe for this to be a transform target —
-            nothing here needs to escape a stacking context.
+            nothing here needs to escape a stacking context. As tall as the screen rather than the
+            post, since only that much can be seen tilting, and an 8800px sheet would be a needlessly
+            huge layer to tilt and blur.
             Server-rendered unconditionally and animated purely by .paperEntranceOverlay, so the
             sheet is already moving on the first painted frame. That stylesheet also owns the two
             cases where the entrance shouldn't play at all (reduced motion, backwards navigation) —
@@ -576,33 +583,44 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
         <div
           aria-hidden
           className={cn(
-            'absolute inset-0 sheet:top-[100px] overflow-x-clip pointer-events-none',
+            'absolute inset-x-0 top-0 h-[100lvh] sheet:top-[100px] sheet:h-[calc(100lvh_-_100px)] pointer-events-none',
             styles.paperEntranceOverlay
           )}
           style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--paper-left)', maxWidth: 'var(--paper-max-w)' }}
         />
 
-        {/* Departing-sheet overlay (backwards navigation): the inverse of the entrance above. The
+        {/* Departing-sheet overlay (backwards navigation): the page that was open turning back. The
             content is already revealed underneath (instant-reveal in the mount effect), and this
-            sheet starts at the paper's rest position and slides out to the top-right. Needs an
+            sheet starts at the paper's rest position and lifts away about its right edge
+            (src/lib/paper-exit-transition.ts). Needs an
             explicit z-index: the content below is visible during the exit, and carousel children
             use z-[50] at the root stacking level (the real paper deliberately isn't a stacking
             context), so without one the carousel would paint above the departing sheet. z-[55]
             stays below the sidebar (z-60). */}
         {exitEntrance && !exitDone && (
-          // Clips the sheet's overhang at the bottom of the page — see PAPER_EXIT_OVERHANG_PX.
-          <div aria-hidden className="absolute inset-0 overflow-clip pointer-events-none z-[55]">
+          // Clips the lifted sheet to the page, so it can't stretch the document while it tilts.
+          <div aria-hidden className="absolute inset-0 overflow-clip pointer-events-none z-[55]" style={PAPER_EXIT_PERSPECTIVE}>
+            {/* As tall as the screen rather than the page: only what is on screen can be seen
+                lifting, and a post's 8800px sheet would be a needlessly huge layer to tilt and blur. */}
             <motion.div
-              className="absolute inset-0 sheet:top-[100px] overflow-x-clip"
-              style={{ bottom: -PAPER_EXIT_OVERHANG_PX, backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--paper-left)', maxWidth: 'var(--paper-max-w)', transformOrigin: PAPER_EXIT_TRANSFORM_ORIGIN }}
+              className="absolute inset-x-0 top-0 h-[100lvh] sheet:top-[100px] sheet:h-[calc(100lvh_-_100px)]"
+              style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--paper-left)', maxWidth: 'var(--paper-max-w)', transformOrigin: PAPER_EXIT_TRANSFORM_ORIGIN }}
               initial={PAPER_EXIT_REST}
-              animate={paperExitOffscreen()}
+              animate={PAPER_EXIT_OFFSCREEN}
               transition={exitTransition}
               onAnimationComplete={() => setExitDone(true)}
               // Without it the sheet flashes back to full opacity just before it unmounts — see
               // keepOnMainThread.
               onUpdate={keepOnMainThread}
-            />
+            >
+              <motion.div
+                className="absolute inset-0"
+                style={{ background: 'var(--paper-exit-shade)' }}
+                initial={PAPER_EXIT_SHADE_REST}
+                animate={PAPER_EXIT_SHADE_LIFTED}
+                transition={exitShadeTransition}
+              />
+            </motion.div>
           </div>
         )}
       </div>

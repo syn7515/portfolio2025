@@ -1,6 +1,6 @@
 /* ── Paper entrance ──────────────────────────────────────────────────────────────────────────
-   A sheet of paper slides in from the top-right with a blur-in, lands, and the real content is
-   revealed underneath it.
+   A sheet of paper settles onto the stack about its right edge with a blur-in, lands, and the real
+   content is revealed underneath it.
 
    This is deliberately CSS rather than Framer Motion. Driving it from JS meant the content sat at
    `visibility: hidden` until React hydrated, so First Contentful Paint measured how long the
@@ -15,32 +15,26 @@
    Timings here are the source of truth for the entrance; the *exit* (backwards navigation) is
    still Framer-driven and lives in src/lib/paper-exit-transition.ts. */
 
-/* The slide and the tilt are separate animations on the individual `translate` and `rotate`
-   properties, because they have to finish at different times. Wound into one transform they
-   unwound on one curve, so the sheet was still tilted over its last few pixels of travel, which is
-   where the eye judges a landing. Wherever the paper has a margin beside it, that put a leaning
-   edge right next to the underlay's straight one, swinging upright like a wiper as the two met.
-   Now the tilt is spent by 300ms and the last 200ms is a pure slide: the sheet squares up to the
-   stack first and then glides into register, the way friction stops a real sheet turning before
-   it stops it moving. */
-@keyframes paper-slide {
+/* The sheet comes down onto the stack about its right edge, the end of a page turn: hinged there,
+   its outer edge settles the last 18deg. See --paper-hinge-view in globals.css. Being a hinge,
+   it can't lean against the underlay's edges the way the slide's in-plane tilt once did: the
+   right edge never moves, and the others come down into register rather than swinging into it. */
+@keyframes paper-settle {
     from {
-        translate: 40px -32px;
+        transform: var(--paper-hinge-view) rotateY(var(--paper-settle-angle));
     }
-}
 
-/* From the shared, height-fitted angle. See --paper-swing-angle in globals.css. */
-@keyframes paper-square {
-    from {
-        rotate: var(--paper-swing-angle);
+    to {
+        transform: var(--paper-hinge-view) rotateY(0deg);
     }
 }
 
 /* Per-property pacing: opacity clears first (the sheet materializes quickly, by 260ms), blur clears
-   before the slide finishes (sharp and solid while still approaching rest, by 360ms). */
+   before the sheet is down (sharp and solid while still approaching rest, by 360ms). Tilted, it
+   starts a shade darker, coming into the light as it settles: the lift-away's shade in reverse. */
 @keyframes paper-materialize {
     0% {
-        filter: blur(10px);
+        filter: blur(10px) brightness(0.96);
         opacity: 0;
     }
 
@@ -49,18 +43,20 @@
     }
 
     72% {
-        filter: blur(0);
+        filter: blur(0) brightness(1);
     }
 
     100% {
-        filter: blur(0);
+        filter: blur(0) brightness(1);
         opacity: 1;
     }
 }
 
 /* Retires the sheet on its landing frame, revealing the real content underneath. Kept as a
-   separate zero-length animation starting exactly at the entrance's end so it can't interfere
-   with the opacity pacing above. */
+   separate zero-length animation so it can't interfere with the opacity pacing above. It runs at
+   400ms, a little before the settle's 500ms are out: by then the sheet is solid and sharp and
+   within 0.14deg of flat, so lifting it off for the real paper underneath can't be seen, and the
+   content shows 100ms sooner than if the sheet waited out its last, invisible stretch. */
 @keyframes paper-entrance-dismiss {
     to {
         opacity: 0;
@@ -111,30 +107,32 @@
 @media (prefers-reduced-motion: no-preference) {
     .paperEntranceOverlay {
         display: block;
-        /* See --paper-swing-origin in globals.css: this overlay is `absolute inset-0`, so its
-           height is the whole post. Without this the tilt above swings by page length. */
-        transform-origin: var(--paper-swing-origin);
+        /* The hinge. See --paper-hinge-view in globals.css. */
+        transform-origin: 100% 50vh;
+        /* The settle on a gentler curve than the fade, so the tilt is still there to see once the
+           sheet has come in: ~9deg at 100ms, down by 300ms. On the fade's curve it was spent while
+           the sheet was still faint, and the settle read as a fade. */
         animation:
-            paper-slide 500ms cubic-bezier(0.23, 1, 0.32, 1) both,
-            paper-square 300ms cubic-bezier(0.23, 1, 0.32, 1) both,
+            paper-settle 500ms cubic-bezier(0.33, 1, 0.68, 1) both,
             paper-materialize 500ms cubic-bezier(0.23, 1, 0.32, 1) both,
-            paper-entrance-dismiss 1ms linear 500ms forwards;
+            paper-entrance-dismiss 1ms linear 400ms forwards;
     }
 
     .paperUnderlay {
         opacity: 1;
-        animation: paper-underlay-retire 500ms ease-out 500ms forwards;
+        animation: paper-underlay-retire 500ms ease-out 400ms forwards;
     }
 
-    /* Opacity overlaps the paper's final 190ms for responsiveness. Blur starts closer to the
-       landing frame so it remains visible after the paper overlay clears. */
+    /* Opacity overlaps the sheet's final 190ms for responsiveness. Blur starts closer to the
+       landing frame so it remains visible after the sheet clears. Both keyed to the sheet's 400ms
+       landing frame (paper-entrance-dismiss). */
     .contentBlurRevealItem,
     .contentBlurReveal > :not(:has([data-carousel])),
     .contentBlurReveal > * > :not(:has([data-carousel])),
     .contentBlurReveal [data-carousel-layer] {
         animation:
-            content-opacity-reveal 350ms cubic-bezier(0.23, 1, 0.32, 1) 310ms backwards,
-            content-blur-reveal 300ms cubic-bezier(0.23, 1, 0.32, 1) 450ms backwards;
+            content-opacity-reveal 350ms cubic-bezier(0.23, 1, 0.32, 1) 210ms backwards,
+            content-blur-reveal 300ms cubic-bezier(0.23, 1, 0.32, 1) 350ms backwards;
     }
 }
 
@@ -172,7 +170,7 @@
 }
 
 /* Backwards navigation (footer "Previous" or sidebar "Home"): no sheet arrives — the departing
-   sheet slides out over content that is already settled.
+   sheet lifts away over content that is already settled.
 
    Two selectors carry this, and both are required:
 

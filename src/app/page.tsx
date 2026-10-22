@@ -11,11 +11,14 @@ import styles from './page.module.css';
 import { trackOutboundClick } from '@/lib/analytics';
 import {
   PAPER_EXIT_REST,
-  paperExitOffscreen,
+  PAPER_EXIT_OFFSCREEN,
+  PAPER_EXIT_SHADE_REST,
+  PAPER_EXIT_SHADE_LIFTED,
+  PAPER_EXIT_SHADE_TRANSITION,
   PAPER_EXIT_TRANSITION,
   PAPER_EXIT_TRANSITION_REDUCED,
   PAPER_EXIT_TRANSFORM_ORIGIN,
-  PAPER_EXIT_OVERHANG_PX,
+  PAPER_EXIT_PERSPECTIVE,
   isPaperBackNav,
   clearPaperBackNav,
   isPageReload,
@@ -26,8 +29,8 @@ import { keepOnMainThread } from '@/lib/motion';
 // Persists across client-side navigation (back button) but resets on full page load
 let hasVisitedHome = false;
 
-// The paper entrance (sheet slides in from the top-right with a blur-in, content rises into place
-// behind it on a stagger) lives in page.module.css. It has no dynamic inputs, so CSS can run it on
+// The paper entrance (sheet settles onto the desk about its right edge with a blur-in, content rises
+// into place behind it on a stagger) lives in page.module.css. It has no dynamic inputs, so CSS can run it on
 // the first painted frame rather than waiting for the bundle to download and hydrate — which is
 // what used to gate this page's First Contentful Paint. See the comment at the top of that file.
 //
@@ -35,7 +38,7 @@ let hasVisitedHome = false;
 // timeline, so a tab opened in the background arrives already settled instead of stuck hidden.
 
 // Stagger, in ms, applied per element on top of the base offset. The sequence now starts while the
-// sheet is still approaching rest, giving the first text block 320ms of overlap with the 500ms slide.
+// sheet is still approaching rest, giving the first text block 320ms of overlap with the 500ms settle.
 const CONTENT_BASE_DELAY_MS = 180;
 const DELAY = {
   name: 0,
@@ -122,8 +125,8 @@ function HomeFooterLinks() {
 export default function Home() {
   const shouldAnimate = !hasVisitedHome;
   // Backwards navigation (sidebar "Home" link on a blog post): instead of the normal staggered
-  // entrance, a sheet slides OUT to the top-right, revealing this page's content already sitting on
-  // the paper underneath — the reverse of a fresh paper landing. The CSS half reads the <html>
+  // entrance, the sheet on top lifts away about its right edge, revealing this page's content
+  // already sitting on the paper underneath — a page turned back. The CSS half reads the <html>
   // attribute on the first frame; this state only decides whether to mount the departing sheet,
   // which is post-hydration by nature. Shared with blog-post-layout.tsx's identical mechanism via
   // src/lib/paper-exit-transition.ts.
@@ -172,6 +175,7 @@ export default function Home() {
 
   const shouldReduceMotion = useReducedMotion();
   const exitTransition = shouldReduceMotion ? PAPER_EXIT_TRANSITION_REDUCED : PAPER_EXIT_TRANSITION;
+  const exitShadeTransition = shouldReduceMotion ? PAPER_EXIT_TRANSITION_REDUCED : PAPER_EXIT_SHADE_TRANSITION;
 
   // shouldAnimate is only ever false on a client-only SPA return to home, where the entrance has
   // already played once and would otherwise replay on remount.
@@ -409,24 +413,36 @@ export default function Home() {
         </RevealFooter>
 
         {/* Departing-sheet overlay (backwards navigation from a blog post's sidebar "Home" link):
-            the reverse of the entrance above. Content is already settled underneath (page.module.css
-            suppresses the entrance entirely when the back-nav attribute is present), and this sheet
-            starts at the paper's rest position and slides out to the top-right. z-[55] matches blog-post-layout.tsx's departing sheet for consistency, even
-            though this page has no z-[50] descendant of its own to clear. */}
+            the page that was open turning back. Content is already settled underneath
+            (page.module.css suppresses the entrance entirely when the back-nav attribute is
+            present), and this sheet starts at the paper's rest position and lifts away about its
+            right edge (src/lib/paper-exit-transition.ts). z-[55] matches blog-post-layout.tsx's
+            departing sheet for consistency, even though this page has no z-[50] descendant of its
+            own to clear. */}
         {exitEntrance && !exitDone && (
-          // Clips the sheet's overhang at the bottom of the page — see PAPER_EXIT_OVERHANG_PX.
-          <div aria-hidden className="absolute inset-0 overflow-clip pointer-events-none z-[55]">
+          // Clips the lifted sheet to the page, so it can't stretch the document while it tilts.
+          <div aria-hidden className="absolute inset-0 overflow-clip pointer-events-none z-[55]" style={PAPER_EXIT_PERSPECTIVE}>
+            {/* As tall as the screen rather than the page: only what is on screen can be seen
+                lifting, and a post's 8800px sheet would be a needlessly huge layer to tilt and blur. */}
             <motion.div
-              className="absolute inset-0 sheet:top-[100px] overflow-x-clip"
-              style={{ bottom: -PAPER_EXIT_OVERHANG_PX, backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--paper-left)', maxWidth: 'var(--paper-max-w)', transformOrigin: PAPER_EXIT_TRANSFORM_ORIGIN }}
+              className="absolute inset-x-0 top-0 h-[100lvh] sheet:top-[100px] sheet:h-[calc(100lvh_-_100px)]"
+              style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--paper-left)', maxWidth: 'var(--paper-max-w)', transformOrigin: PAPER_EXIT_TRANSFORM_ORIGIN }}
               initial={PAPER_EXIT_REST}
-              animate={paperExitOffscreen()}
+              animate={PAPER_EXIT_OFFSCREEN}
               transition={exitTransition}
               onAnimationComplete={() => setExitDone(true)}
               // Without it the sheet flashes back to full opacity just before it unmounts — see
               // keepOnMainThread.
               onUpdate={keepOnMainThread}
-            />
+            >
+              <motion.div
+                className="absolute inset-0"
+                style={{ background: 'var(--paper-exit-shade)' }}
+                initial={PAPER_EXIT_SHADE_REST}
+                animate={PAPER_EXIT_SHADE_LIFTED}
+                transition={exitShadeTransition}
+              />
+            </motion.div>
           </div>
         )}
       </main>
