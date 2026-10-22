@@ -564,7 +564,8 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
             landing frame. Has no real children, so it's safe for this to be a transform target —
             nothing here needs to escape a stacking context. As tall as the screen rather than the
             post, since only that much can be seen tilting, and an 8800px sheet would be a needlessly
-            huge layer to tilt and blur.
+            huge layer to tilt and blur; with 80px to spare below it, so the lay-down's 24px drift
+            never brings its bottom edge into view.
             Server-rendered unconditionally and animated purely by .paperEntranceOverlay, so the
             sheet is already moving on the first painted frame. That stylesheet also owns the two
             cases where the entrance shouldn't play at all (reduced motion, backwards navigation) —
@@ -572,7 +573,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
         <div
           aria-hidden
           className={cn(
-            'absolute inset-x-0 top-0 h-[100lvh] sheet:top-[100px] sheet:h-[calc(100lvh_-_100px)] pointer-events-none',
+            'absolute inset-x-0 top-0 h-[calc(100lvh_+_80px)] sheet:top-[100px] sheet:h-[calc(100lvh_-_20px)] pointer-events-none',
             styles.paperEntranceOverlay
           )}
           style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--paper-left)', maxWidth: 'var(--paper-max-w)' }}
