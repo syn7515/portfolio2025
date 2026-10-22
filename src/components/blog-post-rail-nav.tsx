@@ -244,7 +244,9 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
                   'motion-safe:active:scale-[0.97]'
                 )}
               >
-                <span aria-hidden className={cn(styles.tick, isActive && styles.tickActive)} />
+                {/* Above the labels: a hovered label's backdrop reaches 24-40px left of its text,
+                    over the ticks, and would otherwise wash out the hovered one's rose. */}
+                <span aria-hidden className={cn(styles.tick, isActive && styles.tickActive, 'z-10')} />
                 <span
                   className={cn(
                     styles.reveal,
