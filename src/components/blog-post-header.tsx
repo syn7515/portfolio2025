@@ -7,8 +7,16 @@ interface BlogPostHeaderProps {
 }
 
 export default function BlogPostHeader({ title, subtitle }: BlogPostHeaderProps) {
+  // The gap under the header stays short of the paper's top margin over the title (its top padding
+  // in blog-post-layout.tsx), so the title sits nearer the text it heads than the paper's edge: by
+  // eye, ink to ink, about three quarters of it. On the sheet that is 72px under the 100px margin
+  // until 1200px, then this rises on that margin's ramp, to 100px under its 140px by 1500px (28px
+  // over 300px = 9.333vw; intercept 72px - 112px = -2.5rem). Below the sheet it was already well
+  // short of it.
+  // The 640px step is written min-[640px] rather than sm, as the paper's padding is: Tailwind emits
+  // the rem-based sm rules after the px-based sheet and paper ones, so sm would override them.
   return (
-    <header className="max-w-[var(--content-w)] mx-auto pt-4 sm:pt-0 mb-14 sm:mb-20 lg:mb-[100px] text-left">
+    <header className="max-w-[var(--content-w)] mx-auto pt-4 sm:pt-0 mb-14 min-[640px]:mb-20 sheet:mb-[72px] paper:mb-[clamp(4.5rem,calc(9.333vw_-_2.5rem),6.25rem)] text-left">
       {/* Title. 40px on the sheet (1024px up) — the display size, since that is where the case
           study becomes a sheet with a margin around it and the title is the only thing on it above
           the fold. Below the sheet it slides from 40px at 1024px down to 32px at 640px, then
