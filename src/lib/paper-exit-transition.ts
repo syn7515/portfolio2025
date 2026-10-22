@@ -77,7 +77,7 @@ const LOOSE_SHADOW_DOWN = 'drop-shadow(0px 0px 0px rgba(0, 0, 0, 0))'
 const LOOSE_SHADOW_UP = 'drop-shadow(0px 40px 48px rgba(0, 0, 0, 0.14))'
 
 // The loose sheet, lifted straight off the desk: its entrance there (being laid down,
-// page.module.css) run backwards. It drifts 32px right and 24px up, back toward the top right where
+// page.module.css) run backwards. It drifts 16px right and 12px up, back toward the top right where
 // sheets come from, comes up 2.5% larger and turns 0.8deg out of square about the middle of what
 // is on screen, its shadow spreading and its focus going as it comes toward you, all from the start
 // on the lift's pacing; then it fades, as the page does.
@@ -91,8 +91,8 @@ export const PAPER_LIFTOFF_REST = {
   opacity: 1,
 }
 export const PAPER_LIFTOFF_OFFSCREEN = {
-  x: 32,
-  y: -24,
+  x: 16,
+  y: -12,
   scale: 1.025,
   rotate: 0.8,
   filter: `blur(${PAPER_EXIT_BLUR_PX}px) ${LOOSE_SHADOW_UP}`,
