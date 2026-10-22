@@ -59,9 +59,11 @@ export default function PaperExitSheet({ onDone }: PaperExitSheetProps) {
       style={PAPER_EXIT_PERSPECTIVE}
     >
       {/* As tall as the screen rather than the page: only what is on screen can be seen lifting,
-          and a post's 8800px sheet would be a needlessly huge layer to tilt and blur. */}
+          and a post's 8800px sheet would be a needlessly huge layer to tilt and blur. With 80px
+          to spare below it, so the lift-off's 24px drift up never brings its bottom edge into
+          view; the wrapper clips what hangs past the page. */}
       <motion.div
-        className="absolute inset-x-0 top-0 h-[100lvh] sheet:top-[100px] sheet:h-[calc(100lvh_-_100px)]"
+        className="absolute inset-x-0 top-0 h-[calc(100lvh_+_80px)] sheet:top-[100px] sheet:h-[calc(100lvh_-_20px)]"
         style={{
           backgroundColor: 'var(--paper-bg)',
           boxShadow: 'var(--paper-box-shadow)',
