@@ -43,6 +43,53 @@
     }
 }
 
+/* From the centred breakpoint the sheet sits whole on the desk, a margin either side, and reads as
+   a loose printed sheet rather than a notebook's page: it is laid down instead of turned. It comes
+   from a little above the desk, 2.5% larger and 0.8deg off square, with a wide soft shadow under
+   it, and the shadow closes in as it lands. The values are kept in step with blog-post.module.css. */
+@keyframes home-paper-place {
+    from {
+        transform: scale(1.025) rotate(0.8deg);
+    }
+}
+
+/* The fade on the materialize's pacing, apart from the filter so the two can keep their own. */
+@keyframes home-paper-place-fade {
+    0% {
+        opacity: 0;
+    }
+
+    52%,
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Blur and the lifted shadow share `filter` but not a pace: the blur clears on the materialize's
+   steep curve, while the shadow has to close in with the landing (place's curve), or it is gone
+   before the sheet can be seen. So the keyframes carry both curves, sampled, and run linear. */
+@keyframes home-paper-place-focus {
+    0% {
+        filter: blur(10px) drop-shadow(0 40px 48px var(--paper-lift-shadow));
+    }
+
+    20% {
+        filter: blur(2.5px) drop-shadow(0 20px 26px color-mix(in srgb, var(--paper-lift-shadow) 50%, transparent));
+    }
+
+    40% {
+        filter: blur(0.7px) drop-shadow(0 9px 12px color-mix(in srgb, var(--paper-lift-shadow) 22%, transparent));
+    }
+
+    72% {
+        filter: blur(0) drop-shadow(0 1px 2px color-mix(in srgb, var(--paper-lift-shadow) 2%, transparent));
+    }
+
+    100% {
+        filter: blur(0) drop-shadow(0 0 0 transparent);
+    }
+}
+
 /* Each block rises and sharpens into place. Individual delays are set inline per element, on top of
    the base offset that holds the whole sequence until the sheet is most of the way in. */
 @keyframes home-content-rise {
@@ -71,6 +118,19 @@
     animation:
         home-paper-settle 500ms cubic-bezier(0.33, 1, 0.68, 1) backwards,
         home-paper-materialize 500ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+/* The loose sheet's entrance (see home-paper-place above). Scaled and turned about the middle of
+   what is on screen. All three fill backwards only, so once down the paper holds no transform or
+   filter, for the same reason the settle doesn't. */
+@media (min-width: 1362.5px) {
+    .paperEntrance {
+        transform-origin: 50% 50vh;
+        animation:
+            home-paper-place 500ms cubic-bezier(0.33, 1, 0.68, 1) backwards,
+            home-paper-place-fade 500ms cubic-bezier(0.23, 1, 0.32, 1) backwards,
+            home-paper-place-focus 500ms linear backwards;
+    }
 }
 
 .contentRise {

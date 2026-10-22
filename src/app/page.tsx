@@ -1,30 +1,20 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
 import ProjectListItem from '@/components/ui/project-list-item';
 import Dinkus from '@/components/ui/dinkus';
 import InlineLinkPreview from '@/components/ui/inline-link-preview';
 import PaperGridBackground from '@/components/ui/paper-grid-background';
+import PaperExitSheet from '@/components/ui/paper-exit-sheet';
 import RevealFooter, { revealPaperClassName } from '@/components/ui/reveal-footer';
 import styles from './page.module.css';
 import { trackOutboundClick } from '@/lib/analytics';
 import {
-  PAPER_EXIT_REST,
-  PAPER_EXIT_OFFSCREEN,
-  PAPER_EXIT_SHADE_REST,
-  PAPER_EXIT_SHADE_LIFTED,
-  PAPER_EXIT_SHADE_TRANSITION,
-  PAPER_EXIT_TRANSITION,
-  PAPER_EXIT_TRANSITION_REDUCED,
-  PAPER_EXIT_TRANSFORM_ORIGIN,
-  PAPER_EXIT_PERSPECTIVE,
   isPaperBackNav,
   clearPaperBackNav,
   isPageReload,
   clearPageReload,
 } from '@/lib/paper-exit-transition';
-import { keepOnMainThread } from '@/lib/motion';
 
 // Persists across client-side navigation (back button) but resets on full page load
 let hasVisitedHome = false;
@@ -172,10 +162,6 @@ export default function Home() {
   useEffect(() => {
     if (reloadSuppressed) clearPageReload();
   }, [reloadSuppressed]);
-
-  const shouldReduceMotion = useReducedMotion();
-  const exitTransition = shouldReduceMotion ? PAPER_EXIT_TRANSITION_REDUCED : PAPER_EXIT_TRANSITION;
-  const exitShadeTransition = shouldReduceMotion ? PAPER_EXIT_TRANSITION_REDUCED : PAPER_EXIT_SHADE_TRANSITION;
 
   // shouldAnimate is only ever false on a client-only SPA return to home, where the entrance has
   // already played once and would otherwise replay on remount.
@@ -412,39 +398,11 @@ export default function Home() {
           <HomeFooterLinks />
         </RevealFooter>
 
-        {/* Departing-sheet overlay (backwards navigation from a blog post's sidebar "Home" link):
-            the page that was open turning back. Content is already settled underneath
-            (page.module.css suppresses the entrance entirely when the back-nav attribute is
-            present), and this sheet starts at the paper's rest position and lifts away about its
-            right edge (src/lib/paper-exit-transition.ts). z-[55] matches blog-post-layout.tsx's
-            departing sheet for consistency, even though this page has no z-[50] descendant of its
-            own to clear. */}
-        {exitEntrance && !exitDone && (
-          // Clips the lifted sheet to the page, so it can't stretch the document while it tilts.
-          <div aria-hidden className="absolute inset-0 overflow-clip pointer-events-none z-[55]" style={PAPER_EXIT_PERSPECTIVE}>
-            {/* As tall as the screen rather than the page: only what is on screen can be seen
-                lifting, and a post's 8800px sheet would be a needlessly huge layer to tilt and blur. */}
-            <motion.div
-              className="absolute inset-x-0 top-0 h-[100lvh] sheet:top-[100px] sheet:h-[calc(100lvh_-_100px)]"
-              style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--paper-left)', maxWidth: 'var(--paper-max-w)', transformOrigin: PAPER_EXIT_TRANSFORM_ORIGIN }}
-              initial={PAPER_EXIT_REST}
-              animate={PAPER_EXIT_OFFSCREEN}
-              transition={exitTransition}
-              onAnimationComplete={() => setExitDone(true)}
-              // Without it the sheet flashes back to full opacity just before it unmounts — see
-              // keepOnMainThread.
-              onUpdate={keepOnMainThread}
-            >
-              <motion.div
-                className="absolute inset-0"
-                style={{ background: 'var(--paper-exit-shade)' }}
-                initial={PAPER_EXIT_SHADE_REST}
-                animate={PAPER_EXIT_SHADE_LIFTED}
-                transition={exitShadeTransition}
-              />
-            </motion.div>
-          </div>
-        )}
+        {/* Departing sheet (backwards navigation from a blog post's sidebar "Home" link): the page
+            that was open, leaving. Content is already settled underneath (page.module.css
+            suppresses the entrance entirely when the back-nav attribute is present). See
+            ui/paper-exit-sheet. */}
+        {exitEntrance && !exitDone && <PaperExitSheet onDone={() => setExitDone(true)} />}
       </main>
 
     </div>
