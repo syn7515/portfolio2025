@@ -1,99 +1,65 @@
-// Shared "paper slides out" exit animation for backwards navigation out of a blog post — via the
-// footer Previous link or the sidebar Home link. Makes the departure read as the current sheet
-// leaving toward the top-right corner (where papers come from), revealing the destination's content
-// already sitting on the paper underneath, rather than a hard cut or a new paper sliding in over a
-// blank page. Shared between blog-post-layout.tsx and app/page.tsx so both exits feel identical.
+// Shared "page lifts away" exit animation for backwards navigation out of a blog post — via the
+// footer Previous link or the sidebar Home link. The current sheet turns back about its right edge,
+// the way the page you are reading goes back over a notebook's spine: its outer edge lifts toward
+// you, and before it can stand up it is gone, blurred out, revealing the destination's content
+// already sitting on the paper underneath. It is only the start of a page turn, the way the
+// entrance's slide-in is only the end of one, and that is enough to read as one without drawing
+// the eye off the page. Shared between blog-post-layout.tsx and app/page.tsx so both exits feel
+// identical.
 
-const PAPER_EXIT_OFFSET_X = 40
-const PAPER_EXIT_OFFSET_Y = -32
-const PAPER_EXIT_BLUR_PX = 10
+/** How far the sheet lifts before it is gone. At 22deg its outer edge has come ~420px off the page
+    toward you and looks a fifth taller, its top corner standing ~65px over the paper's top edge,
+    which is what says "lifted". */
+const PAPER_EXIT_LIFT_DEG = 22
+const PAPER_EXIT_BLUR_PX = 8
 
-// JS mirror of --paper-swing-angle in globals.css, which the Framer-driven exit can't read: the
-// tilt whose 50vh lever sweeps the sheet's top edge 16px sideways, capped at 2deg. Without it the
-// sheet would leave with the same tall-window swing the entrance no longer has.
-const PAPER_SWING_SWEEP_PX = 16
-const PAPER_SWING_MAX_DEG = 2
+/** The hinge: the sheet's right edge, which is the screen's right edge wherever the paper runs off
+    it, and the sheet's own edge where it has a margin. */
+export const PAPER_EXIT_TRANSFORM_ORIGIN = '100% 50%'
 
-function paperSwingAngleDeg() {
-  if (typeof window === 'undefined') return PAPER_SWING_MAX_DEG
-  const fitted = (Math.atan2(PAPER_SWING_SWEEP_PX, window.innerHeight / 2) * 180) / Math.PI
-  return Math.min(PAPER_SWING_MAX_DEG, fitted)
+/** Goes on the departing sheet's wrapper, which spans the page from its top: the lift is seen from
+    the middle of the screen, from far enough off that the sheet tilts rather than looms. */
+export const PAPER_EXIT_PERSPECTIVE = { perspective: '2400px', perspectiveOrigin: '50% 50vh' }
+
+export const PAPER_EXIT_REST = { rotateY: 0, filter: 'blur(0px)', opacity: 1 }
+export const PAPER_EXIT_OFFSCREEN = {
+  rotateY: PAPER_EXIT_LIFT_DEG,
+  filter: `blur(${PAPER_EXIT_BLUR_PX}px)`,
+  opacity: 0,
 }
 
-// The departing sheet is `absolute inset-0`, so its height is the destination document's height —
-// ~890px on Home but ~8800px on a long blog post. transform-origin defaults to the element's own
-// centre, which put the rotation pivot ~4400px below the fold there and turned the shared 2deg
-// rotate into a ~154px lateral sweep across the visible area, against ~15px on Home. Same
-// transition, wildly different motion. The variable pins the pivot to the middle of the viewport
-// so the rotation reads identically however tall the page underneath is; it lives in globals.css
-// because the *entrance* is pure CSS and has the same problem, and the two must agree.
-export const PAPER_EXIT_TRANSFORM_ORIGIN = 'var(--paper-swing-origin)'
+/** The sheet turning away from the light as it lifts: a shade over it, even, since it stays flat.
+    (A fade toward the outer edge stepped visibly, being so faint.) Its colour is
+    --paper-exit-shade in globals.css. */
+export const PAPER_EXIT_SHADE_REST = { opacity: 0 }
+export const PAPER_EXIT_SHADE_LIFTED = { opacity: 1 }
 
-// The sheet rests flush with the bottom of the page, which on Home is the bottom of the viewport.
-// Lifted 32px and swung 2deg, its bottom edge came up into view and opened a strip of background
-// under it on the way out. So the departing sheet hangs this far below the page, inside a wrapper
-// that clips it at the page's bottom edge: it reaches the bottom of the viewport all the way through
-// its arc. Its edge rises at most ~55px (the 32px lift, plus ~20px of swing at the left corner of a
-// 1120px sheet), and the 10px blur softens another ~30px above that.
-export const PAPER_EXIT_OVERHANG_PX = 120
+const EXIT_DURATION = 0.55
+// The lift has to be seen before the sheet fades, so it moves first and briskly — ~9deg by 150ms —
+// then slows as the sheet goes.
+const EXIT_LIFT_EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1]
+// Then the fade, from 120ms, easing in and out so the sheet is still half there at 300ms, ~18deg up.
+const EXIT_FADE_EASE: [number, number, number, number] = [0.4, 0, 0.2, 1]
+const EXIT_FADE_DELAY = 0.12
 
-export const PAPER_EXIT_REST = { x: 0, y: 0, rotate: 0, filter: 'blur(0px)', opacity: 1 }
-
-type PaperExitTarget = typeof PAPER_EXIT_REST
-let paperExitOffscreenTarget: PaperExitTarget | null = null
-
-// The angle depends on the window's height, so the target is built on demand rather than once at
-// module load. It is reused for as long as that height holds, so a re-render hands Framer Motion
-// the same object instead of a fresh one for the in-flight tween.
-export function paperExitOffscreen(): PaperExitTarget {
-  const rotate = paperSwingAngleDeg()
-  if (paperExitOffscreenTarget?.rotate !== rotate) {
-    paperExitOffscreenTarget = {
-      x: PAPER_EXIT_OFFSET_X,
-      y: PAPER_EXIT_OFFSET_Y,
-      rotate,
-      filter: `blur(${PAPER_EXIT_BLUR_PX}px)`,
-      opacity: 0,
-    }
-  }
-  return paperExitOffscreenTarget
-}
-
-// Launch the slide/rotate/blur decisively, then let the motion settle over the remaining duration.
-const EXIT_EASE: [number, number, number, number] = [0.16, 1, 0.3, 1]
-// Drop opacity decisively as soon as the fade starts, then ease out the remaining transparency.
-const EXIT_OPACITY_EASE: [number, number, number, number] = [0.16, 1, 0.3, 1]
-const EXIT_DURATION = 0.7
-// Keep the sheet solid briefly, then fade over the remaining 500ms of the departure.
-const EXIT_OPACITY_DELAY = 0.2
-
-// Hold the tilt back while the sheet starts to slide, so it leaves as a straight glide and only then
-// begins to turn: the entrance in reverse, which squares up before it lands. It still ends on the
-// same 700ms frame as everything else.
-const EXIT_ROTATE_DELAY = 0.12
-
-const EXIT_TRANSITION_FULL = { duration: EXIT_DURATION, ease: EXIT_EASE }
-const EXIT_ROTATE_TRANSITION_FULL = {
-  duration: EXIT_DURATION - EXIT_ROTATE_DELAY,
-  ease: EXIT_EASE,
-  delay: EXIT_ROTATE_DELAY,
-}
-const EXIT_OPACITY_TRANSITION_FULL = {
-  duration: EXIT_DURATION - EXIT_OPACITY_DELAY,
-  ease: EXIT_OPACITY_EASE,
-  delay: EXIT_OPACITY_DELAY,
+const EXIT_LIFT_TRANSITION_FULL = { duration: EXIT_DURATION, ease: EXIT_LIFT_EASE }
+const EXIT_FADE_TRANSITION_FULL = {
+  duration: EXIT_DURATION - EXIT_FADE_DELAY,
+  ease: EXIT_FADE_EASE,
+  delay: EXIT_FADE_DELAY,
 }
 const EXIT_TRANSITION_REDUCED = { duration: 0 }
 
-// Per-property transition map: x/y/filter use `default`, rotate starts late, and opacity gets its
-// own delayed pacing. Kept as stable module-level references (not built inline at each call site)
-// so an unrelated re-render never hands Framer Motion a new object reference for an in-flight tween.
+// Per-property transition map: the lift on its own pacing, opacity and blur on the fade's. Kept as
+// stable module-level references (not built inline at each call site) so an unrelated re-render
+// never hands Framer Motion a new object reference for an in-flight tween.
 export const PAPER_EXIT_TRANSITION = {
-  default: EXIT_TRANSITION_FULL,
-  rotate: EXIT_ROTATE_TRANSITION_FULL,
-  opacity: EXIT_OPACITY_TRANSITION_FULL,
+  rotateY: EXIT_LIFT_TRANSITION_FULL,
+  opacity: EXIT_FADE_TRANSITION_FULL,
+  filter: EXIT_FADE_TRANSITION_FULL,
 }
-export const PAPER_EXIT_TRANSITION_REDUCED = { default: EXIT_TRANSITION_REDUCED, opacity: EXIT_TRANSITION_REDUCED }
+export const PAPER_EXIT_TRANSITION_REDUCED = { default: EXIT_TRANSITION_REDUCED }
+export const PAPER_EXIT_SHADE_TRANSITION = EXIT_LIFT_TRANSITION_FULL
 
 // Backwards-navigation signal, carried on two channels because it has to survive both kinds of
 // navigation and be readable before the destination's first paint:
