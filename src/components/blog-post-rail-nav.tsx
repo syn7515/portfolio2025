@@ -240,8 +240,8 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
                   // hover widths expand rightward. The label stays at the former 44px edge. A 14px
                   // height fills the complete row pitch, so neighboring targets remain contiguous.
                   'relative -ml-2 flex h-[14px] w-14 cursor-pointer items-center rounded-sm',
-                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-600/60 dark:focus-visible:ring-rose-300/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
-                  'motion-safe:active:scale-[0.97]'
+                  // No press scale here: pressing scales the label alone (blog-post-rail-nav.module.css).
+                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-600/60 dark:focus-visible:ring-rose-300/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background'
                 )}
               >
                 {/* Above the labels: a hovered label's backdrop reaches 24-40px left of its text,
