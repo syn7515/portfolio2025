@@ -39,8 +39,9 @@ const TITLE_HOVER_SESSION_MS = 2500
  * margin is too narrow for the text sidebar until 1520px, so in both there is no gutter wide enough
  * for a text rail — the outline collapses to tick marks that expand on hover, and Home becomes a
  * ghost icon button sitting above them. Up to 1024px it floats over the full-bleed paper; from
- * there it sits on the drafting grid in the sheet's left margin, and between 1024 and 1064px, where
- * that margin is too narrow to hold it (RAIL_BREAKPOINT below), it is not shown at all.
+ * there it sits on the drafting grid in the sheet's left margin, close to the sheet's edge, and
+ * between 1024 and 1064px, where that margin is too narrow to hold it (RAIL_BREAKPOINT below), it
+ * is not shown at all.
  *
  * Everything floats over body copy, which is why the labels carry DescriptionBackdrop.
  */
@@ -157,24 +158,27 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
       className={cn(
         styles.railNav,
         showTitlesInstantly && styles.titlesInstant,
-        // RAIL_BREAKPOINT: 24px in, the rail's 56px hit area needs the sheet's left margin to be
-        // at least 80px, which it reaches at ~1063px (102.273vw - 1007.27px, globals.css). 1064 is
-        // the narrowest that keeps it off the sheet: any lower and hovering the sheet's edge would
-        // light the ticks. What shows sits well inside that margin — the marks end 48px in, 57px
-        // with a tick fanned out on hover. Below that, within the sheet band, it steps aside.
-        // Repeated in the entrance media query in blog-post-rail-nav.module.css.
+        // RAIL_BREAKPOINT: the rail hangs off the sheet's left edge (below), its 56px hit area
+        // ending 8px short of it so hovering the sheet's edge never lights the ticks. That needs a
+        // left margin of 64px for the rail to start on screen at all, and 1064px, where the margin
+        // is ~81px (102.273vw - 1007.27px, globals.css), leaves it 17px in. Below that, within the
+        // sheet band, it steps aside. Repeated in the entrance media query in
+        // blog-post-rail-nav.module.css.
         // It comes back from 1362.5px to 1520px, where the sheet has centred but its left margin
         // (181–220px) can't yet hold the text sidebar — see SIDEBAR_RETURN_BREAKPOINT in
         // src/lib/breakpoints.ts. Its 80px reach fits there with room to spare.
         'hidden min-[820px]:flex sheet:hidden min-[1064px]:flex paper:hidden min-[1362.5px]:flex min-[1520px]:hidden',
         // Vertically centred so the cluster stays reachable at any scroll position without being
-        // fixed to an edge. 24px from the viewport edge throughout: over the full-bleed paper
-        // below 1024px, and on the grid in the sheet's left margin from 1064px.
+        // fixed to an edge. Over the full-bleed paper below 1024px it is 24px from the viewport
+        // edge. On the grid in the sheet's left margin, from 1064px, it keeps to the sheet instead,
+        // its marks ending 40px short of the sheet's edge, 49px with a tick fanned out on hover, so
+        // it reads as the paper's margin rather than the screen's: held to the screen's edge, it
+        // drifted 130-170px off the centred sheet as the margin opened past 1362.5px.
         // Below 1024px it isn't fixed but absolute, inside the viewport-tall sticky box the layout
         // gives it on the paper — the same place on screen, except that it leaves with the paper
         // when the paper scrolls up off the reveal footer (blog-post-layout.tsx). That box passes
         // no pointer events, so the rail takes them back.
-        'absolute sheet:fixed left-2 min-[820px]:left-6 top-1/2 -translate-y-1/2 z-60 pointer-events-auto',
+        'absolute sheet:fixed left-2 min-[820px]:left-6 min-[1064px]:left-[calc(var(--paper-left)_-_64px)] top-1/2 -translate-y-1/2 z-60 pointer-events-auto',
         'flex-col items-start gap-5'
       )}
       aria-label="Post navigation"
@@ -188,10 +192,12 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
         aria-label="Back to home"
         className={cn(
           'flex h-8 w-14 items-center rounded-full pl-2',
-          // Colour copied from the ≥1200px sidebar Home link so the two read as one control. The
-          // glyph carries the hover by itself; no hover background behind it, since a tint under a
-          // 16px mark and the mark's own colour change are two signals for one state.
-          '!not-italic !no-underline !text-stone-400 dark:!text-zinc-400',
+          // The ≥1200px sidebar Home link's colour, a step darker in light mode: there a lone 16px
+          // glyph on the drafting grid read fainter than that link's word in the same stone-400.
+          // In dark mode they match. The glyph carries the hover by itself; no hover background
+          // behind it, since a tint under a 16px mark and the mark's own colour change are two
+          // signals for one state.
+          '!not-italic !no-underline !text-stone-500 dark:!text-zinc-400',
           'hover:!text-rose-700 dark:hover:!text-rose-400',
           'motion-safe:active:scale-[0.97]',
           'focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-600/60 dark:focus-visible:ring-rose-300/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background'

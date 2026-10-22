@@ -78,7 +78,8 @@
 }
 
 /* At rest every tick is the same length — the section you're in is marked by colour alone. Length
-   carries no meaning until the pointer arrives. */
+   carries no meaning until the pointer arrives. stone-400 at rest in light mode: stone-300, a
+   2px line on the drafting grid, all but vanished into it. */
 .tick {
     position: absolute;
     left: 11px;
@@ -87,16 +88,16 @@
     height: 2px;
     width: 10px;
     border-radius: 0;
-    background-color: rgb(214 211 209);
-    /* stone-300 */
+    background-color: rgb(168 162 158);
+    /* stone-400 */
     transition:
         width 200ms cubic-bezier(0.23, 1, 0.32, 1),
         background-color 200ms ease-out;
 }
 
 .tickActive {
-    background-color: rgb(68 64 60);
-    /* stone-700 */
+    background-color: rgb(12 10 9);
+    /* stone-950, well clear of the stone-400 ticks at rest */
 }
 
 /* The rail's hover highlight is the same rose the links and the external-link arrow use, so it
