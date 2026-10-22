@@ -20,14 +20,15 @@ export default function BlogPostToc({ contentSelector, className }: BlogPostTocP
   if (items.length === 0) return null
 
   return (
-    <nav aria-label="Table of contents" className={cn('flex flex-col gap-1', className)}>
+    // Flush right against the sheet from 1520px: see the sidebar in blog-post-layout.tsx.
+    <nav aria-label="Table of contents" className={cn('flex flex-col min-[1520px]:items-end gap-1', className)}>
       {items.map(({ id, text }) => (
         <button
           key={id}
           type="button"
           onClick={() => goTo(id)}
           className={cn(
-            'origin-left cursor-pointer rounded text-left hover:translate-x-[12px] hover:text-rose-700 dark:hover:text-rose-400 motion-safe:active:scale-[0.97]',
+            'origin-left min-[1520px]:origin-right cursor-pointer rounded text-left min-[1520px]:text-right hover:translate-x-[12px] hover:text-rose-700 dark:hover:text-rose-400 motion-safe:active:scale-[0.97]',
             activeId === id
               ? 'text-stone-800 dark:text-zinc-100'
               : 'text-stone-400 dark:text-zinc-400'

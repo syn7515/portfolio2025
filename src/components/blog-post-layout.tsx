@@ -356,9 +356,14 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           sheet (globals.css) — from there it travels with the sheet instead of staying behind.
           It steps aside from 1362.5px, where the sheet first centres and its left margin is too
           narrow for the labels, and returns at 1520px (SIDEBAR_RETURN_BREAKPOINT in
-          src/lib/breakpoints.ts), where that margin is back to the 220px it has here at 1200. */}
+          src/lib/breakpoints.ts), where that margin is back to the 220px it has here at 1200.
+          From 1520px, beside the centred sheet, its text is set flush right, ending 40px short of
+          the sheet, where the compact rail's marks end too, so it reads as the sheet's margin.
+          Flush left from the strip's own edge, it kept to the screen instead: 164-224px from the
+          sheet, its labels' ragged ends anywhere from 26 to 161px off it depending on the post.
+          Up to 1362.5px it stays flush left, 56px in. */}
       <aside
-        className="hidden paper:block min-[1362.5px]:hidden min-[1520px]:block fixed left-[calc(var(--paper-left)_-_var(--sidebar-w))] top-0 bottom-0 z-60 pointer-events-none"
+        className="hidden paper:block min-[1362.5px]:hidden min-[1520px]:block fixed left-[calc(var(--paper-left)_-_var(--sidebar-w))] min-[1520px]:w-[var(--sidebar-w)] top-0 bottom-0 z-60 pointer-events-none"
         aria-label="Post navigation"
       >
         {/* Background layer at 10% opacity */}
@@ -375,7 +380,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
             opacity: 0.1,
           }}
         />
-        <div className="relative flex flex-col gap-6 pt-[240px] pl-14 pointer-events-auto">
+        <div className="relative flex flex-col gap-6 pt-[240px] pl-14 min-[1520px]:items-end min-[1520px]:pl-0 min-[1520px]:pr-10 pointer-events-auto">
           <Link
             href="/"
             className="flex items-center gap-2 w-fit text-sm font-[460] !not-italic !no-underline !text-stone-400 dark:!text-zinc-400 hover:!text-rose-700 dark:hover:!text-rose-400 motion-safe:active:scale-[0.97] px-3 py-2 -mx-3 -my-2 rounded"
@@ -394,7 +399,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           type="button"
           onClick={handleBackToTop}
           className={cn(
-            'absolute bottom-20 paper:bottom-[120px] mb-[120px] left-14 flex items-center gap-2 w-fit whitespace-nowrap text-sm font-[460] text-stone-400 dark:text-zinc-400 hover:text-rose-700 dark:hover:text-rose-400 motion-safe:active:scale-[0.97] cursor-pointer pointer-events-auto px-3 py-2 -mx-3 -my-2 rounded',
+            'absolute bottom-20 paper:bottom-[120px] mb-[120px] left-14 min-[1520px]:left-auto min-[1520px]:right-10 flex items-center gap-2 w-fit whitespace-nowrap text-sm font-[460] text-stone-400 dark:text-zinc-400 hover:text-rose-700 dark:hover:text-rose-400 motion-safe:active:scale-[0.97] cursor-pointer pointer-events-auto px-3 py-2 -mx-3 -my-2 rounded',
             showBackToTop && viewportTall
               ? 'opacity-100 blur-none'
               : 'opacity-0 blur-[4px] pointer-events-none'
