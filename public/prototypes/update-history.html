@@ -52,13 +52,13 @@
   /* ---------- history table ----------
      Every row is 40px with its rules drawn inside it, as Figma does: a full rule under the header,
      soft ones between the groups and a full one under the last. The group column stays put while
-     the firmware columns scroll beneath its edge shadow; a white fade covers the right edge. */
+     the firmware columns scroll beneath its edge shadow; a white fade covers the right edge. Each
+     one's opacity follows the scroll (--start, --end; see edges()) rather than snapping. */
   .table { position: relative; flex: 1; min-height: 0; display: flex; }
   .sg { position: relative; z-index: 2; width: 216px; flex-shrink: 0; background: var(--bg); border-right: 1px solid var(--soft-border); }
   .sg::after { content: ""; position: absolute; top: 0; bottom: 0; left: 100%; width: 17px; pointer-events: none;
                background: linear-gradient(to right, rgba(0, 0, 0, 0.026), rgba(0, 0, 0, 0.012) 30%, rgba(0, 0, 0, 0.004) 65%, transparent);
-               opacity: 0; transition: opacity 150ms ease; }
-  .scrolled .sg::after { opacity: 1; }
+               opacity: var(--start, 0); }
   .hd, .r, .cell { height: 40px; display: flex; align-items: center; padding: 0 32px; box-shadow: inset 0 -1px 0 var(--soft-border); transition: background-color 60ms ease; }
   .hd { background: var(--tint); box-shadow: inset 0 1px 0 var(--border), inset 0 -1px 0 var(--border); }
   .last { box-shadow: inset 0 -1px 0 var(--border); }
@@ -84,8 +84,7 @@
   .fw .ver { padding-right: 0.4px; }
   .fw .at { padding-right: 0.5px; opacity: 0.5; }
   .fade { position: absolute; z-index: 3; top: 0; right: 0; bottom: 0; width: 150.88px; pointer-events: none;
-          background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.7)); transition: opacity 150ms ease; }
-  .at-end .fade { opacity: 0; }
+          background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.7)); opacity: var(--end, 1); }
 
   /* hovering a cell lights its row across the table and its release down the column, the cell
      where they cross a step darker, as Figma's hover frame shows */
@@ -174,9 +173,16 @@ document.querySelectorAll('i[data-icon]').forEach(i => { i.outerHTML = icon(i.da
 // Scrolled as in Figma: FW 3.5.12 sits 119px into the scroll area, FW 3.5.11 mostly off to the left.
 const table = $('table'), plans = $('plans');
 plans.scrollLeft = 360.92;
+// Each edge's shading builds over the last ~20 on-screen px before that edge, so a drag eases it in
+// and out instead of switching it at the first pixel. Measured on screen, so it reads the same
+// however far fit() has scaled the stage.
+const EDGE_RAMP = 20;
+let scale = 1;
 const edges = () => {
-  table.classList.toggle('scrolled', plans.scrollLeft > 0.5);
-  table.classList.toggle('at-end', plans.scrollLeft >= plans.scrollWidth - plans.clientWidth - 0.5);
+  const ramp = EDGE_RAMP / scale;
+  const left = plans.scrollLeft, right = plans.scrollWidth - plans.clientWidth - left;
+  table.style.setProperty('--start', Math.min(1, Math.max(0, left) / ramp));
+  table.style.setProperty('--end', Math.min(1, Math.max(0, right) / ramp));
 };
 plans.addEventListener('scroll', edges, { passive: true });
 edges();
@@ -222,7 +228,9 @@ document.fonts.ready.then(() => requestAnimationFrame(() => requestAnimationFram
 
 function fit() {
   const st = $('stage');
-  st.style.transform = `scale(${Math.min(innerWidth / st.offsetWidth, innerHeight / st.offsetHeight)})`;
+  scale = Math.min(innerWidth / st.offsetWidth, innerHeight / st.offsetHeight);
+  st.style.transform = `scale(${scale})`;
+  edges();
 }
 addEventListener('resize', fit); fit();
 addEventListener('keydown', e => {
