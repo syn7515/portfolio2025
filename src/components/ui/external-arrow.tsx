@@ -1,8 +1,8 @@
 import { cn } from '@/lib/utils'
 
 /**
- * The "this link leaves the site" mark, shared by the inline link previews, the project list's
- * off-site rows and the case-study prose.
+ * The "this link leaves the site" mark on the project list's off-site rows. The inline link
+ * previews, home page and case-study prose alike, no longer carry it.
  *
  * Its size, colour and raise are the ones the project list uses, so the mark reads the same
  * wherever it appears rather than taking on the weight of whatever text it follows.

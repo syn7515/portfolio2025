@@ -8,7 +8,6 @@ import { SHEET_BREAKPOINT } from '@/lib/breakpoints'
 import { cn } from '@/lib/utils'
 import { keepOnMainThread } from '@/lib/motion'
 import { DescriptionBackdrop } from '@/components/ui/description-backdrop'
-import ExternalArrow from '@/components/ui/external-arrow'
 
 const HOVER_DELAY_MS = 150
 // The rail lives in the room the floating sheet leaves right of the column, so it exists exactly
@@ -203,10 +202,6 @@ export function InlineLinkPreview({
             className="pointer-events-auto absolute inset-x-[-4px] inset-y-[-5px]"
           />
           {children}
-          {/* No lead-in padding here, unlike the project list's serif titles. These links are Inter
-              italic, whose last glyph already leans toward the raised arrow, and the arrow's own
-              ~1.2px side bearing is gap enough — the extra 2px left it floating off the word. */}
-          <ExternalArrow className="pl-0" />
         </a>
 
         {explanation && <span id={descriptionId} className="sr-only">{explanation}</span>}
