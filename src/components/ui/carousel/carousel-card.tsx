@@ -12,6 +12,12 @@ import { renderCaptionWithBadges } from "@/components/ui/sup-caption-badge";
 // How long carousel media takes to fade in over its skeleton once something is on screen.
 const MEDIA_REVEAL_MS = 300;
 
+// How long a card stays lit after the pointer leaves it. A hand slowing to a stop on a card's edge
+// wobbles a couple of pixels either side of it, and each crossing flipped the scrim, so the card
+// blinked darker and lighter a few times before it settled. Coming back within this window keeps
+// the card lit, so only a pointer that has actually left lets it go.
+const HOVER_LEAVE_GRACE_MS = 100;
+
 interface CarouselCardProps {
   item: CarouselItem;
   index: number;
@@ -73,6 +79,20 @@ export function CarouselCard({
   const isMediaShown = shownMediaKey === mediaKey;
   const markMediaShown = () => setShownMediaKey(mediaKey);
   const [isHovered, setIsHovered] = useState(false);
+  // The pending un-hover while the pointer is within HOVER_LEAVE_GRACE_MS of leaving.
+  const hoverLeaveTimerRef = useRef<number | null>(null);
+  const cancelHoverLeave = () => {
+    if (hoverLeaveTimerRef.current === null) return;
+    window.clearTimeout(hoverLeaveTimerRef.current);
+    hoverLeaveTimerRef.current = null;
+  };
+  useEffect(() => {
+    return () => {
+      if (hoverLeaveTimerRef.current !== null) {
+        window.clearTimeout(hoverLeaveTimerRef.current);
+      }
+    };
+  }, []);
 
   // Carousels only ever appear well below the fold, so no card's media belongs on the initial
   // load. Both the video source and the still are withheld until the card is within a viewport of
@@ -200,12 +220,21 @@ export function CarouselCard({
           // closed over it. Only real movement lights a card (an engine's synthetic move after a
           // scroll has no delta). The scrim and the light-mode shadow both read this one state —
           // the shadow used mouseenter, which React drops when the lightbox copy unmounts under the
-          // pointer, so the two could disagree.
+          // pointer, so the two could disagree. Leaving only lets go after HOVER_LEAVE_GRACE_MS, which
+          // real movement back onto the card cancels; a card scrolled back under a still pointer
+          // doesn't, so it still goes out.
           onPointerMove={(e) => {
             if (e.pointerType === "touch" || (e.movementX === 0 && e.movementY === 0)) return;
+            cancelHoverLeave();
             setIsHovered(true);
           }}
-          onPointerLeave={() => setIsHovered(false)}
+          onPointerLeave={() => {
+            cancelHoverLeave();
+            hoverLeaveTimerRef.current = window.setTimeout(() => {
+              hoverLeaveTimerRef.current = null;
+              setIsHovered(false);
+            }, HOVER_LEAVE_GRACE_MS);
+          }}
           className={`group relative ${mobileAspect === "4/3" ? "aspect-[4/3] sm:aspect-video" : "aspect-video"} ${backgroundClass} transition-all duration-150 ${
             disableCursor ? 'cursor-default'
               : isActive
