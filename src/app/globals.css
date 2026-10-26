@@ -123,18 +123,31 @@
 }
 
 /* The sheet breakpoint (SHEET_BREAKPOINT in src/lib/breakpoints.ts). From here the paper lifts off
-   the page as a floating sheet. Up to the paper breakpoint it is the 1200px sheet slid left: the
-   text sidebar is gone (the compact rail stands in for it) and the left margin shrinks linearly
-   from 220px at 1200 to 40px here — 180px over 176px, so 102.273vw - 1007.27px. Everything on the
-   sheet keeps the inset it had at 1200: the columns pin to it in page.tsx and blog-post-layout.tsx,
-   the carousel holds its 784px card (carousel/hooks.ts), and the offset below is the 60px the
-   formula in the paper block works out to at 1200. Only the empty right side of the sheet gives up
-   width. */
+   the page as a floating sheet. Up to the paper breakpoint the text sidebar is gone (the compact
+   rail stands in for it), so the left margin holds at the 88px the rail needs (SHEET_LEFT) and the
+   sheet, running to the viewport's right edge, takes all the width the viewport gains. The
+   carousel holds its 784px card (carousel/hooks.ts) and the columns in page.tsx and
+   blog-post-layout.tsx centre on the viewport, as they do in the paper block. */
 @media (min-width: 1024px) {
   :root {
     --paper-box-shadow: inset 0 0 0 0.5px var(--paper-inset-shadow), 0 30px 60px 0 var(--paper-drop-shadow);
-    --paper-left: calc(102.273vw - 1007.27px);
-    --paper-center-offset: 60px;
+    --paper-left: 88px;
+    --carousel-card-w: 784px;
+
+    /* Cards centre on the viewport, but the paper's left edge is inset by --paper-left, so a card
+       that centred naively would hang off the sheet. The carousel pushes itself right by whatever
+       it takes to keep 48px (CARD_EDGE_GAP) from that edge, which leaves the text column — centred
+       on the viewport — sitting off that axis by the same amount: 16px at 1024px, nothing from
+       1056px across the sheet band, 60px at 1200px where the sidebar's margin arrives, ~49px at
+       1362px, and nothing once the sheet centres, where a centred card already clears the edge.
+       The text rides the same offset so body, header and cards share one centre line.
+
+       Home has no carousel, but its column rides the offset too, so its text starts at the same
+       x as a post's and the two sheets read as one. */
+    --paper-center-offset: max(
+      0px,
+      calc(var(--paper-left) + 48px - (100vw - var(--carousel-card-w)) / 2)
+    );
   }
 }
 
@@ -167,20 +180,6 @@
     --carousel-card-w: min(
       clamp(784px, calc(784px + (100vw - 1200px) * 0.8), 880px),
       calc(100vw - var(--paper-left) - var(--paper-right) - 96px)
-    );
-
-    /* Cards centre on the viewport, but the paper's left edge is inset by --paper-left, so a card
-       that centred naively would hang off the sheet. The carousel pushes itself right by whatever
-       it takes to keep 48px (CARD_EDGE_GAP) from that edge, which leaves the text column — centred
-       on the viewport — sitting off that axis by the same amount: 60px at 1200px, ~49px at
-       1362px, and nothing once the sheet centres, where a centred card already clears the edge.
-       The text rides the same offset so body, header and cards share one centre line.
-
-       Home has no carousel, but its column rides the offset too, so its text starts at the same
-       x as a post's and the two sheets read as one. */
-    --paper-center-offset: max(
-      0px,
-      calc(var(--paper-left) + 48px - (100vw - var(--carousel-card-w)) / 2)
     );
   }
 }
@@ -335,7 +334,7 @@ body {
       20px 20px,
       20px 20px;
     /* The left fade has to finish a pixel short of the paper: the grid line on the paper's edge is
-       the sheet's left border, and in the sheet band — where the margin narrows to 40px — a fade
+       the sheet's left border, and in the sheet band — where the margin narrows to 88px — a fade
        still running at that edge would wash the border out with it. The 25% stop scales with the
        margin for the same reason, and holds its 80px from ~200px of margin up. */
     /* The right fade mirrors it for the margin wide screens open up on that side. While there is

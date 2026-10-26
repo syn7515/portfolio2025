@@ -11,8 +11,8 @@ import { DescriptionBackdrop } from '@/components/ui/description-backdrop'
 
 const HOVER_DELAY_MS = 150
 // The rail lives in the room the floating sheet leaves right of the column, so it exists exactly
-// where the sheet does. Across the sheet band that room narrows with the sheet, and below ~1065px
-// it drops under SIDE_RAIL_MIN_WIDTH on a case study, where the preview falls back to its local
+// where the sheet does. Across the sheet band that room grows with the sheet, and below ~1112px
+// it is under SIDE_RAIL_MIN_WIDTH on a case study, where the preview falls back to its local
 // placement.
 const SIDE_RAIL_BREAKPOINT = SHEET_BREAKPOINT
 const SIDE_RAIL_GAP = 32

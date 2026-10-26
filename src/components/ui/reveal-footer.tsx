@@ -96,9 +96,9 @@ export default function RevealFooter({ children, className, style, fromSheet = f
           >
             {/* From 1024px (only ever shown there with fromSheet) the column lines up with the
                 sheet's text column rather than centring on the screen: the case-study column's
-                own offsets in blog-post-layout.tsx, measured from the viewport's left edge here
-                instead of the sheet's, which is why --paper-left is added back. */}
-            <div className="max-w-[var(--content-w)] mx-auto sheet:max-w-none sheet:w-[var(--content-w)] sheet:ml-[calc(var(--paper-left)_+_100px_+_var(--paper-center-offset))] paper:ml-[calc(50vw_-_var(--content-w)_/_2_+_var(--paper-center-offset))]">
+                own formula in blog-post-layout.tsx, measured from the viewport's left edge here
+                instead of the sheet's, which is why it leaves out --paper-left. */}
+            <div className="max-w-[var(--content-w)] mx-auto sheet:max-w-none sheet:w-[var(--content-w)] sheet:ml-[calc(50vw_-_var(--content-w)_/_2_+_var(--paper-center-offset))]">
               {children}
             </div>
           </div>
