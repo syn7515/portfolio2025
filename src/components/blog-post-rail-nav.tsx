@@ -32,16 +32,14 @@ const RAIL_EXIT_MS = 180
 const TITLE_HOVER_SESSION_MS = 2500
 
 /**
- * Home + table of contents for 820–1024px, 1064–1200px and 1362.5–1520px.
+ * Home + table of contents for 820–1200px and 1362.5–1520px.
  *
  * At 1200–1362.5px and from 1520px this is the fixed text sidebar; below 820px it's the hamburger
  * overlay. Below 1200px --sidebar-w collapses to 0px, and from 1362.5px the centred sheet's left
  * margin is too narrow for the text sidebar until 1520px, so in both there is no gutter wide enough
  * for a text rail — the outline collapses to tick marks that expand on hover, and Home becomes a
  * ghost icon button sitting above them. Up to 1024px it floats over the full-bleed paper; from
- * there it sits on the drafting grid in the sheet's left margin, close to the sheet's edge, and
- * between 1024 and 1064px, where that margin is too narrow to hold it (RAIL_BREAKPOINT below), it
- * is not shown at all.
+ * there it sits on the drafting grid in the sheet's left margin, close to the sheet's edge.
  *
  * Everything floats over body copy, which is why the labels carry DescriptionBackdrop.
  */
@@ -158,27 +156,25 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
       className={cn(
         styles.railNav,
         showTitlesInstantly && styles.titlesInstant,
-        // RAIL_BREAKPOINT: the rail hangs off the sheet's left edge (below), its 56px hit area
-        // ending 8px short of it so hovering the sheet's edge never lights the ticks. That needs a
-        // left margin of 64px for the rail to start on screen at all, and 1064px, where the margin
-        // is ~81px (102.273vw - 1007.27px, globals.css), leaves it 17px in. Below that, within the
-        // sheet band, it steps aside. Repeated in the entrance media query in
-        // blog-post-rail-nav.module.css.
+        // From 1024px the rail hangs off the sheet's left edge (below), its 56px hit area ending
+        // 8px short of it so hovering the sheet's edge never lights the ticks. The sheet band's
+        // 88px margin (SHEET_LEFT in src/lib/breakpoints.ts) is sized to hold it 24px in.
         // It comes back from 1362.5px to 1520px, where the sheet has centred but its left margin
         // (181–220px) can't yet hold the text sidebar — see SIDEBAR_RETURN_BREAKPOINT in
         // src/lib/breakpoints.ts. Its 80px reach fits there with room to spare.
-        'hidden min-[820px]:flex sheet:hidden min-[1064px]:flex paper:hidden min-[1362.5px]:flex min-[1520px]:hidden',
+        'hidden min-[820px]:flex paper:hidden min-[1362.5px]:flex min-[1520px]:hidden',
         // Vertically centred so the cluster stays reachable at any scroll position without being
         // fixed to an edge. Over the full-bleed paper below 1024px it is 24px from the viewport
-        // edge. On the grid in the sheet's left margin, from 1064px, it keeps to the sheet instead,
+        // edge. On the grid in the sheet's left margin, from 1024px, it keeps to the sheet instead,
         // its marks ending 40px short of the sheet's edge, 49px with a tick fanned out on hover, so
         // it reads as the paper's margin rather than the screen's: held to the screen's edge, it
-        // drifted 130-170px off the centred sheet as the margin opened past 1362.5px.
+        // drifted 130-170px off the centred sheet as the margin opened past 1362.5px. Across the
+        // sheet band the two agree, so it holds still as the sheet arrives.
         // Below 1024px it isn't fixed but absolute, inside the viewport-tall sticky box the layout
         // gives it on the paper — the same place on screen, except that it leaves with the paper
         // when the paper scrolls up off the reveal footer (blog-post-layout.tsx). That box passes
         // no pointer events, so the rail takes them back.
-        'absolute sheet:fixed left-2 min-[820px]:left-6 min-[1064px]:left-[calc(var(--paper-left)_-_64px)] top-1/2 -translate-y-1/2 z-60 pointer-events-auto',
+        'absolute sheet:fixed left-2 min-[820px]:left-6 sheet:left-[calc(var(--paper-left)_-_64px)] top-1/2 -translate-y-1/2 z-60 pointer-events-auto',
         'flex-col items-start gap-5'
       )}
       aria-label="Post navigation"

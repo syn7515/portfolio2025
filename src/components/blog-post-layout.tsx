@@ -474,9 +474,8 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           )}
           style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--paper-left)', maxWidth: 'var(--paper-max-w)' }}
         >
-          {/* Compact rail: Home + tick-mark TOC, for 820–1024px, 1064–1200px and 1362.5–1520px,
-              where there is no gutter for the text sidebar below. Hidden between 1024 and 1064px,
-              where the sheet's left margin can't hold even the rail — see blog-post-rail-nav.tsx.
+          {/* Compact rail: Home + tick-mark TOC, for 820–1200px and 1362.5–1520px, where there is
+              no gutter for the text sidebar below — see blog-post-rail-nav.tsx.
               It sits on the paper, in a viewport-tall sticky box spanning it, because below 1024px
               it belongs to the paper rather than to the screen: when the paper's bottom edge
               scrolls up off the reveal footer, the box runs out of paper and is pushed up with it,
@@ -498,10 +497,8 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           >
               {/* --paper-center-offset (globals.css) is what keeps this column on the carousel's
                   centre line rather than the viewport's; without it the cards' bleed is lopsided,
-                  reaching further past one side of the text than the other. Across the sheet band
-                  the column holds its 1200px inset (100px + the 60px offset there), so the sheet
-                  slides left without its contents moving on it. */}
-              <div className="px-6 sheet:px-0 sheet:ml-[calc(100px_+_var(--paper-center-offset))] paper:ml-[calc(50vw_-_var(--content-w)_/_2_-_var(--paper-left)_+_var(--paper-center-offset))] sheet:w-[var(--content-w)]">
+                  reaching further past one side of the text than the other. */}
+              <div className="px-6 sheet:px-0 sheet:ml-[calc(50vw_-_var(--content-w)_/_2_-_var(--paper-left)_+_var(--paper-center-offset))] sheet:w-[var(--content-w)]">
                 {/* Header: title, then client and dates */}
                 <div className={styles.contentBlurRevealItem}>
                   <BlogPostHeader title={title} subtitle={subtitle} />

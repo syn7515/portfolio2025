@@ -1,19 +1,25 @@
 /**
  * The width at which the paper lifts off the page as a floating sheet.
  *
- * Between here and PAPER_BREAKPOINT the sheet is the 1200px one slid left: no text sidebar (the
- * compact rail covers Home and the outline), and a left margin that shrinks linearly from 220px at
- * 1200 to 40px here (paperLeftAt below). Everything on the sheet keeps the inset it had at 1200;
- * only the empty right side of the sheet gives up width. The margin is what runs out: much below
- * this it could no longer read as one.
+ * Between here and PAPER_BREAKPOINT there is no text sidebar (the compact rail covers Home and the
+ * outline), so the sheet keeps one fixed left margin, SHEET_LEFT, and runs to the viewport's right
+ * edge: every pixel the viewport gains goes to the sheet, ~936px here to ~1111px at the top of the
+ * band. The text column centres on the viewport, as it does from PAPER_BREAKPOINT, held clear of
+ * the sheet's left edge by --paper-center-offset (globals.css). At PAPER_BREAKPOINT the sidebar
+ * takes a 220px margin and the sheet steps back down to ~980px.
  *
  * Repeated as `screens.sheet` in tailwind.config.js and in the sheet and grid media queries in
  * globals.css.
  */
 export const SHEET_BREAKPOINT = 1024
 
-/** The paper's left margin at SHEET_BREAKPOINT, where the sheet band bottoms out. */
-const SHEET_MIN_LEFT = 40
+/**
+ * The paper's left margin across the sheet band: room for the compact rail, whose 56px hit area
+ * ends 8px short of the sheet, to sit 24px in from the viewport's edge — where it sits over the
+ * full-bleed paper below SHEET_BREAKPOINT, so it holds still as the sheet arrives. Repeated in the
+ * sheet block of globals.css.
+ */
+const SHEET_LEFT = 88
 
 /**
  * The width at which the text sidebar appears and the sheet shifts right to make room for it.
@@ -26,7 +32,7 @@ const SHEET_MIN_LEFT = 40
  * left edge would be pinned at 220px no matter how narrow the viewport got, while the text column
  * centres on the *viewport* (50vw - 280px) — the gap between the paper's edge and the text is
  * `vw / 2 - 500`, 100px here. Rather than let that gap close, the sidebar steps aside below this
- * width and the sheet band takes over, holding the column at its 1200px inset. (It was 1280 while
+ * width and the sheet band takes over, with a margin only as wide as the rail. (It was 1280 while
  * the sheet maxed out at 1200px; it came down with the sheet's 1120px maximum.)
  *
  * CSS cannot read this value — media queries take no custom properties — so the same number is
@@ -101,10 +107,7 @@ export function sidebarWidthAt(viewportWidth: number): number {
 /** JS mirror of --paper-left (globals.css): where the paper's left edge sits. */
 export function paperLeftAt(viewportWidth: number): number {
   if (viewportWidth < SHEET_BREAKPOINT) return 0
-  if (viewportWidth < PAPER_BREAKPOINT) {
-    const t = (viewportWidth - SHEET_BREAKPOINT) / (PAPER_BREAKPOINT - SHEET_BREAKPOINT)
-    return SHEET_MIN_LEFT + t * (sidebarWidthAt(PAPER_BREAKPOINT) - SHEET_MIN_LEFT)
-  }
+  if (viewportWidth < PAPER_BREAKPOINT) return SHEET_LEFT
   if (viewportWidth < PAPER_CENTERED_BREAKPOINT) return sidebarWidthAt(viewportWidth)
   return (viewportWidth - paperMaxWidthAt(viewportWidth)) / 2
 }

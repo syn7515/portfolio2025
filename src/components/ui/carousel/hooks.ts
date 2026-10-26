@@ -365,8 +365,8 @@ export function useResponsiveSizing(
         setSize({ cardWidth: width, cardHeight: height, gap });
       } else {
         // A ramp from CARD_BAND_WIDTH at the paper breakpoint, rising 0.8px per px of viewport to
-        // CARD_MAX_WIDTH at 1320px, and held at that 784px across the sheet band so the card keeps
-        // its place on the sheet as it slides. --carousel-card-w in globals.css mirrors this.
+        // CARD_MAX_WIDTH at 1320px, and held at that 784px across the sheet band. --carousel-card-w
+        // in globals.css mirrors this.
         // Once the sheet centres the card starts over, from CARD_CENTERED_WIDTH, rising 0.25px per
         // px back to CARD_MAX_WIDTH at 1520px.
         const rampW = Math.max(w, PAPER_BREAKPOINT);
