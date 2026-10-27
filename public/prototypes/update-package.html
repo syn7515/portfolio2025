@@ -86,7 +86,8 @@
      so its centre stays level with the close button */
   .d-title { padding-top: 1px; font-size: 16px; line-height: 1; font-weight: 500; color: var(--card-fg); }
   .d-close { position: absolute; top: 13px; right: 13.1px; padding: 12px; border-radius: 8px; color: var(--primary); transition: background-color 90ms ease; }
-  .d-tabs { height: 40px; flex-shrink: 0; display: flex; gap: 6px; padding: 0 0 4px 14px; }
+  /* the drawer's full-width stone hairline, the picked tab's underline drawn over it */
+  .d-tabs { height: 40px; flex-shrink: 0; display: flex; gap: 6px; padding: 0 0 4px 14px; box-shadow: inset 0 -1px 0 var(--border); }
   .d-tab { height: 36px; padding: 8px 10px 0; border-radius: 6px; transition: background-color 90ms ease; }
   .d-tab span { display: block; padding-bottom: 12px; color: var(--muted-fg); }
   .d-tab.on span { color: var(--fg); box-shadow: inset 0 -1.25px 0 var(--primary); }
