@@ -229,17 +229,17 @@ export default function Home() {
         <div className="flex flex-col sheet:flex-1 px-6 sheet:px-0 sheet:ml-[calc(50vw_-_var(--content-w)_/_2_-_var(--paper-left)_+_var(--paper-center-offset))] sheet:w-[var(--content-w)]">
         <div className="max-w-[var(--content-w)] mx-auto" data-inline-link-preview-boundary>
           {/* Left column: name */}
-          {/* Below the sheet breakpoint the name tracks the viewport: 32px where the sheet appears at
-              1024px, sliding to the 26px phone size by 640px and holding there. Both ends land on
-              existing breakpoints, so there is no step at 640px and no change at 1024px when the
-              sheet comes in. Slope is 6px over 384px = 1.5625vw; the intercept is
-              26px - 640px * 0.015625 = 16px. From 1280px the 32px cap rises with the column, to
-              ~34px by 1680px where the column stops widening (--text-px in globals.css). Crimson
+          {/* Below the sheet breakpoint the name tracks the viewport: the 28px phone size up to
+              640px, rising to 36px by 1024px. Slope is 8px over 384px = 2.0833vw; the intercept is
+              28px - 640px * 0.020833 = 14.67px. With no sheet around it the name runs larger than
+              on the sheet, so where the sheet comes in at 1024px it steps down to 32px. From 1280px
+              that 32px rises with the column, to ~34px by 1680px where the column stops widening
+              (--text-px in globals.css). Crimson
               Pro carries a far larger x-height than the Biro Script it replaced, so it runs ~0.8x
               the old 32-40px ramp to hold the same optical size. */}
           <div>
             <h1
-              className={`!mt-0 !text-[clamp(26px,calc(1.5625vw_+_16px),calc(32*var(--text-px)))] !text-stone-700 dark:!text-zinc-200 !mb-0 md:!mb-0${riseClass}`}
+              className={`!mt-0 !text-[clamp(28px,calc(2.0833vw_+_14.67px),36px)] sheet:!text-[calc(32*var(--text-px))] !text-stone-700 dark:!text-zinc-200 !mb-0 md:!mb-0${riseClass}`}
               style={{
                 fontFamily: 'var(--font-crimson-pro), serif',
                 lineHeight: '120%',
