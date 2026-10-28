@@ -190,9 +190,11 @@ function ProjectNavigationLinks({
 // nothing at load. It is ui/paper-exit-sheet, shared with app/page.tsx so both exits feel
 // identical, its pacing in src/lib/paper-exit-transition.ts.
 
-function startInterruptibleScrollToTop(): () => void {
+// onSettle runs once the scroll is over, whether it reached the top or the reader took over.
+function startInterruptibleScrollToTop(onSettle: () => void): () => void {
   if (scrollBehavior() === 'auto') {
     window.scrollTo({ top: 0, behavior: 'auto' })
+    onSettle()
     return () => {}
   }
 
@@ -204,6 +206,7 @@ function startInterruptibleScrollToTop(): () => void {
     finished = true
     controller.abort()
     window.clearTimeout(fallbackTimer)
+    onSettle()
   }
 
   const interrupt = () => {
@@ -234,6 +237,11 @@ function startInterruptibleScrollToTop(): () => void {
 export default function BlogPostLayout({ children, slug, title, subtitle }: BlogPostLayoutProps) {
   const { previousProject, nextProject } = getProjectNavigation(slug)
   const [showBackToTop, setShowBackToTop] = useState(false)
+  // True from the click until the smooth scroll it starts is over. The button would otherwise stay
+  // up for the whole ride back, until scrollY finally drops past 300 — it leaves on the click
+  // instead, the way a TOC entry takes the highlight on the click rather than on arrival. If the
+  // reader interrupts the scroll partway, this clears and the scroll position decides again.
+  const [scrollingToTop, setScrollingToTop] = useState(false)
   const [viewportTall, setViewportTall] = useState(false)
   // Backwards navigation (footer "Previous" or sidebar "Home"): instead of a new paper sliding in,
   // the current top sheet lifts away about its right edge, revealing this post's content already
@@ -316,7 +324,8 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
 
   const handleBackToTop = useCallback(() => {
     cancelBackToTopRef.current?.()
-    cancelBackToTopRef.current = startInterruptibleScrollToTop()
+    setScrollingToTop(true)
+    cancelBackToTopRef.current = startInterruptibleScrollToTop(() => setScrollingToTop(false))
   }, [])
 
   const hasProjectNavigation = Boolean(previousProject || nextProject)
@@ -400,7 +409,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           onClick={handleBackToTop}
           className={cn(
             'absolute bottom-20 paper:bottom-[120px] mb-[120px] left-14 min-[1520px]:left-auto min-[1520px]:right-10 flex items-center gap-2 w-fit whitespace-nowrap text-sm font-[460] text-stone-400 dark:text-zinc-400 hover:text-rose-700 dark:hover:text-rose-400 motion-safe:active:scale-[0.97] cursor-pointer pointer-events-auto px-3 py-2 -mx-3 -my-2 rounded',
-            showBackToTop && viewportTall
+            showBackToTop && viewportTall && !scrollingToTop
               ? 'opacity-100 blur-none'
               : 'opacity-0 blur-[4px] pointer-events-none'
           )}
