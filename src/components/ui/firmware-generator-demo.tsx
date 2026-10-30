@@ -2,17 +2,20 @@ import type { CSSProperties } from "react";
 import LivePrototype from "./live-prototype";
 
 /* The firmware-generator prototype (public/prototypes/firmware-generator.html), pinned to dark mode
-   whatever the site theme. Each scene's frame sits where the media it replaces was drawn on the 16:9
-   card, sized off the card's height, so the 4:3 phone card shows it a third larger about the same
-   point, cropped at the sides. Create alone is held to the card's width there. */
+   whatever the site theme. Each scene's frame is placed on the 16:9 card and sized off the card's
+   height, so the 4:3 phone card shows it a third larger, cropped at the sides. Create alone is held
+   to the card's width there. */
 
 const SCENES = {
-  // "Edit": 98% of the card's height, centred, 12% from the top, cropped at the bottom. The card cuts
-  // off the bottom (12 + 98 − 100) / 98 of the frame; `clip` tells the page how much of its 820px
-  // screen that is, so its scrolling list ends where the card does.
+  // "Edit": as large as Review's screen, the 16:9 card's full width (16/9 of its height), its top-left
+  // corner set 12% in from the card's top and left edges. The card's right edge then cuts the screen
+  // 88% of the way across, through the middle of the info panel (its last 320 of 1314px), and its
+  // bottom edge leaves 88% of the card's height showing, 9/16 of the 1314px screen's width; `clip`
+  // tells the page how much of its 820px screen is below that, so its scrolling list ends where the
+  // card does. The 4:3 phone card keeps the corner and cuts the screen inside the editor instead.
   edit: {
-    frame: { top: "12%", left: "50%", transform: "translateX(-50%)", height: "98cqh", width: `${(98 * 1314) / 820}cqh` },
-    clip: ((12 + 98 - 100) / 98) * 820,
+    frame: { top: "12%", left: "12%", height: `${(100 * 16 * 820) / (9 * 1314)}cqh`, width: `${(100 * 16) / 9}cqh` },
+    clip: 820 - 0.88 * ((9 / 16) * 1314),
   },
   // "Review": the old media asked for 240% height at top -45% / right 23.75%, but the global
   // `max-width: 100%` on img/video clamped it to the card's width and object-contain centred the
