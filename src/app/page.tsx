@@ -210,18 +210,20 @@ export default function Home() {
             min-height rather than height: nothing here can ever centre content out of reach above
             the scroll origin.
 
-            Below 1024px the top minimum runs a quarter larger than the bottom one: 80/64px on a
-            phone, 120/96px from 640px. Centring splits the leftover evenly, so the difference is a
-            constant offset on top of that split, and it is a deliberate one: the paper now ends in
-            an edge just below the dinkus, and with equal margins the name read as crowded against
-            the top while the mark had more air than it needed under it. Above the breakpoint the
-            old `pb-10` stands, since nothing is being centred there.
+            Below 1024px the bottom minimum runs larger than the top one: 80/112px on a phone,
+            120/144px from 640px. It is the paper under the dinkus before the edge the reveal footer
+            comes out from, and at 64/96px it brought the footer up too close under the list; the
+            extra 48px lengthens the paper and holds the footer further off without touching the
+            space over the name. Where the content overruns the screen the name stays at the top
+            minimum and the paper simply runs on; where it fits and is centred, the larger bottom
+            minimum comes out of the leftover instead, lifting the column by half of it (24px).
+            Above the breakpoint the old `pb-10` stands, since nothing is being centred there.
 
             At 1024px and up the sheet arrives and the layout goes back to what it was: content
             hanging from the paper's top edge with the footer pushed to the bottom. The centred
             reading works because below that width the paper is the viewport; on the floating sheet
             the top edge is the thing content should align to. */}
-        <div className="flex-1 flex flex-col justify-center sheet:justify-start pt-20 min-[640px]:pt-30 sheet:pt-[100px] paper:pt-[clamp(6.25rem,calc(13.333vw_-_3.75rem),8.75rem)] pb-16 min-[640px]:pb-24 sheet:pb-10">
+        <div className="flex-1 flex flex-col justify-center sheet:justify-start pt-20 min-[640px]:pt-30 sheet:pt-[100px] paper:pt-[clamp(6.25rem,calc(13.333vw_-_3.75rem),8.75rem)] pb-28 min-[640px]:pb-36 sheet:pb-10">
         {/* Centred on the viewport, measured from the paper's edge. It rides --paper-center-offset
             like the case-study column in blog-post-layout.tsx, so Home's text starts at the same x
             as a post's: there is no carousel here to centre on, but the two pages hand off to each
@@ -392,8 +394,17 @@ export default function Home() {
 
         {/* Reveal footer, below 1024px: the desk under the paper, holding the drafting grid and the
             footer row, uncovered as the paper scrolls up off it — the same footer a case study
-            ends on. See ui/reveal-footer. */}
-        <RevealFooter className={riseClass.trim() || undefined} style={riseDelay(DELAY.footer)}>
+            ends on. See ui/reveal-footer.
+            Home's one line of links sits a grid cell (20px) lower on the desk than the footer's
+            own padding puts it, 60/68px under the paper's edge rather than 40/48px, with as much
+            taken off the bottom so the desk is no taller: set that close under the edge, a single
+            short row read as stuck to the paper rather than resting on the grid. A whole cell, so
+            it keeps its place against the grid's lines. Posts keep the footer's own padding; their
+            Previous/Next pair is tall enough to hang from the edge. */}
+        <RevealFooter
+          className={`pt-15 pb-15 min-[640px]:pt-17 min-[640px]:pb-19 ${riseClass.trim()}`}
+          style={riseDelay(DELAY.footer)}
+        >
           <HomeFooterLinks />
         </RevealFooter>
 
