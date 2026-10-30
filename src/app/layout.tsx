@@ -41,7 +41,8 @@ const biroScript = localFont({
 
 // Both are declared but never render, so they are kept out of the preload list. Geist Sans only
 // ever appears *after* var(--font-inter) in a stack, which means it is a fallback for a font that
-// is itself preloaded and does not fail; Geist Mono backs --font-mono, which nothing consumes.
+// is itself preloaded and does not fail; Geist Mono backs --font-mono, which only a caption far down
+// the Aniai page uses (ds-button-padding.tsx).
 // Each was costing a blocking font fetch on first paint and drawing a "preloaded but not used"
 // warning for it.
 const geistSans = Geist({

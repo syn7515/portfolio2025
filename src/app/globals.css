@@ -1225,8 +1225,8 @@ a.inline-flex.items-center {
     --ds-btn-bg: #27272a !important; /* zinc-800 */
     --ds-btn-border: #3f3f46 !important; /* zinc-700 */
     --ds-btn-text: #d4d4d8 !important; /* zinc-300 */
-    --ds-btn-ghost-text: rgb(251 113 133 / 0.3) !important; /* rose-400 */
-    --ds-pad-border: rgb(159 18 57 / 0.25) !important; /* rose-800 */
+    --ds-btn-ghost-text: #52525b !important; /* zinc-600 */
+    --ds-caption-text: #71717a !important; /* zinc-500 */
     --ds-pad-outer: rgb(159 18 57 / 0.45) !important; /* rose-800 */
     --ds-pad-inner: rgb(159 18 57 / 0.24) !important;
     --ds-pad-stripe: rgb(225 29 72 / 0.55) !important;
