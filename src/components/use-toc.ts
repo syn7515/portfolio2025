@@ -114,7 +114,12 @@ export function useToc(contentSelector: string = CONTENT_SELECTOR) {
     setActiveId(id)
     const el = document.getElementById(id)
     if (el) {
-      const top = el.getBoundingClientRect().top + window.scrollY - 54
+      // The heading lands 54px down, or 6px under the top navbar where that is taller: below
+      // 1024px it grows from 48px to 64px (blog-post-mobile-menu.tsx), and a fixed 54px would tuck
+      // the heading under it. From 1024px the bar is display: none and measures 0.
+      const navbarBottom =
+        document.querySelector('[data-top-navbar]')?.getBoundingClientRect().bottom ?? 0
+      const top = el.getBoundingClientRect().top + window.scrollY - Math.max(54, navbarBottom + 6)
       window.scrollTo({ top, behavior: scrollBehavior() })
     }
   }, [])

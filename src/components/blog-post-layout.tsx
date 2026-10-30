@@ -484,7 +484,8 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--paper-left)', maxWidth: 'var(--paper-max-w)' }}
         >
           {/* Compact rail: Home + tick-mark TOC, for 820–1200px and 1362.5–1520px, where there is
-              no gutter for the text sidebar below — see blog-post-rail-nav.tsx.
+              no gutter for the text sidebar below — see blog-post-rail-nav.tsx. Below 1024px it is
+              the TOC alone, the navbar's logo standing in for its Home.
               It sits on the paper, in a viewport-tall sticky box spanning it, because below 1024px
               it belongs to the paper rather than to the screen: when the paper's bottom edge
               scrolls up off the reveal footer, the box runs out of paper and is pushed up with it,
@@ -501,8 +502,15 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
               <BlogPostRailNav />
             </div>
           </div>
+          {/* The paper's top margin over the title. Below the sheet the paper is full-bleed, its
+              top edge the viewport's, with the navbar over it, so the margin rides the viewport
+              width rather than stepping: 96px on a phone rising to 128px at the sheet, held from
+              384px down (32px over 640px = 5vw; intercept 96px - 19.2px = 4.8rem). The navbar
+              rides the same ramp at half the size, 48px to 64px (blog-post-mobile-menu.tsx), so
+              the title always sits one bar's height clear of the bar. On the sheet it is 100px
+              from the sheet's own edge until 1200px, then rises to 140px by 1500px. */}
           <div
-            className="pt-20 xs:pt-20 min-[640px]:pt-24 sheet:pt-[100px] paper:pt-[clamp(6.25rem,calc(13.333vw_-_3.75rem),8.75rem)]"
+            className="pt-[clamp(6rem,calc(5vw_+_4.8rem),8rem)] sheet:pt-[100px] paper:pt-[clamp(6.25rem,calc(13.333vw_-_3.75rem),8.75rem)]"
           >
               {/* --paper-center-offset (globals.css) is what keeps this column on the carousel's
                   centre line rather than the viewport's; without it the cards' bleed is lopsided,
