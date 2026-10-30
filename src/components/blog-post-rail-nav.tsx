@@ -38,8 +38,9 @@ const TITLE_HOVER_SESSION_MS = 2500
  * overlay. Below 1200px --sidebar-w collapses to 0px, and from 1362.5px the centred sheet's left
  * margin is too narrow for the text sidebar until 1520px, so in both there is no gutter wide enough
  * for a text rail — the outline collapses to tick marks that expand on hover, and Home becomes a
- * ghost icon button sitting above them. Up to 1024px it floats over the full-bleed paper; from
- * there it sits on the drafting grid in the sheet's left margin, close to the sheet's edge.
+ * ghost icon button sitting above them. Up to 1024px it floats over the full-bleed paper, under the
+ * top navbar, whose logo is Home there, so the rail is the outline alone; from there it sits on the
+ * drafting grid in the sheet's left margin, close to the sheet's edge.
  *
  * Everything floats over body copy, which is why the labels carry DescriptionBackdrop.
  */
@@ -179,15 +180,16 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
       )}
       aria-label="Post navigation"
     >
-      {/* Home — the third of three Home affordances (sidebar, hamburger, here). All must flag the
+      {/* Home — the third of three Home affordances (sidebar, navbar logo, here). All must flag the
           departure as backwards, or this one would slide a fresh sheet in while the others slide
-          the current one out. */}
+          the current one out. Only on the sheet: below 1024px the navbar's logo is already on
+          screen above the rail and does the same job, and the cluster's gap goes with it. */}
       <Link
         href="/"
         onClick={handleHomeClick}
         aria-label="Back to home"
         className={cn(
-          'flex h-8 w-14 items-center rounded-full pl-2',
+          'hidden sheet:flex h-8 w-14 items-center rounded-full pl-2',
           // The ≥1200px sidebar Home link's colour, a step darker in light mode: there a lone 16px
           // glyph on the drafting grid read fainter than that link's word in the same stone-400.
           // In dark mode they match. The glyph carries the hover by itself; no hover background

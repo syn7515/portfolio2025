@@ -123,8 +123,11 @@ export default function BlogPostMobileMenu() {
     slug: p.slug as string | undefined,
   }))
 
+  // Up to the sheet breakpoint, wherever the paper runs full-bleed and has no edge of its own: the
+  // bar is the page's top edge there. From 820px it sits over the compact rail, which gives up its
+  // Home button to the logo below the sheet (blog-post-rail-nav.tsx).
   return (
-    <div className="min-[820px]:hidden">
+    <div className="sheet:hidden">
       {/* Blurred full-viewport overlay. The links form one full-width band across its middle; a tap
           on the scrim above or below that band closes the menu. */}
       <div
@@ -192,12 +195,18 @@ export default function BlogPostMobileMenu() {
       {/* Persistent mobile top navigation: home logo on the left, menu toggle on the right. The bar
           has no side padding of its own: each control fills the bar's full height and runs out to
           its own edge of the viewport, carrying the old 24px inset as padding so the icons sit
-          where they did while the tap target grows into the corner. */}
+          where they did while the tap target grows into the corner.
+          Its height rides the viewport width, on the same ramp as the paper's padding over the
+          title (blog-post-layout.tsx), which stays twice it: 48px on a phone, held from 384px down,
+          to 64px at the sheet (16px over 640px = 2.5vw; intercept 48px - 9.6px = 2.4rem). The
+          icons keep their size and inset, so the logo stays in line with the rail below it from
+          820px; only the air around them grows. The TOC's jumps read its bottom edge (use-toc). */}
       <nav
         aria-label="Primary"
         aria-hidden={!isProjectRoute}
+        data-top-navbar
         className={cn(
-          'fixed inset-x-0 top-0 z-[70] flex h-12 transform-gpu items-stretch justify-between pointer-events-none motion-safe:transition-transform motion-safe:duration-[400ms] motion-safe:ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none',
+          'fixed inset-x-0 top-0 z-[70] flex h-[clamp(3rem,calc(2.5vw_+_2.4rem),4rem)] transform-gpu items-stretch justify-between pointer-events-none motion-safe:transition-transform motion-safe:duration-[400ms] motion-safe:ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none',
           isProjectRoute ? 'translate-y-0' : '-translate-y-full'
         )}
       >
