@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import ProjectListItem from '@/components/ui/project-list-item';
 import Dinkus from '@/components/ui/dinkus';
 import InlineLinkPreview from '@/components/ui/inline-link-preview';
+import { DescriptionBackdrop } from '@/components/ui/description-backdrop';
 import PaperGridBackground from '@/components/ui/paper-grid-background';
 import PaperExitSheet from '@/components/ui/paper-exit-sheet';
 import RevealFooter, { revealPaperClassName } from '@/components/ui/reveal-footer';
@@ -71,42 +72,52 @@ const ENTRANCE_TOTAL_MS = CONTENT_BASE_DELAY_MS + DELAY.footer + CONTENT_RISE_DU
 // them, so at 8px each hit area reaches exactly that separator's edge and stops: one more pixel and
 // the two links would start overlapping each other, with whichever paints on top quietly swallowing
 // taps meant for the other.
-function HomeFooterLinks() {
+//
+// `onGrid` is the reveal footer's copy, which sits on the drafting grid rather than the paper: each
+// side carries DescriptionBackdrop there, as the case studies' Previous/Next pair does, to wash the
+// lines out from under the text. The wrappers stay on the sheet's copy too, so the two lay out alike.
+// The socials get an outer one rather than the backdrop going inside, where `.socialLinks > *` would
+// reach it and its children would need lifting over it one by one.
+function HomeFooterLinks({ onGrid = false }: { onGrid?: boolean }) {
   return (
     <div className="flex items-baseline justify-between gap-4">
-      <div className={`${styles.socialLinks} intro-text flex gap-2 w-fit`}>
-        <a
-          href="https://x.com/sue_park__"
-          target="_blank"
-          rel="noopener noreferrer"
-          data-social-link-trigger
-          onClick={() => trackOutboundClick("https://x.com/sue_park__", "X")}
-          className="sm:text-[calc(14*var(--text-px))] px-2 py-3 -mx-2 -my-3 !text-stone-500 dark:!text-zinc-400 hover:!text-rose-700 active:!text-rose-700 dark:hover:!text-rose-400 dark:active:!text-rose-400 motion-safe:active:scale-[0.97]"
-          style={{
-            transition: 'scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
-          }}
-        >
-          X
-        </a>
-        <span className="sm:text-[calc(14*var(--text-px))] !text-stone-400 dark:!text-zinc-600">·</span>
-        <a
-          href="https://www.linkedin.com/in/sooyeonp/"
-          target="_blank"
-          rel="noopener noreferrer"
-          data-social-link-trigger
-          onClick={() => trackOutboundClick("https://www.linkedin.com/in/sooyeonp/", "LinkedIn")}
-          className="sm:text-[calc(14*var(--text-px))] px-2 py-3 -mx-2 -my-3 !text-stone-500 dark:!text-zinc-400 hover:!text-rose-700 active:!text-rose-700 dark:hover:!text-rose-400 dark:active:!text-rose-400 motion-safe:active:scale-[0.97]"
-          style={{
-            transition: 'scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
-          }}
-        >
-          LinkedIn
-        </a>
+      <div className="relative isolate">
+        {onGrid && <DescriptionBackdrop />}
+        <div className={`${styles.socialLinks} intro-text relative z-10 flex gap-2 w-fit`}>
+          <a
+            href="https://x.com/sue_park__"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-social-link-trigger
+            onClick={() => trackOutboundClick("https://x.com/sue_park__", "X")}
+            className="sm:text-[calc(14*var(--text-px))] px-2 py-3 -mx-2 -my-3 !text-stone-500 dark:!text-zinc-400 hover:!text-rose-700 active:!text-rose-700 dark:hover:!text-rose-400 dark:active:!text-rose-400 motion-safe:active:scale-[0.97]"
+            style={{
+              transition: 'scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
+            }}
+          >
+            X
+          </a>
+          <span className="sm:text-[calc(14*var(--text-px))] !text-stone-400 dark:!text-zinc-600">·</span>
+          <a
+            href="https://www.linkedin.com/in/sooyeonp/"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-social-link-trigger
+            onClick={() => trackOutboundClick("https://www.linkedin.com/in/sooyeonp/", "LinkedIn")}
+            className="sm:text-[calc(14*var(--text-px))] px-2 py-3 -mx-2 -my-3 !text-stone-500 dark:!text-zinc-400 hover:!text-rose-700 active:!text-rose-700 dark:hover:!text-rose-400 dark:active:!text-rose-400 motion-safe:active:scale-[0.97]"
+            style={{
+              transition: 'scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
+            }}
+          >
+            LinkedIn
+          </a>
+        </div>
       </div>
       <div
-        className="text-right text-[calc(14*var(--text-px))] text-stone-400 dark:text-zinc-500 font-normal font-sans [text-wrap:nowrap]"
+        className="relative isolate text-right text-[calc(14*var(--text-px))] text-stone-400 dark:text-zinc-500 font-normal font-sans [text-wrap:nowrap]"
       >
-        © Sue Park {new Date().getFullYear()}
+        {onGrid && <DescriptionBackdrop />}
+        <span className="relative z-10">© Sue Park {new Date().getFullYear()}</span>
       </div>
     </div>
   );
@@ -405,7 +416,7 @@ export default function Home() {
           className={`pt-15 pb-15 min-[640px]:pt-17 min-[640px]:pb-19 ${riseClass.trim()}`}
           style={riseDelay(DELAY.footer)}
         >
-          <HomeFooterLinks />
+          <HomeFooterLinks onGrid />
         </RevealFooter>
 
         {/* Departing sheet (backwards navigation from a blog post's sidebar "Home" link): the page
