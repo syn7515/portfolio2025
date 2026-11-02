@@ -148,8 +148,13 @@
   .icon-btn.pressed, .pop-close.pressed { background: var(--accent); }
   /* Bright enough to read on the dark bar, and ringed in the bar's colour so it stands clear of the
      button's border. */
-  .dot { position: absolute; top: -3px; right: -3px; width: 10px; height: 10px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 0 2px var(--bg); display: none; }
-  .dot.on { display: block; }
+  .dot { position: absolute; top: -3px; right: -3px; width: 10px; height: 10px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 0 2px var(--bg);
+         transform: scale(0); opacity: 0; transition: transform 150ms ease-in, opacity 150ms ease-in; }
+  /* It pops in on a spring (damping ratio 0.5, 350ms response): past full size by 16% at 200ms,
+     settled by 510ms. Opened, it shrinks away quickly. */
+  .dot.on { transform: scale(1); opacity: 1;
+            transition: transform 600ms linear(0, 0.086 4.2%, 0.286 8.3%, 0.528 12.5%, 0.758 16.7%, 0.943 20.8%, 1.071 25%, 1.141 29.2%, 1.163 33.3%, 1.151 37.5%, 1.119 41.7%, 1.08 45.8%, 1.042 50%, 1.011 54.2%, 0.99 58.3%, 0.978 62.5%, 0.973 66.7%, 0.975 70.8%, 0.98 75%, 0.986 79.2%, 0.993 83.3%, 0.998 87.5%, 1.001 91.7%, 1.004 95.8%, 1),
+                        opacity 80ms ease-out; }
   .main { position: relative; }
   .dim { position: absolute; inset: 0; z-index: 5; background: rgba(28, 25, 23, 0.8); opacity: 0; pointer-events: none; transition: opacity 150ms ease; }
   .dim.on { opacity: 1; pointer-events: auto; }
