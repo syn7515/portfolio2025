@@ -7,7 +7,8 @@ import { useEffect, useState, type CSSProperties } from "react";
    height (cqh), so the composition scales with the card like the image it replaces did, and comes
    out a third larger on the 4:3 phone card. Figma's text is 64 units in a ~1724-unit frame, hence
    64/1724 ≈ 3.71% of the 16:9 card's width, 16/9 of that in cqh; the em values below are the Figma
-   numbers divided by 64.
+   numbers divided by 64. The frame's button is the outline variant; this one is the secondary, a
+   fill with no border, so the dashed frame its padded copy shows is the only line round it.
 
    The card plays the frame as one button at its centre, taking the four in turn counter-clockwise
    from the bottom left: it shows its padding, makes room for an icon, puts the padding away, then
@@ -15,12 +16,14 @@ import { useEffect, useState, type CSSProperties } from "react";
    instead. */
 
 const vars = {
-  "--ds-btn-bg": "#ffffff",
-  "--ds-btn-border": "#e7e5e4", // stone-200
+  // The secondary fill: stone-100 would vanish into the card's near-white wash, so a step darker.
+  "--ds-btn-bg": "#e7e5e4", // stone-200
   "--ds-btn-text": "#57534e", // stone-600
   // The annotated copies' label, icon and outline: a pale grey, leaving the rose to the padding.
   "--ds-btn-ghost-text": "#d6d3d1", // stone-300
   "--ds-caption-text": "#a8a29e", // stone-400
+  // The blueprint over a padded copy: its content boxes and their guides.
+  "--ds-guide": "rgb(225 29 72 / 0.45)",
   "--ds-pad-outer": "rgb(244 63 94 / 0.3)",
   "--ds-pad-inner": "rgb(244 63 94 / 0.15)",
   "--ds-pad-stripe": "rgb(225 29 72 / 0.35)",
@@ -37,12 +40,14 @@ function Plus({ style, strokeWidth = 2 }: { style?: CSSProperties; strokeWidth?:
   );
 }
 
-const frame = "inline-flex items-center justify-center overflow-hidden border-solid";
+const frameBox = "inline-flex items-center justify-center";
+const frame = `${frameBox} overflow-hidden`;
+// The secondary has no border, so the padding starts at the button's edge. Its block padding is the
+// Figma outline button's 0.32em plus that button's 0.0714em border, to stand as tall.
 const frameStyle: CSSProperties = {
-  borderWidth: "0.0714em",
   borderRadius: "0.4286em",
   minWidth: "4.5714em",
-  paddingBlock: "0.32em",
+  paddingBlock: "0.3914em",
 };
 // Diagonal hatch laid over a translucent scrim. It tiles a fixed square (sized in em, so it scales
 // with the card) rather than stretching across each box, so two touching padded areas can line their
@@ -111,6 +116,43 @@ function useStep() {
 const ease = (props: string[], duration = MORPH_MS, delay = 0) =>
   props.map((p) => `${p} ${duration}ms ${EASE} ${delay}ms`).join(", ");
 
+// How far a guide runs past the frame, above and below; from the content row, it also crosses the
+// frame's block padding.
+const GUIDE_REACH = "0.35em";
+const GUIDE_INSET = `calc(-1 * (${frameStyle.paddingBlock} + ${GUIDE_REACH}))`;
+// Dashes on the hatch's pitch.
+const GUIDE_DASH = "repeating-linear-gradient(to bottom, var(--ds-guide) 0 0.08em, transparent 0.08em 0.16em)";
+
+// A content box as the blueprint draws it: its outline, and a dashed guide off each side that runs
+// past the frame. The outline fades; the guides also open out from the row's middle. `height` is the
+// box's own, centred in the row: the icon's square is shorter than the label's line.
+function Blueprint({ on, animate, height = "100%" }: { on: boolean; animate: boolean; height?: string }) {
+  const transition = animate ? ease(["opacity", "clip-path"]) : "none";
+  return (
+    <>
+      <span
+        className="absolute inset-x-0 top-1/2 -translate-y-1/2"
+        style={{ height, boxShadow: "inset 0 0 0 1px var(--ds-guide)", opacity: on ? 1 : 0, transition }}
+      />
+      {(["left", "right"] as const).map((side) => (
+        <span
+          key={side}
+          className="absolute w-px"
+          style={{
+            [side]: 0,
+            top: GUIDE_INSET,
+            bottom: GUIDE_INSET,
+            backgroundImage: GUIDE_DASH,
+            clipPath: on ? "inset(0)" : "inset(50% 0)",
+            opacity: on ? 1 : 0,
+            transition,
+          }}
+        />
+      ))}
+    </>
+  );
+}
+
 // The frame's button, with or without its icon, plain or with its padding shown, and able to go
 // from one to the next: the padding's hatching sits on layers that fade, and the icon in a slot that
 // opens. The text wrap sits after the outer padding and the slot; its label's line-height makes it
@@ -126,52 +168,80 @@ function Button({ icon = false, padding = false, animate = false }: { icon?: boo
   const glyph: [number, number] = icon ? [MORPH_MS * 0.6, MORPH_MS * 0.4] : [MORPH_MS * 0.5, 0];
   const wrapOffset = icon ? "calc(0.5714em + 1.1429em)" : "0.5714em";
   return (
-    <span
-      className={frame}
-      style={{
-        ...frameStyle,
-        // With its padding shown, the button is an outline: its fill goes with the rest of its ink.
-        backgroundColor: padding ? "transparent" : "var(--ds-btn-bg)",
-        borderColor: padding ? ink : "var(--ds-btn-border)",
-        transition: t(ease(["background-color", "border-color"])),
-      }}
-    >
-      <span className="relative flex items-center" style={{ paddingInline: "0.5714em" }}>
-        <span
-          className="absolute inset-0"
-          style={{ ...hatch("var(--ds-pad-outer)"), ...paddingOnly("0.5714em"), opacity: padding ? 1 : 0, transition: fade }}
-        />
-        <span className="relative flex items-center">
+    <span className="relative inline-flex">
+      <span
+        className={frame}
+        style={{
+          ...frameStyle,
+          // With its padding shown, the button is drawn rather than filled: its fill goes, and the
+          // blueprint below outlines it dashed.
+          backgroundColor: padding ? "transparent" : "var(--ds-btn-bg)",
+          transition: t(ease(["background-color"])),
+        }}
+      >
+        <span className="relative flex items-center" style={{ paddingInline: "0.5714em" }}>
           <span
-            className="flex justify-center overflow-hidden"
-            style={{ width: icon ? "1.1429em" : 0, transition: t(ease(["width"], ...slot)) }}
-          >
-            <Plus
-              style={{
-                width: "1.1429em",
-                height: "1.1429em",
-                flexShrink: 0,
-                color: ink,
-                opacity: icon ? 1 : 0,
-                scale: icon ? 1 : 0.6,
-                transition: t(`${ease(["opacity", "scale"], ...glyph)}, ${ease(["color"])}`),
-              }}
-              strokeWidth={1.5}
-              aria-hidden
-            />
-          </span>
-          <span className="relative flex" style={{ paddingInline: "0.2857em" }}>
+            className="absolute inset-0"
+            style={{ ...hatch("var(--ds-pad-outer)"), ...paddingOnly("0.5714em"), opacity: padding ? 1 : 0, transition: fade }}
+          />
+          <span className="relative flex items-center">
             <span
-              className="absolute inset-0"
-              style={{
-                ...hatch("var(--ds-pad-inner)", wrapOffset, "var(--ds-pad-stripe-light)"),
-                ...paddingOnly("0.2857em"),
-                opacity: padding ? 1 : 0,
-                transition: t(`${ease(["opacity"])}, ${ease(["background-position"], ...slot)}`),
-              }}
-            />
-            <span className={`${label} relative`} style={{ ...labelStyle, color: ink, transition: t(ease(["color"])) }}>
+              className="flex justify-center overflow-hidden"
+              style={{ width: icon ? "1.1429em" : 0, transition: t(ease(["width"], ...slot)) }}
+            >
+              <Plus
+                style={{
+                  width: "1.1429em",
+                  height: "1.1429em",
+                  flexShrink: 0,
+                  color: ink,
+                  opacity: icon ? 1 : 0,
+                  scale: icon ? 1 : 0.6,
+                  transition: t(`${ease(["opacity", "scale"], ...glyph)}, ${ease(["color"])}`),
+                }}
+                strokeWidth={1.5}
+                aria-hidden
+              />
+            </span>
+            <span className="relative flex" style={{ paddingInline: "0.2857em" }}>
+              <span
+                className="absolute inset-0"
+                style={{
+                  ...hatch("var(--ds-pad-inner)", wrapOffset, "var(--ds-pad-stripe-light)"),
+                  ...paddingOnly("0.2857em"),
+                  opacity: padding ? 1 : 0,
+                  transition: t(`${ease(["opacity"])}, ${ease(["background-position"], ...slot)}`),
+                }}
+              />
+              <span className={`${label} relative`} style={{ ...labelStyle, color: ink, transition: t(ease(["color"])) }}>
+                Button
+              </span>
+            </span>
+          </span>
+        </span>
+      </span>
+      {/* The blueprint: the frame's layout again, laid over it but outside its clip so the guides can
+          run past it, with the label unpainted, and the icon's slot and the label carrying their
+          boxes. The slot's guides show only while it holds the icon, and part as it opens. The frame
+          is outlined dashed on its edge, over the padding's outermost px, in the label's ghost ink
+          and at the 1px of the blueprint's other lines, so it sits back behind the rose. */}
+      <span className={`${frameBox} absolute inset-0`} style={frameStyle}>
+        <span
+          className="absolute inset-0 border border-dashed"
+          style={{
+            borderRadius: frameStyle.borderRadius,
+            borderColor: padding ? "var(--ds-btn-ghost-text)" : "transparent",
+            transition: t(ease(["border-color"])),
+          }}
+        />
+        <span className="flex" style={{ paddingInline: "0.5714em" }}>
+          <span className="relative shrink-0" style={{ width: icon ? "1.1429em" : 0, transition: t(ease(["width"], ...slot)) }}>
+            <Blueprint on={padding && icon} animate={animate} height="1.1429em" />
+          </span>
+          <span className="flex" style={{ paddingInline: "0.2857em" }}>
+            <span className={`${label} relative`} style={{ ...labelStyle, color: "transparent" }}>
               Button
+              <Blueprint on={padding} animate={animate} />
             </span>
           </span>
         </span>
@@ -186,9 +256,11 @@ export default function DsButtonPadding() {
   return (
     <div className="ds-button-padding w-full h-full [container-type:size]" style={vars} aria-hidden>
       <div className="w-full h-full grid place-items-center" style={{ fontSize: `${(3.71 * 16) / 9}cqh` }}>
+        {/* Rows far enough apart that the guides off the two padded buttons, each reaching past its
+            frame, stop short of each other. */}
         <div
           className="[grid-area:1/1] grid justify-items-center items-center motion-safe:hidden"
-          style={{ gridTemplateColumns: "auto auto", columnGap: "1.4em", rowGap: "0.65em" }}
+          style={{ gridTemplateColumns: "auto auto", columnGap: "1.4em", rowGap: "1.1em" }}
         >
           <Button icon />
           <Button icon padding />
