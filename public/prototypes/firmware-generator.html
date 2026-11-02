@@ -188,6 +188,8 @@
           -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 1.5px), #000 calc(100% - 1.5px)); mask: radial-gradient(farthest-side, transparent calc(100% - 1.5px), #000 calc(100% - 1.5px));
           animation: spin 0.9s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
+  /* On the build button it stands with the bar's icons, so its head takes their colour. */
+  .icon-btn .spin { background: conic-gradient(from 20deg, rgba(255, 255, 255, 0.05) 10%, var(--fg) 96%); }
   /* row hover: complete rows reveal an open (→) button, failed rows a "Try again" text button */
   .bi.hover { background: var(--muted); }
   .bi-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
@@ -361,7 +363,8 @@
       <div class="crumb"><span class="p">Test bed</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--fg-light)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg><span class="c">Firmware generator</span></div>
       <div class="actions">
         <div class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.226 20.925A2 2 0 0 0 6 22h12a2 2 0 0 0 2-2V8a2.4 2.4 0 0 0-.706-1.706l-3.588-3.588A2.4 2.4 0 0 0 14 2H6a2 2 0 0 0-2 2v3.127"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="m5 11-3 3"/><path d="m5 17-3-3h10"/></svg></div>
-        <div class="icon-btn" id="buildBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 1 7.38 16.75"/><path d="m16 12-4-4-4 4"/><path d="M12 16V8"/><path d="M2.5 8.875a10 10 0 0 0-.5 3"/><path d="M2.83 16a10 10 0 0 0 2.43 3.4"/><path d="M4.636 5.235a10 10 0 0 1 .891-.857"/><path d="M8.644 21.42a10 10 0 0 0 7.631-.38"/></svg><span class="dot" id="dot"></span></div>
+        <!-- Builds are running, so the button that opens their progress spins like the building rows inside it. -->
+        <div class="icon-btn" id="buildBtn"><span class="spin"></span><span class="dot" id="dot"></span></div>
         <div class="create"><span>Create</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div>
       </div>
     </header>
