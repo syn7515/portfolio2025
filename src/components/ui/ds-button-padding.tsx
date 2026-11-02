@@ -118,10 +118,12 @@ const ease = (props: string[], duration = MORPH_MS, delay = 0) =>
 
 // How far a guide runs past the frame, above and below; from the content row, it also crosses the
 // frame's block padding.
-const GUIDE_REACH = "0.35em";
+const GUIDE_REACH = "0.55em";
 const GUIDE_INSET = `calc(-1 * (${frameStyle.paddingBlock} + ${GUIDE_REACH}))`;
 // Dashes on the hatch's pitch.
 const GUIDE_DASH = "repeating-linear-gradient(to bottom, var(--ds-guide) 0 0.08em, transparent 0.08em 0.16em)";
+// Past the frame, each end fades out over its reach, so a guide trails off rather than stopping.
+const GUIDE_FADE = `linear-gradient(to bottom, transparent, #000 ${GUIDE_REACH}, #000 calc(100% - ${GUIDE_REACH}), transparent)`;
 
 // A content box as the blueprint draws it: its outline, and a dashed guide off each side that runs
 // past the frame. The outline fades; the guides also open out from the row's middle. `height` is the
@@ -143,6 +145,7 @@ function Blueprint({ on, animate, height = "100%" }: { on: boolean; animate: boo
             top: GUIDE_INSET,
             bottom: GUIDE_INSET,
             backgroundImage: GUIDE_DASH,
+            maskImage: GUIDE_FADE,
             clipPath: on ? "inset(0)" : "inset(50% 0)",
             opacity: on ? 1 : 0,
             transition,
@@ -260,7 +263,7 @@ export default function DsButtonPadding() {
             frame, stop short of each other. */}
         <div
           className="[grid-area:1/1] grid justify-items-center items-center motion-safe:hidden"
-          style={{ gridTemplateColumns: "auto auto", columnGap: "1.4em", rowGap: "1.1em" }}
+          style={{ gridTemplateColumns: "auto auto", columnGap: "1.4em", rowGap: "1.3em" }}
         >
           <Button icon />
           <Button icon padding />
