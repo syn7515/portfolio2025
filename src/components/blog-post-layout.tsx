@@ -12,6 +12,7 @@ import useScrollDepth from '@/components/use-scroll-depth'
 import PaperGridBackground from '@/components/ui/paper-grid-background'
 import PaperExitSheet from '@/components/ui/paper-exit-sheet'
 import Dinkus from '@/components/ui/dinkus'
+import { DescriptionBackdrop } from '@/components/ui/description-backdrop'
 import RevealFooter, { RevealDesk, revealPaperClassName } from '@/components/ui/reveal-footer'
 import { PROJECTS } from '@/lib/projects'
 import {
@@ -115,6 +116,10 @@ function ProjectNavigationLinks({
     // there, cancelled by an equal negative margin, which takes the target to 45px without moving
     // the label or the rows around it — the same trade the home footer's social links make. From
     // 640px the description joins the link and makes the target tall enough on its own.
+    // The footer sits on the drafting grid at every width, so each link's text carries
+    // DescriptionBackdrop to wash the lines out from under it. Its box is fit to the text rather
+    // than the half-row, so below 640px the wash hugs the one-word label, and inside the hit
+    // padding so the padding doesn't widen it.
     <div className="flex justify-between items-start gap-8">
       {/* Previous Project */}
       {previousProject ? (
@@ -124,23 +129,28 @@ function ProjectNavigationLinks({
           style={{ textDecoration: 'none' }}
           onClick={(event) => onNavigate(event, `/${previousProject.slug}`, 'previous')}
         >
-          <div className="text-[calc(14*var(--text-px))] text-stone-500 dark:text-zinc-400 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 transition-colors duration-150 font-[400] sm:font-normal not-italic mb-0 sm:mb-1.5 opacity-80 font-sans">
-            <span className="relative inline-flex items-center -translate-x-3 sm:translate-x-0">
-              <ChevronLeft
-                className="absolute left-0 sm:-left-4 size-4 sm:size-3.5 text-stone-400 dark:text-zinc-500 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 opacity-100 sm:opacity-0 blur-none sm:blur-[1px] sm:translate-x-1 transition-colors duration-150 motion-safe:transition-[color,opacity,filter,translate] motion-safe:duration-[150ms,300ms,300ms,300ms] motion-safe:ease-out sm:group-hover:opacity-100 sm:group-hover:blur-none sm:group-hover:translate-x-0 sm:group-active:opacity-100 sm:group-active:blur-none sm:group-active:translate-x-0 sm:group-focus-visible:opacity-100 sm:group-focus-visible:blur-none sm:group-focus-visible:translate-x-0 sm:motion-reduce:opacity-100 sm:motion-reduce:blur-none sm:motion-reduce:translate-x-0"
-                aria-hidden
-              />
-              <span className="relative z-10 translate-x-5 sm:translate-x-0">
-                Previous
-              </span>
-            </span>
+          <div className="relative isolate w-fit">
+            <DescriptionBackdrop />
+            <div className="relative z-10">
+              <div className="text-[calc(14*var(--text-px))] text-stone-500 dark:text-zinc-400 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 transition-colors duration-150 font-[400] sm:font-normal not-italic mb-0 sm:mb-1.5 opacity-80 font-sans">
+                <span className="relative inline-flex items-center -translate-x-3 sm:translate-x-0">
+                  <ChevronLeft
+                    className="absolute left-0 sm:-left-4 size-4 sm:size-3.5 text-stone-400 dark:text-zinc-500 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 opacity-100 sm:opacity-0 blur-none sm:blur-[1px] sm:translate-x-1 transition-colors duration-150 motion-safe:transition-[color,opacity,filter,translate] motion-safe:duration-[150ms,300ms,300ms,300ms] motion-safe:ease-out sm:group-hover:opacity-100 sm:group-hover:blur-none sm:group-hover:translate-x-0 sm:group-active:opacity-100 sm:group-active:blur-none sm:group-active:translate-x-0 sm:group-focus-visible:opacity-100 sm:group-focus-visible:blur-none sm:group-focus-visible:translate-x-0 sm:motion-reduce:opacity-100 sm:motion-reduce:blur-none sm:motion-reduce:translate-x-0"
+                    aria-hidden
+                  />
+                  <span className="relative z-10 translate-x-5 sm:translate-x-0">
+                    Previous
+                  </span>
+                </span>
+              </div>
+              <p
+                className="hidden sm:block mt-0 not-italic project-nav-description transition-colors duration-150 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400"
+                style={{ fontFamily: 'var(--font-crimson-pro), serif', fontSize: 'calc(19 * var(--text-px))', fontWeight: 450, lineHeight: '130%', letterSpacing: '-0.02em', textWrap: 'balance' }}
+              >
+                {preventWidow(previousProject.description)}
+              </p>
+            </div>
           </div>
-          <p
-            className="hidden sm:block mt-0 not-italic project-nav-description transition-colors duration-150 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400"
-            style={{ fontFamily: 'var(--font-crimson-pro), serif', fontSize: 'calc(19 * var(--text-px))', fontWeight: 450, lineHeight: '130%', letterSpacing: '-0.02em', textWrap: 'balance' }}
-          >
-            {preventWidow(previousProject.description)}
-          </p>
         </Link>
       ) : (
         <div className="flex-1" />
@@ -154,23 +164,28 @@ function ProjectNavigationLinks({
           style={{ textDecoration: 'none' }}
           onClick={(event) => onNavigate(event, `/${nextProject.slug}`, 'next')}
         >
-          <div className="text-[calc(14*var(--text-px))] text-stone-500 dark:text-zinc-400 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 transition-colors duration-150 font-[400] sm:font-normal not-italic mb-0 sm:mb-1.5 opacity-80 font-sans">
-            <span className="relative inline-flex items-center justify-end translate-x-3 sm:translate-x-0">
-              <ChevronRight
-                className="absolute right-0 sm:-right-4 size-4 sm:size-3.5 text-stone-400 dark:text-zinc-500 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 opacity-100 sm:opacity-0 blur-none sm:blur-[1px] sm:-translate-x-1 transition-colors duration-150 motion-safe:transition-[color,opacity,filter,translate] motion-safe:duration-[150ms,300ms,300ms,300ms] motion-safe:ease-out sm:group-hover:opacity-100 sm:group-hover:blur-none sm:group-hover:translate-x-0 sm:group-active:opacity-100 sm:group-active:blur-none sm:group-active:translate-x-0 sm:group-focus-visible:opacity-100 sm:group-focus-visible:blur-none sm:group-focus-visible:translate-x-0 sm:motion-reduce:opacity-100 sm:motion-reduce:blur-none sm:motion-reduce:translate-x-0"
-                aria-hidden
-              />
-              <span className="relative z-10 -translate-x-5 sm:translate-x-0">
-                Next
-              </span>
-            </span>
+          <div className="relative isolate w-fit ml-auto">
+            <DescriptionBackdrop />
+            <div className="relative z-10">
+              <div className="text-[calc(14*var(--text-px))] text-stone-500 dark:text-zinc-400 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 transition-colors duration-150 font-[400] sm:font-normal not-italic mb-0 sm:mb-1.5 opacity-80 font-sans">
+                <span className="relative inline-flex items-center justify-end translate-x-3 sm:translate-x-0">
+                  <ChevronRight
+                    className="absolute right-0 sm:-right-4 size-4 sm:size-3.5 text-stone-400 dark:text-zinc-500 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 opacity-100 sm:opacity-0 blur-none sm:blur-[1px] sm:-translate-x-1 transition-colors duration-150 motion-safe:transition-[color,opacity,filter,translate] motion-safe:duration-[150ms,300ms,300ms,300ms] motion-safe:ease-out sm:group-hover:opacity-100 sm:group-hover:blur-none sm:group-hover:translate-x-0 sm:group-active:opacity-100 sm:group-active:blur-none sm:group-active:translate-x-0 sm:group-focus-visible:opacity-100 sm:group-focus-visible:blur-none sm:group-focus-visible:translate-x-0 sm:motion-reduce:opacity-100 sm:motion-reduce:blur-none sm:motion-reduce:translate-x-0"
+                    aria-hidden
+                  />
+                  <span className="relative z-10 -translate-x-5 sm:translate-x-0">
+                    Next
+                  </span>
+                </span>
+              </div>
+              <p
+                className="hidden sm:block mt-0 not-italic project-nav-description transition-colors duration-150 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400"
+                style={{ fontFamily: 'var(--font-crimson-pro), serif', fontSize: 'calc(19 * var(--text-px))', fontWeight: 450, lineHeight: '130%', letterSpacing: '-0.02em', textWrap: 'balance' }}
+              >
+                {preventWidow(nextProject.description)}
+              </p>
+            </div>
           </div>
-          <p
-            className="hidden sm:block mt-0 not-italic project-nav-description transition-colors duration-150 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400"
-            style={{ fontFamily: 'var(--font-crimson-pro), serif', fontSize: 'calc(19 * var(--text-px))', fontWeight: 450, lineHeight: '130%', letterSpacing: '-0.02em', textWrap: 'balance' }}
-          >
-            {preventWidow(nextProject.description)}
-          </p>
         </Link>
       ) : (
         <div className="flex-1" />
