@@ -208,6 +208,10 @@
   .cursor .c-hand { display: none; left: -9.45px; top: -1.6px; transform-origin: 9.45px 1.6px; }
   .cursor.hand .c-arrow { display: none; }
   .cursor.hand .c-hand { display: block; }
+  /* Over a text field, the I-beam, centred on its point. */
+  .cursor .c-text { display: none; left: -6px; top: -11px; transform-origin: 6px 11px; }
+  .cursor.text .c-arrow { display: none; }
+  .cursor.text .c-text { display: block; }
   .cursor.down svg { transform: scale(0.9); }
 
   /* ---------- scene: create from existing parameters (?scene=create) ----------
@@ -257,10 +261,27 @@
   .form { display: flex; gap: 20px; height: 88px; }
   .form > div { flex: 1; display: flex; flex-direction: column; gap: 8px; }
   .form label { font-weight: 500; color: #d6d3d1; }
-  .field { border: 1px solid #44403c; border-radius: 6px; padding: 5px 9px; color: #d6d3d1; display: flex; align-items: center; justify-content: space-between; }
+  .field { position: relative; height: 32px; border: 1px solid #44403c; border-radius: 6px; padding: 5px 9px; color: #d6d3d1; display: flex; align-items: center; justify-content: space-between;
+           transition: border-color 150ms ease, box-shadow 150ms ease; }
+  /* Both fields start empty. The placeholder sits on the value's spot, so the caret of the focused,
+     still-empty name field lands over its first letter, as in an input. */
+  .field .ph { position: absolute; left: 9px; top: 5px; color: #78716c; white-space: nowrap; }
+  .field .fv:not(:empty) ~ .ph { display: none; }
+  #nameField { justify-content: flex-start; }
+  #nameField.focus { border-color: #78716c; box-shadow: 0 0 0 3px rgba(120, 113, 108, 0.5); }
+  /* The version select's menu: the trigger's width, 4px under it, over the overview. */
+  .form > div { position: relative; }
+  .menu { position: absolute; top: 64px; left: 0; right: 0; z-index: 1; padding: 4px; background: #1c1917; border: 1px solid #44403c; border-radius: 6px;
+          box-shadow: 0 10px 20px -4px rgba(0, 0, 0, 0.4), 0 4px 8px -4px rgba(0, 0, 0, 0.3);
+          opacity: 0; transform: scale(0.96); transform-origin: 50% 0; pointer-events: none;
+          transition: opacity 150ms ease, transform 150ms cubic-bezier(0.2, 0.9, 0.3, 1); }
+  .menu.on { opacity: 1; transform: none; }
+  .mi { height: 32px; padding: 0 32px 0 8px; display: flex; align-items: center; border-radius: 4px; color: #d6d3d1; transition: background-color 90ms ease; }
+  .mi.hover { background: #292524; }
   .overview { background: #161210; border-radius: 6px; padding: 32px 0 40px; display: flex; justify-content: center; }
   .fw-card { background: #1c1917; border: 1px solid rgba(68, 64, 60, 0.2); border-radius: 4px; padding: 10px 16px; display: flex; flex-direction: column; gap: 16px; }
   .fw-card .t { line-height: 16px; color: #d6d3d1; }
+  .fw-card .t.none { color: #78716c; }
   .fw-rows { display: flex; flex-direction: column; gap: 8px; }
   .fw-sep { height: 0; box-shadow: 0 -1px 0 rgba(68, 64, 60, 0.7); }
   .fw-mods { display: flex; flex-direction: column; gap: 2px; }
@@ -297,6 +318,7 @@
     .c-row:hover .c-name { color: #d6d3d1; }
     .c-row:hover .c-tgls { display: flex; }
     .tgl:not(.on):hover { background: rgba(87, 83, 78, 0.3); color: #d6d3d1; opacity: 0.6; }
+    .mi:hover { background: #292524; }
     .btn:not(.primary):hover { background: #292524; }
     .btn.primary:hover { opacity: 0.9; }
     .toast .act:hover { background: #44403c; }
@@ -385,14 +407,16 @@
       <div class="dlg-head"><div class="dlg-title">New test firmware</div><div class="dlg-desc">Test firmware won't be available for products in field.</div></div>
       <div class="new-main">
         <div class="form">
-          <div><label>Firmware name</label><div class="field">Spatulating speed test_v3</div></div>
-          <div><label>Version</label><div class="field">3.5.8<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a8a29e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div></div>
+          <div><label>Firmware name</label><div class="field" id="nameField"><span class="fv" id="nameVal"></span><span class="ph">Enter firmware name</span></div></div>
+          <div><label>Version</label><div class="field" id="verField"><span class="fv" id="verVal"></span><span class="ph">Select version</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a8a29e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div>
+            <div class="menu" id="verMenu"><div class="mi">3.6.1-rc.1</div><div class="mi">3.6.0</div><div class="mi">3.5.9</div><div class="mi">3.5.8</div><div class="mi">3.5.7</div></div>
+          </div>
         </div>
         <div class="overview">
           <div class="fw-card">
-            <div class="t">Spatulating speed test_v3</div>
+            <div class="t" id="ovName"></div>
             <div class="fw-rows">
-              <div class="fw-r"><span class="k">Version</span><span class="v">3.5.8</span></div>
+              <div class="fw-r" id="ovVer"><span class="k">Version</span><span class="v"></span></div>
               <div class="fw-sep"></div>
               <div class="fw-mods">
                 <div class="fw-r"><span class="k mono">SPAT</span><span class="v">v1.1.5_0305</span><span class="edits">+ 3 edits</span></div>
@@ -412,6 +436,7 @@
   </div>
   <div class="cursor" id="cursor">
     <svg class="c-arrow" width="24" height="24" viewBox="0 0 24 24"><path d="M5 2.5v17.2l4.6-4.4 2.9 6.6 2.9-1.3-2.9-6.5h6.4z" fill="#fff" stroke="#000" stroke-width="1.2" stroke-linejoin="round"/></svg>
+    <svg class="c-text" width="12" height="22" viewBox="0 0 12 22" fill="none" stroke-linecap="round"><path d="M3 2.5c1.6 0 2.4.5 3 1.5.6-1 1.4-1.5 3-1.5M6 4v14M3 19.5c1.6 0 2.4-.5 3-1.5.6 1 1.4 1.5 3 1.5M4.5 12.5h3" stroke="#fff" stroke-width="3.2"/><path d="M3 2.5c1.6 0 2.4.5 3 1.5.6-1 1.4-1.5 3-1.5M6 4v14M3 19.5c1.6 0 2.4-.5 3-1.5.6 1 1.4 1.5 3 1.5M4.5 12.5h3" stroke="#000" stroke-width="1.2"/></svg>
     <svg class="c-hand" width="22.07" height="23.87" viewBox="0 0 22.0722 23.8667"><path d="M9.23004 20.9333H13.0479C13.0923 20.9333 13.135 20.9157 13.1664 20.8842L14.2615 19.7892C14.3826 19.668 14.5469 19.6 14.7182 19.6C14.9628 19.6 15.1864 19.7382 15.2958 19.957L15.7594 20.8842C15.7745 20.9143 15.8053 20.9333 15.8389 20.9333H17.4121C17.6175 20.9333 17.784 20.7669 17.784 20.5615C17.784 19.0524 18.1354 17.5639 18.8103 16.2141C19.6749 14.4848 20.7269 12.7343 20.4173 10.7157L20.1746 9.13408C20.0981 8.6351 19.6688 8.26667 19.164 8.26667H18.9801C18.517 8.26667 18.1415 8.64211 18.1415 9.10525V9.76506C18.1415 9.8638 18.0615 9.94384 17.9628 9.94384C17.864 9.94384 17.784 9.8638 17.784 9.76506V8.26667C17.784 7.53029 17.187 6.93333 16.4507 6.93333C15.7143 6.93333 15.1173 7.53029 15.1173 8.26667V9.79389C15.1173 9.97798 14.9681 10.1272 14.784 10.1272C14.5999 10.1272 14.4507 9.97798 14.4507 9.79389V8.26667C14.4507 7.53029 13.8537 6.93333 13.1173 6.93333C12.3809 6.93333 11.784 7.53029 11.784 8.26667V10.188C11.784 10.2397 11.7719 10.2908 11.7488 10.337C11.626 10.5827 11.2754 10.5827 11.1525 10.337C11.1294 10.2908 11.1173 10.2397 11.1173 10.188V3.6C11.1173 2.73102 10.4089 1.6 9.45066 1.6C8.49238 1.6 7.78399 2.73102 7.78399 3.6V11.8438C7.78399 12.0774 7.59468 12.2667 7.36115 12.2667C7.21024 12.2667 7.07115 12.1869 6.99394 12.0572C6.7373 11.6263 6.14026 10.6486 5.78399 10.2667C5.58317 10.0514 5.18052 9.89744 4.78882 9.79214C4.18142 9.62886 3.56494 9.92858 3.21605 10.4519C2.77101 11.1195 2.85902 12.0084 3.42634 12.5757L4.52112 13.6705C4.9132 14.0625 5.20861 14.5405 5.38395 15.0666L5.45066 15.2667C5.66987 15.9243 6.03918 16.5219 6.52934 17.012L8.25422 18.7369C8.80685 19.2895 9.11732 20.0391 9.11732 20.8206C9.11732 20.8829 9.16779 20.9333 9.23004 20.9333Z" fill="#fff" stroke="#000" stroke-width="0.8"/></svg>
   </div>
 </div>
@@ -767,7 +792,7 @@ async function press(el, id) { el.classList.add('pressed'); await wait(130, id);
 const ROW_Y = i => 97 + 34 * i + 16;
 const cursor = () => $('cursor');
 async function moveTo(x, y, id, ms = 560, hand = false) {
-  cursor().classList.remove('hand');
+  cursor().classList.remove('hand', 'text');
   cursor().style.transform = `translate(${x}px, ${y}px)`;
   await wait(ms, id);
   cursor().classList.toggle('hand', hand);
@@ -871,9 +896,14 @@ function resetCreate() {
     return row;
   }));
   $('srcScrb').textContent = '-';
-  const ov = $('ovScrb').querySelector('.v');
-  ov.textContent = '-'; ov.classList.add('none');
-  $('ovScrb').classList.remove('flash'); $('srcScrb').classList.remove('flash');
+  for (const row of ['ovScrb', 'ovVer']) {
+    const ov = $(row).querySelector('.v');
+    ov.textContent = '-'; ov.classList.add('none');
+  }
+  $('ovScrb').classList.remove('flash'); $('ovVer').classList.remove('flash'); $('srcScrb').classList.remove('flash');
+  // The new firmware's form starts empty.
+  setName(''); $('nameField').classList.remove('focus'); caret.remove();
+  $('verVal').textContent = ''; $('verMenu').classList.remove('on'); hoverVersion(-1);
   $('toast').className = 'toast';
   // Each loop opens the dialog afresh, at the top of its list.
   $('srcScroller').scrollTop = 0;
@@ -883,6 +913,18 @@ const hoverSource = i => [...$('srcRows').children].forEach((r, j) => r.classLis
 const flash = el => { el.classList.remove('flash'); el.offsetWidth; el.classList.add('flash'); };
 // Source rows start 228px down the stage (dialog header 72 + padding 20 + table 80 + gap 16 + search 40) and step 32px.
 const SRC_Y = i => 228 + 32 * i + 16;
+// The name the form is filled in with; the overview's card shows it as it's typed.
+const NAME = 'Spatulating speed test_v3';
+function setName(v) {
+  $('nameVal').textContent = v;
+  $('ovName').textContent = v || 'Untitled';
+  $('ovName').classList.toggle('none', !v);
+}
+// A typist's uneven rhythm, the same every loop: keys 55–94ms apart, a beat longer at each space.
+const keyGap = i => NAME[i] === ' ' ? 150 : 55 + (i * 37) % 40;
+const hoverVersion = i => [...$('verMenu').children].forEach((m, j) => m.classList.toggle('hover', j === i));
+// Version items start 169px down the stage (field bottom 160 + offset 4 + border 1 + padding 4) and step 32px.
+const VER_Y = i => 169 + 32 * i + 16;
 
 async function playCreate(id) {
   resetCreate();
@@ -910,7 +952,38 @@ async function playCreate(id) {
   await click($('importBtn'), id);
   const ov = $('ovScrb').querySelector('.v');
   ov.textContent = 'v1.1.5_test02'; ov.classList.remove('none'); flash($('ovScrb'));
-  await wait(900, id);
+  await wait(800, id);
+
+  // name the firmware: click into the empty field and type. The pointer hides once the keys start,
+  // as it does on a Mac, and comes back when it next moves.
+  await moveTo(760, 145, id, 720);
+  cursor().classList.add('text');
+  await wait(240, id);
+  await click(null, id);
+  $('nameField').classList.add('focus'); $('nameVal').after(caret);
+  await wait(420, id);
+  cursor().classList.remove('on');
+  for (let i = 0; i < NAME.length; i++) await key(() => setName(NAME.slice(0, i + 1)), id, keyGap(i));
+  await wait(500, id);
+
+  // pick a version: open the select, run down its menu to 3.5.8
+  cursor().classList.add('on');
+  await moveTo(1100, 146, id, 620, true);
+  await wait(160, id);
+  await click(null, id);
+  $('nameField').classList.remove('focus'); caret.remove();
+  $('verMenu').classList.add('on');
+  await wait(380, id);
+  await moveTo(1050, VER_Y(1), id, 360); hoverVersion(1);
+  await wait(220, id);
+  await moveTo(1040, VER_Y(3), id, 300); hoverVersion(3);
+  await wait(380, id);
+  await click(null, id);
+  $('verMenu').classList.remove('on');
+  $('verVal').textContent = '3.5.8';
+  const ver = $('ovVer').querySelector('.v');
+  ver.textContent = '3.5.8'; ver.classList.remove('none'); flash($('ovVer'));
+  await wait(700, id);
 
   // create: the build starts
   await moveTo(1170, 454, id, 760, true);
