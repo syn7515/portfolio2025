@@ -1232,7 +1232,7 @@ a.inline-flex.items-center {
 /* Dark palette for the live design-system buttons in the Aniai carousel (ds-button-padding.tsx). */
 @media (prefers-color-scheme: dark) {
   .ds-button-padding {
-    --ds-btn-bg: #3f3f46 !important; /* zinc-700: zinc-800 is the card's own colour */
+    --ds-btn-bg: #52525b !important; /* zinc-600: zinc-800 is the card's own colour, zinc-700 too near it */
     --ds-btn-text: #d4d4d8 !important; /* zinc-300 */
     --ds-btn-ghost-text: #52525b !important; /* zinc-600 */
     --ds-caption-text: #71717a !important; /* zinc-500 */
