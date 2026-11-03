@@ -72,7 +72,19 @@
 
   .plans { flex: 1; min-width: 0; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
   .plans::-webkit-scrollbar { display: none; }
-  .track { display: flex; width: max-content; height: 100%; }
+  /* A trackpad pulling the releases past either end (the rubber band) opens a gap beside them, by the
+     group column or after the last release, that was bare white with the rows broken off at it. The
+     scroller paints the rows itself, the header's tint and rules and a rule under each group, and
+     it stays put while its content moves, so the rows run on through the gap. The track is opaque
+     over it, so nothing is drawn twice where the cells are. --rows is set from GROUPS. */
+  .plans { background:
+    linear-gradient(var(--border), var(--border)) 0 0 / 100% 1px no-repeat,
+    linear-gradient(var(--border), var(--border)) 0 39px / 100% 1px no-repeat,
+    linear-gradient(var(--tint), var(--tint)) 0 0 / 100% 40px no-repeat,
+    repeating-linear-gradient(to bottom, transparent 0 39px, var(--soft-border) 39px 40px) 0 40px / 100% calc((var(--rows) - 1) * 40px) no-repeat,
+    linear-gradient(var(--border), var(--border)) 0 calc(var(--rows) * 40px + 39px) / 100% 1px no-repeat,
+    var(--bg); }
+  .track { display: flex; width: max-content; height: 100%; background: var(--bg); }
   .plan { width: 480px; flex-shrink: 0; }
   .plan .hd { gap: 24px; padding-right: 0; }
   .plan .hd .t { flex: 1; min-width: 0; font-weight: 500; line-height: 24px; color: var(--muted-fg); white-space: pre; overflow: hidden; text-overflow: ellipsis; }
@@ -166,6 +178,7 @@ const PLANS = [
   [' FW 3.6.0', [['v1.0.2', '3.6.0'], ['v1.0.3a-no_corr', '3.6.0-bas'], ['v1.0.5a', '3.6.0-bas'], ['v1.1g', '3.6.0'], ['v1.1g', '3.6.0-bas'], ['v1.1g-lotteria', '3.6.0'], ['v1.1g-moms', '3.6.0']]],
 ];
 const last = i => (i === GROUPS.length - 1 ? ' last' : '');
+$('plans').style.setProperty('--rows', GROUPS.length);
 $('sg').innerHTML = '<div class="hd"></div>' + GROUPS.map(([name, indent], i) =>
   `<div class="r${last(i)}" data-r="${i}">${indent ? '<span class="indent">↪</span>' : ''}${name}</div>`).join('');
 $('track').innerHTML = PLANS.map(([label, rows], c) => `
