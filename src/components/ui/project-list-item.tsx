@@ -38,7 +38,10 @@ const datesClassName = "text-[14px] sm:text-[calc(15*var(--text-px))] !font-[400
 // matching the inline `transition: scale ...` the social links use.
 const externalIconClassName = "transition-[color,translate] motion-safe:group-hover:translate-x-px motion-safe:group-hover:-translate-y-px";
 
-const linkClassName = "group block w-full cursor-pointer rounded py-2";
+// 6px above and below a row on phones, where its title runs on one line with the year beside it and
+// the 8px it has from 640px left the list loose: titles 14px apart there with the list's 2px gap,
+// 18px from 640px.
+const linkClassName = "group block w-full cursor-pointer rounded py-1.5 sm:py-2";
 const linkStyle: CSSProperties = { textDecoration: 'none' };
 
 export default function ProjectListItem({

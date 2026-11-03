@@ -325,12 +325,11 @@ export default function Home() {
               because there is no glyph to fill it, the space reads looser here than the same
               measure did around the dinkus this replaced.
 
-              The two widths need different numbers because the list around the rule changes shape.
+              The two widths need different numbers because the rows around the rule change size.
               On desktop each row is one 41px line and rows sit 2px apart, so 16px a side (a 33px
-              block) is the smallest gap that still separates. On a phone the rows stack date over
-              title, growing to 60px and 8px apart, and the same 16px read as a hole in a column of
-              much taller items — 12px a side (25px) keeps the break proportional to what surrounds
-              it there.
+              block) is the smallest gap that still separates. On a phone the rows are tighter, 36px
+              with the year trailing the title, and 12px a side (25px) keeps the break in
+              proportion to them.
 
               The space before the interpolation is load-bearing: Tailwind's scanner reads the
               source text, and a utility glued directly to `${'${'}` is not extracted. Written as
@@ -353,10 +352,10 @@ export default function Home() {
               title; on phones it stacks above the title in the same place every case study shows a
               year, so it leads with the year instead.
 
-              Carries the same `gap-2 sm:gap-0.5` as the case-study list above even though it holds a
-              single row today, so a second personal project would get the same spacing as every other
-              pair: 24px on phones, where each row stacks into two lines and needs more air between
-              rows than the rows' own py-2 gives, and 18px from 640px. */}
+              Carries the same `gap-0.5` as the case-study list above even though it holds a single
+              row today, so a second personal project would get the same spacing as every other pair:
+              titles 14px apart on phones and 18px from 640px, the gap and the rows' own padding
+              (project-list-item.tsx). */}
           <div className="flex flex-col gap-0.5">
             <ProjectListItem
               title="Been There — Every Place, Stitched"
