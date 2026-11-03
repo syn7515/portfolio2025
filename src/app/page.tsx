@@ -326,7 +326,7 @@ export default function Home() {
               measure did around the dinkus this replaced.
 
               The two widths need different numbers because the rows around the rule change size.
-              On desktop each row is one 41px line and rows sit 2px apart, so 16px a side (a 33px
+              On desktop each row is one 40px line and rows sit 2px apart, so 16px a side (a 33px
               block) is the smallest gap that still separates. On a phone the rows are tighter, 36px
               with the year trailing the title, and 12px a side (25px) keeps the break in
               proportion to them.
