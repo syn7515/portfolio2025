@@ -201,6 +201,21 @@
   }
   .send:active, .cart:active { filter: brightness(0.92); }
   .no-anim, .no-anim * { transition: none !important; }
+
+  /* ---------- narrow ----------
+     On the phone cards, a frame under 600px wide (fit, below), the portal is laid out 180px narrower
+     so it scales up a sixth more, centred on the backdrop as before. What gives is the slack between
+     things: the top nav's gap, the room beside the overview, the invoices' status column and the
+     room left of their figures, the messages' text (cut shorter), and the compose form's fields,
+     which take the pane's width rather than 609px, "Dispute for" cut short behind a label that
+     takes only its own width. */
+  .narrow .app { left: 279.5px; width: 1041px; }
+  .narrow .inv { grid-template-columns: 113px 140px 140px 1fr 150px 120px; }
+  .narrow .select, .narrow .multi { width: auto; flex: 1; min-width: 0; }
+  .narrow .select .val { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .narrow .dropdown { left: 150px; width: auto; }
+  .narrow .dispute { gap: 40px !important; }
+  .narrow .dispute-for .label { width: auto; }
 </style>
 </head>
 <body>
@@ -269,7 +284,7 @@
                           <span class="label">Related invoice</span>
                           <div class="select"><span class="bar"></span><span class="val">122333</span><i data-icon="expand"></i></div>
                         </div>
-                        <div class="field start" style="gap: 60px">
+                        <div class="field start dispute" style="gap: 60px">
                           <div class="field">
                             <span class="label">Dispute</span>
                             <div class="radios">
@@ -277,7 +292,7 @@
                               <span class="radio" style="left: 63px"><i data-icon="radio-on"></i>Yes</span>
                             </div>
                           </div>
-                          <div class="field" style="flex: 1; min-width: 0; height: 34px">
+                          <div class="field dispute-for" style="flex: 1; min-width: 0; height: 34px">
                             <span class="label">Dispute for</span>
                             <div class="select grow"><span class="bar"></span><span class="val">EM - Incorrect Employee or Patient</span><i data-icon="expand"></i></div>
                           </div>
@@ -483,8 +498,10 @@ Promise.all([
 })));
 
 // Figma's composition fills a 16:9 frame. A narrower one (the 4:3 and square cards) crops the backdrop's
-// sides rather than shrinking the portal, down to the portal filling 92% of its width.
+// sides rather than shrinking the portal, down to the portal filling 92% of its width. On the phone
+// cards the portal itself narrows first (.narrow above).
 function fit() {
+  root.classList.toggle('narrow', innerWidth < 600);
   const st = $('stage'), portal = document.querySelector('.app');
   st.style.transform = `scale(${Math.min(innerWidth * 0.92 / portal.offsetWidth, innerHeight / st.offsetHeight)})`;
 }
