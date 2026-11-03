@@ -10,8 +10,9 @@ const DOWN_KEYS = ['ArrowDown', 'PageDown', 'End']
  * press or a key against the ride stops it where it is. The back-to-top button and the TOC's jumps
  * to a heading share it.
  *
- * onSettle runs once the scroll is over, with whether it got there or the reader took over. The
- * returned function stops the scroll where it is, which counts as taking over.
+ * onSettle runs once the scroll is over, with whether it stopped short of `top`: the reader took
+ * over, or something else cut the smooth scroll off. The returned function stops the scroll where
+ * it is, which counts as stopping short.
  */
 export function startInterruptibleScroll(
   top: number,
@@ -54,14 +55,39 @@ export function startInterruptibleScroll(
     if (goingDown ? keyGoesUp : keyGoesDown) interrupt()
   }
 
+  // The window coming to rest is what ends the scroll, not a scrollend alone: one can arrive from
+  // a scroll that was still settling when this one started (a click mid-momentum), and taking it
+  // for this one's would drop the listeners above with the ride still going. So a scrollend short
+  // of the target only counts once the window has held still for two frames; still moving, it
+  // checks again shortly, which is also the fallback for a browser without scrollend.
+  const settleWhenStill = () => {
+    if (finished) return
+    if (Math.abs(window.scrollY - top) < 2) {
+      cleanUp(false)
+      return
+    }
+    const y = window.scrollY
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        if (finished) return
+        if (window.scrollY === y) {
+          cleanUp(true)
+        } else {
+          window.clearTimeout(fallbackTimer)
+          fallbackTimer = window.setTimeout(settleWhenStill, 500)
+        }
+      })
+    )
+  }
+
   const listenerOptions = { passive: true, signal: controller.signal }
   window.addEventListener('wheel', interrupt, listenerOptions)
   window.addEventListener('touchmove', interrupt, listenerOptions)
   window.addEventListener('pointerdown', interrupt, listenerOptions)
   window.addEventListener('keydown', handleKeyDown, { signal: controller.signal })
-  window.addEventListener('scrollend', () => cleanUp(false), { once: true, signal: controller.signal })
+  window.addEventListener('scrollend', settleWhenStill, { signal: controller.signal })
 
-  const fallbackTimer = window.setTimeout(() => cleanUp(false), 2000)
+  let fallbackTimer = window.setTimeout(settleWhenStill, 2000)
   window.scrollTo({ top, behavior: 'smooth' })
 
   return interrupt
