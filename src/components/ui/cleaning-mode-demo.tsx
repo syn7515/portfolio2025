@@ -9,11 +9,12 @@ import PrototypeTurns from "./prototype-turns";
    down past its "Clean anyway" link, and the controller its bottom 77.8%, from just under its
    gauge's top ticks (which end 224.5 down the 1024 screen, the grill ring's size). They're
    larger than the other cards' screens: 98% of the 16:9 card's height and 92% of the 4:3 mobile
-   one's (74cqh + 13.5cqw is the line through both), with a twelfth of that between the two, as on
-   the recipe card (recipe-select-demo.tsx). */
+   one's (74cqh + 13.5cqw is the line through both), with a twelfth of that between the two, or a
+   sixteenth on the 4:3 card, as on the recipe card (recipe-select-demo.tsx): −1.5cqh + 5.4375cqw
+   through both. */
 const HEIGHT = "(74cqh + 13.5cqw)";
 const WIDTH = `${HEIGHT} * 600 / 1024`;
-const GAP = `${HEIGHT} / 12`;
+const GAP = "(-1.5cqh + 5.4375cqw)";
 const SCREEN: CSSProperties = { height: `calc${HEIGHT}`, width: `calc(${WIDTH})` };
 
 export default function CleaningModeDemo() {

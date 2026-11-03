@@ -7,9 +7,10 @@ import QuickButtonDemo from "./quick-button-demo";
    screen's "tap" scene) beside the quick recipe buttons on the cook screen itself, played by turns,
    the sheet first. Each 600×1024 screen keeps the size it had on a card of its own, 97cqh − 6.75cqw
    tall (85% of the 16:9 card's height, 88% of the 4:3 mobile one's), and the pair is centred with a
-   twelfth of that between them. */
+   twelfth of that between them, or a sixteenth on the 4:3 card, where a twelfth left the pair
+   loose: 0.75cqh + 3.5625cqw is the line through both. */
 const HEIGHT = "(97cqh - 6.75cqw)";
-const GAP = `${HEIGHT} / 12`;
+const GAP = "(0.75cqh + 3.5625cqw)";
 const SCREEN: CSSProperties = { top: "50%", transform: "translateY(-50%)", height: `calc${HEIGHT}`, width: `calc(${HEIGHT} * 600 / 1024)` };
 
 export default function RecipeSelectDemo() {
