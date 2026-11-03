@@ -6,6 +6,11 @@
 <title>Update manager — prototype</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
 <style>
+  /* iOS Safari enlarges text it judges too small to read, weighing each block of text's width
+     against the viewport's. The screen here is laid out at its full size and scaled down to the
+     frame, so its long lines (titles, descriptions) came out a size or two larger than the rest.
+     The sizes set here are the design; leave them be. */
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   /* The "manager-4" Figma frame: the release screen of the update manager, in light mode, with the
      HMI version picker open on AG 1.0.5. Figma draws it at 0.891× (1059×661); this page is built at
      the base size it stands for (1189×742, 14px body text, 40px rows) and the stage scales to fit. */

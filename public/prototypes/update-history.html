@@ -6,6 +6,11 @@
 <title>Update history — prototype</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
 <style>
+  /* iOS Safari enlarges text it judges too small to read, weighing each block of text's width
+     against the viewport's. The screen here is laid out at its full size and scaled down to the
+     frame, so its long lines (titles, descriptions) came out a size or two larger than the rest.
+     The sizes set here are the design; leave them be. */
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   /* The "manager-6" Figma frame: the release center's update history, service groups down the side
      and one column per released firmware, scrolled to the latest two. Figma draws it at 0.8749×
      (1055×659 with a 1px outline around it, the 1057×661 the old image covered); this page is built

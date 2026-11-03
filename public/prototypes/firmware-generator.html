@@ -6,6 +6,11 @@
 <title>Firmware generator — recording prototype</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
 <style>
+  /* iOS Safari enlarges text it judges too small to read, weighing each block of text's width
+     against the viewport's. The screen here is laid out at its full size and scaled down to the
+     frame, so its long lines (titles, descriptions) came out a size or two larger than the rest.
+     The sizes set here are the design; leave them be. */
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   :root {
     --bg: #1c1917;
     --fg: #d6d3d1;

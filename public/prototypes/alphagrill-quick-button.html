@@ -22,6 +22,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>AlphaGrill quick recipe select — prototype</title>
 <style>
+  /* iOS Safari enlarges text it judges too small to read, weighing each block of text's width
+     against the viewport's. The screen here is laid out at its full size and scaled down to the
+     frame, so its long lines (titles, descriptions) came out a size or two larger than the rest.
+     The sizes set here are the design; leave them be. */
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   html, body { margin: 0; height: 100%; overflow: hidden; background: #000; }
   /* Each frame scales its 600×1024 screen to fit itself. They take no input: a real pointer (in the
      lightbox) would only fight the take. */
