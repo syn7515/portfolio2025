@@ -40,7 +40,7 @@ export default function BlogPostHeader({ title, subtitle }: BlogPostHeaderProps)
         className="!mt-0 !text-[26px] sm:!text-[clamp(32px,calc(2.0833vw_+_18.667px),calc(40*var(--text-px)))] !tracking-[-0.03em] !text-stone-700 dark:!text-zinc-200 !mb-0 whitespace-pre-line"
         style={{
           fontFamily: 'var(--font-crimson-pro), serif',
-          lineHeight: '120%',
+          lineHeight: '125%',
           fontWeight: 360,
           wordSpacing: '0.03em',
           textWrap: 'balance',
