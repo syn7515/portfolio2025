@@ -663,7 +663,7 @@ export function Lightbox({
                 return (
                   <motion.div
                     className={`fixed left-0 right-0 text-center text-[16.5px] leading-[1.4] pointer-events-none ${isDarkMode ? '!text-white' : '!text-stone-600'}`}
-                    style={{ top: captionTop, fontFamily: "var(--font-crimson-pro), serif", fontWeight: 400, letterSpacing: "-0.01em" }}
+                    style={{ top: captionTop, fontFamily: "var(--font-crimson-pro), serif", fontWeight: 400, letterSpacing: "-0.02em" }}
                     {...belowMediaMotion}
                   >
                     {/* The backdrop hugs the text, so it wraps an inline box rather than spanning

@@ -423,7 +423,7 @@ export function CarouselCard({
         ) : (
           <div
             className="carousel-caption text-center text-balance text-[15.5px] leading-[140%] sm:text-[calc(1.03125*var(--text-rem))] sm:leading-[1.5] mt-2 sm:mt-3 md:mt-4"
-            style={{ width: "100%", fontFamily: "var(--font-crimson-pro), serif", fontWeight: 400, letterSpacing: "-0.01em", ...(captionStyle || {}) }}
+            style={{ width: "100%", fontFamily: "var(--font-crimson-pro), serif", fontWeight: 400, letterSpacing: "-0.02em", ...(captionStyle || {}) }}
           >
             {renderCaptionWithBadges(caption, { muted: true })}
           </div>
