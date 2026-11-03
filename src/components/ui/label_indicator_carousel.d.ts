@@ -42,7 +42,7 @@ export interface LabelIndicatorCarouselProps {
   enableLightbox?: boolean;
   openLightboxOnCardClick?: boolean;
   supCardMap?: Record<number, number>;
-  mobileAspect?: '16/9' | '4/3';
+  mobileAspect?: '16/9' | '1/1';
 }
 
 declare const LabelIndicatorCarousel: React.FC<LabelIndicatorCarouselProps>;

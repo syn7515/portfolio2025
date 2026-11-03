@@ -4,12 +4,14 @@ import { useEffect, useState, type CSSProperties } from "react";
 
 /* Live recreation of the "ds-2" Figma frame: the button with and without an icon, each beside a
    copy that paints its padding in red. Everything is sized in em off a font-size tied to the card
-   height (cqh), so the composition scales with the card like the image it replaces did, and comes
-   out a third larger on the 4:3 phone card. Figma's text is 64 units in a ~1724-unit frame, hence
-   64/1724 ≈ 3.71% of the 16:9 card's width, 16/9 of that in cqh (6.5956cqh); the em values below
-   are the Figma numbers divided by 64. Below 640px, where the card is the 4:3 one, it takes a tenth
-   more again (7.2551cqh), button and caption alike. The frame's button is the outline variant; this one is the secondary, a
-   fill with no border, so the dashed frame its padded copy shows is the only line round it.
+   height (cqh), so the composition scales with the card like the image it replaces did. Figma's
+   text is 64 units in a ~1724-unit frame, hence 64/1724 ≈ 3.71% of the 16:9 card's width, 16/9 of
+   that in cqh (6.5956cqh); the em values below are the Figma numbers divided by 64. A taller card
+   holds it to that 3.71% of its width, which the height would make a third more on the 4:3 one.
+   Below 640px, on the phone cards, it goes by the height after all, and a tenth more again
+   (7.2551cqh), button and caption alike. The frame's button is the outline variant; this one is
+   the secondary, a fill with no border, so the dashed frame its padded copy shows is the only
+   line round it.
 
    The card plays the frame as one button at its centre, taking the four in turn counter-clockwise
    from the bottom left: it shows its padding, makes room for an icon, puts the padding away, then
@@ -259,7 +261,7 @@ export default function DsButtonPadding() {
   const { padding, icon } = STEPS[step];
   return (
     <div className="ds-button-padding w-full h-full [container-type:size]" style={vars} aria-hidden>
-      <div className="w-full h-full grid place-items-center text-[length:6.5956cqh] max-sm:text-[length:7.2551cqh]">
+      <div className="w-full h-full grid place-items-center text-[length:min(6.5956cqh,3.71cqw)] max-sm:text-[length:7.2551cqh]">
         {/* Rows far enough apart that the guides off the two padded buttons, each reaching past its
             frame, stop short of each other. */}
         <div

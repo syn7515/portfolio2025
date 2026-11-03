@@ -105,7 +105,7 @@ export function useIsHydrated(): boolean {
 
 const COMPACT_QUERY = "(max-width: 639.98px)";
 
-// True below the sm breakpoint, where cards are 4:3. False on the server and through hydration;
+// True below the sm breakpoint, the phone widths. False on the server and through hydration;
 // carousel media is gated until it nears the viewport anyway, so nothing visibly jumps.
 export function useIsCompact(): boolean {
   return useMediaQuery(COMPACT_QUERY);
@@ -126,8 +126,9 @@ export type CarouselItem = {
   alt: string;
   imageSizePercent: number | null;
   imagePosition: ImagePosition | null;
-  // Phone-only (<640px) overrides. The card turns 4:3 there, so the inset that frames a screenshot
-  // on a 16:9 card mostly wastes height; these let a card fill more of it. Unset falls back.
+  // Phone-only (<640px) overrides. A carousel's card can turn taller there (mobileAspect), so the
+  // inset that frames a screenshot on a 16:9 card mostly wastes height; these let a card fill more
+  // of it. Unset falls back.
   mobileImageSizePercent: number | null;
   mobileImagePosition: ImagePosition | null;
   // Width / height of positioned media, as a CSS aspect-ratio ("1120 / 1920"). A video has no
@@ -319,7 +320,7 @@ export function useResponsiveSizing(
   explicitWidth?: number,
   explicitHeight?: number,
   explicitGap?: number,
-  mobileAspect: "16/9" | "4/3" = "16/9"
+  mobileAspect: "16/9" | "1/1" = "16/9"
 ) {
   // Fully specified sizes are used as given; only the responsive case needs state and a listener.
   const isExplicit = explicitWidth != null && explicitHeight != null && explicitGap != null;
@@ -332,6 +333,9 @@ export function useResponsiveSizing(
   useEffect(() => {
     if (isExplicit) return;
 
+    // A card's height below the sheet: 4:3 for a carousel that takes taller cards, 16:9 otherwise.
+    const tallerCard = (width: number) => (mobileAspect === "1/1" ? (width * 3) / 4 : (width * 9) / 16);
+
     const compute = () => {
       if (typeof window === "undefined") return;
       const w = Math.max(
@@ -340,24 +344,25 @@ export function useResponsiveSizing(
       );
 
       if (w < 640) {
-        // Carousels can opt into 4:3 here — 16:9 at this width leaves their screens too small to
-        // read. Mirrored by the aspect classes on the card (carousel-card.tsx).
+        // Carousels can opt into taller cards below the sheet (tallerCard) — 16:9 at this width
+        // leaves their screens too small to read: 4:3, and square below 480px, where even 4:3 does.
+        // Mirrored by the aspect classes on the card (carousel-card.tsx).
         const width = Math.max(120, w - 40);
-        const height = Math.round(mobileAspect === "4/3" ? (width * 3) / 4 : (width * 9) / 16);
+        const height = Math.round(mobileAspect === "1/1" && w < 480 ? width : tallerCard(width));
         setSize({ cardWidth: width, cardHeight: height, gap: 8 });
       } else if (w < 768) {
         const width = Math.max(
           600,
           Math.min(640, Math.round(600 + ((w - 640) / (768 - 640)) * 40))
         );
-        const height = Math.round((width * 9) / 16);
+        const height = Math.round(tallerCard(width));
         setSize({ cardWidth: width, cardHeight: height, gap: 12 });
       } else if (w < SHEET_BREAKPOINT) {
         // Grows with the viewport while keeping RAIL_CLEARANCE from each edge, from 640px (~816px)
         // up to the sheet band's 784px (by 960px), so the card is the same size either side of
         // 1024 and only its position changes when the sheet arrives.
         const width = Math.min(784, Math.max(640, w - RAIL_CLEARANCE * 2));
-        const height = Math.round((width * 9) / 16);
+        const height = Math.round(tallerCard(width));
         // The stack's row gap is twice this. It grows with the card, from 28px (the 56px row gap
         // every card up to 640px gets) to the sheet band's 40px (80px) at 784px, so the spacing
         // keeps pace with the cards rather than tightening as they widen.

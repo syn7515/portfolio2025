@@ -482,7 +482,7 @@ Promise.all([
   announce();
 })));
 
-// Figma's composition fills a 16:9 frame. A narrower one (the 4:3 phone card) crops the backdrop's
+// Figma's composition fills a 16:9 frame. A narrower one (the 4:3 and square cards) crops the backdrop's
 // sides rather than shrinking the portal, down to the portal filling 92% of its width.
 function fit() {
   const st = $('stage'), portal = document.querySelector('.app');

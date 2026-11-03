@@ -51,9 +51,11 @@ export default function LabelIndicatorCarousel({
   openLightboxOnCardClick = true,
   // Sup navigation: maps supId (number) → cardIndex
   supCardMap,
-  // Card ratio below 640px, where 16:9 leaves screens too small to read. "4/3" suits portrait
-  // screens, and landscape ones whose frames are sized off the card's height, which then show a
-  // third larger, cropped at the sides.
+  // Card ratio below the sheet (1024px), where 16:9 leaves screens too small to read. "1/1" makes
+  // the card square on phones, below 480px, and 4:3 from there to 1024px, where a square one would
+  // stand taller than it needs to. It suits portrait screens, and landscape ones whose frames are
+  // sized off the card's height, which then show larger, cropped at the sides; a live prototype
+  // that crops badly that way can take another frame on the square card (live-prototype.tsx).
   mobileAspect = "16/9",
 } = {}) {
   const sourceItems = items ?? FALLBACK_ITEMS;
@@ -63,8 +65,11 @@ export default function LabelIndicatorCarousel({
   const index = isControlled ? currentIndex : uncontrolledIndex;
   const wrapperRef = useRef(null);
 
-  // Viewport detection for disabling lightbox on sm and below
+  // Viewport detection for disabling lightbox on sm and below, and below the sheet for a carousel
+  // with taller cards: its 4:3 or square card there already shows as much as the lightbox's 16:9
+  // box, which the viewport's width holds to about the card's.
   const isSmOrBelow = useMediaQuery('(max-width: 767.98px)');
+  const isBelowSheet = useMediaQuery('(max-width: 1023.98px)');
 
   // Dark mode detection. Both read false on the server and through hydration (see useMediaQuery),
   // so the server markup is never branched on them.
@@ -103,8 +108,8 @@ export default function LabelIndicatorCarousel({
     window.scrollTo(0, savedScrollY);
   }, []);
   
-  // Disable lightbox on sm and below
-  const effectiveLightboxEnabled = enableLightbox && !isSmOrBelow;
+  // Disable lightbox on sm and below (below the sheet for taller cards)
+  const effectiveLightboxEnabled = enableLightbox && !(mobileAspect === "1/1" ? isBelowSheet : isSmOrBelow);
 
   const calculateCardTransform = useCallback((cardIndex) => {
     const cardElement = cardRefs.current[cardIndex];

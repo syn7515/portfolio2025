@@ -3,7 +3,7 @@ import LivePrototype from "./live-prototype";
 
 /* The firmware-generator prototype (public/prototypes/firmware-generator.html), pinned to dark mode
    whatever the site theme. Each scene's frame is placed on the 16:9 card and sized off the card's
-   height, so the 4:3 phone card shows it a third larger, cropped at the sides. Create instead stacks
+   height, so the 4:3 card shows it a third larger, cropped at the sides. Create instead stacks
    its dialogs there, one at a time, in a frame of their own shape. */
 
 const SCENES = {
@@ -12,9 +12,18 @@ const SCENES = {
   // 88% of the way across, through the middle of the info panel (its last 320 of 1314px), and its
   // bottom edge leaves 88% of the card's height showing, 9/16 of the 1314px screen's width; `clip`
   // tells the page how much of its 820px screen is below that, so its scrolling list ends where the
-  // card does. The 4:3 phone card keeps the corner and cuts the screen inside the editor instead.
+  // card does. The 4:3 card keeps the corner and cuts the screen inside the editor instead.
+  // The square one would cut it short of the values being edited, so there the screen runs off the
+  // card's left edge too, past its sidebar, to bring them in. Between takes it zooms out to the
+  // wider cards' corner, 12% in from the card's top and left, at 145% of the card's width, the
+  // least that still runs past its bottom edge, and back in for the next (the page says when). The
+  // page drops `clip` there, as zoomed out the card cuts the screen lower down.
   edit: {
     frame: { top: "12%", left: "12%", height: `${(100 * 16 * 820) / (9 * 1314)}cqh`, width: `${(100 * 16) / 9}cqh` },
+    squareFrame: { left: "-15%" },
+    squareZoomedOutFrame: {
+      transform: `translateX(${12 + 15}cqw) scale(${145 / ((100 * 16) / 9)})`,
+    },
     clip: 820 - 0.88 * ((9 / 16) * 1314),
   },
   // "Review": the old media asked for 240% height at top -45% / right 23.75%, but the global
@@ -30,8 +39,8 @@ const SCENES = {
   },
   // "Create": the 1232×660 two-dialog composition, 83% of the card's height, centred (92% of its
   // width where that is less: 92 × 660/1232 = 49.2857cqw tall, 83 × 1232/660 = 154.9333cqh wide).
-  // Below 640px, where the card turns 4:3 (and in the lightbox there too, so the two copies agree),
-  // side by side the dialogs are too small to read (a 362px card draws them at 0.27×). The frame
+  // Below 640px, on the phone cards, 4:3 or square (and in the lightbox there too, so the two copies
+  // agree), side by side the dialogs are too small to read (a 362px card draws them at 0.27×). The frame
   // takes the 600×660 shape of the stacked layout instead, which the page switches to as its box
   // narrows past 1.4:1, at 90% of the card's height (0.37×): 90 × 600/660 = 81.8182cqh wide, or
   // 92% of the width where that is less (92 × 660/600 = 101.2cqw tall). The box changes with the
@@ -43,7 +52,7 @@ const SCENES = {
       "inset-0 m-auto h-[min(83cqh,49.2857cqw)] w-[min(154.9333cqh,92cqw)] max-sm:h-[min(90cqh,101.2cqw)] max-sm:w-[min(81.8182cqh,92cqw)]",
     bare: true,
   },
-} satisfies Record<string, { frame: CSSProperties; frameClassName?: string; bare?: boolean; clip?: number }>;
+} satisfies Record<string, { frame: CSSProperties; frameClassName?: string; squareFrame?: CSSProperties; squareZoomedOutFrame?: CSSProperties; bare?: boolean; clip?: number }>;
 
 export default function FirmwareGeneratorDemo({ scene = "edit" }: { scene?: keyof typeof SCENES }) {
   const config = SCENES[scene];
@@ -55,6 +64,8 @@ export default function FirmwareGeneratorDemo({ scene = "edit" }: { scene?: keyo
       title="Firmware generator prototype"
       frame={config.frame}
       frameClassName={"frameClassName" in config ? config.frameClassName : undefined}
+      squareFrame={"squareFrame" in config ? config.squareFrame : undefined}
+      squareZoomedOutFrame={"squareZoomedOutFrame" in config ? config.squareZoomedOutFrame : undefined}
       bare={"bare" in config}
     />
   );

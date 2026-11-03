@@ -42,7 +42,7 @@ interface CarouselCardProps {
   hiddenCardIndex?: number | null;
   disableCursor?: boolean;
   forceActive?: boolean;
-  mobileAspect?: "16/9" | "4/3";
+  mobileAspect?: "16/9" | "1/1";
 }
 
 export function CarouselCard({
@@ -235,7 +235,7 @@ export function CarouselCard({
               setIsHovered(false);
             }, HOVER_LEAVE_GRACE_MS);
           }}
-          className={`group relative ${mobileAspect === "4/3" ? "aspect-[4/3] sm:aspect-video" : "aspect-video"} ${backgroundClass} transition-all duration-150 ${
+          className={`group relative ${mobileAspect === "1/1" ? "aspect-square min-[480px]:aspect-[4/3] sheet:aspect-video" : "aspect-video"} ${backgroundClass} transition-all duration-150 ${
             disableCursor ? 'cursor-default'
               : isActive
               ? canOpenLightboxFromCard ? 'cursor-zoom-in' : 'cursor-default'

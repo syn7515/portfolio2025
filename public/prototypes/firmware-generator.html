@@ -101,7 +101,8 @@
   .thumb { position: absolute; top: 0; right: 2px; width: 6px; border-radius: 3px; background: var(--scroll); transition: background-color 90ms ease; }
   .bar.drag .thumb { background: var(--scroll-on); }
   /* The editor's list and bar end --clip above the bottom, where an embedding card cuts the screen
-     off (?clip), so the last rows and the end of the thumb's travel stay in view. */
+     off (?clip), so the last rows and the end of the thumb's travel stay in view. Not on the square
+     phone card, which zooms in and out of the screen (see zoom in the script). */
   .editor > .scroller, .editor > .bar { bottom: var(--clip, 0px); }
   .list { padding: 39px 0 40px 77px; width: 870px; }
   .section { color: var(--fg-light); font-size: 14px; line-height: 20px; padding: 0 0 13px 16px; }
@@ -312,7 +313,7 @@
   .toast .msg span + span { color: #a8a29e; opacity: 0.9; }
   /* Inset by the same 19px on the right as above and below, so it sits evenly in the toast. */
   .toast .act { margin: -4px -5px -4px 0; padding: 5px 13px; min-width: 44px; line-height: 24px; border: 1px solid #44403c; border-radius: 6px; background: #292524; color: #d6d3d1; }
-  /* Stacked, for a frame too narrow for the pair side by side (the 4:3 phone card): one dialog at a
+  /* Stacked, for a frame too narrow for the pair side by side (the phone cards): one dialog at a
      time on a 600×660 stage, each centred on it. The import dialog closes on Import and the create
      dialog opens in its place, 490px tall and so 85px down; when the build starts the toast rises in
      under it, centred, and the dialog rises with it on the toast's own curve, 47px, to centre the
@@ -644,7 +645,18 @@ let loopStart = 0, vt = 0, dry = false;
 // embedder may only start listening after that (it hydrates after this page has loaded), so it
 // also asks with "proto:ping", and a page that is already showing answers again.
 let caughtUp = false, shown = false;
-const announce = () => { if (parent !== window) parent.postMessage({ type: 'proto:ready', scene: SCENE }, location.origin); };
+// The edit screen's zoom on the square phone card, which draws it (live-prototype.tsx): out to the
+// screen's corner between takes, in to the rows being edited for them. The card moves the frame on
+// this page's word, so the zoom keeps the loop's time, and the lightbox's 16:9 copy, which no card
+// zooms, runs the same loop. A step passed while catching up zooms at once.
+let zoomedOut = false;
+const postZoom = instant => { if (parent !== window) parent.postMessage({ type: 'proto:zoom', scene: SCENE, out: zoomedOut, instant }, location.origin); };
+function zoom(out) {
+  zoomedOut = out;
+  if (!dry) postZoom(!caughtUp);
+}
+// Ahead of the ready, so an embedder that has only just started listening places the frame first.
+const announce = () => { if (parent !== window) { postZoom(true); parent.postMessage({ type: 'proto:ready', scene: SCENE }, location.origin); } };
 function markCaughtUp() {
   caughtUp = true;
   requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -676,7 +688,7 @@ async function key(fn, id, ms = 140) {
 }
 
 async function play(id) {
-  build(); select(null);
+  build(); select(null); zoom(false);
   await wait(900, id);
 
   // 1. SNR lower limit: 10 → 15
@@ -704,9 +716,11 @@ async function play(id) {
   await key(() => setVal('v1.2.0'), id, 190);
   await wait(420, id);
   commit(true);
-  await wait(1100, id);
+  await wait(500, id);
 
-  // 4. Deselect
+  // 4. Zoom out on the change, deselect
+  zoom(true);
+  await wait(600, id);
   select(null);
   await wait(2200, id);
 }
@@ -1166,8 +1180,17 @@ const params = new URLSearchParams(location.search);
 // ?embed: framed inside the portfolio carousel — transparent page, no HUD, theme follows the OS
 // (the same prefers-color-scheme the site itself themes off) unless ?theme pins it.
 if (params.has('embed')) root.classList.add('embed');
-// ?clip=<stage px>: how much of the screen's bottom the embedding card cuts off.
-if (params.has('clip')) root.style.setProperty('--clip', `${parseFloat(params.get('clip'))}px`);
+// ?clip=<stage px>: how much of the screen's bottom the embedding card cuts off. The square phone
+// card cuts it lower down whenever it zooms out, which would show the list ending short, so there
+// the list runs to the bottom; it measures the card the page is framed into (live-prototype.tsx),
+// whose shape changes with the viewport.
+const clip = parseFloat(params.get('clip') ?? '0');
+const card = frameElement?.closest('[data-live-prototype]');
+function fitClip() {
+  const square = card && card.clientWidth < (card.clientHeight * 7) / 6;
+  root.style.setProperty('--clip', `${square ? 0 : clip}px`);
+}
+addEventListener('resize', fitClip); fitClip();
 // Inert on the carousel card. The site gives the frame no pointer there (pointer-events: none on the
 // iframe; only the lightbox's copy, inside [data-lightbox-live], takes one), but iOS Safari still
 // hands a swipe that starts on the open build popover's list to that list, whose overscroll

@@ -5,18 +5,19 @@ import LivePrototype from "./live-prototype";
    button prototype in English, turning the setting on from the menu and changing the recipe with a
    quick button. The 600×1024
    screen sits where the GRILL screen beside it does, centred at 85% of the card's height on the
-   16:9 card and 88% on the 4:3 mobile one. 97cqh − 6.75cqw is that line through both aspects.
-   On a card it shares (prototype-turns.tsx), `frame` places it elsewhere and `turns` has its
-   take wait for its turn. */
+   16:9 card and 88% on the 4:3 one. 97cqh − 6.75cqw is that line through both aspects.
+   On a card it shares (prototype-turns.tsx), `frame` and `squareFrame` place it elsewhere and
+   `turns` has its take wait for its turn. */
 const HEIGHT = "(97cqh - 6.75cqw)";
 
-export default function QuickButtonDemo({ frame, turns = false }: { frame?: CSSProperties; turns?: boolean }) {
+export default function QuickButtonDemo({ frame, squareFrame, turns = false }: { frame?: CSSProperties; squareFrame?: CSSProperties; turns?: boolean }) {
   return (
     <LivePrototype
       src={`/prototypes/alphagrill-quick-button.html?embed${turns ? "&turns" : ""}`}
       scene="quick-select"
       title="AlphaGrill quick recipe select prototype"
       frame={frame ?? { top: "50%", left: "50%", transform: "translate(-50%, -50%)", height: `calc${HEIGHT}`, width: `calc(${HEIGHT} * 600 / 1024)` }}
+      squareFrame={squareFrame}
     />
   );
 }

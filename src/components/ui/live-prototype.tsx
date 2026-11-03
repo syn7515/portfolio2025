@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
 
 /* A live HTML prototype (a page under public/prototypes) framed into a carousel card in place of the
    screenshot or recording it replaces. The page is framed rather than ported so the card plays the
@@ -8,6 +8,13 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
    `frame` places that box where the replaced media was drawn, and `frameClassName` can place it
    instead where the box changes with the viewport, which an inline style can't; `bare` drops the
    outline and shadow for a page whose pieces sit on the card itself.
+
+   `squareFrame` changes the box on the square phone card (label_indicator_carousel.jsx), for a
+   frame whose 16:9 and 4:3 placement crops badly carried over to it. Its properties override
+   `frame`'s and the rest stand. A container query picks it rather than the viewport, since the
+   lightbox's copy of a card is 16:9 whatever the screen. A page can zoom the square card's frame
+   out and back in on its own clock by posting "proto:zoom", which moves it to `squareZoomedOutFrame`
+   while out (its transform, from a top-left origin) and back to `squareFrame`.
 
    A fresh iframe paints blank for a few frames before the page loads and catches up with its loop,
    so the frame stays invisible until the page posts "proto:ready" for this scene, with a skeleton
@@ -23,22 +30,49 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 // Where each page's lists were last scrolled to, by src and then by list name.
 const scrollTops = new Map<string, Record<string, number>>();
 
+// How the square card's frame zooms between squareFrame and squareZoomedOutFrame.
+const ZOOM_TRANSITION = "opacity 300ms ease-out, transform 1000ms cubic-bezier(0.65, 0, 0.35, 1)";
+
+const declarations = (frame: CSSProperties) =>
+  Object.entries(frame)
+    .map(([property, value]) => `${property.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`)}: ${value} !important;`)
+    .join(" ");
+
+// squareFrame (and squareZoomedOutFrame) as stylesheet rules for this copy's boxes, on a card
+// squarer than 7:6 (the square one, well clear of 4:3). They have to outrank the inline frame,
+// hence !important. A zoom the page passed while catching up lands at once.
+function squareFrameRule(id: string, frame: CSSProperties, zoomedOut?: CSSProperties) {
+  const box = `[data-frame="${id}"]`;
+  const zoom = zoomedOut
+    ? `${box} { transform-origin: 0 0 !important; transition: ${ZOOM_TRANSITION} !important; }
+       [data-zoomed-out] > ${box} { ${declarations(zoomedOut)} }
+       [data-zoom-instant] > ${box} { transition-property: opacity !important; }`
+    : "";
+  return `@container (aspect-ratio < 7 / 6) { ${box} { ${declarations(frame)} } ${zoom} }`;
+}
+
 export type LivePrototypeProps = {
   src: string;
   scene: string;
   title: string;
   frame: CSSProperties;
   frameClassName?: string;
+  squareFrame?: CSSProperties;
+  squareZoomedOutFrame?: CSSProperties;
   bare?: boolean;
 };
 
-export default function LivePrototype({ src, scene, title, frame, frameClassName = "", bare = false }: LivePrototypeProps) {
+export default function LivePrototype({ src, scene, title, frame, frameClassName = "", squareFrame, squareZoomedOutFrame, bare = false }: LivePrototypeProps) {
+  const frameId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   // Keyed to the page: the lightbox reuses this component when stepping between cards, and the
   // iframe navigating to another page is blank again until that one reports ready.
   const [readySrc, setReadySrc] = useState<string | null>(null);
   const ready = readySrc === src;
+  // Whether the page has zoomed the square card's frame out, and whether that was a step it passed
+  // while catching up (proto:zoom).
+  const [zoom, setZoom] = useState({ out: false, instant: true });
 
   useEffect(() => {
     const onMessage = (e: MessageEvent) => {
@@ -52,6 +86,10 @@ export default function LivePrototype({ src, scene, title, frame, frameClassName
             other.contentWindow?.postMessage({ type: "proto:scroll", list, top }, window.location.origin);
           }
         }
+        return;
+      }
+      if (e.data.type === "proto:zoom") {
+        setZoom({ out: !!e.data.out, instant: !!e.data.instant });
         return;
       }
       if (e.data.type !== "proto:ready") return;
@@ -75,20 +113,26 @@ export default function LivePrototype({ src, scene, title, frame, frameClassName
     <div
       ref={rootRef}
       className="relative w-full h-full overflow-clip [container-type:size]"
+      data-live-prototype=""
       data-content-pending={ready ? undefined : ""}
+      data-zoomed-out={zoom.out ? "" : undefined}
+      data-zoom-instant={zoom.instant ? "" : undefined}
       aria-hidden
     >
+      {squareFrame && <style>{squareFrameRule(frameId, squareFrame, squareZoomedOutFrame)}</style>}
       {/* The loading skeleton image and video cards show (.media-skeleton in globals.css), in the
           frame's own box; the frame fades in over it once the page is ready. A lightbox copy stays
           wholly transparent until ready and then has to stand in for the card in one frame, so it
           gets neither the skeleton nor the fade — unless the lightbox shows it before it's ready
           (data-lightbox-waiting: a step to a page that's slow to load), when the skeleton shows. */}
       <div
+        data-frame={frameId}
         data-shown={ready ? "" : undefined}
         className={`media-skeleton transition-opacity duration-300 ease-[ease-out] [[data-lightbox-live]:not([data-lightbox-waiting])_&]:hidden ${frameClassName}`}
         style={{ ...frame, opacity: ready ? 0 : 1 }}
       />
       <div
+        data-frame={frameId}
         className={`absolute overflow-hidden transition-opacity duration-300 ease-[ease-out] [[data-lightbox-live]_&]:transition-none ${frameClassName} ${bare ? "" : "shadow-[0px_1px_1px_-0.5px_rgba(0,0,0,0.10),0px_3px_3px_-1.5px_rgba(0,0,0,0.10)] dark:shadow-[0px_2px_4px_rgba(0,0,0,0.25)]"}`}
         style={{ ...frame, opacity: ready ? 1 : 0 }}
       >

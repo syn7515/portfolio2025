@@ -3,7 +3,9 @@ import LivePrototype from "./live-prototype";
 /* The update manager's package picker on desktop and phone (public/prototypes/update-package.html),
    live in place of the "manager-5" image. It sits where that image was drawn: 108% of the card's
    height, centred, 9% from the top, cropped at the bottom; the page is 40px wider than the image on
-   each side to leave the dialog's shadow room. The page draws its own frames, so the frame is bare. */
+   each side to leave the dialog's shadow room. The page draws its own frames, so the frame is bare.
+   Sized that way the square phone card would cut into both screens, so there it's 86% from 15% down,
+   which keeps them whole across the card and still runs past its bottom edge. */
 export default function UpdatePackageDemo() {
   return (
     <LivePrototype
@@ -11,6 +13,7 @@ export default function UpdatePackageDemo() {
       scene="package"
       title="Update package prototype"
       frame={{ top: "9%", left: "50%", transform: "translateX(-50%)", height: "108cqh", width: `${(108 * 1122) / 918}cqh` }}
+      squareFrame={{ top: "15%", height: "86cqh", width: `${(86 * 1122) / 918}cqh` }}
       bare
     />
   );
