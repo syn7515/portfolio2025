@@ -210,15 +210,16 @@ export default function BlogPostMobileMenu() {
           isProjectRoute ? 'translate-y-0' : '-translate-y-full'
         )}
       >
-        {/* The press scale sits on the image, not the link: the link is now padded on one side
-            only, so scaling it would pull the mark off-centre toward the viewport edge. */}
+        {/* The link pads the mark 24px on both sides, so the target runs from the viewport edge to
+            as far past the mark on its right. The press scale sits on the image, not the link, so
+            the mark shrinks about its own centre. */}
         <Link
           href="/"
           aria-label="Sue Park — Home"
           tabIndex={!isProjectRoute || leaving ? -1 : undefined}
           onClick={(e) => handleLinkClick(e, '/', false)}
           className={cn(
-            'group inline-flex items-center pl-6 pr-2 rounded !no-underline [-webkit-tap-highlight-color:transparent]',
+            'group inline-flex items-center px-6 rounded !no-underline [-webkit-tap-highlight-color:transparent]',
             isProjectRoute && !leaving ? 'pointer-events-auto' : 'pointer-events-none'
           )}
         >
@@ -241,8 +242,10 @@ export default function BlogPostMobileMenu() {
         </Link>
 
         {/* The bars keep their old 36px box, now nested so the button itself can fill the bar's
-            height and reach the viewport edge; pr-4 is the old 24px inset less the -8px pull. Like
-            the logo, the press scale goes on that inner box so it shrinks about the icon's centre. */}
+            height and reach the viewport edge; pr-4 is the old 24px inset less the -8px pull, and
+            pl-4 matches it, so as with the logo the target runs 24px past the bars on both sides.
+            Like the logo, the press scale goes on that inner box so it shrinks about the icon's
+            centre. */}
         <button
           type="button"
           onClick={() => { if (!leaving) setOpen(v => !v) }}
@@ -250,7 +253,7 @@ export default function BlogPostMobileMenu() {
           aria-label={menuOpen && !leaving ? 'Close menu' : 'Open menu'}
           aria-expanded={menuOpen && !leaving}
           aria-controls="mobile-menu"
-          className="group pointer-events-auto inline-flex items-center pr-4 cursor-pointer disabled:pointer-events-none [-webkit-tap-highlight-color:transparent]"
+          className="group pointer-events-auto inline-flex items-center px-4 cursor-pointer disabled:pointer-events-none [-webkit-tap-highlight-color:transparent]"
         >
           <span
             aria-hidden
