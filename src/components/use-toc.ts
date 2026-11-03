@@ -1,15 +1,15 @@
 "use client"
 
 import React from 'react'
-import { scrollBehavior } from '@/lib/utils'
+import { startInterruptibleScroll } from '@/lib/interruptible-scroll'
 
 const CONTENT_SELECTOR = '[data-blog-content]'
 const HEADING_SELECTOR = '[data-blog-heading]'
 
-// Clicking a TOC entry scrolls smoothly, which fires a burst of intersection changes on the way
-// past every heading in between. Ignoring them for this long keeps the highlight on the entry that
-// was actually clicked instead of flickering through the ones being scrolled over.
-const SCROLL_SETTLE_MS = 1000
+// The band a heading has to be in to take the highlight: from 80px under the top of the viewport
+// to 40% of the way down it.
+const BAND_TOP_PX = 80
+const BAND_BOTTOM_PCT = 40
 
 export interface TocItem {
   id: string
@@ -34,7 +34,12 @@ function slugify(text: string): string {
 export function useToc(contentSelector: string = CONTENT_SELECTOR) {
   const [items, setItems] = React.useState<TocItem[]>([])
   const [activeId, setActiveId] = React.useState<string | null>(null)
-  const lastClickTimeRef = React.useRef<number>(0)
+  // Clicking a TOC entry scrolls smoothly, which fires a burst of intersection changes on the way
+  // past every heading in between. They are ignored for as long as the scroll runs, so the highlight
+  // stays on the entry that was actually clicked instead of flickering through the ones being
+  // scrolled over.
+  const jumpingRef = React.useRef(false)
+  const cancelJumpRef = React.useRef<(() => void) | null>(null)
 
   React.useEffect(() => {
     const extractHeadings = () => {
@@ -78,7 +83,7 @@ export function useToc(contentSelector: string = CONTENT_SELECTOR) {
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (Date.now() - lastClickTimeRef.current < SCROLL_SETTLE_MS) return
+        if (jumpingRef.current) return
 
         const firstId = items[0]?.id
         const firstEntry = entries.find((entry) => entry.target.id === firstId)
@@ -98,7 +103,7 @@ export function useToc(contentSelector: string = CONTENT_SELECTOR) {
           if (id) setActiveId(id)
         }
       },
-      { rootMargin: '-80px 0px -60% 0px', threshold: 0 }
+      { rootMargin: `-${BAND_TOP_PX}px 0px -${100 - BAND_BOTTOM_PCT}% 0px`, threshold: 0 }
     )
 
     items.forEach(({ id }) => {
@@ -109,20 +114,45 @@ export function useToc(contentSelector: string = CONTENT_SELECTOR) {
     return () => observer.disconnect()
   }, [contentSelector, items])
 
-  const goTo = React.useCallback((id: string) => {
-    lastClickTimeRef.current = Date.now()
-    setActiveId(id)
-    const el = document.getElementById(id)
-    if (el) {
+  React.useEffect(() => {
+    return () => cancelJumpRef.current?.()
+  }, [])
+
+  const goTo = React.useCallback(
+    (id: string) => {
+      const el = document.getElementById(id)
+      if (!el) return
+      // A click on another entry mid-jump: its pointerdown has already stopped this one, so this
+      // only covers a keyboard press.
+      cancelJumpRef.current?.()
+      jumpingRef.current = true
+      setActiveId(id)
       // The heading lands 54px down, or 6px under the top navbar where that is taller: below
       // 1024px it grows from 48px to 64px (blog-post-mobile-menu.tsx), and a fixed 54px would tuck
       // the heading under it. From 1024px the bar is display: none and measures 0.
       const navbarBottom =
         document.querySelector('[data-top-navbar]')?.getBoundingClientRect().bottom ?? 0
       const top = el.getBoundingClientRect().top + window.scrollY - Math.max(54, navbarBottom + 6)
-      window.scrollTo({ top, behavior: scrollBehavior() })
-    }
-  }, [])
+      cancelJumpRef.current = startInterruptibleScroll(top, (interrupted) => {
+        jumpingRef.current = false
+        cancelJumpRef.current = null
+        // Stopped short, the clicked heading may be nowhere near the band, and the observer only
+        // speaks up when one crosses it: the highlight goes to the last heading above the band's
+        // bottom edge, or to none while the first is still below it.
+        if (interrupted) {
+          const bandBottom = (window.innerHeight * BAND_BOTTOM_PCT) / 100
+          let current: string | null = null
+          for (const item of items) {
+            const heading = document.getElementById(item.id)
+            if (!heading || heading.getBoundingClientRect().top >= bandBottom) break
+            current = item.id
+          }
+          setActiveId(current)
+        }
+      })
+    },
+    [items]
+  )
 
   return { items, activeId, goTo }
 }

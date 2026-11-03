@@ -1,7 +1,8 @@
 "use client"
 
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { cn, scrollBehavior } from '@/lib/utils'
+import { cn } from '@/lib/utils'
+import { startInterruptibleScroll } from '@/lib/interruptible-scroll'
 import Link from 'next/link'
 import { ArrowUp, ChevronLeft, ChevronRight, Undo2 } from 'lucide-react'
 import styles from './blog-post.module.css'
@@ -205,50 +206,6 @@ function ProjectNavigationLinks({
 // nothing at load. It is ui/paper-exit-sheet, shared with app/page.tsx so both exits feel
 // identical, its pacing in src/lib/paper-exit-transition.ts.
 
-// onSettle runs once the scroll is over, whether it reached the top or the reader took over.
-function startInterruptibleScrollToTop(onSettle: () => void): () => void {
-  if (scrollBehavior() === 'auto') {
-    window.scrollTo({ top: 0, behavior: 'auto' })
-    onSettle()
-    return () => {}
-  }
-
-  const controller = new AbortController()
-  let finished = false
-
-  const cleanUp = () => {
-    if (finished) return
-    finished = true
-    controller.abort()
-    window.clearTimeout(fallbackTimer)
-    onSettle()
-  }
-
-  const interrupt = () => {
-    if (finished) return
-    window.scrollTo({ top: window.scrollY, behavior: 'auto' })
-    cleanUp()
-  }
-
-  const handleKeyDown = (event: KeyboardEvent) => {
-    if (['ArrowDown', 'PageDown', 'End', ' '].includes(event.key)) {
-      interrupt()
-    }
-  }
-
-  const listenerOptions = { passive: true, signal: controller.signal }
-  window.addEventListener('wheel', interrupt, listenerOptions)
-  window.addEventListener('touchmove', interrupt, listenerOptions)
-  window.addEventListener('pointerdown', interrupt, listenerOptions)
-  window.addEventListener('keydown', handleKeyDown, { signal: controller.signal })
-  window.addEventListener('scrollend', cleanUp, { once: true, signal: controller.signal })
-
-  const fallbackTimer = window.setTimeout(cleanUp, 2000)
-  window.scrollTo({ top: 0, behavior: 'smooth' })
-
-  return interrupt
-}
-
 export default function BlogPostLayout({ children, slug, title, subtitle }: BlogPostLayoutProps) {
   const { previousProject, nextProject } = getProjectNavigation(slug)
   const [showBackToTop, setShowBackToTop] = useState(false)
@@ -340,7 +297,7 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
   const handleBackToTop = useCallback(() => {
     cancelBackToTopRef.current?.()
     setScrollingToTop(true)
-    cancelBackToTopRef.current = startInterruptibleScrollToTop(() => setScrollingToTop(false))
+    cancelBackToTopRef.current = startInterruptibleScroll(0, () => setScrollingToTop(false))
   }, [])
 
   const hasProjectNavigation = Boolean(previousProject || nextProject)
