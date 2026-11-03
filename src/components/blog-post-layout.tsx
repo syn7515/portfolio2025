@@ -121,6 +121,10 @@ function ProjectNavigationLinks({
     // DescriptionBackdrop to wash the lines out from under it. Its box is fit to the text rather
     // than the half-row, so below 640px the wash hugs the one-word label, and inside the hit
     // padding so the padding doesn't widen it.
+    // Below 640px the chevron sits in the row beside the label, and the box is pulled 12px out
+    // past the column with a negative margin, rather than the label being translated over its
+    // chevron: iOS Safari clips text translated past its box at the box's edge, which cut the
+    // front off the N in "Next". From 640px the chevron is absolute again, hanging off the edge.
     <div className="flex justify-between items-start gap-8">
       {/* Previous Project */}
       {previousProject ? (
@@ -130,16 +134,16 @@ function ProjectNavigationLinks({
           style={{ textDecoration: 'none' }}
           onClick={(event) => onNavigate(event, `/${previousProject.slug}`, 'previous')}
         >
-          <div className="relative isolate w-fit">
+          <div className="relative isolate w-fit -ml-3 sm:ml-0">
             <DescriptionBackdrop />
             <div className="relative z-10">
               <div className="text-[calc(14*var(--text-px))] text-stone-500 dark:text-zinc-400 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 transition-colors duration-150 font-[400] sm:font-normal not-italic mb-0 sm:mb-1.5 opacity-80 font-sans">
-                <span className="relative inline-flex items-center -translate-x-3 sm:translate-x-0">
+                <span className="relative inline-flex items-center">
                   <ChevronLeft
-                    className="absolute left-0 sm:-left-4 size-4 sm:size-3.5 text-stone-400 dark:text-zinc-500 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 opacity-100 sm:opacity-0 blur-none sm:blur-[1px] sm:translate-x-1 transition-colors duration-150 motion-safe:transition-[color,opacity,filter,translate] motion-safe:duration-[150ms,300ms,300ms,300ms] motion-safe:ease-out sm:group-hover:opacity-100 sm:group-hover:blur-none sm:group-hover:translate-x-0 sm:group-active:opacity-100 sm:group-active:blur-none sm:group-active:translate-x-0 sm:group-focus-visible:opacity-100 sm:group-focus-visible:blur-none sm:group-focus-visible:translate-x-0 sm:motion-reduce:opacity-100 sm:motion-reduce:blur-none sm:motion-reduce:translate-x-0"
+                    className="shrink-0 mr-1 sm:mr-0 sm:absolute sm:-left-4 size-4 sm:size-3.5 text-stone-400 dark:text-zinc-500 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 opacity-100 sm:opacity-0 blur-none sm:blur-[1px] sm:translate-x-1 transition-colors duration-150 motion-safe:transition-[color,opacity,filter,translate] motion-safe:duration-[150ms,300ms,300ms,300ms] motion-safe:ease-out sm:group-hover:opacity-100 sm:group-hover:blur-none sm:group-hover:translate-x-0 sm:group-active:opacity-100 sm:group-active:blur-none sm:group-active:translate-x-0 sm:group-focus-visible:opacity-100 sm:group-focus-visible:blur-none sm:group-focus-visible:translate-x-0 sm:motion-reduce:opacity-100 sm:motion-reduce:blur-none sm:motion-reduce:translate-x-0"
                     aria-hidden
                   />
-                  <span className="relative z-10 translate-x-5 sm:translate-x-0">
+                  <span className="relative z-10">
                     Previous
                   </span>
                 </span>
@@ -165,18 +169,18 @@ function ProjectNavigationLinks({
           style={{ textDecoration: 'none' }}
           onClick={(event) => onNavigate(event, `/${nextProject.slug}`, 'next')}
         >
-          <div className="relative isolate w-fit ml-auto">
+          <div className="relative isolate w-fit ml-auto -mr-3 sm:mr-0">
             <DescriptionBackdrop />
             <div className="relative z-10">
               <div className="text-[calc(14*var(--text-px))] text-stone-500 dark:text-zinc-400 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 transition-colors duration-150 font-[400] sm:font-normal not-italic mb-0 sm:mb-1.5 opacity-80 font-sans">
-                <span className="relative inline-flex items-center justify-end translate-x-3 sm:translate-x-0">
-                  <ChevronRight
-                    className="absolute right-0 sm:-right-4 size-4 sm:size-3.5 text-stone-400 dark:text-zinc-500 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 opacity-100 sm:opacity-0 blur-none sm:blur-[1px] sm:-translate-x-1 transition-colors duration-150 motion-safe:transition-[color,opacity,filter,translate] motion-safe:duration-[150ms,300ms,300ms,300ms] motion-safe:ease-out sm:group-hover:opacity-100 sm:group-hover:blur-none sm:group-hover:translate-x-0 sm:group-active:opacity-100 sm:group-active:blur-none sm:group-active:translate-x-0 sm:group-focus-visible:opacity-100 sm:group-focus-visible:blur-none sm:group-focus-visible:translate-x-0 sm:motion-reduce:opacity-100 sm:motion-reduce:blur-none sm:motion-reduce:translate-x-0"
-                    aria-hidden
-                  />
-                  <span className="relative z-10 -translate-x-5 sm:translate-x-0">
+                <span className="relative inline-flex items-center justify-end">
+                  <span className="relative z-10">
                     Next
                   </span>
+                  <ChevronRight
+                    className="shrink-0 ml-1 sm:ml-0 sm:absolute sm:-right-4 size-4 sm:size-3.5 text-stone-400 dark:text-zinc-500 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 opacity-100 sm:opacity-0 blur-none sm:blur-[1px] sm:-translate-x-1 transition-colors duration-150 motion-safe:transition-[color,opacity,filter,translate] motion-safe:duration-[150ms,300ms,300ms,300ms] motion-safe:ease-out sm:group-hover:opacity-100 sm:group-hover:blur-none sm:group-hover:translate-x-0 sm:group-active:opacity-100 sm:group-active:blur-none sm:group-active:translate-x-0 sm:group-focus-visible:opacity-100 sm:group-focus-visible:blur-none sm:group-focus-visible:translate-x-0 sm:motion-reduce:opacity-100 sm:motion-reduce:blur-none sm:motion-reduce:translate-x-0"
+                    aria-hidden
+                  />
                 </span>
               </div>
               <p
