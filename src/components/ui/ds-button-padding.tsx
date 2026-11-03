@@ -6,8 +6,9 @@ import { useEffect, useState, type CSSProperties } from "react";
    copy that paints its padding in red. Everything is sized in em off a font-size tied to the card
    height (cqh), so the composition scales with the card like the image it replaces did, and comes
    out a third larger on the 4:3 phone card. Figma's text is 64 units in a ~1724-unit frame, hence
-   64/1724 ≈ 3.71% of the 16:9 card's width, 16/9 of that in cqh; the em values below are the Figma
-   numbers divided by 64. The frame's button is the outline variant; this one is the secondary, a
+   64/1724 ≈ 3.71% of the 16:9 card's width, 16/9 of that in cqh (6.5956cqh); the em values below
+   are the Figma numbers divided by 64. Below 640px, where the card is the 4:3 one, it takes a tenth
+   more again (7.2551cqh), button and caption alike. The frame's button is the outline variant; this one is the secondary, a
    fill with no border, so the dashed frame its padded copy shows is the only line round it.
 
    The card plays the frame as one button at its centre, taking the four in turn counter-clockwise
@@ -258,7 +259,7 @@ export default function DsButtonPadding() {
   const { padding, icon } = STEPS[step];
   return (
     <div className="ds-button-padding w-full h-full [container-type:size]" style={vars} aria-hidden>
-      <div className="w-full h-full grid place-items-center" style={{ fontSize: `${(3.71 * 16) / 9}cqh` }}>
+      <div className="w-full h-full grid place-items-center text-[length:6.5956cqh] max-sm:text-[length:7.2551cqh]">
         {/* Rows far enough apart that the guides off the two padded buttons, each reaching past its
             frame, stop short of each other. */}
         <div
@@ -272,12 +273,14 @@ export default function DsButtonPadding() {
         </div>
         {/* Centred in the card, so it opens and shuts about its middle; the caption hangs below. Its
             texts share one cell so one can fade out before the next fades in, quickly and in
-            opacity alone, leaving the motion to the button. */}
+            opacity alone, leaving the motion to the button. On the phone card the caption is a fifth
+            larger again and stands a tenth further off (1.15 of its larger em), so it still reads
+            at that size. */}
         <div className="[grid-area:1/1] relative flex motion-reduce:hidden">
           <Button padding={padding} icon={icon} animate={animate} />
           <span
-            className="absolute left-1/2 top-full -translate-x-1/2 grid font-mono whitespace-nowrap"
-            style={{ fontSize: "0.5em", marginTop: "1.25em", color: "var(--ds-caption-text)" }}
+            className="absolute left-1/2 top-full -translate-x-1/2 grid font-mono whitespace-nowrap text-[length:0.5em] mt-[1.25em] max-sm:text-[length:0.6em] max-sm:mt-[1.15em]"
+            style={{ color: "var(--ds-caption-text)" }}
           >
             {STEPS.map(({ caption }, i) => (
               <span
