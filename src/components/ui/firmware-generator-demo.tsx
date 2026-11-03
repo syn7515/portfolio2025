@@ -3,8 +3,8 @@ import LivePrototype from "./live-prototype";
 
 /* The firmware-generator prototype (public/prototypes/firmware-generator.html), pinned to dark mode
    whatever the site theme. Each scene's frame is placed on the 16:9 card and sized off the card's
-   height, so the 4:3 phone card shows it a third larger, cropped at the sides. Create alone is held
-   to the card's width there. */
+   height, so the 4:3 phone card shows it a third larger, cropped at the sides. Create instead stacks
+   its dialogs there, one at a time, in a frame of their own shape. */
 
 const SCENES = {
   // "Edit": as large as Review's screen, the 16:9 card's full width (16/9 of its height), its top-left
@@ -28,14 +28,22 @@ const SCENES = {
     frame: { top: "75%", left: "50%", transform: "translate(-73.75%, -50%)", height: `${(100 * 16 * 865) / (9 * 1314)}cqh`, width: `${(100 * 16) / 9}cqh` },
     clip: 865 / 2 - ((9 / 16) * 1314) / 4,
   },
-  // "Create": the 1232×660 two-dialog composition, 83% of the card's height, centred — or 92% of its
-  // width on the 4:3 card, where 83% of the height would crop both dialogs. They float on the card
+  // "Create": the 1232×660 two-dialog composition, 83% of the card's height, centred (92% of its
+  // width where that is less: 92 × 660/1232 = 49.2857cqw tall, 83 × 1232/660 = 154.9333cqh wide).
+  // Below 640px, where the card turns 4:3 (and in the lightbox there too, so the two copies agree),
+  // side by side the dialogs are too small to read (a 362px card draws them at 0.27×). The frame
+  // takes the 600×660 shape of the stacked layout instead, which the page switches to as its box
+  // narrows past 1.4:1, at 90% of the card's height (0.37×): 90 × 600/660 = 81.8182cqh wide, or
+  // 92% of the width where that is less (92 × 660/600 = 101.2cqw tall). The box changes with the
+  // viewport, so it's set in classes rather than the inline frame. The dialogs float on the card
   // itself, so the frame is bare: no outline or shadow of its own.
   create: {
-    frame: { top: "50%", left: "50%", transform: "translate(-50%, -50%)", height: `min(83cqh, ${(92 * 660) / 1232}cqw)`, width: `min(${(83 * 1232) / 660}cqh, 92cqw)` },
+    frame: {},
+    frameClassName:
+      "inset-0 m-auto h-[min(83cqh,49.2857cqw)] w-[min(154.9333cqh,92cqw)] max-sm:h-[min(90cqh,101.2cqw)] max-sm:w-[min(81.8182cqh,92cqw)]",
     bare: true,
   },
-} satisfies Record<string, { frame: CSSProperties; bare?: boolean; clip?: number }>;
+} satisfies Record<string, { frame: CSSProperties; frameClassName?: string; bare?: boolean; clip?: number }>;
 
 export default function FirmwareGeneratorDemo({ scene = "edit" }: { scene?: keyof typeof SCENES }) {
   const config = SCENES[scene];
@@ -46,6 +54,7 @@ export default function FirmwareGeneratorDemo({ scene = "edit" }: { scene?: keyo
       scene={scene}
       title="Firmware generator prototype"
       frame={config.frame}
+      frameClassName={"frameClassName" in config ? config.frameClassName : undefined}
       bare={"bare" in config}
     />
   );

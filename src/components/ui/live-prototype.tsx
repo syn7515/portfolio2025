@@ -5,8 +5,9 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 /* A live HTML prototype (a page under public/prototypes) framed into a carousel card in place of the
    screenshot or recording it replaces. The page is framed rather than ported so the card plays the
    exact prototype the videos were recorded from; it scales its screen to whatever box it gets.
-   `frame` places that box where the replaced media was drawn; `bare` drops the outline and shadow
-   for a page whose pieces sit on the card itself.
+   `frame` places that box where the replaced media was drawn, and `frameClassName` can place it
+   instead where the box changes with the viewport, which an inline style can't; `bare` drops the
+   outline and shadow for a page whose pieces sit on the card itself.
 
    A fresh iframe paints blank for a few frames before the page loads and catches up with its loop,
    so the frame stays invisible until the page posts "proto:ready" for this scene, with a skeleton
@@ -27,10 +28,11 @@ export type LivePrototypeProps = {
   scene: string;
   title: string;
   frame: CSSProperties;
+  frameClassName?: string;
   bare?: boolean;
 };
 
-export default function LivePrototype({ src, scene, title, frame, bare = false }: LivePrototypeProps) {
+export default function LivePrototype({ src, scene, title, frame, frameClassName = "", bare = false }: LivePrototypeProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   // Keyed to the page: the lightbox reuses this component when stepping between cards, and the
@@ -83,11 +85,11 @@ export default function LivePrototype({ src, scene, title, frame, bare = false }
           (data-lightbox-waiting: a step to a page that's slow to load), when the skeleton shows. */}
       <div
         data-shown={ready ? "" : undefined}
-        className="media-skeleton transition-opacity duration-300 ease-[ease-out] [[data-lightbox-live]:not([data-lightbox-waiting])_&]:hidden"
+        className={`media-skeleton transition-opacity duration-300 ease-[ease-out] [[data-lightbox-live]:not([data-lightbox-waiting])_&]:hidden ${frameClassName}`}
         style={{ ...frame, opacity: ready ? 0 : 1 }}
       />
       <div
-        className={`absolute overflow-hidden transition-opacity duration-300 ease-[ease-out] [[data-lightbox-live]_&]:transition-none ${bare ? "" : "shadow-[0px_1px_1px_-0.5px_rgba(0,0,0,0.10),0px_3px_3px_-1.5px_rgba(0,0,0,0.10)] dark:shadow-[0px_2px_4px_rgba(0,0,0,0.25)]"}`}
+        className={`absolute overflow-hidden transition-opacity duration-300 ease-[ease-out] [[data-lightbox-live]_&]:transition-none ${frameClassName} ${bare ? "" : "shadow-[0px_1px_1px_-0.5px_rgba(0,0,0,0.10),0px_3px_3px_-1.5px_rgba(0,0,0,0.10)] dark:shadow-[0px_2px_4px_rgba(0,0,0,0.25)]"}`}
         style={{ ...frame, opacity: ready ? 1 : 0 }}
       >
         <iframe
