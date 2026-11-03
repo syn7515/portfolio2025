@@ -34,13 +34,15 @@ export default function BlogPostHeader({ title, subtitle }: BlogPostHeaderProps)
           Tracking is -0.03em at every size: -1.2px at 40px, -0.78px at 26px, which is where the
           home name's flat -0.75px sits. A flat px value would read noticeably loose at the top of
           the ramp. It lives on the utility rather than the inline style only to keep the type
-          settings in one place. */}
+          settings in one place. The words open by 0.03em against it (1.2px at 40px), so the tight
+          letters don't run them together. */}
       <h1
         className="!mt-0 !text-[26px] sm:!text-[clamp(32px,calc(2.0833vw_+_18.667px),calc(40*var(--text-px)))] !tracking-[-0.03em] !text-stone-700 dark:!text-zinc-200 !mb-0 whitespace-pre-line"
         style={{
           fontFamily: 'var(--font-crimson-pro), serif',
           lineHeight: '120%',
           fontWeight: 360,
+          wordSpacing: '0.03em',
           textWrap: 'balance',
         }}
       >
