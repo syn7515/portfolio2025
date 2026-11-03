@@ -27,7 +27,10 @@ const titleStyle: CSSProperties = {
   fontFamily: 'var(--font-crimson-pro), serif',
   fontWeight: 450,
   lineHeight: '130%',
-  letterSpacing: '-0.02em',
+  // Tracked in a little tighter than the headings' -0.02em, with the words opened a touch so the
+  // tighter letters don't run them together.
+  letterSpacing: '-0.025em',
+  wordSpacing: '0.02em',
 };
 
 const titleClassName = "text-[17.5px] sm:text-[calc(18.5*var(--text-px))] [text-wrap:wrap] sm:[text-wrap:balance] !text-stone-700 dark:!text-zinc-200 transition-colors duration-150 group-hover:!text-rose-700 group-active:!text-rose-700 group-focus-visible:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 dark:group-focus-visible:!text-rose-400";
