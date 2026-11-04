@@ -19,39 +19,50 @@
      base; the phone at 1:1. Heights follow what Figma rendered rather than its export, which adds
      borders Figma draws inside.
      Elevation uses the stacked shadows of shadow-plugin (shadow.floriankiem.com), the "-ring" kind
-     whose last layer is the 1px hairline, so an edge and its shadow read as one. */
+     whose last layer is the 1px hairline, so an edge and its shadow read as one.
+     A scripted pointer plays it on a loop (the script): on the desktop dialog it reads down the
+     packages, picks FW 3.6.0, the phone picking it too, and stops on applying it. */
+  /* In dark, as the firmware prototype's screens are in this post: stone surfaces (#1c1917), the
+     lifted fills a step lighter and the lists' wells a step darker, light text, and a light primary
+     with dark text on it. */
   :root {
-    --bg: #ffffff;
-    --fg: #1c1917;
-    --fg-light: #44403c;
-    --card-fg: #161210;
-    --muted-fg: #78716c;
-    --muted: #f5f5f4;
-    --border: #e7e5e4;
-    --primary: #57534e;
-    --ring: #a8a29e;
+    --bg: #1c1917;
+    --fg: #e7e5e4;
+    --fg-light: #d6d3d1;
+    --card-fg: #e7e5e4;
+    --muted-fg: #a8a29e;
+    --muted: #292524;
+    --well: #141110;
+    --border: #383431;
+    --primary: #d6d3d1;
+    --primary-fg: #1c1917;
+    --ring: #78716c;
     --mono: "SF Mono", ui-monospace, Menlo, monospace;
     --sans: "Pretendard Variable", Pretendard, -apple-system, sans-serif;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; background: #d6d3d1; overflow: hidden; }
+  html, body { height: 100%; background: #0c0a09; overflow: hidden; }
   .embed, .embed body { background: transparent; }
   body { font-family: var(--sans); font-size: 14px; line-height: 20px; color: var(--fg); -webkit-font-smoothing: antialiased; }
   svg { display: block; }
 
-  #stage { position: absolute; left: 50%; top: 50%; width: 1122px; height: 918px; margin: -459px 0 0 -561px; transform-origin: center; }
+  #stage { position: absolute; left: 50%; top: 50%; width: 1122px; height: 918px; margin: -459px 0 0 -561px; transform-origin: center;
+           transition: transform 900ms cubic-bezier(0.65, 0, 0.35, 1); }
+
+  /* The square phone card shows the desktop dialog alone (place). The 4:3 card (.compact, from the
+     card's shape) draws the two screens 36px apart rather than 67, each moved in. */
+  .square .phone { display: none; }
+  .compact .dialog-wrap { left: 69px; }
+  .compact .phone { left: 665px; }
 
   /* package cards, shared by both screens */
   .month { position: relative; height: 25.77px; }
   .dr-group + .dr-group .month { height: 26.63px; }
   .month span { position: absolute; left: 0; top: 6px; padding: 2px 24px; font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.06em; color: var(--muted-fg); opacity: 0.7; }
-  /* the picked card lifts on a faint ring and a soft shadow, both drawn outside it, so picking moves
-     nothing */
-  .pkg { display: flex; flex-direction: column; gap: 8px; padding: 18px 24px 16px; border-radius: 12px; background: var(--bg); transition: box-shadow 90ms ease; }
-  .pkg.on { /* smooth-shadow-ring-sm, its hairline the stone ring at 50% (the plugin's smooth-ring-*-400/50) */
-            box-shadow: 0 18px 47px rgba(0, 0, 0, 0.03), 0 7.5px 19px rgba(0, 0, 0, 0.02), 0 4px 10.5px rgba(0, 0, 0, 0.02),
-                        0 2.3px 5.8px rgba(0, 0, 0, 0.01), 0 1.2px 3.1px rgba(0, 0, 0, 0.01), 0 0.5px 1.3px rgba(0, 0, 0, 0.01),
-                        0 0 0 1px color-mix(in srgb, var(--ring) 50%, transparent); }
+  /* the picked card lifts on a light scrim over its fill (white at 9%), and a hovered one on half
+     that, so picking moves nothing */
+  .pkg { display: flex; flex-direction: column; gap: 8px; padding: 18px 24px 16px; border-radius: 12px; background: var(--bg); transition: background-color 90ms ease; }
+  .pkg.on { background: color-mix(in srgb, #fafaf9 9%, var(--bg)); }
   .pkg .info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
   .pkg .name { font-weight: 500; color: var(--fg-light); }
   .pkg .name, .pkg .note { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -76,9 +87,9 @@
   .dialog-wrap { position: absolute; left: 53px; top: 46px; width: 560px; height: 649.43px; }
   .dialog { position: absolute; left: 0; top: 0; width: 526px; height: 610px; transform: scale(1.0646); transform-origin: 0 0; display: flex; flex-direction: column; overflow: hidden;
             background: var(--bg); border-radius: 8px;
-            /* smooth-shadow-ring-lg, its hairline at Figma's 10% black */
+            /* smooth-shadow-ring-lg's shadow, without its hairline: the dark dialog needs no edge */
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.05), 0 12px 24px rgba(0, 0, 0, 0.04), 0 6px 12px rgba(0, 0, 0, 0.03),
-                        0 3px 6px rgba(0, 0, 0, 0.02), 0 1.5px 3px rgba(0, 0, 0, 0.02), 0 0 0 1px rgba(0, 0, 0, 0.1); }
+                        0 3px 6px rgba(0, 0, 0, 0.02), 0 1.5px 3px rgba(0, 0, 0, 0.02); }
   /* Figma rounds the dialog's line heights to whole pixels at its 1.0646× size */
   .dialog .pkg { line-height: 20.66px; }
   .dialog .badge, .dialog .fw .ver.mono, .dialog .month span { line-height: 16.9px; }
@@ -96,45 +107,64 @@
   .d-tab { height: 36px; padding: 8px 10px 0; border-radius: 6px; transition: background-color 90ms ease; }
   .d-tab span { display: block; padding-bottom: 12px; color: var(--muted-fg); }
   .d-tab.on span { color: var(--fg); box-shadow: inset 0 -2px 0 var(--primary); }
-  .d-body { flex: 1; min-height: 0; background: var(--muted); padding: 28px 40px; }
+  .d-body { flex: 1; min-height: 0; background: var(--well); padding: 28px 40px; }
   .d-list { display: flex; flex-direction: column; gap: 72px; padding: 40px 0; }
   .d-group { position: relative; display: flex; flex-direction: column; gap: 12px; }
-  .d-group .month { position: absolute; left: 13px; top: -38px; height: auto; padding: 6px 0; background: var(--muted); }
+  .d-group .month { position: absolute; left: 13px; top: -38px; height: auto; padding: 6px 0; background: var(--well); }
   .d-group + .d-group .month { top: -36px; }
   .d-group .month span { position: static; display: block; padding: 2px 10px; }
-  .d-foot { height: 64.4px; flex-shrink: 0; display: flex; justify-content: flex-end; align-items: flex-start; gap: 8px; padding: 11px 24px 0; background: var(--bg); border-top: 1px solid rgba(231, 229, 228, 0.5); }
+  .d-foot { height: 64.4px; flex-shrink: 0; display: flex; justify-content: flex-end; align-items: flex-start; gap: 8px; padding: 11px 24px 0; background: var(--bg); }
   /* Cancel keeps the slate of the stock button it came from, as Figma has it */
-  .btn { display: flex; align-items: center; justify-content: center; min-width: 64px; padding: 5px 11px; border-radius: 6px; border: 1px solid #e2e8f0; font-weight: 500; line-height: 24px; color: #0f172a; background: var(--bg); transition: background-color 90ms ease, opacity 90ms ease, filter 90ms ease; }
-  .btn.primary { border-color: var(--primary); background: var(--primary); color: #fafaf9; }
+  .btn { display: flex; align-items: center; justify-content: center; min-width: 64px; padding: 5px 11px; border-radius: 6px; border: 1px solid #44403c; font-weight: 500; line-height: 24px; color: var(--fg); background: var(--bg); transition: background-color 90ms ease, opacity 90ms ease, filter 90ms ease; }
+  .btn.primary { border-color: var(--primary); background: var(--primary); color: var(--primary-fg); }
   .d-foot .btn { line-height: 24.42px; }
 
   /* phone drawer */
-  .phone { position: absolute; left: 680px; top: 0; width: 402px; height: 918px; overflow: hidden; background: var(--bg); border: 1px solid rgba(0, 0, 0, 0.1); }
-  .ph-screen { position: absolute; left: -1px; top: -1px; width: 402px; height: 874px; overflow: hidden; background: rgba(214, 211, 209, 0.8); }
+  .phone { position: absolute; left: 680px; top: 0; width: 402px; height: 918px; overflow: hidden; background: var(--bg); border: 1px solid rgba(255, 255, 255, 0.08); }
+  .ph-screen { position: absolute; left: -1px; top: -1px; width: 402px; height: 874px; overflow: hidden; background: rgba(12, 10, 9, 0.85); }
   .ph-status { position: absolute; left: 0; top: 0; width: 402px; display: flex; align-items: center; gap: 6px; padding: 11px 16px; }
-  .ph-status .time { flex: 1; text-align: center; padding-top: 2px; font-family: "SF Pro Text", -apple-system, system-ui, sans-serif; font-size: 17px; line-height: 22px; font-weight: 600; color: #000; }
+  .ph-status .time { flex: 1; text-align: center; padding-top: 2px; font-family: "SF Pro Text", -apple-system, system-ui, sans-serif; font-size: 17px; line-height: 22px; font-weight: 600; color: #fff; }
   .ph-status .island { width: 125px; height: 37px; }
   .ph-status .levels { flex: 1; display: flex; justify-content: center; align-items: center; gap: 7px; padding-top: 1px; }
   .drawer { position: absolute; left: 0; top: 62px; width: 402px; height: 812px; overflow: hidden; display: flex; flex-direction: column; background: var(--bg); border-radius: 12px 12px 0 0;
             /* smooth-shadow-ring-lg with the plugin's own 5% hairline */
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.05), 0 12px 24px rgba(0, 0, 0, 0.04), 0 6px 12px rgba(0, 0, 0, 0.03),
-                        0 3px 6px rgba(0, 0, 0, 0.02), 0 1.5px 3px rgba(0, 0, 0, 0.02), 0 0 0 1px rgba(0, 0, 0, 0.05); }
+                        0 3px 6px rgba(0, 0, 0, 0.02), 0 1.5px 3px rgba(0, 0, 0, 0.02), 0 0 0 1px rgba(255, 255, 255, 0.06); }
   /* the iOS sheet grabber's 36×5, in the same 24px row Figma's 100×8 handle took */
   .dr-handle { height: 24px; padding-top: 8px; display: flex; justify-content: center; flex-shrink: 0; }
-  .dr-handle span { width: 36px; height: 5px; border-radius: 999px; background: #d6d3d1; }
+  .dr-handle span { width: 36px; height: 5px; border-radius: 999px; background: #57534e; }
   .dr-head { position: relative; padding: 16px; flex-shrink: 0; text-align: center; font-size: 16px; line-height: 24px; font-weight: 500; color: var(--card-fg); }
   .dr-back { position: absolute; left: 16.15px; top: 12px; padding: 8px; border-radius: 6px; color: var(--primary); transition: background-color 90ms ease; }
   .dr-tabs { display: flex; flex-shrink: 0; box-shadow: inset 0 -1px 0 var(--border); }
   .dr-tab { flex: 1; padding: 8px 16px 14px; text-align: center; font-size: 16px; line-height: 24px; font-weight: 500; color: var(--muted-fg); transition: background-color 90ms ease; }
   .dr-tab.on { color: var(--fg); box-shadow: inset 0 -2px 0 var(--primary); }
-  .dr-body { flex: 1; min-height: 0; background: var(--muted); padding: 28px 16px; }
+  .dr-body { flex: 1; min-height: 0; background: var(--well); padding: 28px 16px; }
   .dr-list { display: flex; flex-direction: column; gap: 40px; }
   .dr-group { display: flex; flex-direction: column; gap: 12px; }
   .dr-group + .dr-group { gap: 10px; }
   /* the drawer runs past the screen: only the top of its footer shows above the home indicator */
   .dr-foot { flex-shrink: 0; height: 80px; margin-bottom: -48px; padding: 7px 16px 32px; background: var(--muted); border-top: 1px solid var(--border); }
   .dr-foot .btn { width: 100%; height: 40px; font-size: 16px; }
-  .ph-home { position: absolute; left: 50%; bottom: 7px; width: 144px; height: 5px; margin-left: -72px; border-radius: 100px; background: #000; }
+  .ph-home { position: absolute; left: 50%; bottom: 7px; width: 144px; height: 5px; margin-left: -72px; border-radius: 100px; background: #fff; }
+
+  /* what the scripted pointer is over, as a real one shows it (below) */
+  .pkg.hover:not(.on) { background: color-mix(in srgb, #fafaf9 4.5%, var(--bg)); }
+  .btn.primary.hover { opacity: 0.9; }
+
+  /* ---------- the pointer ----------
+     macOS-size pointers against the 1:1 screen, as in the other prototypes: Figma's "Cursor / Hand"
+     and an arrow to match, each offset so its hotspot sits on the point, presses scaling about it.
+     A real pointer (the lightbox's copy) puts it out of sight, so there's only one. */
+  .cursor { position: absolute; z-index: 25; left: 0; top: 0; width: 0; height: 0; pointer-events: none; opacity: 0;
+            transition: transform 520ms cubic-bezier(0.4, 0, 0.2, 1), opacity 200ms ease; }
+  .cursor.on { opacity: 1; }
+  .cursor svg { position: absolute; overflow: visible; filter: drop-shadow(-0.67px 0.67px 0.93px rgba(0, 0, 0, 0.6)); }
+  .cursor .c-arrow { left: -5px; top: -2.5px; transform-origin: 5px 2.5px; }
+  .cursor .c-hand { display: none; left: -9.45px; top: -1.6px; transform-origin: 9.45px 1.6px; }
+  .cursor.hand .c-arrow { display: none; }
+  .cursor.hand .c-hand { display: block; }
+  .cursor.down svg { transform: scale(0.9); }
+  .live .cursor.on { opacity: 0; }
 
   /* ---------- real pointer input ----------
      In the lightbox the page takes real hover and clicks (on the carousel card it's inert): a click
@@ -143,9 +173,9 @@
   html { -webkit-user-select: none; user-select: none; cursor: default; }
   /* Hover only where a pointer can hover: on a touch screen a tap would leave it stuck on. */
   @media (hover: hover) and (pointer: fine) {
-    /* a card under the pointer keeps its fill and takes only the picked card's hairline, fainter */
-    .pkg:not(.on):hover { box-shadow: 0 0 0 1px color-mix(in srgb, var(--ring) 30%, transparent); }
-    .d-close:hover, .dr-back:hover { background: rgba(231, 229, 228, 0.6); }
+    /* a card under the pointer takes half the picked card's scrim */
+    .pkg:not(.on):hover { background: color-mix(in srgb, #fafaf9 4.5%, var(--bg)); }
+    .d-close:hover, .dr-back:hover { background: rgba(68, 64, 60, 0.6); }
     .btn:not(.primary):hover { background: var(--muted); }
     .btn.primary:hover { opacity: 0.9; }
   }
@@ -161,7 +191,7 @@
       <div class="d-close"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>
       <div class="d-tabs"><div class="d-tab on"><span>By package</span></div><div class="d-tab"><span>Manual</span></div></div>
       <div class="d-body scroll"><div class="d-list" id="deskList"></div></div>
-      <div class="d-foot"><div class="btn">Cancel</div><div class="btn primary">Apply package</div></div>
+      <div class="d-foot"><div class="btn">Cancel</div><div class="btn primary" id="apply">Apply package</div></div>
     </div>
   </div>
 
@@ -178,13 +208,17 @@
         <div class="time">9:41</div>
         <div class="island"></div>
         <div class="levels">
-          <svg width="19.2" height="12.23" viewBox="0 0 19.2 12.2264"><path fill-rule="evenodd" clip-rule="evenodd" d="M19.2 1.14623C19.2 0.513183 18.7224 0 18.1333 0H17.0667C16.4776 0 16 0.513183 16 1.14623V11.0802C16 11.7132 16.4776 12.2264 17.0667 12.2264H18.1333C18.7224 12.2264 19.2 11.7132 19.2 11.0802V1.14623ZM11.7659 2.44528H12.8326C13.4217 2.44528 13.8992 2.97078 13.8992 3.61902V11.0527C13.8992 11.7009 13.4217 12.2264 12.8326 12.2264H11.7659C11.1768 12.2264 10.6992 11.7009 10.6992 11.0527V3.61902C10.6992 2.97078 11.1768 2.44528 11.7659 2.44528ZM7.43411 5.09433H6.36745C5.77834 5.09433 5.30078 5.62652 5.30078 6.28301V11.0377C5.30078 11.6942 5.77834 12.2264 6.36745 12.2264H7.43411C8.02322 12.2264 8.50078 11.6942 8.50078 11.0377V6.28301C8.50078 5.62652 8.02322 5.09433 7.43411 5.09433ZM2.13333 7.53962H1.06667C0.477563 7.53962 0 8.06421 0 8.71132V11.0547C0 11.7018 0.477563 12.2264 1.06667 12.2264H2.13333C2.72244 12.2264 3.2 11.7018 3.2 11.0547V8.71132C3.2 8.06421 2.72244 7.53962 2.13333 7.53962Z" fill="#000"/></svg>
-          <svg width="17.14" height="12.33" viewBox="0 0 17.1417 12.3283"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.5713 2.46628C11.0584 2.46639 13.4504 3.38847 15.2529 5.04195C15.3887 5.1696 15.6056 5.16799 15.7393 5.03834L17.0368 3.77487C17.1045 3.70911 17.1422 3.62004 17.1417 3.52735C17.1411 3.43467 17.1023 3.34603 17.0338 3.28104C12.3028 -1.09368 4.83907 -1.09368 0.108056 3.28104C0.039524 3.34598 0.000639766 3.4346 7.82398e-06 3.52728C-0.000624118 3.61996 0.0370483 3.70906 0.104689 3.77487L1.40255 5.03834C1.53615 5.16819 1.75327 5.1698 1.88893 5.04195C3.69167 3.38836 6.08395 2.46628 8.5713 2.46628ZM8.56795 6.68656C9.92527 6.68647 11.2341 7.19821 12.2403 8.12234C12.3763 8.2535 12.5907 8.25065 12.7234 8.11593L14.0106 6.79663C14.0784 6.72742 14.1161 6.63355 14.1151 6.53599C14.1141 6.43844 14.0746 6.34536 14.0054 6.27757C10.9416 3.38672 6.19688 3.38672 3.13305 6.27757C3.06384 6.34536 3.02435 6.43849 3.02345 6.53607C3.02254 6.63365 3.06028 6.72752 3.12822 6.79663L4.41513 8.11593C4.54778 8.25065 4.76215 8.2535 4.89823 8.12234C5.90368 7.19882 7.21152 6.68713 8.56795 6.68656ZM11.0924 9.48011C11.0943 9.58546 11.0572 9.68703 10.9899 9.76084L8.81327 12.2156C8.74946 12.2877 8.66247 12.3283 8.5717 12.3283C8.48093 12.3283 8.39394 12.2877 8.33013 12.2156L6.1531 9.76084C6.08585 9.68697 6.04886 9.58537 6.05085 9.48002C6.05284 9.37467 6.09365 9.27491 6.16364 9.20429C7.55374 7.8904 9.58966 7.8904 10.9798 9.20429C11.0497 9.27497 11.0904 9.37476 11.0924 9.48011Z" fill="#000"/></svg>
-          <svg width="27.33" height="13" viewBox="0 0 27.328 13"><rect opacity="0.35" x="0.5" y="0.5" width="24" height="12" rx="3.8" stroke="#000" fill="none"/><path opacity="0.4" d="M26 4.78113V8.8566C26.8047 8.51143 27.328 7.70847 27.328 6.81886C27.328 5.92926 26.8047 5.1263 26 4.78113" fill="#000"/><rect x="2" y="2" width="21" height="9" rx="2.5" fill="#000"/></svg>
+          <svg width="19.2" height="12.23" viewBox="0 0 19.2 12.2264"><path fill-rule="evenodd" clip-rule="evenodd" d="M19.2 1.14623C19.2 0.513183 18.7224 0 18.1333 0H17.0667C16.4776 0 16 0.513183 16 1.14623V11.0802C16 11.7132 16.4776 12.2264 17.0667 12.2264H18.1333C18.7224 12.2264 19.2 11.7132 19.2 11.0802V1.14623ZM11.7659 2.44528H12.8326C13.4217 2.44528 13.8992 2.97078 13.8992 3.61902V11.0527C13.8992 11.7009 13.4217 12.2264 12.8326 12.2264H11.7659C11.1768 12.2264 10.6992 11.7009 10.6992 11.0527V3.61902C10.6992 2.97078 11.1768 2.44528 11.7659 2.44528ZM7.43411 5.09433H6.36745C5.77834 5.09433 5.30078 5.62652 5.30078 6.28301V11.0377C5.30078 11.6942 5.77834 12.2264 6.36745 12.2264H7.43411C8.02322 12.2264 8.50078 11.6942 8.50078 11.0377V6.28301C8.50078 5.62652 8.02322 5.09433 7.43411 5.09433ZM2.13333 7.53962H1.06667C0.477563 7.53962 0 8.06421 0 8.71132V11.0547C0 11.7018 0.477563 12.2264 1.06667 12.2264H2.13333C2.72244 12.2264 3.2 11.7018 3.2 11.0547V8.71132C3.2 8.06421 2.72244 7.53962 2.13333 7.53962Z" fill="#fff"/></svg>
+          <svg width="17.14" height="12.33" viewBox="0 0 17.1417 12.3283"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.5713 2.46628C11.0584 2.46639 13.4504 3.38847 15.2529 5.04195C15.3887 5.1696 15.6056 5.16799 15.7393 5.03834L17.0368 3.77487C17.1045 3.70911 17.1422 3.62004 17.1417 3.52735C17.1411 3.43467 17.1023 3.34603 17.0338 3.28104C12.3028 -1.09368 4.83907 -1.09368 0.108056 3.28104C0.039524 3.34598 0.000639766 3.4346 7.82398e-06 3.52728C-0.000624118 3.61996 0.0370483 3.70906 0.104689 3.77487L1.40255 5.03834C1.53615 5.16819 1.75327 5.1698 1.88893 5.04195C3.69167 3.38836 6.08395 2.46628 8.5713 2.46628ZM8.56795 6.68656C9.92527 6.68647 11.2341 7.19821 12.2403 8.12234C12.3763 8.2535 12.5907 8.25065 12.7234 8.11593L14.0106 6.79663C14.0784 6.72742 14.1161 6.63355 14.1151 6.53599C14.1141 6.43844 14.0746 6.34536 14.0054 6.27757C10.9416 3.38672 6.19688 3.38672 3.13305 6.27757C3.06384 6.34536 3.02435 6.43849 3.02345 6.53607C3.02254 6.63365 3.06028 6.72752 3.12822 6.79663L4.41513 8.11593C4.54778 8.25065 4.76215 8.2535 4.89823 8.12234C5.90368 7.19882 7.21152 6.68713 8.56795 6.68656ZM11.0924 9.48011C11.0943 9.58546 11.0572 9.68703 10.9899 9.76084L8.81327 12.2156C8.74946 12.2877 8.66247 12.3283 8.5717 12.3283C8.48093 12.3283 8.39394 12.2877 8.33013 12.2156L6.1531 9.76084C6.08585 9.68697 6.04886 9.58537 6.05085 9.48002C6.05284 9.37467 6.09365 9.27491 6.16364 9.20429C7.55374 7.8904 9.58966 7.8904 10.9798 9.20429C11.0497 9.27497 11.0904 9.37476 11.0924 9.48011Z" fill="#fff"/></svg>
+          <svg width="27.33" height="13" viewBox="0 0 27.328 13"><rect opacity="0.35" x="0.5" y="0.5" width="24" height="12" rx="3.8" stroke="#fff" fill="none"/><path opacity="0.4" d="M26 4.78113V8.8566C26.8047 8.51143 27.328 7.70847 27.328 6.81886C27.328 5.92926 26.8047 5.1263 26 4.78113" fill="#fff"/><rect x="2" y="2" width="21" height="9" rx="2.5" fill="#fff"/></svg>
         </div>
       </div>
     </div>
     <div class="ph-home"></div>
+  </div>
+  <div class="cursor" id="cursor">
+    <svg class="c-arrow" width="24" height="24" viewBox="0 0 24 24"><path d="M5 2.5v17.2l4.6-4.4 2.9 6.6 2.9-1.3-2.9-6.5h6.4z" fill="#fff" stroke="#000" stroke-width="1.2" stroke-linejoin="round"/></svg>
+    <svg class="c-hand" width="22.07" height="23.87" viewBox="0 0 22.0722 23.8667" fill="none"><path d="M9.23 20.933H13.048C13.092 20.933 13.135 20.916 13.166 20.884L14.262 19.789C14.383 19.668 14.547 19.6 14.718 19.6C14.963 19.6 15.186 19.738 15.296 19.957L15.759 20.884C15.775 20.914 15.805 20.933 15.839 20.933H17.412C17.618 20.933 17.784 20.767 17.784 20.562C17.784 19.052 18.135 17.564 18.81 16.214C19.675 14.485 20.727 12.734 20.417 10.716L20.175 9.134C20.098 8.635 19.669 8.267 19.164 8.267H18.98C18.517 8.267 18.142 8.642 18.142 9.105V9.765C18.142 9.864 18.062 9.944 17.963 9.944C17.864 9.944 17.784 9.864 17.784 9.765V8.267C17.784 7.53 17.187 6.933 16.451 6.933C15.714 6.933 15.117 7.53 15.117 8.267V9.794C15.117 9.978 14.968 10.127 14.784 10.127C14.6 10.127 14.451 9.978 14.451 9.794V8.267C14.451 7.53 13.854 6.933 13.117 6.933C12.381 6.933 11.784 7.53 11.784 8.267V10.188C11.784 10.24 11.772 10.291 11.749 10.337C11.626 10.583 11.275 10.583 11.153 10.337C11.129 10.291 11.117 10.24 11.117 10.188V3.6C11.117 2.731 10.409 1.6 9.451 1.6C8.492 1.6 7.784 2.731 7.784 3.6V11.844C7.784 12.077 7.595 12.267 7.361 12.267C7.21 12.267 7.071 12.187 6.994 12.057C6.737 11.626 6.14 10.649 5.784 10.267C5.583 10.051 5.181 9.897 4.789 9.792C4.181 9.629 3.565 9.929 3.216 10.452C2.771 11.12 2.859 12.008 3.426 12.576L4.521 13.671C4.913 14.063 5.209 14.541 5.384 15.067L5.451 15.267C5.67 15.924 6.039 16.522 6.529 17.012L8.254 18.737C8.807 19.29 9.117 20.039 9.117 20.821C9.117 20.883 9.168 20.933 9.23 20.933Z" fill="#fff" stroke="#000" stroke-width="0.8"/><path d="M11.487 12.744V17.875M14.119 12.744V17.875M16.815 12.744V17.875" stroke="#000" stroke-width="0.8"/></svg>
   </div>
 </div>
 
@@ -213,32 +247,176 @@ const card = ([name, note, fw, cfg, mono]) => `
 $('deskList').innerHTML = MONTHS.map(([m, pkgs]) => `<div class="d-group"><div class="month"><span>${m}</span></div>${pkgs.map(card).join('')}</div>`).join('');
 $('phoneList').innerHTML = MONTHS.map(([m, pkgs]) => `<div class="dr-group"><div class="month"><span>${m}</span></div>${pkgs.map(card).join('')}</div>`).join('');
 
-// It's one dialog shown on two screens, so a package picked on either is picked on both. FW 3.6.0
-// starts selected, as in Figma.
+// It's one dialog shown on two screens, so a package picked on either is picked on both.
 const lists = [$('deskList'), $('phoneList')].map(list => [...list.querySelectorAll('.pkg')]);
 const pick = i => lists.forEach(pkgs => pkgs.forEach((p, j) => p.classList.toggle('on', j === i)));
 lists.forEach(pkgs => pkgs.forEach((p, i) => p.addEventListener('click', () => pick(i))));
-pick(0);
+const desk = lists[0], deskBody = document.querySelector('.d-body');
+const hoverPkg = i => desk.forEach((p, j) => p.classList.toggle('hover', j === i));
+
+/* ---------- the loop ----------
+   As in the other prototypes, waits are scheduled against the wall clock rather than chained
+   timeouts: step n of the loop lands at loopStart + (sum of waits up to n), and an embedded copy
+   takes loopStart from Date.now() too, so the carousel card and its lightbox copy show the same
+   moment. A wait whose time has passed returns at once, which is how a copy that starts mid-loop
+   catches up; the first that hasn't is the first moment the scene is in place. */
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+let runId = 0, loopStart = 0, vt = 0, dry = false, caughtUp = false;
+async function wait(ms, id) {
+  if (id !== runId) throw 'abort';
+  vt += ms;
+  if (dry) return;
+  while (true) {
+    if (id !== runId) throw 'abort';
+    const left = loopStart + vt - Date.now();
+    if (left <= 0) return;
+    if (!caughtUp) markCaughtUp();
+    await sleep(Math.min(left, 30));
+  }
+}
+async function loop() {
+  const id = ++runId;
+  try {
+    // Measure the loop with a dry run (every wait returns at once), so a synced copy can find its place in it.
+    dry = true; vt = 0; await play(id); dry = false;
+    const length = vt;
+    while (true) {
+      const now = Date.now();
+      loopStart = root.classList.contains('embed') ? now - (now % length) : now;
+      vt = 0;
+      await play(id);
+    }
+  } catch (e) { dry = false; if (e !== 'abort') throw e; }
+}
+
+/* ---------- the pointer ----------
+   Points are stage px, measured off the elements they're over. */
+const cursor = $('cursor');
+function stageBox(el) {
+  const st = $('stage'), s = st.getBoundingClientRect(), b = el.getBoundingClientRect();
+  const k = s.width / st.offsetWidth;
+  return { left: (b.left - s.left) / k, top: (b.top - s.top) / k, right: (b.right - s.left) / k, bottom: (b.bottom - s.top) / k,
+           cx: ((b.left + b.right) / 2 - s.left) / k, cy: ((b.top + b.bottom) / 2 - s.top) / k };
+}
+function jump(x, y) {
+  cursor.style.transition = 'none'; cursor.classList.remove('hand');
+  cursor.style.transform = `translate(${x}px, ${y}px)`;
+  cursor.offsetHeight; cursor.style.transition = ''; cursor.classList.add('on');
+}
+async function moveTo(x, y, id, ms = 560, hand = false) {
+  if (!hand) cursor.classList.remove('hand');
+  cursor.style.transitionDuration = `${ms}ms, 200ms`;
+  cursor.style.transform = `translate(${x}px, ${y}px)`;
+  await wait(ms, id);
+  cursor.classList.toggle('hand', hand);
+}
+async function click(id) {
+  cursor.classList.add('down'); await wait(130, id); cursor.classList.remove('down');
+}
+// Over a desktop package, a little in from its left, lit once the pointer's most of the way there.
+async function toPkg(i, id, ms, x = 0.42) {
+  const b = stageBox(desk[i]);
+  cursor.style.transitionDuration = `${ms}ms, 200ms`;
+  cursor.style.transform = `translate(${b.left + (b.right - b.left) * x}px, ${b.top + 30}px)`;
+  await wait(ms * 0.6, id);
+  hoverPkg(i); cursor.classList.add('hand');
+  await wait(ms * 0.4, id);
+}
+// The desktop list scrolled by the wheel under the pointer, at once while catching up.
+const scrollDesk = top => deskBody.scrollTo({ top, behavior: caughtUp && !dry ? 'smooth' : 'auto' });
+
+async function play(id) {
+  // FW 3.5.12, the package the robots are on, picked to begin with
+  pick(1); hoverPkg(-1); $('apply').classList.remove('hover'); deskBody.scrollTop = 0;
+  // From the dialog's empty tab bar, right of its tabs
+  const tabs = stageBox(document.querySelector('.d-tabs'));
+  const rest = [tabs.right - 90, tabs.cy + 6];
+  jump(...rest);
+  await wait(900, id);
+
+  // reading down the packages, on to June's and back up
+  await toPkg(1, id, 680);
+  await wait(500, id);
+  await toPkg(2, id, 360);
+  await wait(360, id);
+  scrollDesk(deskBody.scrollHeight - deskBody.clientHeight);
+  hoverPkg(-1);
+  await wait(500, id);
+  await toPkg(3, id, 320);
+  await wait(600, id);
+  hoverPkg(-1);
+  scrollDesk(0);
+  await wait(500, id);
+
+  // FW 3.6.0, picked on both screens at once
+  await toPkg(0, id, 520);
+  await wait(380, id);
+  await click(id);
+  pick(0);
+  await wait(900, id);
+
+  // on to applying it, stopping short of the click
+  await moveTo(...(b => [b.cx + 6, b.cy + 2])(stageBox($('apply'))), id, 760, true);
+  hoverPkg(-1);
+  $('apply').classList.add('hover');
+  await wait(1600, id);
+
+  // and away, back to the robots' package for the next
+  $('apply').classList.remove('hover');
+  await moveTo(...rest, id, 800);
+  pick(1);
+  await wait(1000, id);
+}
 
 /* ---------- embedding ----------
-   Same handshake as the other prototypes: once the first frame has painted, transitions come back
-   and an embedding page is told this one is ready to show (and told again if it asks with
-   "proto:ping", in case it only started listening after the page had loaded). */
+   Same handshake as the other prototypes: once the fonts are in, the loop starts, and once it has
+   caught up and that frame has painted, transitions come back and an embedding page is told this one
+   is ready to show (and told again if it asks with "proto:ping", in case it only started listening
+   after the page had loaded). */
 const SCENE = 'package';
 const root = document.documentElement;
 if (new URLSearchParams(location.search).has('embed')) root.classList.add('embed');
 let shown = false;
 const announce = () => { if (parent !== window) parent.postMessage({ type: 'proto:ready', scene: SCENE }, location.origin); };
 addEventListener('message', e => { if (e.origin === location.origin && e.data === 'proto:ping' && shown) announce(); });
-document.fonts.ready.then(() => requestAnimationFrame(() => requestAnimationFrame(() => {
-  root.classList.remove('no-anim');
-  shown = true;
-  announce();
-})));
+function markCaughtUp() {
+  caughtUp = true;
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    root.classList.remove('no-anim');
+    shown = true;
+    announce();
+  }));
+}
+addEventListener('pointermove', e => { if (e.pointerType !== 'touch') root.classList.add('live'); }, { passive: true });
+root.addEventListener('pointerleave', () => root.classList.remove('live'));
+document.fonts.ready.then(loop);
 
+/* ---------- framing ----------
+   The stage scales to fit the frame. On the square phone card the frame is the whole card instead
+   (update-package-demo.tsx), where the two screens side by side come out too small: the phone goes,
+   and the dialog is centred in the card with a margin of 40 stage px above and below. */
+const BASE_VIEW = () => { const w = 649.43 + 80; return { x: 53 + 280 - w / 2, y: 46 + 649.43 / 2 - w / 2, w, h: w }; };
+let view = null;
+const isSquare = () => innerWidth < (innerHeight * 7) / 6;
+// The card the page is framed into (live-prototype.tsx), whose shape says which layout: 4:3 is
+// .compact. The lightbox's copy is 16:9.
+const host = frameElement?.closest('[data-live-prototype]');
+function place() {
+  const st = $('stage'), W = st.offsetWidth, H = st.offsetHeight;
+  const square = isSquare();
+  root.classList.toggle('square', square);
+  root.classList.toggle('compact', !square && !!host && host.clientWidth < host.clientHeight * 1.55);
+  const v = square ? view ?? BASE_VIEW() : null;
+  const k = v ? Math.min(innerWidth / v.w, innerHeight / v.h) : Math.min(innerWidth / W, innerHeight / H);
+  const [tx, ty] = v ? [-k * (v.x + v.w / 2 - W / 2), -k * (v.y + v.h / 2 - H / 2)] : [0, 0];
+  st.style.transform = `translate(${tx}px, ${ty}px) scale(${k})`;
+  return k;
+}
+const aim = v => { view = v; place(); };
+// A resize lands at once rather than gliding there.
 function fit() {
   const st = $('stage');
-  st.style.transform = `scale(${Math.min(innerWidth / st.offsetWidth, innerHeight / st.offsetHeight)})`;
+  st.style.transition = 'none'; place(); st.offsetHeight; st.style.transition = '';
 }
 addEventListener('resize', fit); fit();
 addEventListener('keydown', e => {
