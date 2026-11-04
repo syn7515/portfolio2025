@@ -13,7 +13,8 @@
   html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   /* The "ds-1" Figma frame: the design system's components laid out on a dashed grid, at Figma's
      1.333× scale (1600×900 stands for a 1200×675 screen, so 18.67px is the 14px body size). Every
-     piece sits under one radial fade, as in Figma. */
+     piece sits under one radial fade, as in Figma. Narrower frames get a layout of their own (the
+     end of the styles). */
   :root {
     --bg: #1c1917;
     --sheet: #292524;
@@ -42,9 +43,11 @@
            mask-image: radial-gradient(916.1px 563.5px at 800px 450px, #000 53.9%, transparent 100%); }
   #sheet > * { position: absolute; }
 
-  /* dashed layout guides */
+  /* dashed layout guides, on the columns' edges and the rows' tops */
   .guide-v { top: 1px; width: 1px; height: 898.5px; background: repeating-linear-gradient(to bottom, #383838 0 4px, transparent 4px 8px); }
   .guide-h { left: 0; height: 1px; width: 1600px; background: repeating-linear-gradient(to right, #383838 0 4px, transparent 4px 8px); }
+  .v1 { left: 525px; } .v2 { left: 671px; } .v3 { left: 1044px; } .v4 { left: 1196px; }
+  .h1 { top: 64px; } .h2 { top: 255px; } .h3 { top: 520px; }
 
   /* buttons */
   .btn { display: flex; align-items: center; justify-content: center; min-width: 85.33px; height: 42.67px; padding: 0 16px; border-radius: 8px;
@@ -102,12 +105,16 @@
 
   /* tags and badges */
   .tags { left: 671.67px; display: flex; gap: 9px 24px; }
+  .tags.types { top: 754px; }
+  .tags.status { top: 796.67px; }
   .tag { padding: 1.33px 5.33px; border-radius: 5.33px; font-size: 16px; line-height: 21.33px; white-space: nowrap; }
   .tags.types .tag { font-family: var(--mono); }
   .badge { font-weight: 500; }
 
   /* sidebars */
   .sidebar { top: 255px; height: 944px; background: var(--bg); border-right: 1.33px solid var(--border); }
+  .sidebar.full { left: 1196px; width: 341.33px; }
+  .sidebar.collapsed { left: 1560px; width: 64px; }
   .sb-head { padding: 18.67px 10.67px 48px; display: flex; align-items: center; justify-content: space-between; }
   .sb-logo { width: 42.67px; height: 42.67px; display: grid; place-items: center; }
   .icon-btn { padding: 10.67px; border-radius: 8px; color: var(--fg-light); transition: background-color 90ms ease; }
@@ -137,18 +144,50 @@
   .btn:active, .undo:active, .icon-btn:active, .field .clear:active, .dd-item:active, .sb-item:active, .cb-row:active { filter: brightness(0.85); }
   /* No transitions until the first frame has painted, so the page appears already in place. */
   .no-anim, .no-anim * { transition: none !important; }
+
+  /* ---------- narrower cards ----------
+     The frame fills the card, so the sheet is laid out again for its shape (fit, in the script)
+     rather than cut down from the 16:9 one.
+     4:3 (.r43), 1200×900: the middle column and the sidebar move in, the sidebar cut at the right
+     edge past its labels, the collapsed one off the sheet; the fade re-centred. */
+  .r43 #stage { width: 1200px; margin-left: -600px; }
+  .r43 #sheet { -webkit-mask-image: radial-gradient(687px 563.5px at 600px 450px, #000 53.9%, transparent 100%);
+                mask-image: radial-gradient(687px 563.5px at 600px 450px, #000 53.9%, transparent 100%); }
+  .r43 .crumbs, .r43 .buttons { left: 600px; }
+  .r43 .dropdown { left: 742.67px; }
+  .r43 .fields { left: 603.33px; }
+  .r43 .tags { left: 601px; }
+  .r43 .sidebar.full { left: 1040px; }
+  .r43 .sidebar.collapsed { display: none; }
+  .r43 .v2 { left: 600px; } .r43 .v3 { left: 973px; } .r43 .v4 { left: 1040px; }
+  /* 1:1 (.sq), 900×900: two columns. Down the left the toast, the radios, the fields, the buttons and
+     the tags; down the right the breadcrumb with its menu open and the sidebar, both cut at the
+     edge. The combobox and the collapsed sidebar sit this one out. */
+  .sq #stage { width: 900px; margin-left: -450px; }
+  .sq #sheet { -webkit-mask-image: radial-gradient(620px 620px at 450px 450px, #000 55%, transparent 100%);
+               mask-image: radial-gradient(620px 620px at 450px 450px, #000 55%, transparent 100%); }
+  .sq .toast { left: 48px; }
+  .sq .radios { left: 48px; }
+  .sq .fields { left: 48px; top: 470px; }
+  .sq .buttons { left: 48px; top: 662px; }
+  .sq .tags { left: 48px; }
+  .sq .crumbs, .sq .sidebar.full { left: 620px; }
+  .sq .dropdown { left: 762.67px; }
+  .sq .cb-trigger, .sq .cb-pop, .sq .sidebar.collapsed, .sq .v4 { display: none; }
+  .sq .v1 { left: 421px; } .sq .v2 { left: 554px; } .sq .v3 { left: 620px; }
+  .sq .h3 { top: 470px; }
 </style>
 </head>
 <body>
 <div id="stage">
   <div id="sheet">
-    <div class="guide-v" style="left: 525px"></div>
-    <div class="guide-v" style="left: 671px"></div>
-    <div class="guide-v" style="left: 1044px"></div>
-    <div class="guide-v" style="left: 1196px"></div>
-    <div class="guide-h" style="top: 64px"></div>
-    <div class="guide-h" style="top: 255px"></div>
-    <div class="guide-h" style="top: 520px"></div>
+    <div class="guide-v v1"></div>
+    <div class="guide-v v2"></div>
+    <div class="guide-v v3"></div>
+    <div class="guide-v v4"></div>
+    <div class="guide-h h1"></div>
+    <div class="guide-h h2"></div>
+    <div class="guide-h h3"></div>
 
     <div class="toast">
       <div class="msg"><span>Firmware update has been scheduled</span><span>Sunday, December 03, 2025 at 9:00 AM</span></div>
@@ -180,19 +219,19 @@
       <div class="cb-list" id="cbList"></div>
     </div>
 
-    <div class="tags types" style="top: 754px">
+    <div class="tags types">
       <span class="tag" style="background: rgba(147, 51, 234, 0.2); color: #c084fc">bool</span>
       <span class="tag" style="background: rgba(37, 99, 235, 0.2); color: #60a5fa">int</span>
       <span class="tag" style="background: rgba(37, 99, 235, 0.2); color: #22d3ee">num</span>
       <span class="tag" style="background: rgba(124, 45, 18, 0.2); color: rgba(253, 186, 116, 0.9)">str</span>
     </div>
-    <div class="tags" style="top: 796.67px">
+    <div class="tags status">
       <span class="tag badge" style="box-shadow: inset 0 0 0 1.33px var(--border); color: var(--fg)">In progress</span>
       <span class="tag badge" style="background: rgba(69, 26, 3, 0.6); color: var(--critical)">Failed</span>
       <span class="tag badge" style="background: rgba(22, 101, 52, 0.3); color: #22c55e">Complete</span>
     </div>
 
-    <div class="sidebar" style="left: 1196px; width: 341.33px">
+    <div class="sidebar full">
       <div class="sb-head">
         <div class="sb-logo" style="opacity: 0.3"><svg class="ic" viewBox="0 0 21.3333 21.3333"><path d="M10.6664 1.55588C15.2048 1.55588 18.867 5.16204 18.8881 9.59592V19.7776H17.185V9.63401C17.1847 6.07621 14.256 3.21018 10.6664 3.21018C7.07693 3.2102 4.14816 6.07585 4.14789 9.63401V9.63498C4.14829 13.1929 7.07672 16.0588 10.6664 16.0588H12.0336L12.5668 17.7131H10.6664C8.58933 17.7131 6.6965 16.9545 5.24946 15.7063L4.14789 14.7551V19.7776H2.44477V9.63401C2.44503 5.18268 6.11514 1.5559 10.6664 1.55588Z" fill="#57534E" stroke="#57534E" stroke-width="1.33333"/></svg></div>
         <div class="icon-btn"><i data-icon="panel-left"></i></div>
@@ -211,7 +250,7 @@
       </div>
     </div>
 
-    <div class="sidebar collapsed" style="left: 1560px; width: 64px">
+    <div class="sidebar collapsed">
       <div class="sb-head" style="padding-bottom: 48px">
         <div class="icon-btn"><svg class="ic" viewBox="0 0 21.3333 21.3333"><path d="M10.6664 1.77561C15.096 1.77561 18.6613 5.30172 18.6674 9.62326V19.5578H17.4047V10.5207H17.4057V9.63401C17.4054 5.95134 14.3741 2.99045 10.6664 2.99045C6.95882 2.99047 3.92843 5.95097 3.92817 9.63401V9.63498C3.92858 13.3178 6.9586 16.2795 10.6664 16.2795H11.8745L12.2651 17.4934H10.6664C8.64409 17.4934 6.80249 16.7541 5.39399 15.5393L3.92817 14.2746V19.5578H2.6645V9.63401C2.66476 5.30753 6.23327 1.77563 10.6664 1.77561Z" stroke="#57534E" stroke-width="1.77333" fill="none"/></svg></div>
       </div>
@@ -281,8 +320,11 @@ document.fonts.ready.then(() => requestAnimationFrame(() => requestAnimationFram
   announce();
 })));
 
+// The sheet's layout for the frame's shape: the card's, which the frame fills.
 function fit() {
-  const st = $('stage');
+  const st = $('stage'), r = innerWidth / innerHeight;
+  root.classList.toggle('sq', r < 7 / 6);
+  root.classList.toggle('r43', r >= 7 / 6 && r < 1.55);
   st.style.transform = `scale(${Math.min(innerWidth / st.offsetWidth, innerHeight / st.offsetHeight)})`;
 }
 addEventListener('resize', fit); fit();
