@@ -1,7 +1,9 @@
 import LivePrototype from "./live-prototype";
 
 /* The Partner PayOnline billing portal (public/prototypes/athena-portal.html), live in place of the
-   "athena-1" (home) and "athena-2" (messages) images. Each covered the whole 16:9 card, sky-blue
+   "athena-1" (home) and "athena-2" (messages) images, each now played on a loop by a scripted
+   pointer: Home's runs down the invoices' status column and rests on the overdue one, Messages'
+   fills in a dispute and writes it. Each image covered the whole 16:9 card, sky-blue
    backdrop and all, and so does this 1600×900 page, in a frame filling the card. On the 4:3 and
    square cards the page crops its backdrop's sides instead, so the portal comes out a fifth larger,
    92% of the card's width, and on the phone ones it lays the portal out narrower too, larger again.

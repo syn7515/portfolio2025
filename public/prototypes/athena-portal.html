@@ -40,7 +40,8 @@
   svg { display: block; flex-shrink: 0; }
   .ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-  #stage { position: absolute; left: 50%; top: 50%; width: 1600px; height: 900px; margin: -450px 0 0 -800px; transform-origin: center; }
+  #stage { position: absolute; left: 50%; top: 50%; width: 1600px; height: 900px; margin: -450px 0 0 -800px; transform-origin: center;
+           transition: transform 900ms cubic-bezier(0.65, 0, 0.35, 1); }
   .app { position: absolute; left: 190px; top: 69px; width: 1221px; height: 762px; display: flex; flex-direction: column; overflow: hidden; background: #e9e9ea; }
   .shell { flex: 1; min-height: 0; display: flex; }
 
@@ -149,17 +150,36 @@
   .radios { position: relative; width: 106px; height: 32px; }
   .radio { position: absolute; top: 8px; display: flex; gap: 8px; line-height: 16px; }
   .multi { position: relative; display: flex; align-items: center; gap: 4px; width: 609px; height: 34px; margin: -1px 0; padding-right: 12px; border-radius: 3px; background: #fff; box-shadow: inset 0 0 0 1px var(--field); }
-  /* focused: a 2px ring 2px out */
-  .multi::after { content: ""; position: absolute; inset: -4px; border: 2px solid rgba(4, 102, 180, 0.8); border-radius: 4px; pointer-events: none; }
+  /* open: a 2px ring 2px out */
+  .select.focus::after, .multi.focus::after { content: ""; position: absolute; inset: -4px; border: 2px solid rgba(4, 102, 180, 0.8); border-radius: 4px; pointer-events: none; }
   .chips { flex: 1; min-width: 0; display: flex; align-items: center; gap: 4px; height: 25px; overflow: hidden; }
   .chip { display: flex; align-items: flex-start; gap: 6px; height: 23px; padding: 1px 12px 0; border-radius: 16px; background: rgba(219, 219, 219, 0.5); color: var(--cell); white-space: pre; }
   .chip .x { align-self: center; width: 12px; height: 12px; display: grid; place-items: center; opacity: 0.7; }
   .input { flex: 1; min-width: 0; height: 32px; padding: 6px 5px 6px 10px; border-radius: 3px; box-shadow: inset 0 0 0 1px var(--field); }
-  .dropdown { position: absolute; right: 0; top: 130px; width: 609px; overflow: hidden; border-radius: 4px; background: #fff;
-              box-shadow: 0 4px 6px -1px rgba(120, 113, 108, 0.1), 0 2px 4px -2px rgba(120, 113, 108, 0.1); }
-  .dropdown::after { content: ""; position: absolute; inset: 0; border: 1px solid #dbdbdb; border-radius: 4px; pointer-events: none; }
-  .opt { display: flex; align-items: center; gap: 8px; padding: 7px 16px 7px 12px; color: #000; transition: background-color 60ms ease; }
-  .textarea { height: 164px; padding: 8px 12px; border-radius: 3px; box-shadow: inset 0 0 0 1px #b6b7b7; color: var(--light); }
+  /* A field's list opens 4px under it, as wide as it or, for the reasons, as its longest. */
+  .pop { position: absolute; left: 0; top: calc(100% + 4px); z-index: 5; min-width: 100%; overflow: hidden; border-radius: 4px; background: #fff;
+         box-shadow: 0 4px 6px -1px rgba(120, 113, 108, 0.1), 0 2px 4px -2px rgba(120, 113, 108, 0.1);
+         opacity: 0; transform: translateY(-4px); pointer-events: none; transition: opacity 150ms ease, transform 150ms ease; }
+  .pop::after { content: ""; position: absolute; inset: 0; border: 1px solid #dbdbdb; border-radius: 4px; pointer-events: none; }
+  .pop.on { opacity: 1; transform: none; }
+  .pop.right { left: auto; right: 0; }
+  .opt { display: flex; align-items: center; gap: 8px; padding: 7px 16px 7px 12px; color: #000; white-space: nowrap; transition: background-color 60ms ease; }
+  .opt .cb-on, .opt.checked .cb-off, .radio .ri-on, .radio.on .ri-off { display: none; }
+  .opt.checked .cb-on, .radio.on .ri-on { display: block; }
+  .textarea { height: 164px; padding: 8px 12px; border-radius: 3px; box-shadow: inset 0 0 0 1px #b6b7b7; color: var(--fg); white-space: pre-wrap; transition: box-shadow 120ms ease; }
+  .textarea.focus { box-shadow: inset 0 0 0 1px var(--link), 0 0 0 2px rgba(4, 102, 180, 0.25); }
+  /* An empty field's placeholder, and fields not yet open to input */
+  .ph, .textarea.ph { color: var(--light); }
+  .field { transition: opacity 200ms ease; }
+  .field.off { opacity: 0.45; }
+  .caret { display: inline-block; width: 1px; height: 17px; margin-left: 1px; vertical-align: -3px; background: var(--fg); animation: blink 1s steps(1) infinite; }
+  .caret.typing { animation: none; }
+  @keyframes blink { 50% { opacity: 0; } }
+  /* The subject fills itself in from the invoice and the reason. */
+  .input.flash { animation: filled 700ms ease-out; }
+  @keyframes filled { from { background-color: rgba(4, 102, 180, 0.12); } }
+  .form, .viewer { transition: opacity 250ms ease; }
+  .form.clearing, .viewer.hidden { opacity: 0; }
   .send { align-self: flex-start; display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 16px 0 12px; border-radius: 3px; background: var(--link); color: #fff; transition: filter 90ms ease; }
 
   .viewer { display: flex; flex-direction: column; gap: 20px; padding: 16px 24px; box-shadow: inset 0 1px 0 var(--rule); }
@@ -180,14 +200,27 @@
   .bill .r { justify-content: flex-end; }
   .bill .f { justify-content: space-between; }
 
-  /* ---------- the Figma frame's pointer ----------
-     The frame draws a hand over the row or option it hovers. Real pointer input (the lightbox's
-     copy; the carousel card's is inert) takes over from it: the hand goes and hover follows the
-     pointer, until it leaves the page and the frame's picture comes back. */
-  .hand { position: absolute; z-index: 20; pointer-events: none; }
-  .live .hand { display: none; }
-  :root:not(.live) .inv .demo > span, :root:not(.live) .opt.demo { background-color: var(--row-hover); }
-  :root:not(.live) .opt.demo { background-color: var(--option-hover); }
+  /* ---------- the pointer ----------
+     A scripted pointer plays each scene on a loop (the script, below), drawn at macOS size against
+     the 1:1 portal as in the firmware prototype: Figma's "Cursor / Hand", and an arrow and I-beam to
+     match, each offset so its hotspot sits on the point, presses scaling about it. Real pointer input
+     (the lightbox's copy; the carousel card's is inert) puts it out of sight, so there's only one,
+     as does the compose pane scrolled away from where its moves are laid out. */
+  .cursor { position: absolute; z-index: 20; left: 0; top: 0; width: 0; height: 0; pointer-events: none; opacity: 0;
+            transition: transform 520ms cubic-bezier(0.4, 0, 0.2, 1), opacity 200ms ease; }
+  .cursor.on { opacity: 1; }
+  .cursor svg { position: absolute; overflow: visible; filter: drop-shadow(-0.67px 0.67px 0.93px rgba(0, 0, 0, 0.6)); }
+  .cursor .c-arrow { left: -5px; top: -2.5px; transform-origin: 5px 2.5px; }
+  .cursor .c-hand { display: none; left: -9.45px; top: -1.6px; transform-origin: 9.45px 1.6px; }
+  .cursor .c-text { display: none; left: -6px; top: -11px; transform-origin: 6px 11px; }
+  .cursor.hand .c-arrow, .cursor.text .c-arrow { display: none; }
+  .cursor.hand .c-hand, .cursor.text .c-text { display: block; }
+  .cursor.down svg { transform: scale(0.9); }
+  .live .cursor.on, .detail-scrolled .cursor.on { opacity: 0; }
+  /* what it's over */
+  .inv > div.hover > span { background-color: var(--row-hover); }
+  .opt.hover { background-color: var(--option-hover); }
+  .send.hover { filter: brightness(1.1); }
 
   /* ---------- real pointer input ----------
      Hover and press show, but nothing acts on a click. Text doesn't select. */
@@ -213,7 +246,6 @@
   .narrow .inv { grid-template-columns: 113px 140px 140px 1fr 150px 120px; }
   .narrow .select, .narrow .multi { width: auto; flex: 1; min-width: 0; }
   .narrow .select .val { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .narrow .dropdown { left: 150px; width: auto; }
   .narrow .dispute { gap: 40px !important; }
   .narrow .dispute-for .label { width: auto; }
 </style>
@@ -278,51 +310,44 @@
                 <div class="detail" id="detail">
                   <div class="compose">
                     <h2 class="h2">New message</h2>
-                    <div class="form">
+                    <div class="form" id="form">
                       <div class="fields">
                         <div class="field">
                           <span class="label">Related invoice</span>
-                          <div class="select"><span class="bar"></span><span class="val">122333</span><i data-icon="expand"></i></div>
+                          <div class="select" id="invSel"><span class="bar"></span><span class="val" id="invVal"></span><i data-icon="expand"></i><div class="pop" id="invPop"></div></div>
                         </div>
                         <div class="field start dispute" style="gap: 60px">
                           <div class="field">
                             <span class="label">Dispute</span>
                             <div class="radios">
-                              <span class="radio" style="left: 0"><i data-icon="radio-off"></i>No</span>
-                              <span class="radio" style="left: 63px"><i data-icon="radio-on"></i>Yes</span>
+                              <span class="radio" id="rNo" style="left: 0"><span class="ri-off"><i data-icon="radio-off"></i></span><span class="ri-on"><i data-icon="radio-on"></i></span>No</span>
+                              <span class="radio" id="rYes" style="left: 63px"><span class="ri-off"><i data-icon="radio-off"></i></span><span class="ri-on"><i data-icon="radio-on"></i></span>Yes</span>
                             </div>
                           </div>
-                          <div class="field dispute-for" style="flex: 1; min-width: 0; height: 34px">
+                          <div class="field dispute-for" id="forField" style="flex: 1; min-width: 0; height: 34px">
                             <span class="label">Dispute for</span>
-                            <div class="select grow"><span class="bar"></span><span class="val">EM - Incorrect Employee or Patient</span><i data-icon="expand"></i></div>
+                            <div class="select grow" id="forSel"><span class="bar"></span><span class="val" id="forVal"></span><i data-icon="expand"></i><div class="pop right" id="forPop"></div></div>
                           </div>
                         </div>
-                        <div class="field" style="height: 32px">
+                        <div class="field" id="itemField" style="height: 32px">
                           <span class="label">Disputing item</span>
-                          <div class="multi">
+                          <div class="multi" id="itemSel">
                             <span class="bar"></span>
-                            <div class="chips">
-                              <span class="chip">Procedure  94640<span class="x"><i data-icon="x"></i></span></span>
-                              <span class="chip">Procedure 95934<span class="x"><i data-icon="x"></i></span></span>
-                            </div>
+                            <div class="chips" id="chips"></div>
                             <i data-icon="expand"></i>
+                            <div class="pop" id="itemPop"></div>
                           </div>
                         </div>
                         <div class="field">
                           <span class="label">Subject</span>
-                          <div class="input">Dispute: Invoice 122333 - EM</div>
+                          <div class="input" id="subj"></div>
                         </div>
-                        <div class="dropdown">
-                          <div class="opt"><i data-icon="check"></i>Procedure 94640</div>
-                          <div class="opt demo"><i data-icon="check"></i>Procedure 95934</div>
-                        </div>
-                        <span data-hand style="left: 424.3px; top: 188.73px"></span>
                       </div>
-                      <div class="textarea">Your message</div>
-                      <div class="send"><i data-icon="send"></i>Send and dispute</div>
+                      <div class="textarea" id="msgBox"><span id="msgText"></span></div>
+                      <div class="send" id="send"><i data-icon="send"></i>Send and dispute</div>
                     </div>
                   </div>
-                  <div class="viewer">
+                  <div class="viewer" id="viewer">
                     <div class="sec-head"><h2 class="h2">Invoice viewer</h2><span class="close"><i data-icon="close"></i></span></div>
                     <div class="viewer-body">
                     <div class="invoice">
@@ -354,6 +379,11 @@
     </div>
     <footer class="foot"><img src="athena-portal/partner-payonline.png" alt="Partner PayOnline | athenahealth" /><span>@2023 WC Holding LLC.</span></footer>
   </div>
+  <div class="cursor" id="cursor">
+    <svg class="c-arrow" width="24" height="24" viewBox="0 0 24 24"><path d="M5 2.5v17.2l4.6-4.4 2.9 6.6 2.9-1.3-2.9-6.5h6.4z" fill="#fff" stroke="#000" stroke-width="1.2" stroke-linejoin="round"/></svg>
+    <svg class="c-text" width="12" height="22" viewBox="0 0 12 22" fill="none" stroke-linecap="round"><path d="M3 2.5c1.6 0 2.4.5 3 1.5.6-1 1.4-1.5 3-1.5M6 4v14M3 19.5c1.6 0 2.4-.5 3-1.5.6 1 1.4 1.5 3 1.5M4.5 12.5h3" stroke="#fff" stroke-width="3.2"/><path d="M3 2.5c1.6 0 2.4.5 3 1.5.6-1 1.4-1.5 3-1.5M6 4v14M3 19.5c1.6 0 2.4-.5 3-1.5.6 1 1.4 1.5 3 1.5M4.5 12.5h3" stroke="#000" stroke-width="1.2"/></svg>
+    <svg class="c-hand" width="22.07" height="23.87" viewBox="0 0 22.0722 23.8667" fill="none"><path d="M9.23 20.933H13.048C13.092 20.933 13.135 20.916 13.166 20.884L14.262 19.789C14.383 19.668 14.547 19.6 14.718 19.6C14.963 19.6 15.186 19.738 15.296 19.957L15.759 20.884C15.775 20.914 15.805 20.933 15.839 20.933H17.412C17.618 20.933 17.784 20.767 17.784 20.562C17.784 19.052 18.135 17.564 18.81 16.214C19.675 14.485 20.727 12.734 20.417 10.716L20.175 9.134C20.098 8.635 19.669 8.267 19.164 8.267H18.98C18.517 8.267 18.142 8.642 18.142 9.105V9.765C18.142 9.864 18.062 9.944 17.963 9.944C17.864 9.944 17.784 9.864 17.784 9.765V8.267C17.784 7.53 17.187 6.933 16.451 6.933C15.714 6.933 15.117 7.53 15.117 8.267V9.794C15.117 9.978 14.968 10.127 14.784 10.127C14.6 10.127 14.451 9.978 14.451 9.794V8.267C14.451 7.53 13.854 6.933 13.117 6.933C12.381 6.933 11.784 7.53 11.784 8.267V10.188C11.784 10.24 11.772 10.291 11.749 10.337C11.626 10.583 11.275 10.583 11.153 10.337C11.129 10.291 11.117 10.24 11.117 10.188V3.6C11.117 2.731 10.409 1.6 9.451 1.6C8.492 1.6 7.784 2.731 7.784 3.6V11.844C7.784 12.077 7.595 12.267 7.361 12.267C7.21 12.267 7.071 12.187 6.994 12.057C6.737 11.626 6.14 10.649 5.784 10.267C5.583 10.051 5.181 9.897 4.789 9.792C4.181 9.629 3.565 9.929 3.216 10.452C2.771 11.12 2.859 12.008 3.426 12.576L4.521 13.671C4.913 14.063 5.209 14.541 5.384 15.067L5.451 15.267C5.67 15.924 6.039 16.522 6.529 17.012L8.254 18.737C8.807 19.29 9.117 20.039 9.117 20.821C9.117 20.883 9.168 20.933 9.23 20.933Z" fill="#fff" stroke="#000" stroke-width="0.8"/><path d="M11.487 12.744V17.875M14.119 12.744V17.875M16.815 12.744V17.875" stroke="#000" stroke-width="0.8"/></svg>
+  </div>
 </div>
 
 <script>
@@ -370,28 +400,26 @@ const ICONS = {
   'radio-off': [16, 16, '<circle cx="8" cy="8" r="7.5" stroke="#B3B3B3"/>'],
   x: [10, 10, '<path d="M1 9L5 5M5 5L1 1M5 5L9 9M5 5L9 1" stroke="#373738" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>'],
   close: [10, 10, '<path d="M1 9L5 5M5 5L1 1M5 5L9 9M5 5L9 1" stroke="#373738" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>'],
+  box: [16, 22, '<rect x="0.5" y="3.5" width="15" height="15" rx="2.5" fill="#fff" stroke="#B3B3B3"/>'],
   check: [16, 22, '<rect y="3" width="16" height="16" rx="3" fill="#0466B4"/><path d="M4 11.2825L6.79 13.8125L12 8.8125" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'],
   send: [14, 14, '<path d="M7.201 11.025L5.644 12.906V9.284L9.625 5.25M11.148 11.725L13.125 1.094L0.875 7L11.148 11.725Z" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>'],
   filter: [16, 16, '<path d="M15 1H1L6.25 6.25V15L9.75 12.98V6.25L15 1Z" stroke="#7C7D7D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'],
 };
 const icon = name => { const [w, h, body] = ICONS[name]; return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none">${body}</svg>`; };
-// Figma's "Cursor / Hand", its drop shadow included, drawn where the frame's sits.
-const HAND = `<svg class="hand" width="22.07" height="23.87" viewBox="0 0 22.0722 23.8667" fill="none">
-  <defs><filter id="hand-shadow" x="0" y="0" width="22.0722" height="23.8667" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="bg"/><feColorMatrix in="SourceAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="a"/><feOffset dx="-0.666667" dy="0.666667"/><feGaussianBlur stdDeviation="0.933333"/><feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.6 0"/><feBlend in2="bg" result="s"/><feBlend in="SourceGraphic" in2="s"/></filter></defs>
-  <path filter="url(#hand-shadow)" d="M9.23 20.933H13.048C13.092 20.933 13.135 20.916 13.166 20.884L14.262 19.789C14.383 19.668 14.547 19.6 14.718 19.6C14.963 19.6 15.186 19.738 15.296 19.957L15.759 20.884C15.775 20.914 15.805 20.933 15.839 20.933H17.412C17.618 20.933 17.784 20.767 17.784 20.562C17.784 19.052 18.135 17.564 18.81 16.214C19.675 14.485 20.727 12.734 20.417 10.716L20.175 9.134C20.098 8.635 19.669 8.267 19.164 8.267H18.98C18.517 8.267 18.142 8.642 18.142 9.105V9.765C18.142 9.864 18.062 9.944 17.963 9.944C17.864 9.944 17.784 9.864 17.784 9.765V8.267C17.784 7.53 17.187 6.933 16.451 6.933C15.714 6.933 15.117 7.53 15.117 8.267V9.794C15.117 9.978 14.968 10.127 14.784 10.127C14.6 10.127 14.451 9.978 14.451 9.794V8.267C14.451 7.53 13.854 6.933 13.117 6.933C12.381 6.933 11.784 7.53 11.784 8.267V10.188C11.784 10.24 11.772 10.291 11.749 10.337C11.626 10.583 11.275 10.583 11.153 10.337C11.129 10.291 11.117 10.24 11.117 10.188V3.6C11.117 2.731 10.409 1.6 9.451 1.6C8.492 1.6 7.784 2.731 7.784 3.6V11.844C7.784 12.077 7.595 12.267 7.361 12.267C7.21 12.267 7.071 12.187 6.994 12.057C6.737 11.626 6.14 10.649 5.784 10.267C5.583 10.051 5.181 9.897 4.789 9.792C4.181 9.629 3.565 9.929 3.216 10.452C2.771 11.12 2.859 12.008 3.426 12.576L4.521 13.671C4.913 14.063 5.209 14.541 5.384 15.067L5.451 15.267C5.67 15.924 6.039 16.522 6.529 17.012L8.254 18.737C8.807 19.29 9.117 20.039 9.117 20.821C9.117 20.883 9.168 20.933 9.23 20.933Z" fill="#fff" stroke="#000" stroke-width="0.8"/>
-  <path d="M11.487 12.744V17.875M14.119 12.744V17.875M16.815 12.744V17.875" stroke="#000" stroke-width="0.8"/>
-</svg>`;
 const $ = id => document.getElementById(id);
 
 /* ---------- scene ---------- */
 const params = new URLSearchParams(location.search);
+const INVOICE_NOS = ['122333', '023231', '778444', '667444', '663322'];
+const REASONS = ['EM - Incorrect Employee or Patient', 'DU - Duplicate charge', 'CO - Incorrect procedure code', 'AM - Incorrect amount'];
+const ITEMS = ['Procedure 94640', 'Procedure 95934'];
+const MESSAGE = 'The patient on this invoice isn’t one of our employees. Please review both procedures.';
 const SCENE = params.get('scene') === 'messages' ? 'messages' : 'home';
 document.querySelectorAll('.scene').forEach(s => { if (s.dataset.scene !== SCENE) s.remove(); });
 document.querySelector(`.menu [data-page="${SCENE}"]`).classList.add('on');
 
 if (SCENE === 'home') {
-  // Invoice, invoice date, due by, status, original balance, balance. Figma's hand rests on the
-  // overdue one.
+  // Invoice, invoice date, due by, status, original balance, balance.
   const INVOICES = [
     ['122333', '04/10/2023', 'Due now', '$757.00', '$757.00'],
     ['023231', '04/10/2023', 'Due now', '$135.00', '$135.00'],
@@ -402,8 +430,8 @@ if (SCENE === 'home') {
   $('invoices').innerHTML =
     '<div class="th"><span>Invoice</span><span>Invoice date</span><span>Due by</span><span class="st">Status</span><span class="r">Original balance</span><span class="r">Balance</span></div>' +
     INVOICES.map(([no, date, status, orig, bal]) => `
-      <div${status === 'Overdue' ? ' class="demo"' : ''}><span>${no}</span><span>${date}</span><span>08/10/2023</span>
-        <span class="st" style="position: relative"><span class="tag ${status.toLowerCase().replace(' ', '-')}">${status}</span>${status === 'Overdue' ? '<span data-hand style="left: 62.3px; top: 18.73px"></span>' : ''}</span>
+      <div><span>${no}</span><span>${date}</span><span>08/10/2023</span>
+        <span class="st"><span class="tag ${status.toLowerCase().replace(' ', '-')}">${status}</span></span>
         <span class="r">${orig}</span><span class="r">${bal}</span></div>`).join('');
 
   const HI_KELLY = 'Hi, Kelly. Can you double check if the patient name is correct? It doesn’t seems so to me';
@@ -430,13 +458,18 @@ if (SCENE === 'home') {
     `<div class="th"><span class="f">Due By${icon('filter')}</span><span>Status</span><span class="f">Procedure${icon('filter')}</span><span>Units</span><span class="r">Charge</span><span class="r">Adjustment</span><span class="r">Payment</span><span class="r">Balance</span></div>` +
     BILL.map(([proc, units, charge]) => `
       <div><span>11/14/2022</span><span><span class="tag">Due now</span></span><span>${proc}</span><span>${units}</span><span class="r">${charge}</span><span class="r">$0.00</span><span class="r">$0.00</span><span class="r">${charge}</span></div>`).join('');
+
+  // The form's lists: the account's invoices, the reasons to dispute one, and the invoice's items.
+  $('invPop').innerHTML = INVOICE_NOS.map(no => `<div class="opt">${no}</div>`).join('');
+  $('forPop').innerHTML = REASONS.map(r => `<div class="opt">${r}</div>`).join('');
+  $('itemPop').innerHTML = ITEMS.map(item =>
+    `<div class="opt"><span class="cb-off"><i data-icon="box"></i></span><span class="cb-on"><i data-icon="check"></i></span>${item}</div>`).join('');
 }
 document.querySelectorAll('i[data-icon]').forEach(i => { i.outerHTML = icon(i.dataset.icon); });
-document.querySelectorAll('[data-hand]').forEach(el => { el.outerHTML = HAND.replace('class="hand"', `class="hand" style="${el.getAttribute('style')}"`); });
 
 /* ---------- real pointer input ----------
-   A mouse moving over the page (only the lightbox's copy takes one) puts it live: the frame's hand
-   and the hover it draws give way to the real pointer's, and come back once it leaves. */
+   A mouse moving over the page (only the lightbox's copy takes one) puts it live: the scripted
+   pointer steps aside for the real one, and comes back once it leaves. */
 const root = document.documentElement;
 addEventListener('pointermove', e => { if (e.pointerType !== 'touch') root.classList.add('live'); }, { passive: true });
 root.addEventListener('pointerleave', () => root.classList.remove('live'));
@@ -462,13 +495,268 @@ function syncedScroll(name, scroller) {
     },
   };
 }
-if ($('detail')) syncedScroll('detail', $('detail'));
+if ($('detail')) {
+  syncedScroll('detail', $('detail'));
+  $('detail').addEventListener('scroll', () => root.classList.toggle('detail-scrolled', $('detail').scrollTop > 0), { passive: true });
+}
+
+/* ---------- the loop ----------
+   As in the other prototypes, waits are scheduled against the wall clock rather than chained
+   timeouts: step n of the loop lands at loopStart + (sum of waits up to n), and an embedded copy
+   takes loopStart from Date.now() too, so the carousel card and its lightbox copy show the same
+   moment. A wait whose time has passed returns at once, which is how a copy that starts mid-loop
+   catches up; the first that hasn't is the first moment the scene is in place. */
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+let runId = 0, loopStart = 0, vt = 0, dry = false, caughtUp = false;
+async function wait(ms, id) {
+  if (id !== runId) throw 'abort';
+  vt += ms;
+  if (dry) return;
+  while (true) {
+    if (id !== runId) throw 'abort';
+    const left = loopStart + vt - Date.now();
+    if (left <= 0) return;
+    if (!caughtUp) markCaughtUp();
+    await sleep(Math.min(left, 30));
+  }
+}
+async function loop() {
+  const id = ++runId;
+  const scene = SCENE === 'home' ? playHome : playMessages;
+  try {
+    // Measure the loop with a dry run (every wait returns at once), so a synced copy can find its place in it.
+    dry = true; vt = 0; await scene(id); dry = false;
+    const length = vt;
+    while (true) {
+      const now = Date.now();
+      loopStart = root.classList.contains('embed') ? now - (now % length) : now;
+      vt = 0;
+      await scene(id);
+    }
+  } catch (e) { dry = false; if (e !== 'abort') throw e; }
+}
+
+/* ---------- the pointer ----------
+   Points are stage px, measured off the elements they're over, so the moves follow whichever
+   layout the portal has (.narrow). */
+const cursor = $('cursor');
+function stageBox(el) {
+  const st = $('stage'), s = st.getBoundingClientRect(), b = el.getBoundingClientRect();
+  const k = s.width / st.offsetWidth;
+  return { left: (b.left - s.left) / k, top: (b.top - s.top) / k, right: (b.right - s.left) / k, bottom: (b.bottom - s.top) / k,
+           width: b.width / k, cx: ((b.left + b.right) / 2 - s.left) / k, cy: ((b.top + b.bottom) / 2 - s.top) / k };
+}
+function jump(x, y) {
+  cursor.style.transition = 'none'; cursor.classList.remove('hand', 'text');
+  cursor.style.transform = `translate(${x}px, ${y}px)`;
+  cursor.offsetHeight; cursor.style.transition = ''; cursor.classList.add('on');
+}
+// A hand stays a hand on the way to another thing to click; otherwise it's the arrow until there.
+async function moveTo(x, y, id, ms = 560, hand = false) {
+  cursor.classList.remove('text');
+  if (!hand) cursor.classList.remove('hand');
+  cursor.style.transitionDuration = `${ms}ms, 200ms`;
+  cursor.style.transform = `translate(${x}px, ${y}px)`;
+  await wait(ms, id);
+  cursor.classList.toggle('hand', hand);
+}
+async function click(el, id) {
+  cursor.classList.add('down'); el?.classList.add('pressed'); await wait(130, id);
+  cursor.classList.remove('down'); el?.classList.remove('pressed');
+}
+
+/* ---------- Home: down the status column to the overdue invoice, and resting on it ---------- */
+const hoverRow = i => document.querySelectorAll('.inv > div:not(.th)').forEach((r, j) => r.classList.toggle('hover', j === i));
+// Over a row's status tag, its row lit once the pointer is most of the way there.
+async function toRow(i, id, ms) {
+  const tag = stageBox(document.querySelectorAll('.inv .tag')[i]);
+  cursor.style.transitionDuration = `${ms}ms, 200ms`;
+  cursor.style.transform = `translate(${tag.cx + 4}px, ${tag.cy + 2}px)`;
+  await wait(ms * 0.6, id);
+  hoverRow(i); cursor.classList.add('hand');
+  await wait(ms * 0.4, id);
+}
+// The square card's camera on Home: the portal's whole height with a margin above and below, and
+// as much on its left, square, so it's cut a little past the status column.
+function homeView() {
+  const app = stageBox(document.querySelector('.app'));
+  const margin = 44, w = app.bottom - app.top + 2 * margin;
+  return { x: app.left - margin, y: app.top - margin, w, h: w };
+}
+async function playHome(id) {
+  hoverRow(-1); aim(null);
+  // From the room beside the overview, the camera in as the pointer sets off
+  const ov = stageBox(document.querySelectorAll('.ov')[1]);
+  const rest = [ov.right + 64, ov.cy + 24];
+  jump(...rest);
+  await wait(300, id);
+  aim(homeView());
+  await wait(600, id);
+  await toRow(0, id, 720);
+  await wait(420, id);
+  await toRow(1, id, 300);
+  await wait(340, id);
+  await toRow(2, id, 300);
+  await wait(380, id);
+  await toRow(3, id, 440);
+  await wait(2400, id);
+  // and back out with it
+  aim(null);
+  cursor.classList.remove('hand');
+  cursor.style.transitionDuration = '760ms, 200ms';
+  cursor.style.transform = `translate(${rest[0]}px, ${rest[1]}px)`;
+  await wait(120, id);
+  hoverRow(-1);
+  await wait(1540, id);
+}
+
+/* ---------- Messages: the dispute filled in and written ---------- */
+const caret = document.createElement('span'); caret.className = 'caret';
+// A typist's uneven rhythm, the same every loop (a fixed scatter, so the card and lightbox copies
+// agree): quick runs inside a word with the odd stumble, a beat between words, and a longer one
+// after a comma or full stop.
+const scatter = i => (Math.imul(i + 1, 2654435761) >>> 0) % 997 / 997;
+function keyGap(i) {
+  const r = scatter(i);
+  if (/[.,]/.test(MESSAGE[i])) return 360 + 200 * r;
+  if (MESSAGE[i] === ' ') return 110 + 120 * r;
+  return 38 + 70 * r * r + (r > 0.94 ? 180 : 0);
+}
+function setVal(el, text, placeholder = false) { el.textContent = text; el.classList.toggle('ph', placeholder); }
+const pops = () => [$('invPop'), $('forPop'), $('itemPop')];
+function openPop(pop) { pop.classList.add('on'); pop.parentElement.classList.add('focus'); }
+function closePops() { pops().forEach(p => { p.classList.remove('on'); p.parentElement.classList.remove('focus'); }); hoverOpt(null); }
+const hoverOpt = opt => pops().forEach(p => [...p.children].forEach(o => o.classList.toggle('hover', o === opt)));
+const setDispute = yes => { $('rYes').classList.toggle('on', yes); $('rNo').classList.toggle('on', !yes); ['forField', 'itemField'].forEach(f => $(f).classList.toggle('off', !yes)); };
+function resetForm() {
+  closePops();
+  setVal($('invVal'), 'Select an invoice', true);
+  setDispute(false);
+  setVal($('forVal'), 'Select a reason', true);
+  $('chips').innerHTML = '<span class="ph" style="padding-left: 6px">Select items</span>';
+  [...$('itemPop').children].forEach(o => o.classList.remove('checked'));
+  setVal($('subj'), 'Subject', true); $('subj').classList.remove('flash');
+  setVal($('msgText'), 'Your message'); $('msgBox').classList.add('ph'); $('msgBox').classList.remove('focus'); caret.remove();
+  $('send').classList.remove('hover');
+  $('viewer').classList.add('hidden');
+}
+function pickItem(i) {
+  const opt = $('itemPop').children[i];
+  opt.classList.add('checked');
+  $('chips').querySelector('.ph')?.remove();
+  $('chips').insertAdjacentHTML('beforeend', `<span class="chip">${ITEMS[i]}<span class="x">${icon('x')}</span></span>`);
+}
+// Over a field, a little way in from its left, where its value sits.
+const intoField = (el, x = 0.4) => { const b = stageBox(el); return [b.left + Math.min(240, b.width * x), b.cy + 2]; };
+const intoOpt = (el, x = 96) => { const b = stageBox(el); return [b.left + x, b.cy + 2]; };
+async function pick(pop, i, id, ms = 300) {
+  const opt = pop.children[i];
+  await moveTo(...intoOpt(opt), id, ms, true); hoverOpt(opt);
+  await wait(300, id);
+  await click(null, id);
+}
+
+// The square card's camera on Messages: from just left of the compose pane out past the portal's
+// right edge, with the same margin there as Home's view keeps, and up or down to the point the
+// pointer's working at (y), kept to that margin above and below the portal.
+function paneView(y) {
+  const app = stageBox(document.querySelector('.app')), pane = stageBox($('detail'));
+  const margin = 44, x = pane.left - 24, w = app.right + margin - x;
+  return { x, y: Math.min(Math.max(y - w / 2, app.top - margin), app.bottom + margin - w), w, h: w };
+}
+async function playMessages(id) {
+  resetForm(); aim(null);
+  // From the pane's empty top, right of its heading
+  const head = stageBox(document.querySelector('.compose .h2'));
+  const rest = [head.right + 220, head.cy + 6];
+  jump(...rest);
+  await wait(800, id);
+
+  // the invoice it's about, which the viewer below then shows
+  aim(paneView(stageBox($('invSel')).cy + 70));
+  await moveTo(...intoField($('invSel')), id, 620, true);
+  await wait(140, id);
+  await click(null, id);
+  openPop($('invPop'));
+  await wait(380, id);
+  await pick($('invPop'), 0, id);
+  closePops(); setVal($('invVal'), INVOICE_NOS[0]); $('viewer').classList.remove('hidden');
+  await wait(560, id);
+
+  // a dispute, and what it's for
+  const yes = stageBox($('rYes'));
+  aim(paneView(yes.cy + 60));
+  await moveTo(yes.left + 8, yes.cy + 1, id, 560, true);
+  await wait(120, id);
+  await click(null, id);
+  setDispute(true);
+  await wait(420, id);
+  await moveTo(...intoField($('forSel'), 0.5), id, 520, true);
+  await wait(120, id);
+  await click(null, id);
+  openPop($('forPop'));
+  await wait(380, id);
+  await pick($('forPop'), 0, id);
+  closePops(); setVal($('forVal'), REASONS[0]);
+  setVal($('subj'), `Dispute: Invoice ${INVOICE_NOS[0]} - EM`); $('subj').classList.add('flash');
+  await wait(520, id);
+
+  // the two procedures it disputes
+  aim(paneView(stageBox($('itemSel')).cy + 30));
+  await moveTo(...intoField($('itemSel'), 0.5), id, 560, true);
+  await wait(120, id);
+  await click(null, id);
+  openPop($('itemPop'));
+  await wait(380, id);
+  await pick($('itemPop'), 0, id, 320);
+  pickItem(0);
+  await wait(300, id);
+  await pick($('itemPop'), 1, id, 260);
+  pickItem(1);
+  await wait(420, id);
+
+  // the message: a click in the box (closing the list), the pointer out of sight while the keys run
+  const box = stageBox($('msgBox'));
+  aim(paneView(box.cy));
+  await moveTo(box.left + 160, box.top + 70, id, 640);
+  cursor.classList.add('text');
+  await wait(200, id);
+  await click(null, id);
+  closePops();
+  $('msgBox').classList.remove('ph'); $('msgBox').classList.add('focus');
+  $('msgText').textContent = ''; $('msgText').after(caret);
+  await wait(360, id);
+  cursor.classList.remove('on');
+  for (let i = 0; i < MESSAGE.length; i++) {
+    caret.classList.add('typing'); $('msgText').textContent = MESSAGE.slice(0, i + 1);
+    await wait(keyGap(i), id);
+    caret.classList.remove('typing');
+  }
+  await wait(600, id);
+
+  // over to send it, where it stops short of the click
+  cursor.classList.add('on');
+  const send = stageBox($('send'));
+  aim(paneView(send.cy));
+  await moveTo(send.cx + 24, send.cy + 2, id, 620, true);
+  $('send').classList.add('hover');
+  await wait(1600, id);
+
+  // and away, the camera back out and the form clearing for the next
+  $('send').classList.remove('hover');
+  aim(null);
+  await moveTo(...rest, id, 800);
+  $('form').classList.add('clearing'); $('viewer').classList.add('hidden');
+  await wait(260, id);
+  resetForm(); $('form').classList.remove('clearing');
+  await wait(900, id);
+}
 
 /* ---------- embedding ----------
-   Same handshake as the other prototypes: once the fonts and the backdrop are in and the first
-   frame has painted, transitions come back and an embedding page is told this one is ready to show
-   (and told again if it asks with "proto:ping", in case it only started listening after the page
-   had loaded). */
+   Same handshake as the other prototypes: once the fonts and the backdrop are in, the loop starts,
+   and once it has caught up and that frame has painted, transitions come back and an embedding page
+   is told this one is ready to show (and told again if it asks with "proto:ping", in case it only
+   started listening after the page had loaded). */
 if (params.has('embed')) root.classList.add('embed');
 // Inert on the carousel card. The site gives the frame no pointer there (pointer-events: none on the
 // iframe; only the lightbox's copy, inside [data-lightbox-live], takes one), but iOS Safari still
@@ -491,19 +779,40 @@ Promise.all([
   document.fonts.load('600 14px "Source Sans Pro"'),
   backdrop.decode().catch(() => {}),
   ...[...document.images].map(img => img.decode().catch(() => {})),
-]).then(() => document.fonts.ready).then(() => requestAnimationFrame(() => requestAnimationFrame(() => {
-  root.classList.remove('no-anim');
-  shown = true;
-  announce();
-})));
+]).then(() => document.fonts.ready).then(loop);
+function markCaughtUp() {
+  caughtUp = true;
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    root.classList.remove('no-anim');
+    shown = true;
+    announce();
+  }));
+}
 
 // Figma's composition fills a 16:9 frame. A narrower one (the 4:3 and square cards) crops the backdrop's
 // sides rather than shrinking the portal, down to the portal filling 92% of its width. On the phone
 // cards the portal itself narrows first (.narrow above).
+//
+// On the square card (the phone card below 480px) the stage also has a camera: aim() zooms it in on
+// a view, a box of stage px brought to fill the frame, and aim(null) back out. The scenes aim it as
+// the pointer works (see each, above); anywhere else it stays out.
+let view = null;
+function place() {
+  const st = $('stage'), portal = document.querySelector('.app');
+  const square = innerWidth < (innerHeight * 7) / 6;
+  if (!view || !square) {
+    st.style.transform = `translate(0px, 0px) scale(${Math.min(innerWidth * 0.92 / portal.offsetWidth, innerHeight / st.offsetHeight)})`;
+    return;
+  }
+  const k = Math.min(innerWidth / view.w, innerHeight / view.h);
+  st.style.transform = `translate(${-k * (view.x + view.w / 2 - 800)}px, ${-k * (view.y + view.h / 2 - 450)}px) scale(${k})`;
+}
+const aim = v => { view = v; place(); };
+// A resize lands at once rather than gliding there.
 function fit() {
   root.classList.toggle('narrow', innerWidth < 600);
-  const st = $('stage'), portal = document.querySelector('.app');
-  st.style.transform = `scale(${Math.min(innerWidth * 0.92 / portal.offsetWidth, innerHeight / st.offsetHeight)})`;
+  const st = $('stage');
+  st.style.transition = 'none'; place(); st.offsetHeight; st.style.transition = '';
 }
 addEventListener('resize', fit); fit();
 addEventListener('keydown', e => {
