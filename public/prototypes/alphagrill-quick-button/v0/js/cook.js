@@ -122,6 +122,11 @@
     preheatAlmost:      { label: 'Preheat · almost',       state: 'preheat', temp: { 0: 215, 1: 218, 4: 212, 5: 216 }, t0: COLD,                     heat: { 0: 215, 1: 218 } },
     preheatCoolingdown: { label: 'Preheat · cooling down', state: 'preheat', temp: { 0: 260, 1: 265, 4: 258, 5: 262 }, t0: { 0: 260, 1: 265, 4: 258, 5: 262 }, heat: { 0: 260, 1: 265 } },
     ready:              { label: 'Ready',                  state: 'ready',   temp: { 0: 220, 1: 220, 4: 220, 5: 220 }, t0: { 0: 220, 1: 220, 4: 220, 5: 220 }, heat: { 0: 220, 1: 220 } },
+    // 조리 시작 이후 (cooking). Jumping here starts the cook at that step; Beef Burger has cheese (meltingSec 10).
+    cook:               { label: 'Cooking · 조리 중',      state: 'ready',   temp: { 0: 220, 1: 220, 4: 220, 5: 220 }, t0: { 0: 220, 1: 220, 4: 220, 5: 220 }, heat: { 0: 220, 1: 220 }, cook: 'cook' },
+    cookWaitMelt:       { label: 'Cooking · 치즈 대기',    state: 'ready',   temp: { 0: 220, 1: 220, 4: 220, 5: 220 }, t0: { 0: 220, 1: 220, 4: 220, 5: 220 }, heat: { 0: 220, 1: 220 }, cook: 'waitMelt', recipeId: 2 },
+    cookMelt:           { label: 'Cooking · 치즈 조리 중', state: 'ready',   temp: { 0: 220, 1: 220, 4: 220, 5: 220 }, t0: { 0: 220, 1: 220, 4: 220, 5: 220 }, heat: { 0: 220, 1: 220 }, cook: 'melt', recipeId: 2 },
+    cookOutput:         { label: 'Cooking · 배출 및 정리', state: 'ready',   temp: { 0: 220, 1: 220, 4: 220, 5: 220 }, t0: { 0: 220, 1: 220, 4: 220, 5: 220 }, heat: { 0: 220, 1: 220 }, cook: 'output' },
     noSelect:           { label: 'No recipe (standby)',    state: 'standby', temp: { 0: 200, 1: 200, 4: 200, 5: 200 }, t0: { 0: 200, 1: 200, 4: 200, 5: 200 }, heat: { 0: 0, 1: 0 }, noRecipe: true },
   };
 
@@ -295,12 +300,171 @@
     });
   }
 
+  const escapeHTML = (text) => String(text).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  // ── Cooking (조리 시작 이후) ───────────────────────────────────────────────
+  // Ported from fw-app-tauri-AlphaGrill main @ 96c89ba: features/cook/model/constants.ts
+  // (STEPS_BY_MODE, STATUS_PHASE_LABEL, STATE_TO_BACKGROUND), components/cook-active-view.tsx,
+  // cook-action-bar.tsx, cook-timer.tsx. The STM sequence is simulated here (proto-only):
+  //   COOK (cookingSec) → [cheese] WAIT_MELT → 치즈 조리 시작 → MELT (meltingSec)
+  //   → [배출 ON] OUTPUT → CLEAN → back to READY.   중지 → ABORT → CLEAN → READY.
+  // TODO(미정): OUTPUT / CLEAN / ABORT durations and what follows a no-arm cook are guesses, not STM values.
+  const COOK_STR = {
+    ko: { pressGrilling: '조리 중', grillingFinished: '조리 완료', meltingCheese: '치즈 조리', meltingCheese2: '치즈 조리 중',
+          unloadAndCleanUp: '배출 및 그리들 정리', stopCooking: '중지', stopScrape: '중지', startCheeseCooking: '치즈 조리 시작',
+          placeCheese: '치즈를 조리물 위에 올리고\n추가 가열을 시작하세요.' },
+    en: { pressGrilling: 'PRESSING & GRILLING', grillingFinished: 'GRILLING FINISHED', meltingCheese: 'MELTING CHEESE', meltingCheese2: 'MELTING CHEESE',
+          unloadAndCleanUp: 'UNLOAD & CLEAN UP', stopCooking: 'Stop', stopScrape: 'Stop scraping', startCheeseCooking: 'Start melting',
+          placeCheese: 'Place cheese on top of food and start melting.' },
+  };
+  // phase → STATUS_PHASE_LABEL / STATUS_STEP_KEY
+  const PHASE_LABEL = { cook: 'pressGrilling', waitMelt: 'grillingFinished', melt: 'meltingCheese2', output: 'unloadAndCleanUp', clean: 'unloadAndCleanUp' };
+  const PHASE_STEP  = { cook: 'pressGrilling', waitMelt: 'grillingFinished', melt: 'meltingCheese', output: 'unloadAndCleanUp', clean: 'unloadAndCleanUp' };
+  const STEP_ID = (key) => (key === 'meltingCheese2' ? 'meltingCheese' : key);   // stepIdentity()
+  const OUTPUT_SEC = 3, CLEAN_SEC = 4, ABORT_SEC = 2;
+
+  function stepsForMode(withoutArm, cheese) {
+    if (!withoutArm && cheese) return ['pressGrilling', 'grillingFinished', 'meltingCheese', 'unloadAndCleanUp'];
+    if (!withoutArm) return ['pressGrilling', 'unloadAndCleanUp'];
+    if (cheese) return ['pressGrilling', 'grillingFinished', 'meltingCheese'];
+    return ['pressGrilling'];
+  }
+
+  /** null = not cooking. phase: cook | waitMelt | melt | output | clean; abort keeps the phase it stopped from. */
+  let cook = null;
+  const cookSpeed = { value: Math.max(1, Number(params.get('speed')) || 1) };
+
+  function startCook(phase) {
+    const d = derive();
+    if (!d.option) return;
+    const cheese = (d.option.meltingSec || 0) > 0;
+    cook = { phase: phase || 'cook', cheese, withoutArm: state.withoutArm, remaining: 0, abort: 0, after: 0 };
+    enterPhase(cook.phase);
+    state.sheet.open = false;
+    render();
+  }
+  function enterPhase(phase) {
+    const d = derive();
+    cook.phase = phase;
+    cook.remaining = phase === 'cook' ? d.option.cookingSec : (phase === 'waitMelt' || phase === 'melt') ? d.option.meltingSec : 0;
+    cook.after = phase === 'output' ? OUTPUT_SEC : phase === 'clean' ? CLEAN_SEC : 0;
+  }
+  function endCook() { cook = null; render(); }
+  function afterMain() {   // main countdown of COOK / MELT reached 0
+    if (cook.phase === 'cook' && cook.cheese) return enterPhase('waitMelt');
+    if (cook.withoutArm) return endCook();
+    enterPhase('output');
+  }
+  function tickCook() {
+    if (!cook) return;
+    if (cook.abort > 0) {
+      if (--cook.abort <= 0) { cook.abortDone = true; enterPhase('clean'); cook.stopped = true; }
+    } else if (cook.phase === 'cook' || cook.phase === 'melt') {
+      if (--cook.remaining <= 0) { cook.remaining = 0; afterMain(); }
+    } else if (cook.phase === 'output' || cook.phase === 'clean') {
+      if (--cook.after <= 0) {
+        if (cook.phase === 'output') enterPhase('clean');
+        else return endCook();
+      }
+    }
+    if (cook) render();
+  }
+  let cookTimer = null;
+  function restartCookTimer() {
+    clearInterval(cookTimer);
+    cookTimer = setInterval(tickCook, 1000 / cookSpeed.value);
+  }
+  restartCookTimer();
+
+  function stopCook() {   // send("abort")
+    if (!cook || cook.abort > 0) return;
+    cook.abort = ABORT_SEC;
+    render();
+  }
+
+  // Shared-layout FLIP for the timeline: the step promoted from upcoming slides from its old
+  // spot into the middle, the rest slide left, the leaving phase fades (stand-in for motion's layoutId).
+  function flipTimeline(apply) {
+    const before = new Map();
+    document.querySelectorAll('#cooking-view [data-step]').forEach((el) => before.set(el.dataset.step, el.getBoundingClientRect()));
+    const oldPhase = document.querySelector('#cv-phase-slot [data-step]');
+    const oldPhaseRect = oldPhase && oldPhase.getBoundingClientRect();
+    const oldPhaseId = oldPhase && oldPhase.dataset.step;
+    apply();
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) return;
+    const scale = document.getElementById('device').getBoundingClientRect().width / 600 || 1;
+    document.querySelectorAll('#cooking-view [data-step]').forEach((el) => {
+      const prev = before.get(el.dataset.step);
+      if (!prev) return;
+      const now = el.getBoundingClientRect();
+      const dx = (prev.left - now.left) / scale, dy = (prev.top - now.top) / scale;
+      if (!dx && !dy) return;
+      el.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }], { duration: 520, easing: 'cubic-bezier(.2, .9, .25, 1)' });
+    });
+    const newPhase = document.querySelector('#cv-phase-slot [data-step]');
+    if (oldPhase && oldPhaseId !== (newPhase && newPhase.dataset.step)) {
+      const ghost = oldPhase.cloneNode(true);
+      const slot = $('cv-phase-slot').getBoundingClientRect();
+      ghost.style.cssText = `position:absolute;left:${(oldPhaseRect.left - slot.left) / scale}px;top:0;pointer-events:none`;
+      $('cv-phase-slot').appendChild(ghost);
+      ghost.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 260, easing: 'ease-out' }).finished.then(() => ghost.remove());
+    }
+  }
+
+  let lastTimelineKey = '';
+  function renderCooking(d) {
+    const view = $('cooking-view');
+    document.documentElement.classList.toggle('is-cooking', !!cook);
+    view.hidden = !cook;
+    if (!cook) { lastTimelineKey = ''; return; }
+    const s = COOK_STR[state.lang];
+    view.classList.toggle('is-multi', d.multi);
+    $('cv-name').textContent = d.recipe ? d.recipe.name : '-';
+    $('cv-option').hidden = !d.multi;
+    $('cv-option-text').textContent = d.multi && d.option ? d.option.name : '';
+
+    // timeline
+    const steps = stepsForMode(cook.withoutArm, cook.cheese);
+    const idx = steps.indexOf(PHASE_STEP[cook.phase]);
+    const upcoming = (idx >= 0 ? steps.slice(idx + 1) : []).filter((k) => k !== 'grillingFinished');
+    const phaseKey = PHASE_LABEL[cook.phase];
+    const key = state.lang + '|' + phaseKey + '|' + upcoming.join(',');
+    if (key !== lastTimelineKey) {
+      const apply = () => {
+        $('cv-phase-slot').innerHTML = `<div class="cv-step" data-step="${STEP_ID(phaseKey)}"><p class="cv-label cv-phase">${escapeHTML(s[phaseKey])}</p></div>`;
+        $('cv-upcoming').innerHTML = upcoming.map((k) => `<div class="cv-step" data-step="${k}"><p class="cv-label">${escapeHTML(s[k])}</p></div>`).join('');
+      };
+      if (lastTimelineKey && lastTimelineKey.split('|')[0] === state.lang) flipTimeline(apply); else apply();
+      lastTimelineKey = key;
+    }
+
+    // timer: WAIT_MELT or 0 dims it
+    const isWaitMelt = cook.phase === 'waitMelt' && cook.cheese;
+    const rem = Math.max(0, cook.remaining);
+    const min = Math.floor(rem / 60), sec = rem % 60;
+    $('cv-timer').classList.toggle('is-dimmed', isWaitMelt || rem <= 0);
+    $('cv-min').textContent = min; $('cv-sec').textContent = String(sec).padStart(2, '0');
+    $('cv-min').classList.toggle('is-wide', min >= 10); $('cv-sec').classList.toggle('is-wide', min >= 10);
+
+    $('cv-guide').hidden = !isWaitMelt;
+    $('cv-guide-text').textContent = s.placeCheese;
+
+    // action bar
+    const aborting = cook.abort > 0;
+    const stopLabel = cook.phase === 'clean' ? s.stopScrape : s.stopCooking;
+    const stopBtn = (cls) => `<button type="button" class="cv-btn-wrap ${cls}" data-cook="stop" aria-disabled="${aborting}"><span class="cv-btn is-stop"><svg aria-hidden="true"><use href="#i-stop-fill"/></svg><span class="type-body2">${escapeHTML(stopLabel)}</span></span></button>`;
+    $('cv-bar').innerHTML = isWaitMelt
+      ? stopBtn('is-stop-pair') + `<button type="button" class="cv-btn-wrap is-cheese" data-cook="melt" aria-disabled="${aborting}"><span class="cv-btn is-primary"><svg aria-hidden="true"><use href="#i-play-fill"/></svg><span class="type-body2">${escapeHTML(s.startCheeseCooking)}</span></span></button>`
+      : stopBtn('is-stop-only');
+  }
+
   // ── Render ───────────────────────────────────────────────────────────────
   function renderHeader(d) {
     const sw = $('clean-switch');
     const slide = $('switch-slide');
     // headerCleanSwitchColor(): no recipe / standby → black, READY → green, else red.
-    const color = !d.recipe || d.phase === 'standby' ? 'black' : d.isReady ? 'green' : 'red';
+    const color = !d.recipe || d.phase === 'standby' ? 'black' : cook ? (cook.phase === 'waitMelt' ? 'green' : 'red') : d.isReady ? 'green' : 'red';
     sw.dataset.color = color;
     sw.classList.remove('bg-black/50', 'shadow-switch-red', 'bg-black/20', 'bg-white/18!');
     slide.classList.remove('bg-[rgb(245,96,96)]/50', 'bg-[#46CB89]/40', 'shadow-[0px_0px_12px_0px_rgba(0,0,0,0.25)]', 'bg-white/20!');
@@ -322,7 +486,9 @@
   function renderStatus(d) {
     const container = $('cook-container');
     container.classList.remove('bg-cook-preparing', 'bg-cook-ready-to-cook', 'bg-black');
-    container.classList.add(!d.recipe ? 'bg-black' : d.isReady ? 'bg-cook-ready-to-cook' : 'bg-cook-preparing');
+    // cooking: STATE_TO_BACKGROUND — red, WAIT_MELT green
+    const cookBg = cook ? (cook.phase === 'waitMelt' ? 'bg-cook-ready-to-cook' : 'bg-cook-preparing') : null;
+    container.classList.add(!d.recipe ? 'bg-black' : cookBg || (d.isReady ? 'bg-cook-ready-to-cook' : 'bg-cook-preparing'));
 
     // From v14 (?from=v14): the cook option leads the phase line, as the quick button's status
     // does ("웰던 · 준비 중"), instead of riding in a pill under the name.
@@ -353,7 +519,8 @@
     hint.classList.toggle('hidden', !d.isPreheat);
     hint.classList.toggle('flex', d.isPreheat);
     $('temp-hint-state').textContent = (d.temps.isOvershoot ? d.str.coolingDown : d.str.heatingUp) + ' ·';
-    $('temp-hint-value').textContent = Math.round(Math.max(d.temps.remainingDeltaTemp, d.temps.overshootDeltaTemp)) + '°C';
+    setReadout($('temp-hint-value'), Math.round(Math.max(d.temps.remainingDeltaTemp, d.temps.overshootDeltaTemp)) + '°C',
+      (d.isPreheat ? 'preheat' : 'none') + ':' + (d.option ? d.option.id : ''));
     $('temp-hint-remaining').textContent = d.str.remaining;
 
     // ready guidance (ready only)
@@ -368,6 +535,19 @@
     sel.classList.toggle('flex', showSel);
     $('select-guidance-text').textContent = d.str.selectRecipe;
     $('select-trigger-label').textContent = d.str.openRecipePicker;
+  }
+
+  // v15 (and v0 reached from it): a temperature readout changes at most once a second, so it can be
+  // read; a change of kind (shown ↔ hidden, other recipe) goes through at once.
+  function setReadout(el, text, kind) {
+    const h = document.documentElement;
+    if (!(h.dataset.variant === 'v15' || h.dataset.fromVariant === 'v15')) { el.textContent = text; return; }
+    const now = performance.now();
+    if (el.dataset.kind !== kind || now - (Number(el.dataset.at) || 0) >= 1000) {
+      if (el.textContent !== text) el.dataset.at = now;
+      el.dataset.kind = kind;
+      el.textContent = text;
+    }
   }
 
   function renderActions(d) {
@@ -398,6 +578,10 @@
   const SHEET_CLOSE_MS = 220;  // matches --sheet-close-dur in proto.css
   let sheetHideTimer = 0;
   function renderSheet(d) {
+    { // v15's smaller ✕ in the sheet header too, when reached from v15
+      const u = document.querySelector('#recipe-sheet [data-action="sheet-header-close"] use');
+      if (u && document.documentElement.dataset.fromVariant === 'v15' && u.getAttribute('href') === '#i-x') u.setAttribute('href', '#i-x-small');
+    }
     const wrap = $('recipe-sheet');
     if (!SHEET_V14) {
       wrap.classList.toggle('hidden', !state.sheet.open);
@@ -488,8 +672,27 @@
 
   function renderTempModal(d) {
     const wrap = $('temp-modal');
-    wrap.classList.toggle('hidden', !state.tempModalOpen);
-    if (!state.tempModalOpen) return;
+    // v15 (and v0 reached from it): fade out for 120ms before hiding (.is-closing in proto.css)
+    const h = document.documentElement;
+    const fades = h.dataset.variant === 'v15' || h.dataset.fromVariant === 'v15';
+    if (!state.tempModalOpen) {
+      if (wrap.classList.contains('hidden') || wrap.classList.contains('is-closing')) return;
+      if (!fades || matchMedia('(prefers-reduced-motion: reduce)').matches) { wrap.classList.add('hidden'); return; }
+      wrap.classList.add('is-closing');
+      setTimeout(() => { wrap.classList.remove('is-closing'); if (!state.tempModalOpen) wrap.classList.add('hidden'); }, 120);
+      return;
+    }
+    wrap.classList.remove('is-closing');
+    const opening = wrap.classList.contains('hidden');
+    if (fades) { const u = wrap.querySelector('[data-action="temp-close"] use'); if (u && u.getAttribute('href') === '#i-x') u.setAttribute('href', '#i-x-small'); }   // v15's smaller ✕
+    wrap.classList.remove('hidden');
+    // v15: the readings refresh once a second (readable; the sim underneath still runs every 200ms),
+    // with no motion on change. Shown at once on open.
+    if (fades) {
+      const now = performance.now();
+      if (!opening && now - (renderTempModal.lastRead || 0) < 1000) return;
+      renderTempModal.lastRead = now;
+    }
     $('tm-title').textContent = d.str.temperatureTitle;
     $('tm-griddle').textContent = d.str.griddleLabel;
     $('tm-current').textContent = d.str.currentLabel;
@@ -500,7 +703,8 @@
     $('tm-bot-target').textContent = Math.round(d.temps.bottom.target);
     const line = (id, value, heating) => {
       const el = $(id);
-      el.textContent = value.toFixed(1);
+      const text = value.toFixed(1);
+      el.textContent = text;
       el.classList.toggle('text-[#FF5454]', heating);
       el.classList.toggle('text-white', !heating);
       wrap.querySelector(`[data-zone="${id.replace('tm-', '')}"]`).setAttribute('fill', heating ? '#FF5454' : '#FFFFFF');
@@ -519,6 +723,9 @@
     paintRing(d);
     renderSheet(d);
     renderTempModal(d);
+    renderCooking(d);
+    const speedBtn = document.querySelector('[data-dev="speed"]');
+    if (speedBtn) speedBtn.textContent = '×' + cookSpeed.value;
     document.documentElement.lang = state.lang;
     const sel = document.querySelector('[data-dev="scenario"]');
     if (sel) sel.value = state.scenario;
@@ -566,7 +773,7 @@
   $('qa-scrape').addEventListener('click', () => console.info('[Cook] send("clean") — 간이 청소 (out of scope)'));
   $('primary-btn').addEventListener('click', () => {
     if ($('primary-btn').getAttribute('aria-disabled') === 'true') return;
-    console.info('[Cook] send("cook") — 조리 시작 (out of scope)');
+    startCook('cook');   // send("cook")
   });
   $('menu-btn').addEventListener('click', () => console.info('[Cook] openMenu (out of scope)'));
   $('clean-switch').addEventListener('click', () => console.info('[Cook] clean mode toggle (out of scope)'));
@@ -608,6 +815,13 @@
     }
   });
 
+  $('cv-bar').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-cook]');
+    if (!b || b.getAttribute('aria-disabled') === 'true' || !cook) return;
+    if (b.dataset.cook === 'stop') stopCook();
+    if (b.dataset.cook === 'melt' && cook.phase === 'waitMelt') { enterPhase('melt'); render(); }   // send("cook")
+  });
+
   $('temp-modal').addEventListener('click', (e) => {
     if (e.target.closest('[data-action="temp-close"]')) { state.tempModalOpen = false; render(); }
   });
@@ -637,17 +851,29 @@
   }
   const langBtn = document.querySelector('[data-dev="lang"]');
   if (langBtn) langBtn.addEventListener('click', () => setLang(state.lang === 'ko' ? 'en' : 'ko'));
+  // proto-only: cooking clock speed ×1 → ×5 → ×20
+  const speedBtn = document.querySelector('[data-dev="speed"]');
+  if (speedBtn) speedBtn.addEventListener('click', () => {
+    cookSpeed.value = cookSpeed.value === 1 ? 5 : cookSpeed.value === 5 ? 20 : 1;
+    restartCookTimer(); render();
+  });
 
   function setScenario(key) {
     if (!SCENARIOS[key]) { console.warn('[Cook] unknown scenario', key); return; }
     sim = null;
+    cook = null;
     state.scenario = key;
     if (SCENARIOS[key].noRecipe) state.recipeId = null;
+    else if (SCENARIOS[key].recipeId) {
+      const r = RECIPES.find((x) => x.id === SCENARIOS[key].recipeId) || RECIPES[0];
+      state.recipeId = r.id; state.cookOptionId = r.cookOptions[0].id; state.withoutArm = !!r.cookOptions[0].withoutArm;
+    }
     else if (state.recipeId == null) {
       state.recipeId = 1;
       state.cookOptionId = 1;
       state.withoutArm = !!RECIPES[0].cookOptions[0].withoutArm;
     }
+    if (SCENARIOS[key].cook) { startCook(SCENARIOS[key].cook); return; }
     render();
   }
   function setLang(lang) {
@@ -657,7 +883,7 @@
   }
   // ── Init ─────────────────────────────────────────────────────────────────
   buildRing($('tick-ring'));
-  render();
+  if (SCENARIOS[state.scenario].cook) setScenario(state.scenario); else render();
 
-  window.Cook = { state, SCENARIOS, RECIPES, setScenario, setLang, render, get sim() { return sim; } };
+  window.Cook = { state, SCENARIOS, RECIPES, setScenario, setLang, render, startCook, stopCook, get sim() { return sim; }, get cook() { return cook; } };
 })();

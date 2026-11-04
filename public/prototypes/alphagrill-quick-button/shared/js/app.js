@@ -20,6 +20,8 @@
   // to edge, no dev bar, and ignore the saved zoom and 빠른 레시피 선택, so every frame shows
   // the variant it asks for.
   const EMBED = new URLSearchParams(location.search).has('embed');
+  // Variant this v0 stands in for (빠른 레시피 선택 off). Read once: the address bar is rewritten below.
+  const FROM = new URLSearchParams(location.search).get('from');
   const STAGE_PAD = EMBED ? 0 : 24;
 
   const device = document.getElementById('device');
@@ -60,7 +62,7 @@
   function applyQuickSelect(opts) {
     if (!isVariant || EMBED) return false;   // embedded frames show the variant they ask for
     const on = prefs.get('quickSelect', true);
-    const from = new URLSearchParams(location.search).get('from');
+    const from = FROM;
     let target = null;
     if (!on && pageVariant !== 'v0') target = variantUrl('v0', { from: pageVariant });
     else if (on && pageVariant === 'v0' && from) target = variantUrl(from);
@@ -70,9 +72,24 @@
     return true;
   }
   if (applyQuickSelect()) return;
+  // With the setting off, a quick variant shows v0 — but the address bar keeps the variant's own
+  // URL (/v15/…), so what is being looked at reads as "v15 with 빠른 레시피 선택 off". Reloading that
+  // URL lands here again; turning the setting on goes back to the variant itself.
+  if (pageVariant === 'v0' && FROM && !EMBED) {
+    const q = new URLSearchParams(location.search);
+    q.delete('from');
+    const qs = q.toString();
+    // after load: rewriting earlier would make the page's own relative scripts (js/cook.js) resolve against /v15/
+    window.addEventListener('load', () => {
+      history.replaceState(history.state, '', rootDir + FROM + '/' + (qs ? '?' + qs : '') + location.hash);
+    });
+  }
   // v0 shown in place of a quick variant (setting off) knows which one, so it can carry
   // that variant's header tweaks: <html data-from="v13">.
-  { const from = new URLSearchParams(location.search).get('from'); if (from) document.documentElement.dataset.from = from; }
+  // v15 starts as a copy of v14, so v0 reached from v15 takes v14's tweaks too (data-from="v14").
+  // TODO(미정): once v15 changes v0-facing details, give v15 its own data-from rules.
+  { const FROM_ALIAS = { v15: 'v14' };
+    const from = FROM; if (from) { document.documentElement.dataset.from = FROM_ALIAS[from] || from; document.documentElement.dataset.fromVariant = from; } }
 
   // -- router ---------------------------------------------------------------
   function screenById(id) {
@@ -164,8 +181,8 @@
   // Prototype variants, newest first. Add a folder here and a card in the launcher's
   // index.html to start another one.
   const VARIANTS = [
+    { id: 'v15', label: 'v15 · 인터렉션 정리' },
     { id: 'v14', label: 'v14 · 바텀 시트' },
-    { id: 'v13', label: 'v13 · 왼쪽 정렬 + 전환' },
     { id: 'v0', label: 'v0 · 원본 (퀵 버튼 없음)' },
   ];
 
@@ -178,7 +195,7 @@
     if (variantSel) {
       const here = pageVariant;
       // on v0 because 빠른 레시피 선택 is off: the select keeps showing the variant being viewed
-      const from = new URLSearchParams(location.search).get('from');
+      const from = FROM;
       if (VARIANTS.some(v => v.id === here)) {
         VARIANTS.forEach(v => {
           const opt = document.createElement('option');

@@ -1,4 +1,4 @@
-/* portfolio: the Tailwind classes of v14 and v0, compiled ahead of time by shared/vendor/tailwind-browser.js
+/* portfolio: the Tailwind classes of v15 and v0, compiled ahead of time by shared/vendor/tailwind-browser.js
    (the runtime the pages loaded) from every token in their markup and scripts that could be a class,
    so the pages no longer compile them at load and rescan on every class change. Regenerate with
    scripts/compile-prototype-tailwind.py when a page starts using a class it has never used before. */
@@ -644,6 +644,9 @@
   .flex-1 {
     flex: 1;
   }
+  .shrink {
+    flex-shrink: 1;
+  }
   .shrink-0 {
     flex-shrink: 0;
   }
@@ -764,9 +767,6 @@
   .gap-13\.5 {
     gap: calc(var(--spacing) * 13.5);
   }
-  .gap-14 {
-    gap: calc(var(--spacing) * 14);
-  }
   .gap-16 {
     gap: calc(var(--spacing) * 16);
   }
@@ -801,6 +801,9 @@
   }
   .overflow-y-auto {
     overflow-y: auto;
+  }
+  .rounded {
+    border-radius: 0.25rem;
   }
   .rounded-2xl {
     border-radius: var(--radius-2xl);
@@ -936,6 +939,9 @@
   .bg-\[\#e44242\] {
     background-color: #e44242;
   }
+  .bg-\[\#ff5c5c\] {
+    background-color: #ff5c5c;
+  }
   .bg-\[rgb\(245\,96\,96\)\]\/50 {
     background-color: color-mix(in oklab, rgb(245,96,96) 50%, transparent);
   }
@@ -946,12 +952,6 @@
     background-color: color-mix(in srgb, #000 20%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
       background-color: color-mix(in oklab, var(--color-black) 20%, transparent);
-    }
-  }
-  .bg-black\/26 {
-    background-color: color-mix(in srgb, #000 26%, transparent);
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--color-black) 26%, transparent);
     }
   }
   .bg-black\/50 {
@@ -988,6 +988,12 @@
     background-color: color-mix(in srgb, #fff 15%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
       background-color: color-mix(in oklab, var(--color-white) 15%, transparent);
+    }
+  }
+  .bg-white\/18 {
+    background-color: color-mix(in srgb, #fff 18%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-white) 18%, transparent);
     }
   }
   .bg-white\/18\! {
@@ -1244,9 +1250,6 @@
   .pr-16 {
     padding-right: calc(var(--spacing) * 16);
   }
-  .pb-4 {
-    padding-bottom: calc(var(--spacing) * 4);
-  }
   .pb-5 {
     padding-bottom: calc(var(--spacing) * 5);
   }
@@ -1270,9 +1273,6 @@
   }
   .pl-3 {
     padding-left: calc(var(--spacing) * 3);
-  }
-  .pl-5 {
-    padding-left: calc(var(--spacing) * 5);
   }
   .pl-6 {
     padding-left: calc(var(--spacing) * 6);
@@ -1376,6 +1376,9 @@
   }
   .text-\[\#fa5656\] {
     color: #fa5656;
+  }
+  .text-\[\#ff5c5c\] {
+    color: #ff5c5c;
   }
   .text-\[\#ff2222\] {
     color: #ff2222;
@@ -1529,6 +1532,11 @@
     transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
     transition-duration: var(--tw-duration, var(--default-transition-duration));
   }
+  .transition-opacity {
+    transition-property: opacity;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+  }
   .transition-transform {
     transition-property: transform, translate, scale, rotate;
     transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
@@ -1545,9 +1553,6 @@
   .ease-out {
     --tw-ease: var(--ease-out);
     transition-timing-function: var(--ease-out);
-  }
-  .will-change-\[backdrop-filter\] {
-    will-change: backdrop-filter;
   }
   .outline-none {
     --tw-outline-style: none;

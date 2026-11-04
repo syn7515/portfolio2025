@@ -17,6 +17,19 @@
   font-weight: 500;
   font-style: normal;
 }
+/* Barlow Semi Condensed — the cooking timer (type-numeric1/2). From the app's src/assets/font. */
+@font-face {
+  font-family: "Barlow Semi Condensed";
+  src: url("../assets/font/BarlowSemiCondensed-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Barlow Semi Condensed";
+  src: url("../assets/font/BarlowSemiCondensed-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+}
 
 /* Equivalent of the app's `body` rules, scoped to the canvas. Unlayered on
    purpose so it beats the stage font set in base.css. */
@@ -249,7 +262,7 @@
 }
 
 /* portfolio: Inter (the site's own InterVariable) in place of Pretendard for the whole canvas,
-   both v14 and v0, so the two frames still match where the take swaps them. Korean, which
+   both v15 and v0, so the two frames still match where the take swaps them. Korean, which
    Inter doesn't have (한글 in Settings), falls back to Pretendard. */
 @font-face {
   font-family: "Inter";
@@ -258,7 +271,7 @@
   font-style: normal;
 }
 .device, .device * { font-family: "Inter", "Pretendard", system-ui, sans-serif; }
-/* Pretendard came in Medium alone, so text that names no weight (v14's status, keys and
+/* Pretendard came in Medium alone, so text that names no weight (v15's status, keys and
    buttons) drew at 500; Inter is variable and would draw it at 400. Medium stays the canvas
    default, as in the app — a weight set on purpose (400 on v0's phase label) still applies. */
 .device { font-weight: 500; }

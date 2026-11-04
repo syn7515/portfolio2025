@@ -2,15 +2,16 @@
 <!-- AlphaGrill's quick recipe select, played as a storyboard for the portfolio carousel.
 
      The prototype itself is in alphagrill-quick-button/, copied as it is from the Prototypes repo's
-     "quick button" motion-proto (67b2882): v14 (the cook screen with quick recipe buttons), v0 (the
+     "quick button" recipe-proto (2a80e6a): v15 (the cook screen with quick recipe buttons), v0 (the
      app's cook screen as it ships) and the shared/ files both load. This page frames the two in
-     English and plays one take over them: from the app's own cook screen, open the menu, turn Quick
-     recipe select on in Settings and back out to the quick buttons, then change the recipe with one
-     of them.
+     English and plays one take over them: from the app's own cook screen, open the menu, pick Recipe
+     buttons for the Standby screen in Settings and back out to the quick buttons, then change the
+     recipe with one of them.
 
-     The prototype swaps pages when the setting changes (v0 → v14 and back). Here both pages
+     The prototype swaps pages when the setting changes (v0 → v15 and back). Here both pages
      are loaded from the start and stacked, and the swap is which frame is on top: it happens under
-     the settings page, which is the same in both, so it doesn't show.
+     the settings page, which is the same in both (v0 takes v15's look with ?from=v15), so it
+     doesn't show.
 
      Changed from the source (each marked "portfolio" where it is made): the canvas is set in Inter
      instead of Pretendard (shared/css/alphagrill.css); in v0, as in v0-4 (local/v0-4, cad981a), the
@@ -54,8 +55,8 @@
 </style>
 </head>
 <body>
-<iframe id="v14" class="top" src="alphagrill-quick-button/v14/index.html?embed&scenario=ready&lang=en" title="Cook screen with quick recipe select" tabindex="-1"></iframe>
-<iframe id="v0" src="alphagrill-quick-button/v0/index.html?embed&from=v14&scenario=ready&lang=en" title="Cook screen as it ships" tabindex="-1"></iframe>
+<iframe id="v15" class="top" src="alphagrill-quick-button/v15/index.html?embed&scenario=ready&lang=en" title="Cook screen with quick recipe select" tabindex="-1"></iframe>
+<iframe id="v0" src="alphagrill-quick-button/v0/index.html?embed&from=v15&scenario=ready&lang=en" title="Cook screen as it ships" tabindex="-1"></iframe>
 <div id="touch"></div>
 <script>
 const root = document.documentElement;
@@ -67,7 +68,7 @@ const until = async test => { while (!test()) await sleep(30); };
 const touch = document.getElementById('touch');
 
 /* ---------- the two frames ---------- */
-const F = {};   // 'v14' | 'v0' → { el, win, doc, device }
+const F = {};   // 'v15' | 'v0' → { el, win, doc, device }
 
 // The mock recipes that only have Korean names get English ones: this is the English app. The
 // first is named after the recipe the cook screen beside it on the card starts on.
@@ -121,18 +122,22 @@ function hideMenu(f) {
   menu.classList.add('is-closed');
   menu.hidden = true;
 }
-// Settings open with the switch at `on`, the menu shut and the cook screen at rest beneath it: the
-// state a swap lands on, set up while that frame is underneath.
+// Settings open with the Standby screen at `on` (Recipe buttons) or off (Gauge), the menu shut and the
+// cook screen at rest beneath it: the state a swap lands on, set up while that frame is underneath.
 function settle(f, on) {
   hideMenu(f);
   F[f].win.AppMenu.settings.quickSelect = on;
   F[f].win.AppMenu.openSetting();
 }
-// Settings shut at once, with no slide out: the last take left v0's open beneath the quick buttons.
+// Settings shut at once, with no fade out: the last take left v0's open beneath the quick buttons.
+// Its contents go too. v15 plays every re-render of the page from the one before (menu.js
+// withMorph), so the next open would draw Recipe buttons' radio, where the last take left it,
+// fading back to Gauge; emptied, the page opens on Gauge already checked.
 function hideSetting(f) {
   const setting = F[f].doc.getElementById('app-setting');
   setting.hidden = true;
-  setting.classList.remove('is-entering', 'is-leaving');
+  setting.classList.remove('is-opening', 'is-closing');
+  setting.replaceChildren();
 }
 // v0's own cook screen on top at rest with the setting off, and the quick buttons waiting beneath in
 // Settings with it on, back on the first recipe (setScenario drops the heat-up a pick starts).
@@ -140,11 +145,11 @@ function reset() {
   F.v0.win.AppMenu.settings.quickSelect = false;
   hideSetting('v0');
   hideMenu('v0');
-  const cook = F.v14.win.Cook;
+  const cook = F.v15.win.Cook;
   cook.state.recipeId = 1;
   cook.state.cookOptionId = 1;
   cook.setScenario('ready');
-  settle('v14', true);
+  settle('v15', true);
   show('v0');
 }
 // The heat-up a pick starts runs on the screen's own 200ms clock and reaches the new targets in
@@ -158,17 +163,10 @@ function heated(f) {
   sim.phase = 'ready';
   render();
 }
-// The switch slides the way the app's ToggleSwitch does (200ms). The prototype re-renders the
-// settings page on a toggle, which snaps it, and then swaps pages; the take does the swap itself.
-const QS = '#app-setting [data-setting-toggle="quickSelect"]';
-function slideSwitch(f, on) {
-  const row = $(f, QS), track = row.lastElementChild, knob = track.firstElementChild;
-  track.classList.toggle('bg-[#38B6FF]', on);
-  track.classList.toggle('bg-black/26', !on);
-  knob.classList.toggle('translate-x-[42px]', on);
-  row.setAttribute('aria-pressed', on);
-  F[f].win.AppMenu.settings.quickSelect = on;
-}
+// Standby screen's Recipe buttons card. Picking it re-renders the settings page with its radio on
+// (the prototype plays the radio's fill across the re-render) and, 260ms on, swaps pages; embedded,
+// the prototype leaves the swap alone, so the take does it itself.
+const QS_ON = '#app-setting [data-quick-select="on"]', QS_ON_THUMB = QS_ON + ' .qs-thumb';
 
 /* ---------- timeline ---------- */
 // Waits are scheduled against the wall clock, as in the other prototypes: step n of the take lands
@@ -266,7 +264,6 @@ async function tap(f, sel, id, { at, text = false, act } = {}) {
 const MENU = '#menu-btn', MENU_ICON = '#menu-btn > div';
 const SETTINGS = '#app-menu [data-menu="setting"]', SETTINGS_LABEL = SETTINGS + ' p';
 const BACK = '#app-setting [data-setting-back]';
-const SWITCH = QS + ' > div:last-child';
 const BEEF_BURGER = '#quick-list [data-quick-recipe="2"]';       // beside the selected 6oz Pork
 
 async function take(id) {
@@ -276,15 +273,15 @@ async function take(id) {
   await wait(900, id);                                            // the menu pushes the screen aside (360ms)
   await tap('v0', SETTINGS, id, { at: SETTINGS_LABEL, text: true });
   await wait(1000, id);
-  await tap('v0', QS, id, { at: SWITCH, act: () => slideSwitch('v0', true) });
-  await wait(220, id);                                            // the prototype's own beat before it swaps pages
-  if (!dry) show('v14');
+  await tap('v0', QS_ON, id, { at: QS_ON_THUMB });
+  await wait(260, id);                                            // the prototype's own beat before it swaps pages
+  if (!dry) show('v15');
   await wait(700, id);
-  await tap('v14', BACK, id);
+  await tap('v15', BACK, id);
   await wait(1600, id);                                           // the quick buttons on the cook screen
-  await tap('v14', BEEF_BURGER, id);                              // one tap changes the recipe
+  await tap('v15', BEEF_BURGER, id);                              // one tap changes the recipe
   await wait(3400, id);                                           // Beef Burger heats toward its own targets
-  if (!dry) heated('v14');
+  if (!dry) heated('v15');
   await wait(3000, id);                                           // and rests on Ready before the take ends
 }
 
@@ -316,7 +313,7 @@ addEventListener('keydown', e => {
     parent.dispatchEvent(new KeyboardEvent('keydown', { key: e.key, code: e.code, bubbles: true, cancelable: true }));
   }
 });
-Promise.all([setUp('v14'), setUp('v0')]).then(loop);
+Promise.all([setUp('v15'), setUp('v0')]).then(loop);
 </script>
 </body>
 </html>

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- v14 — v13 with the app's recipe bottom sheet, opened from the status block, sliding up and down. -->
-<html lang="ko" data-variant="v14">
+<!-- v15 — 인터렉션 정리: a copy of v14 (with the cooking screen); tidies the recipe / settings panels' headers, motion and styling. -->
+<html lang="ko" data-variant="v15">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>v14 · 바텀 시트</title>
+  <title>v15 · 인터렉션 정리</title>
   <link rel="stylesheet" href="../shared/css/tokens.css">
   <link rel="stylesheet" href="../shared/css/base.css">
   <link rel="stylesheet" href="../shared/css/alphagrill.css">
@@ -21,6 +21,8 @@
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16"/><path d="M4 12h16"/><path d="M4 19h16"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  <!-- v15: the temperature panel's smaller ✕ (24) at the original ✕'s visible weight (1.5 at 40 ≈ 2.5 at 24) -->
+  <symbol id="i-x-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
   <symbol id="i-chevron-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></symbol>
   <symbol id="i-chevron-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></symbol>
@@ -28,6 +30,8 @@
   <symbol id="i-chevron-left-thin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></symbol>
   <symbol id="i-chevron-right-thin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></symbol>
   <symbol id="i-play-fill" viewBox="0 0 256 256" fill="currentColor"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.32,229.65a16,16,0,0,1-16.2.3A15.86,15.86,0,0,1,64,216.13V39.87a15.86,15.86,0,0,1,8.12-13.82,16,16,0,0,1,16.2.3L232.4,114.49A15.74,15.74,0,0,1,240,128Z"/></symbol>
+  <!-- Icons.stopFill (components/ui/icons.tsx) -->
+  <symbol id="i-stop-fill" viewBox="0 0 32 32" fill="currentColor"><path d="M27 7V25C27 25.5304 26.7893 26.0391 26.4142 26.4142C26.0391 26.7893 25.5304 27 25 27H7C6.46957 27 5.96086 26.7893 5.58579 26.4142C5.21071 26.0391 5 25.5304 5 25V7C5 6.46957 5.21071 5.96086 5.58579 5.58579C5.96086 5.21071 6.46957 5 7 5H25C25.5304 5 26.0391 5.21071 26.4142 5.58579C26.7893 5.96086 27 6.46957 27 7Z"/></symbol>
   <symbol id="i-heat" viewBox="0 0 40 40" fill="currentColor">
     <path d="M19.2153 7.19781C19.4787 6.4604 20.521 6.4604 20.7843 7.19781L23.7694 15.5523C23.9631 16.0948 23.5608 16.6667 22.9849 16.6672H21.0952C21.034 17.7185 20.7153 18.769 20.1333 19.8036C19.2122 21.4414 19.212 23.0047 20.1333 24.6425C21.4337 26.9549 21.434 29.3434 20.1333 31.6558C19.6425 32.5286 19.4276 33.3543 19.4416 34.1477L17.2248 34.1867C17.2029 32.9436 17.5453 31.7322 18.1997 30.5686C19.1209 28.9308 19.1207 27.3674 18.1997 25.7297C16.8989 23.4173 16.8992 21.0288 18.1997 18.7164C18.5892 18.0239 18.8117 17.3442 18.8719 16.6672H17.0164C16.4402 16.6672 16.0365 16.095 16.2303 15.5523L19.2153 7.19781Z"/>
     <path d="M30.0487 7.19781C30.3121 6.4604 31.3543 6.4604 31.6177 7.19781L34.6027 15.5523C34.7965 16.0948 34.3941 16.6667 33.8182 16.6672H31.9286C31.8673 17.7185 31.5486 18.769 30.9667 19.8036C30.0456 21.4414 30.0454 23.0047 30.9667 24.6425C32.2671 26.9549 32.2674 29.3434 30.9667 31.6558C30.4759 32.5286 30.261 33.3543 30.2749 34.1477L28.0581 34.1867C28.0363 32.9436 28.3787 31.7322 29.0331 30.5686C29.9543 28.9308 29.9541 27.3674 29.0331 25.7297C27.7323 23.4173 27.7326 21.0288 29.0331 18.7164C29.4226 18.0239 29.6451 17.3442 29.7053 16.6672H27.8498C27.2735 16.6672 26.8698 16.095 27.0637 15.5523L30.0487 7.19781Z"/>
@@ -114,6 +118,30 @@
               </div>
               <button type="button" id="primary-btn" class="grid-start"><svg aria-hidden="true"><use href="#i-play-fill"/></svg><span id="primary-label"></span></button>
             </div>
+
+            <!-- CookCookingScreen → CookActiveView (조리 시작 이후). Shown in place of the quick panel
+                 while cooking; rendered by cook.js renderCooking. -->
+            <section id="cooking-view" class="cv" hidden>
+              <div class="cv-top">
+                <div class="cv-info">
+                  <div class="cv-name-block">
+                    <p id="cv-name" class="cv-name"></p>
+                    <div id="cv-option" class="cv-option" hidden><span id="cv-option-text" class="type-body2"></span></div>
+                  </div>
+                </div>
+                <div class="cv-timeline">
+                  <div class="cv-shade" aria-hidden="true"></div>
+                  <div aria-hidden="true"></div>
+                  <div id="cv-phase-slot" class="cv-phase-slot"></div>
+                  <div class="cv-upcoming-wrap"><div id="cv-upcoming" class="cv-upcoming"></div></div>
+                </div>
+                <div id="cv-timer" class="cv-timer">
+                  <span id="cv-min" class="cv-num">0</span><span class="cv-sep">:</span><span id="cv-sec" class="cv-num">00</span>
+                </div>
+              </div>
+              <div id="cv-guide" class="cv-guide type-body2" hidden><span id="cv-guide-text"></span></div>
+              <div id="cv-bar" class="cv-bar"></div>
+            </section>
           </div>
 
           <!-- RecipeBottomSheet (fixed → absolute; list rendered by cook.js) -->
@@ -129,7 +157,7 @@
                   <span class="sheet-icon-box"><svg class="size-10 text-white"><use href="#i-chevron-left-thin"/></svg></span>
                 </button>
                 <button type="button" aria-label="취소" data-action="sheet-header-close" class="absolute top-0 right-0 flex h-25 w-30 items-center justify-center p-2.5 transition-colors active:bg-white/18">
-                  <span class="sheet-icon-box"><svg class="size-10 text-white"><use href="#i-x"/></svg></span>
+                  <span class="sheet-icon-box"><svg class="size-10 text-white"><use href="#i-x-small"/></svg></span>
                 </button>
               </div>
               <!-- RecipeBottomSheetList / CookOptionList -->
@@ -159,7 +187,7 @@
               <div class="relative flex h-25 items-center justify-center">
                 <p id="tm-title" class="type-body2 whitespace-nowrap text-white/70">온도</p>
                 <button type="button" aria-label="취소" data-action="temp-close" class="absolute top-0 right-0 flex h-25 w-30 items-center justify-center">
-                  <span class="sheet-icon-box"><svg class="size-10 text-white"><use href="#i-x"/></svg></span>
+                  <span class="sheet-icon-box"><svg class="size-10 text-white"><use href="#i-x-small"/></svg></span>
                 </button>
               </div>
               <div class="grid grid-cols-[140px_1fr_156px] bg-black/20">
@@ -217,6 +245,7 @@
   <select data-dev="scenario" title="Cook scenario (mock state)"></select>
   <select data-dev="recipes" title="Number of recipes (mock)"></select>
   <button data-dev="lang" title="Toggle language">ko</button>
+  <button data-dev="speed" title="Cooking clock speed (proto-only)">×1</button>
   <button data-dev="back" title="Back (Esc)">←</button>
   <button data-dev="fit" title="Toggle fit-to-window / 1:1">Fit</button>
   <button data-dev="grid" title="8px grid overlay">Grid</button>

@@ -36,7 +36,10 @@
       unitAndLanguage: '단위 및 언어', temperature: '온도', length: '길이', language: '언어',
       otherFeatures: '기타 기능', foodDetection: '조리물 감지',
       foodDetectionDesc: '그리들 위 조리물 위치에 맞춰 배출합니다',
+      foodDetectionDescV15: '조리물 위치에 맞춰 배출합니다',   // v15: without 그리들 위
       quickSelect: '빠른 레시피 선택', quickSelectDesc: '조리 화면에서 레시피를 바로 고릅니다',
+      quickSelectDescV15: '대기 화면에서 레시피를 바로 고릅니다',   // v15: 조리 → 대기 화면
+      standbyScreen: '대기 화면', quickSelectOn: '레시피 버튼', quickSelectOff: '게이지',   // v15: 빠른 레시피 선택 as its own section, a name per mode
       close: '닫기', back: '뒤로',
       // recipe page (app/routes/recipe/*, features/recipe/*; locales/ko.json recipe.*)
       reorder: '순서 변경', create: '레시피 추가', noSavedRecipes: '저장된 레시피가 없습니다.',
@@ -48,7 +51,7 @@
       autoUnloadSetting: '배출 기본 설정', autoUnloadStateOn: '배출 켬', autoUnloadStateOff: '배출 끔',
       recipeOptions: '레시피 옵션', editRecipeAction: '레시피 수정', deleteRecipeAction: '레시피 삭제',
       // create / reorder (locales/ko.json recipe.*, common.*)
-      done: '변경 완료', reOrder2: '순서 변경하기', orderUpdated: '순서를 변경했습니다',
+      done: '변경 완료', reOrder2: '순서 변경하기', reorderEdit: '순서 편집', orderUpdated: '순서를 변경했습니다',
       unsavedChangesWarning: '변경 사항이 저장되지 않았습니다.\n이 화면을 나가면 변경 내용이 사라집니다.',
       keepEditing: '계속 수정하기', discardChanges: '나가기',
       newRecipe: '레시피 추가하기', RecipeName: '레시피 이름', cookOptionDefaultName: (n) => '조리 설정 ' + n,
@@ -77,7 +80,10 @@
       unitAndLanguage: 'Unit & Languages', temperature: 'Temperature', length: 'Length', language: 'Language',
       otherFeatures: 'Other features', foodDetection: 'Food detection',
       foodDetectionDesc: 'Unload based on food placement',
+      foodDetectionDescV15: 'Unload by food position',   // one line in the card
       quickSelect: 'Quick recipe select', quickSelectDesc: 'Pick recipes on the cook screen',
+      quickSelectDescV15: 'Pick recipes on standby',   // one line in the card
+      standbyScreen: 'Standby screen', quickSelectOn: 'Recipe buttons', quickSelectOff: 'Gauge',
       close: 'Close', back: 'Back',
       reorder: 'Reorder', create: 'Create', noSavedRecipes: 'No saved recipes',
       saveGrillSettingsDescription: 'Save grill settings as a recipe\nto start cooking right away.',
@@ -87,7 +93,7 @@
       cheeseMeltOption: 'Cheese melting', heatingTime: 'Heating time', disabled: 'Disabled',
       autoUnloadSetting: 'Unload setting', autoUnloadStateOn: 'On', autoUnloadStateOff: 'Off',
       recipeOptions: 'Recipe options', editRecipeAction: 'Edit recipe', deleteRecipeAction: 'Delete recipe',
-      done: 'Done', reOrder2: 'Reorder', orderUpdated: 'Order updated',
+      done: 'Done', reOrder2: 'Reorder', reorderEdit: 'Edit order', orderUpdated: 'Order updated',
       unsavedChangesWarning: 'You have unsaved changes.\nLeaving this page will discard them.',
       keepEditing: 'Keep editing', discardChanges: 'Discard',
       newRecipe: 'New recipe', RecipeName: 'Recipe name', cookOptionDefaultName: (n) => 'Setup ' + n,
@@ -137,22 +143,27 @@
 
   // Icons: lucide X / ChevronLeft / ChevronRight, phosphor FilmScript + GearSix (fill).
   const ICON = {
-    x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',
+    x: '<svg data-icon="x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',
     // v14: close as "←|" (arrow into a vertical line), pointing back where the menu folds away
-    arrowLeftToLine: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19V5"/><path d="m13 6-6 6 6 6"/><path d="M7 12h14"/></svg>',
-    chevronLeft: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>',
-    chevronRight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>',
+    arrowLeftToLine: '<svg data-icon="arrowLeftToLine" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19V5"/><path d="m13 6-6 6 6 6"/><path d="M7 12h14"/></svg>',
+    chevronLeft: '<svg data-icon="chevronLeft" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>',
+    chevronRight: '<svg data-icon="chevronRight" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>',
     // lucide ArrowUpDown / Plus / Ellipsis / Pencil / Trash2 (recipe page)
-    arrowUpDown: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>',
+    arrowUpDown: '<svg data-icon="arrowUpDown" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>',
     plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>',
-    ellipsis: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>',
-    pencil: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg>',
-    trash2: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>',
-    menuLines: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16"/><path d="M4 18h16"/><path d="M4 6h16"/></svg>',
+    ellipsis: '<svg data-icon="ellipsis" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>',
+    pencil: '<svg data-icon="pencil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg>',
+    trash2: '<svg data-icon="trash2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>',
+    menuLines: '<svg data-icon="menuLines" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16"/><path d="M4 18h16"/><path d="M4 6h16"/></svg>',
     // components/ui/icons.tsx circleAlertInverted / checkCircle / errorCircle
     circleAlert: '<svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="16.25" fill="#E44242"/><path d="M20 13.3333V20.8333" stroke="white" stroke-width="2.5" stroke-linecap="round"/><path d="M20 26.6667H20.0167" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>',
     checkCircle: '<svg width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="16.25" fill="#46CB89"/><path d="M13.75 21.25 17.5 25 26.25 16.25" stroke="#222" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     errorCircle: '<svg width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="16.25" fill="#FF5C5C"/><path d="M14 14L26 26M26 14L14 26" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>',
+    // v15's ⋯ menu: drawn for this prototype on the 24 grid (filled). Pencil — eraser cap apart from
+    // the body, tip tapering to a rounded point, at 45°. Trash — lid with a handle, body narrowing
+    // a little with rounded foot corners, two slots cut out (evenodd).
+    pencilFill: '<svg data-icon="pencilFill" viewBox="0 0 24 24" fill="currentColor"><g transform="rotate(45 12 12)"><rect x="9.25" y="1.6" width="5.5" height="3.3" rx="1.35"/><path d="M9.25 6.35h5.5v9.2l-2.06 5.08a.75.75 0 0 1-1.38 0L9.25 15.55Z"/></g></svg>',
+    trashFill: '<svg data-icon="trashFill" viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd"><path d="M9.1 4.6V3.95c0-.8.65-1.45 1.45-1.45h2.9c.8 0 1.45.65 1.45 1.45v.65h4.35a1.15 1.15 0 0 1 0 2.3H4.75a1.15 1.15 0 0 1 0-2.3Zm1.9 0h2v-.3h-2Z"/><path d="M5.55 8.55h12.9l-.9 11.05a2.5 2.5 0 0 1-2.49 2.3H8.94a2.5 2.5 0 0 1-2.49-2.3ZM9.6 11.5a.8.8 0 0 0-.8.8v5.6a.8.8 0 0 0 1.6 0v-5.6a.8.8 0 0 0-.8-.8Zm4.8 0a.8.8 0 0 0-.8.8v5.6a.8.8 0 0 0 1.6 0v-5.6a.8.8 0 0 0-.8-.8Z"/></svg>',
     filmScript: '<svg viewBox="0 0 256 256" fill="currentColor"><path d="M200,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V40A16,16,0,0,0,200,24ZM76,188a12,12,0,1,1,12-12A12,12,0,0,1,76,188Zm0-48a12,12,0,1,1,12-12A12,12,0,0,1,76,140Zm0-48A12,12,0,1,1,88,80,12,12,0,0,1,76,92Z"/></svg>',
     gearSix: '<svg viewBox="0 0 256 256" fill="currentColor"><path d="M237.94,107.21a8,8,0,0,0-3.89-5.4l-29.83-17-.12-33.62a8,8,0,0,0-2.83-6.08,111.91,111.91,0,0,0-36.72-20.67,8,8,0,0,0-6.46.59L128,41.85,97.88,25a8,8,0,0,0-6.47-.6A111.92,111.92,0,0,0,54.73,45.15a8,8,0,0,0-2.83,6.07l-.15,33.65-29.83,17a8,8,0,0,0-3.89,5.4,106.47,106.47,0,0,0,0,41.56,8,8,0,0,0,3.89,5.4l29.83,17,.12,33.63a8,8,0,0,0,2.83,6.08,111.91,111.91,0,0,0,36.72,20.67,8,8,0,0,0,6.46-.59L128,214.15,158.12,231a7.91,7.91,0,0,0,3.9,1,8.09,8.09,0,0,0,2.57-.42,112.1,112.1,0,0,0,36.68-20.73,8,8,0,0,0,2.83-6.07l.15-33.65,29.83-17a8,8,0,0,0,3.89-5.4A106.47,106.47,0,0,0,237.94,107.21ZM128,168a40,40,0,1,1,40-40A40,40,0,0,1,128,168Z"/></svg>',
   };
@@ -193,13 +204,6 @@
     #app-menu .menu-backdrop { transition: opacity 150ms; }
     #app-menu .menu-popup { transition: opacity 200ms; }
     #app-menu.is-closed .menu-backdrop, #app-menu.is-closed .menu-popup { opacity: 0; }
-    /* portfolio: Settings comes in over the menu, 80 in from the right as it fades in (v14's
-       drill-in shift, on the menu's 360ms curve), and ‹ sends it back out the same way in the
-       menu's 260ms close; without the slide when motion is reduced */
-    #app-setting { transition: opacity 360ms cubic-bezier(0.32, 0.72, 0, 1), transform 360ms cubic-bezier(0.32, 0.72, 0, 1); }
-    #app-setting:is(.is-entering, .is-leaving) { opacity: 0; transform: translateX(80px); }
-    #app-setting.is-leaving { transition-duration: 260ms; pointer-events: none; }
-    @media (prefers-reduced-motion: reduce) { #app-setting:is(.is-entering, .is-leaving) { transform: none; } }
     .proto-icon-10 svg { width: 40px; height: 40px; }
     .proto-icon-8 svg { width: 32px; height: 32px; }
     #app-recipe .rd-tabs::-webkit-scrollbar { display: none; }
@@ -331,14 +335,12 @@
   }
 
   // Switch variant="sm" color="gray" — the same markup as the header's 그릴/마감 청소 switch.
-  // portfolio: its track darker than the page (white/18 → black/26), as the clean screen's header
-  // switch has it.
   function segSwitch(key, left, right, value, render) {
     const checked = value === right;
     return `
       <div class="-my-5 inline-flex cursor-pointer py-5" data-setting="${key}" data-left="${left}" data-right="${right}">
         <button type="button" role="switch" aria-checked="${checked}" data-slot="switch" data-variant="sm" data-color="gray" ${checked ? 'data-checked=""' : 'data-unchecked=""'}
-          class="peer group/switch relative inline-flex h-15 w-[276px] shrink-0 overflow-hidden rounded-[12px] border-transparent bg-black/26 p-1.5 outline-none transition-colors duration-200 ease-out after:absolute after:-inset-y-4.5">
+          class="peer group/switch relative inline-flex h-15 w-[276px] shrink-0 overflow-hidden rounded-[12px] border-transparent bg-white/18 p-1.5 outline-none transition-colors duration-200 ease-out after:absolute after:-inset-y-4.5">
           <span class="absolute top-1.5 bottom-1.5 left-1.5 z-0 w-[calc(50%-6px)] rounded-[8px] bg-white/20 shadow-[0px_0px_12px_0px_rgba(0,0,0,0.5)] transition-transform duration-200 ease-out ${checked ? 'translate-x-full' : 'translate-x-0'}" aria-hidden="true"></span>
           <span class="relative z-0 flex min-h-0 flex-1 cursor-pointer items-center justify-center rounded-xl type-body2 text-white transition-all duration-200 ease-out ${checked ? 'opacity-70' : ''}" aria-hidden="true">${render(left)}</span>
           <span class="relative z-0 flex min-h-0 flex-1 cursor-pointer items-center justify-center rounded-xl type-body2 text-white transition-all duration-200 ease-out ${checked ? '' : 'opacity-70'}" aria-hidden="true">${render(right)}</span>
@@ -346,56 +348,108 @@
       </div>`;
   }
 
-  // portfolio: the rows sit closer, 12 above and below instead of 20 and 16 for the toggle rows,
-  // whose two lines of text want a little more (they lose their fixed 120 for it): 24 is left
-  // between the switches above and 32 between the toggle rows. The section titles get 16 under them,
-  // and the sections 56 between them rather than 48.
-  function renderSetting() {
+  // The standby tick ring in the 빠른 레시피 선택 miniature, in the screen's own units (viewBox
+  // 600 × 1024): 625 across, centred at (300, 492.5), 40-long ticks (cook-tick-ring.tsx) — every
+  // other one of the 150, drawn thicker so they read at 0.17. It fades by angle as the real one
+  // (v0 ?from=v14 #tick-ring-box): gone within 60° of 6 o'clock, whole from 150°. Red from 6
+  // o'clock round to the left and up (a preheat under way), the rest the empty ticks' white.
+  let qsRingSvg = null;
+  function quickSelectRing() {
+    if (qsRingSvg) return qsRingSvg;
+    const N = 75, cx = 300, cy = 492.5, R = 312.5, LEN = 40, W = 8;
+    let ticks = '';
+    for (let i = 0; i < N; i++) {
+      const deg = (360 * i) / N;   // 0 = 6 o'clock, clockwise
+      const d = Math.min(deg, 360 - deg);
+      const a = Math.max(0, Math.min(1, (d - 60) / 90));
+      if (!a) continue;
+      const red = deg < 120;
+      ticks += `<rect x="${cx - W / 2}" y="${cy - R}" width="${W}" height="${LEN}" rx="${W / 2}" fill="${red ? '#e74646' : '#fff'}" fill-opacity="${+(a * (red ? 1 : 0.4)).toFixed(3)}" transform="rotate(${180 + deg} ${cx} ${cy})"/>`;
+    }
+    qsRingSvg = `<svg class="qs-svg" viewBox="0 0 600 1024" preserveAspectRatio="none" aria-hidden="true">${ticks}</svg>`;
+    return qsRingSvg;
+  }
+
+  function renderSetting() { withMorph(setting, renderSettingNow); }
+  function renderSettingNow() {
     const row = (label, control) => `
-      <div class="flex items-center justify-between py-3 pr-7 pl-10">
+      <div class="flex items-center justify-between py-5 pr-7 pl-10">
         <p class="type-body2 text-white">${label}</p>
         ${control}
       </div>`;
     const same = (v) => v;
     // FoodDetectionRow: the whole row is the button; the ToggleSwitch is display-only.
-    // portfolio: off, its track is black/26 like the switches above, rather than white/20.
     const toggleRow = (key, labelKey, descKey) => {
       const on = settings[key];
       return `
-              <button type="button" data-setting-toggle="${key}" aria-pressed="${on}" class="flex w-full items-center py-4 pr-7 pl-10 text-left active:bg-white/18">
+              <button type="button" data-setting-toggle="${key}" aria-pressed="${on}" class="flex h-30 w-full items-center py-5 pr-7 pl-10 text-left active:bg-white/18">
                 <div class="flex min-w-0 flex-1 flex-col gap-1 pr-5">
                   <p class="type-body2 truncate text-white">${t(labelKey)}</p>
                   <p class="type-body3 text-white/70">${t(descKey)}</p>
                 </div>
-                <div class="relative flex h-[54px] w-24 shrink-0 items-center rounded-full px-[3px] transition-colors duration-200 ${on ? 'bg-[#38B6FF]' : 'bg-black/26'}" aria-hidden="true">
+                <div class="relative flex h-[54px] w-24 shrink-0 items-center rounded-full px-[3px] transition-colors duration-200 ${on ? 'bg-[#38B6FF]' : 'bg-white/20'}" aria-hidden="true">
                   <div class="size-12 rounded-full bg-white transition-transform duration-200 ${on ? 'translate-x-[42px]' : ''}"></div>
                 </div>
               </button>`;
     };
-    // portfolio: the header bar without its white/20 band, straight on the page's ground, and ‹ pressing
-    // to white/10 as the menu's buttons do there (black/20 needed the band to show). ‹ sits 12 further
-    // in (pl 8 → 20), as v14 moved its header buttons. The page is #222, the recipe sheet's grey,
-    // rather than black.
+    // v15: 빠른 레시피 선택 as its own section, 대기 화면, with two radio cards — 게이지 · 레시피 버튼 (as
+    // iOS's 화면 모드 → 라이트 / 다크): thumbnail, name, radio. Each draws the standby screen it
+    // gives in miniature, from the real screens' coordinates (600 × 1024 → 104 wide) — 끔: the recipe
+    // name inside the tick ring with the three actions under it; 켬: the name up top and the recipe
+    // grid. Only what differs is drawn bright; ☰ · 그릴 | 마감 청소 · 온도 · 조리 시작 stay faint.
+    const quickSelectRow = () => {
+      const S = 104 / 600;
+      const u = (v) => +(v * S).toFixed(2) + 'px';
+      const box = (cls, x, y, w, h, r = 0) => `<i class="${cls}" style="left:${u(x)};top:${u(y)};width:${u(w)};height:${u(h)};border-radius:${u(r)}"></i>`;
+      const text = (cls, x, y, w, h) => box(cls, x, y + h * 0.24, w, h * 0.52, h);   // a line of text → a bar half its line tall
+      const chrome = box('qs-faint', 40, 46, 40, 28, 4) + box('qs-faint', 160, 26, 280, 64, 16) + box('qs-faint', 520, 46, 40, 28, 4) +
+        box('qs-faint', 28, 892, 544, 80, 40);
+      const ring = quickSelectRing();
+      const off = ring + chrome + text('qs-dim', 259, 390, 82, 36) + text('qs-bright', 177, 434, 247, 65) + text('qs-dim', 182, 553, 236, 36) +
+        [67, 268, 469].map((x) => box('qs-icon', x + 8, 736, 48, 48, 12)).join('') +
+        [[44, 110], [254, 91], [457, 89]].map(([x, w]) => text('qs-dim', x, 804, w, 31)).join('');
+      const keys = [[40, 324], [306, 324], [40, 436], [306, 436], [40, 548], [306, 548]];
+      const grid = box('qs-faint', 40, 812, 520, 160, 28) + chrome + text('qs-bright', 63, 172, 183, 48) + text('qs-dim', 63, 228, 119, 32) +
+        keys.map(([x, y], i) => box(i === 0 ? 'qs-key is-sel' : 'qs-key', x, y, 254, 100, 20)).join('') + text('qs-dim', 275, 680, 51, 33);
+      const opt = (value, labelKey, thumb) => {
+        const sel = settings.quickSelect === value;
+        return `
+                <button type="button" role="radio" aria-checked="${sel}" data-quick-select="${value ? 'on' : 'off'}" class="qs-option">
+                  <span class="qs-thumb" aria-hidden="true">${thumb}</span>
+                  <span class="type-body2 text-white">${t(labelKey)}</span>
+                  <span class="qs-radio transition-colors${sel ? ' is-on' : ''}" aria-hidden="true"><svg class="transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+                </button>`;
+      };
+      return `
+              <div data-quick-select-row class="qs-options" role="radiogroup" aria-label="${t('standbyScreen')}">
+                ${opt(false, 'quickSelectOff', off)}
+                ${opt(true, 'quickSelectOn', grid)}
+              </div>`;
+    };
     setting.innerHTML = `
-      <div class="h-full bg-[#222]">
+      <div class="h-full bg-black">
         <div class="flex h-full flex-col overflow-hidden overflow-y-auto">
-          <header class="relative flex h-[100px] min-w-0 shrink-0 items-center justify-between py-3 pl-5">
-            <button type="button" data-setting-back class="inline-flex h-16 min-w-0 cursor-pointer items-center justify-center gap-0 overflow-hidden rounded-lg px-3 text-white transition-all active:bg-white/10">
+          <header class="relative flex h-[100px] min-w-0 shrink-0 items-center justify-between bg-white/20 py-3 pl-2">
+            <button type="button" data-setting-back class="inline-flex h-16 min-w-0 cursor-pointer items-center justify-center gap-0 overflow-hidden rounded-lg px-3 text-white transition-all active:bg-black/20">
               <div class="proto-icon-10 flex size-10 min-w-0 shrink-0 items-center justify-center text-white">${ICON.chevronLeft}</div>
               <span class="type-body1 min-w-0 truncate px-3 text-white">${t('settings')}</span>
             </button>
           </header>
-          <main class="flex flex-col gap-14 pt-12">
+          <main class="flex flex-col gap-12 pt-12">
             <section>
-              <h2 class="type-body3 pb-4 pl-10 text-white/70">${t('unitAndLanguage')}</h2>
+              <h2 class="type-body3 pl-10 text-white/70">${t('unitAndLanguage')}</h2>
               ${row(t('temperature'), segSwitch('temperatureUnit', '°C', '°F', settings.temperatureUnit, same))}
               ${row(t('length'), segSwitch('lengthUnit', 'mm', 'inch', settings.lengthUnit, same))}
               ${row(t('language'), segSwitch('locale', 'ko', 'en', lang(), (l) => LOCALE_LABELS[l]))}
             </section>
+            ${animatesFields() ? `<section>
+              <h2 class="type-body3 pl-10 text-white/70">${t('standbyScreen')}</h2>
+              ${quickSelectRow()}
+            </section>` : ''}
             <section>
-              <h2 class="type-body3 pb-4 pl-10 text-white/70">${t('otherFeatures')}</h2>
-              ${toggleRow('foodDetection', 'foodDetection', 'foodDetectionDesc')}
-              ${toggleRow('quickSelect', 'quickSelect', 'quickSelectDesc')}
+              <h2 class="type-body3 pl-10 text-white/70">${t('otherFeatures')}</h2>
+              ${toggleRow('foodDetection', 'foodDetection', animatesFields() ? 'foodDetectionDescV15' : 'foodDetectionDesc')}
+              ${animatesFields() ? '' : toggleRow('quickSelect', 'quickSelect', 'quickSelectDesc')}
             </section>
           </main>
         </div>
@@ -405,7 +459,7 @@
   // v14 (and v0 reached from it) closes with ←| instead of ✕
   function closeIcon() {
     const h = document.documentElement;
-    return h.dataset.variant === 'v14' || h.dataset.from === 'v14' ? ICON.arrowLeftToLine : ICON.x;
+    return (h.dataset.variant === 'v14' || h.dataset.variant === 'v15') || h.dataset.from === 'v14' ? ICON.arrowLeftToLine : ICON.x;
   }
 
   // -- recipe page -----------------------------------------------------------
@@ -499,8 +553,8 @@
     const popover = recipeView.popover ? `
           <div data-recipe-popover-close class="absolute inset-0 z-40 bg-black/60"></div>
           <div class="absolute top-[108px] right-5 z-50 flex w-75 flex-col rounded-2xl border border-white/10 bg-[#222] py-1.5">
-            <button type="button" data-recipe-action="edit" class="proto-icon-8 flex w-full items-center gap-3 px-10 py-6 active:bg-white/5"><span class="text-white">${ICON.pencil}</span><span class="type-body2 whitespace-nowrap text-white">${t('editRecipeAction')}</span></button>
-            <button type="button" data-recipe-action="delete" class="proto-icon-8 flex w-full items-center gap-3 px-10 py-6 active:bg-white/5"><span class="text-[#ff2222]">${ICON.trash2}</span><span class="type-body2 whitespace-nowrap text-[#ff2222]">${t('deleteRecipeAction')}</span></button>
+            <button type="button" data-recipe-action="edit" class="proto-icon-8 flex w-full items-center gap-3 px-10 py-6 active:bg-white/5"><span class="text-white">${animatesFields() ? ICON.pencilFill : ICON.pencil}</span><span class="type-body2 whitespace-nowrap text-white">${t('editRecipeAction')}</span></button>
+            <button type="button" data-recipe-action="delete" class="proto-icon-8 flex w-full items-center gap-3 px-10 py-6 active:bg-white/5"><span class="text-[#ff2222]">${animatesFields() ? ICON.trashFill : ICON.trash2}</span><span class="type-body2 whitespace-nowrap text-[#ff2222]">${t('deleteRecipeAction')}</span></button>
           </div>` : '';
     return `
       <div class="relative h-full bg-black">
@@ -523,7 +577,192 @@
       </div>`;
   }
 
+  // The form is re-rendered as a whole (innerHTML) on every focus / keystroke, so a field's label
+  // would jump to its new place. In v15 (the app's motion: top · size · chip, 200ms) each field that
+  // changed state starts one frame in its old state and then transitions. Other variants: as before.
+  const animatesFields = () => {
+    const h = document.documentElement;
+    return h.dataset.variant === 'v15' || h.dataset.fromVariant === 'v15';
+  };
+  // Pages re-render with innerHTML, so the app's CSS transitions (switch thumb / track, the
+  // segmented switch's slide and labels: 200ms) never play. In v15: snapshot the elements that
+  // carry a transition-* class before a render and, after it, animate the ones whose look changed
+  // from the old value to the new one. Matched by order, only when the structure is the same.
+  const MORPH_PROPS = ['translate', 'transform', 'backgroundColor', 'opacity'];   // Tailwind v4 moves with `translate`
+  const morphEls = (root) => [...root.querySelectorAll('[class*="transition-"]')];
+  function morphSnapshot(root) {
+    return morphEls(root).map((el) => { const cs = getComputedStyle(el); return Object.fromEntries(MORPH_PROPS.map((k) => [k, cs[k]])); });
+  }
+  function morphPlay(root, before) {
+    const els = morphEls(root);
+    if (els.length !== before.length) return;
+    els.forEach((el, i) => {
+      const cs = getComputedStyle(el), from = {}, to = {};
+      MORPH_PROPS.forEach((k) => { if (cs[k] !== before[i][k]) { from[k] = before[i][k]; to[k] = cs[k]; } });
+      if (Object.keys(from).length) el.animate([from, to], { duration: 200, easing: 'ease-out' });
+    });
+  }
+  let skipMorph = false;   // a render that must not animate (e.g. right after a drop)
+  function withMorph(root, render) {
+    if (!animatesFields() || skipMorph) { render(); return; }
+    const before = morphSnapshot(root);
+    render();
+    morphPlay(root, before);
+  }
+
+  // Last known state per field and, for fields that just changed, when and from what. A field
+  // re-rendered mid-transition (one tap can render twice) resumes it with a negative delay.
+  const FIELD_MS = 200;
+  const fieldLast = new Map();   // key → { raised, focused }
+  const fieldAnim = new Map();   // key → { start, raisedFrom?, focusedFrom? }
+  function readField(el) {
+    return { raised: el.classList.contains('has-value') || el.classList.contains('is-focused'), focused: el.classList.contains('is-focused') };
+  }
+  function animateFields() {
+    const now = performance.now();
+    const seen = new Set();
+    rpBody.querySelectorAll('.pi[data-kb-field]').forEach((el) => {
+      const key = el.dataset.kbField;
+      seen.add(key);
+      const cur = readField(el);
+      const was = fieldLast.get(key);
+      fieldLast.set(key, cur);
+      let a = fieldAnim.get(key);
+      if (a && now - a.start >= FIELD_MS) { fieldAnim.delete(key); a = null; }
+      if (was && (was.raised !== cur.raised || was.focused !== cur.focused)) {
+        a = { start: now,
+              raisedFrom: was.raised !== cur.raised ? was.raised : undefined,
+              focusedFrom: was.focused !== cur.focused ? was.focused : undefined };
+        fieldAnim.set(key, a);
+      }
+      if (!a) return;
+      // Web Animations from the old look to the new one (the app's motion: 200ms, ease .25,.1,.25,1).
+      // A negative delay resumes a transition the previous render started.
+      const opts = { duration: FIELD_MS, delay: -(now - a.start), easing: 'cubic-bezier(.25,.1,.25,1)', fill: 'backwards' };
+      if (a.raisedFrom !== undefined && a.raisedFrom !== cur.raised) {
+        const chip = el.style.getPropertyValue('--lbl-bg') || '#000';
+        const RAISED = { top: '-12px', fontSize: '24px', lineHeight: '100%', backgroundColor: chip };
+        const REST = { top: '23px', fontSize: '28px', lineHeight: '150%', backgroundColor: 'rgba(0,0,0,0)' };
+        el.querySelector('.pi-label').animate(a.raisedFrom ? [RAISED, REST] : [REST, RAISED], opts);
+      }
+      if (a.focusedFrom !== undefined && a.focusedFrom !== cur.focused && !el.classList.contains('is-error')) {
+        const ON = { borderColor: 'rgb(255 255 255 / 70%)' }, OFF = { borderColor: 'rgb(255 255 255 / 30%)' };
+        el.querySelector('.pi-box').animate(a.focusedFrom ? [ON, OFF] : [OFF, ON], { ...opts, duration: 150 });
+      }
+    });
+    for (const k of [...fieldLast.keys()]) if (!seen.has(k)) { fieldLast.delete(k); fieldAnim.delete(k); }
+  }
+  // v15: list ↔ detail. The page's black stays and ‹ stays put. What moves:
+  //  · the title beside ‹ — the old one fades out where it was, the new one slides in 8 (from the
+  //    right going in, from the left coming back) while fading in;
+  //  · the body under the header — slides in 8 the same way;
+  //  · the header's right side — going in, 순서 변경's label fades and its ↑↓ slides over to ⋯ while
+  //    shrinking (0.6) and fading; ⋯ then grows in (0.6 → 1). Coming back is the reverse.
+  // The header is re-rendered, so the old pieces are cloned as ghosts over the new header.
+  // Other variants: no motion, as before.
+  const NAV_EASE = 'cubic-bezier(0.32, 0.72, 0, 1)';
+  function headerParts() {
+    const header = rpBody.querySelector('header');
+    if (!header) return null;
+    return {
+      header,
+      title: [header.querySelector('[data-recipe-back] .type-body1')].find((el) => el && el.offsetWidth) || null,   // a hidden title (v15 list) has nothing to animate
+      right: header.querySelector(':scope > button:not([data-recipe-back])'),
+    };
+  }
+  function navRecipe(dir, mutate) {
+    const motion = animatesFields() && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const old = motion ? headerParts() : null;
+    const scale = document.getElementById('device').getBoundingClientRect().width / 600 || 1;
+    const snap = (el) => el && { el: el.cloneNode(true), rect: el.getBoundingClientRect() };
+    // the body under the header too, with its scroll offsets, so the outgoing copy looks as it was
+    const snapBody = (el) => {
+      const s = snap(el);
+      s.scrolls = [el, ...el.querySelectorAll('*')].map((n) => n.scrollTop);
+      return s;
+    };
+    const before = old && {
+      title: snap(old.title), rightBox: snap(old.right && old.right.firstElementChild),
+      body: [...old.header.parentElement.children].filter((el) => el !== old.header).map(snapBody),
+    };
+    mutate();
+    renderRecipe();
+    if (!before) return;
+    const now = headerParts();
+    if (!now) return;
+    const hr = now.header.getBoundingClientRect();
+    const place = (s) => {
+      const g = s.el;
+      g.style.cssText += `;position:absolute;margin:0;pointer-events:none;left:${(s.rect.left - hr.left) / scale}px;top:${(s.rect.top - hr.top) / scale}px;width:${s.rect.width / scale}px;height:${s.rect.height / scale}px`;
+      now.header.appendChild(g);
+      return g;
+    };
+    const sx = dir === 'in' ? 8 : -8;
+    // title: old fades out in place, new slides in
+    // the title copy: no padding / clipping of its own, so it never shows … while it fades
+    if (before.title) { const g = place(before.title); g.style.padding = '0'; g.style.overflow = 'visible'; g.style.textOverflow = 'clip'; g.style.width = 'max-content'; g.style.maxWidth = 'none'; g.style.whiteSpace = 'nowrap'; }
+    if (before.title) before.title.el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 140, easing: 'ease-out', fill: 'forwards' }).finished.then(() => before.title.el.remove());
+    if (now.title) now.title.animate([{ opacity: 0, transform: `translateX(${sx}px)` }, { opacity: 1, transform: 'none' }], { duration: 220, easing: NAV_EASE, fill: 'backwards' });
+    // body under the header: the old one drifts 8 the other way and fades (160ms), over the new
+    const box = now.header.parentElement;
+    if (getComputedStyle(box).position === 'static') box.style.position = 'relative';
+    const br = box.getBoundingClientRect();
+    before.body.forEach((s) => {
+      const g = s.el;
+      g.style.cssText += `;position:absolute;margin:0;pointer-events:none;z-index:1;left:${(s.rect.left - br.left) / scale}px;top:${(s.rect.top - br.top) / scale}px;width:${s.rect.width / scale}px;height:${s.rect.height / scale}px`;
+      box.appendChild(g);
+      [g, ...g.querySelectorAll('*')].forEach((n, i) => { if (s.scrolls[i]) n.scrollTop = s.scrolls[i]; });
+      g.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: `translateX(${-sx}px)` }], { duration: 160, easing: 'ease-out', fill: 'forwards' })
+        .finished.then(() => g.remove());
+    });
+    [...now.header.parentElement.children].filter((el) => !before.body.some((s) => s.el === el)).filter((el) => el !== now.header).forEach((el) =>
+      el.animate([{ opacity: 0, transform: `translateX(${sx}px)` }, { opacity: 1, transform: 'none' }], { duration: 220, easing: NAV_EASE, fill: 'backwards' }));
+    // right side: 순서 변경 (icon + label) ↔ ⋯
+    const newBox = now.right && now.right.firstElementChild;
+    if (!before.rightBox || !newBox) return;
+    // 순서 변경 ↔ ⋯, kept simple: the outgoing one (icon + label together) shrinks a little and fades,
+    // the incoming one grows from 0.85 while fading in. `scale` (not transform) keeps the boxes'
+    // translate offset intact.
+    const OUT = { duration: 120, easing: 'ease-out', fill: 'forwards' };
+    // coming back (⋯ → 순서 변경) runs quicker: 순서 변경 is the wider of the two, so the same timing read as slow
+    const IN = dir === 'in' ? { duration: 160, delay: 60, easing: NAV_EASE, fill: 'backwards' } : { duration: 120, delay: 20, easing: NAV_EASE, fill: 'backwards' };
+    const ghost = place(before.rightBox);
+    ghost.style.background = 'transparent';
+    ghost.animate([{ opacity: 1, scale: 1 }, { opacity: 0, scale: 0.85 }], OUT).finished.then(() => ghost.remove());
+    newBox.animate([{ opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1 }], IN);
+  }
+  // ⋯ popover close. v15 lets it fade out first (.is-closing on the dim and panel, 120ms in CSS);
+  // other variants remove it at once, as before.
+  let popoverClosing = false;
+  function closePopover() {
+    if (!recipeView.popover || popoverClosing) return;
+    const done = () => { popoverClosing = false; recipeView.popover = false; renderRecipe(); };
+    const dim = rpBody.querySelector('[data-recipe-popover-close]');
+    if (!animatesFields() || !dim) { done(); return; }
+    popoverClosing = true;
+    dim.classList.add('is-closing');
+    dim.nextElementSibling && dim.nextElementSibling.classList.add('is-closing');
+    setTimeout(done, 120);
+  }
   function renderRecipe() {
+    withMorph(rpBody, renderRecipeNow);
+    if (animatesFields()) animateFields();
+  }
+  // v15: each render rebuilds the page's scrolling <main>, which used to land back at the top — a
+  // drop in 순서 편집 jumped the list up. The same list (list ↔ 순서 편집) or the same recipe keeps
+  // its scroll; another page (list → detail, back, a fresh open) starts at the top as before.
+  let lastScrollKey = null;
+  function renderRecipeNow() {
+    if (!animatesFields() || recipeView.mode === 'create') { lastScrollKey = null; renderRecipeBody(); return; }
+    const key = recipeView.id != null && recipeView.mode !== 'reorder' ? 'detail:' + recipeView.id : 'list';
+    const main = rpBody.querySelector('main');
+    const keep = key === lastScrollKey && main ? main.scrollTop : 0;
+    renderRecipeBody();
+    lastScrollKey = key;
+    const next = keep && rpBody.querySelector('main');
+    if (next) next.scrollTop = keep;
+  }
+  function renderRecipeBody() {
     if (recipeView.mode === 'create') {
       const scrolls = [...rpBody.querySelectorAll('.overflow-auto')].map((el) => el.scrollTop);
       rpBody.innerHTML = renderCreate() + renderConfirm();
@@ -812,7 +1051,29 @@
 
   // Reorder mode: ‹ (no label) + "순서 변경하기", rows with ≡ and no summary, dragged by a long
   // press; 변경 완료 at the bottom, enabled once the order differs.
+  // v15: reordering happens in place on the list — same header (‹ stays, "순서 편집" in the centre),
+  // the same rows with a drag handle where › was, no 레시피 추가 and no 변경 완료: ‹ saves.
+  function renderReorderInline() {
+    const byId = new Map(recipes().map((r) => [r.id, r]));
+    const rows = reorder.order.map((id, i) => recipeItem(byId.get(id), i)
+      .replace(/<button type="button" data-recipe-open="[^"]*" class="/, `<div data-drag-row="${i}" style="touch-action:none" class="select-none `)
+      .replace(/<\/button>\s*$/, '</div>')
+      .replace(`<div class="proto-icon-10 flex size-10 shrink-0 items-center text-white">${ICON.chevronRight}</div>`,
+               `<div class="proto-icon-10 flex size-10 shrink-0 items-center text-white/70">${ICON.menuLines}</div>`)).join('');
+    const header = pageHeader('data-recipe-back', '', '').replace(/<\/header>\s*$/,
+      `  <h3 data-reorder-title class="type-body2 absolute top-1/2 left-1/2 max-w-[calc(100%-8rem)] -translate-x-1/2 -translate-y-1/2 truncate text-center text-white">${t('reorderEdit')}</h3>\n          </header>`);
+    return `
+      <div class="relative h-full bg-black">
+        <div class="flex h-full flex-col overflow-hidden">
+          ${header}
+          <main class="flex h-full flex-col overflow-y-auto py-7">
+            <div class="flex flex-col" data-drag-list="recipes">${rows}</div>
+          </main>
+        </div>
+      </div>`;
+  }
   function renderReorder() {
+    if (animatesFields()) return renderReorderInline();
     const byId = new Map(recipes().map((r) => [r.id, r]));
     const changed = reorder.order.join() !== reorder.original.join();
     return `
@@ -904,14 +1165,19 @@
   });
   window.addEventListener('pointermove', (e) => {
     if (!drag) return;
-    const dy = (e.clientY - drag.y0) / drag.scale;
+    let dy = (e.clientY - drag.y0) / drag.scale;
     if (!drag.active) {
       if (Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0) > 5) { clearTimeout(drag.timer); drag = null; }
       return;
     }
     e.preventDefault();
+    // v15: the dragged row can't leave the list — no higher than the first slot, no lower than the last
+    if (animatesFields()) dy = Math.max(-drag.from * drag.pitch, Math.min((drag.rows.length - 1 - drag.from) * drag.pitch, dy));
     drag.row.style.transform = `translateY(${dy}px)`;
-    drag.to = Math.max(0, Math.min(drag.rows.length - 1, drag.from + Math.round(dy / drag.pitch)));
+    // v15: a neighbour gives way once the dragged row's leading edge overlaps it by a quarter of a row
+    // (edges meeting), not when the centre line passes the gap (half a row)
+    const steps = animatesFields() ? Math.sign(dy) * Math.floor(Math.abs(dy) / drag.pitch + 0.75) : Math.round(dy / drag.pitch);
+    drag.to = Math.max(0, Math.min(drag.rows.length - 1, drag.from + steps));
     drag.rows.forEach((r, i) => {
       if (r === drag.row) return;
       const shift = drag.from < drag.to && i > drag.from && i <= drag.to ? -1 : drag.from > drag.to && i < drag.from && i >= drag.to ? 1 : 0;
@@ -926,11 +1192,25 @@
     if (!d.active) return;
     suppressClick = true;
     setTimeout(() => { suppressClick = false; }, 0);
-    if (d.to === d.from) { renderRecipe(); return; }
     const move = (arr) => { const [x] = arr.splice(d.from, 1); arr.splice(d.to, 0, x); };
-    if (d.list.dataset.dragList === 'recipes') move(reorder.order);
-    else { move(form.options); form.dirty = true; }
-    renderRecipe();
+    const commit = () => {
+      if (d.to !== d.from) {
+        if (d.list.dataset.dragList === 'recipes') move(reorder.order);
+        else { move(form.options); form.dirty = true; }
+      }
+      renderRecipe();
+    };
+    if (animatesFields()) {
+      // v15: the dropped row settles into its slot from where it was let go (120ms), the others are
+      // already in place; the re-render after that is instant — no second, replayed reorder motion
+      const from = d.row.style.transform || 'none';
+      const toY = (d.to - d.from) * d.pitch;
+      d.row.style.transform = `translateY(${toY}px)`;
+      d.row.animate([{ transform: from }, { transform: `translateY(${toY}px)` }], { duration: 120, easing: 'cubic-bezier(0.2, 0, 0, 1)' })
+        .finished.then(() => { skipMorph = true; commit(); skipMorph = false; });
+      return;
+    }
+    commit();
   });
 
   function openCreate() {
@@ -940,9 +1220,13 @@
     renderRecipe();
   }
   function openReorder() {
-    const ids = recipes().map((r) => r.id);
-    reorder = { order: ids.slice(), original: ids };
-    recipeView.mode = 'reorder';
+    const start = () => {
+      const ids = recipes().map((r) => r.id);
+      reorder = { order: ids.slice(), original: ids };
+      recipeView.mode = 'reorder';
+    };
+    if (animatesFields()) { morphReorder('in', start); return; }
+    start();
     renderRecipe();
   }
   function leaveMode() { recipeView.mode = null; form = null; reorder = null; confirmBox = null; kb = null; renderRecipe(); }
@@ -1232,30 +1516,135 @@
     if (recipeView.mode === 'create') {
       if (form.dirty) { confirmBox = { kind: 'leave' }; renderRecipe(); } else leaveMode();
     } else if (recipeView.mode === 'reorder') {
+      if (animatesFields()) {
+        // v15: ‹ keeps the new order (no 변경 완료 step) and morphs back to the list
+        const changed = reorder.order.join() !== reorder.original.join();
+        morphReorder('out', () => { if (changed) applyReorder(); recipeView.mode = null; reorder = null; confirmBox = null; });
+        return;   // no toast: the list itself shows the new order
+      }
       if (reorder.order.join() !== reorder.original.join()) { confirmBox = { kind: 'leave' }; renderRecipe(); } else leaveMode();
     }
   }
-  function submitReorder() {
+  function applyReorder() {
     const list = recipes();
     const byId = new Map(list.map((r) => [r.id, r]));
     const next = reorder.order.map((id) => byId.get(id));
     list.splice(0, list.length, ...next);
+  }
+  function submitReorder() {
+    applyReorder();
     showToast(t('orderUpdated'));
     leaveMode();
+  }
+
+  // v15: list ↔ 순서 편집 in place. The page and the rows stay; what changes moves:
+  //  · each row's › and the drag handle cross (out: shrink + fade 140ms; in: grow 0.6 → 1, 80ms later);
+  //  · 레시피 추가 slides down out of the screen (and back up on return);
+  //  · 순서 변경's label travels to the header's centre while it turns into "순서 편집" (crossfade, 260ms),
+  //    its ↑↓ shrinking away; coming back, the title travels back and the ↑↓ grows in.
+  function morphReorder(dir, mutate) {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { mutate(); renderRecipe(); return; }
+    const scale = document.getElementById('device').getBoundingClientRect().width / 600 || 1;
+    const q = (s) => rpBody.querySelector(s);
+    const trails = () => [...rpBody.querySelectorAll('main :is([data-recipe-open], [data-drag-row]) > div:last-child')];
+    const snap = (el) => el && { el: el.cloneNode(true), rect: el.getBoundingClientRect() };
+    const old = {
+      trails: trails().map(snap),
+      fab: snap(q(':scope > div > button[data-recipe-action="create"]')),
+      label: snap(q('[data-recipe-action="reorder"] .type-body1') || q('header [data-reorder-title]')),
+      icon: snap(q('[data-recipe-action="reorder"] .proto-icon-10')),
+    };
+    mutate();
+    renderRecipe();
+    const root = rpBody.firstElementChild;
+    if (!root) return;
+    const rr = root.getBoundingClientRect();
+    const place = (s) => {
+      const g = s.el;
+      g.style.cssText += `;position:absolute;margin:0;pointer-events:none;z-index:5;left:${(s.rect.left - rr.left) / scale}px;top:${(s.rect.top - rr.top) / scale}px;width:${s.rect.width / scale}px;height:${s.rect.height / scale}px;translate:none`;
+      root.appendChild(g);
+      return g;
+    };
+    const gone = (g) => () => g.remove();
+    // › ↔ handle
+    old.trails.forEach((s) => { const g = place(s); g.animate([{ opacity: 1, scale: 1 }, { opacity: 0, scale: 0.6 }], { duration: 140, easing: 'ease-out', fill: 'forwards' }).finished.then(gone(g)); });
+    trails().forEach((el) => el.animate([{ opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1 }], { duration: 200, delay: 80, easing: NAV_EASE, fill: 'backwards' }));
+    // 레시피 추가
+    if (dir === 'in' && old.fab) {
+      const g = place(old.fab);
+      g.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(160px)' }], { duration: 240, easing: 'cubic-bezier(0.4, 0, 1, 1)', fill: 'forwards' }).finished.then(gone(g));
+    }
+    const fab = q(':scope > div > button[data-recipe-action="create"]');
+    if (dir === 'out' && fab) fab.animate([{ opacity: 0, transform: 'translateY(160px)' }, { opacity: 1, transform: 'none' }], { duration: 280, delay: 60, easing: NAV_EASE, fill: 'backwards' });
+    // the label ↔ the centred title
+    const label = q('[data-recipe-action="reorder"] .type-body1') || q('header [data-reorder-title]');
+    if (old.label && label) {
+      const nr = label.getBoundingClientRect();
+      const dx = ((old.label.rect.left + old.label.rect.width / 2) - (nr.left + nr.width / 2)) / scale;
+      const dy = ((old.label.rect.top + old.label.rect.height / 2) - (nr.top + nr.height / 2)) / scale;
+      const g = place(old.label);
+      g.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: `translate(${-dx}px, ${-dy}px)` }], { duration: 260, easing: NAV_EASE, fill: 'forwards' }).finished.then(gone(g));
+      label.animate([{ opacity: 0, transform: `translate(${dx}px, ${dy}px)` }, { opacity: 1, transform: 'none' }], { duration: 260, easing: NAV_EASE, fill: 'backwards' });
+    }
+    // 순서 변경's ↑↓
+    if (dir === 'in' && old.icon) {
+      const g = place(old.icon);
+      g.animate([{ opacity: 1, scale: 1 }, { opacity: 0, scale: 0.6 }], { duration: 140, easing: 'ease-out', fill: 'forwards' }).finished.then(gone(g));
+    }
+    const icon = q('[data-recipe-action="reorder"] .proto-icon-10');
+    if (dir === 'out' && icon) icon.animate([{ opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1 }], { duration: 200, delay: 120, easing: NAV_EASE, fill: 'backwards' });
   }
 
   // Language changes (dev bar ko/en, or 언어 in settings) re-render whatever is open, so the
   // menu's 레시피 / 설정 / 장비 관리 follow the cook screen's language.
   // cook.js re-sets lang on every render (each 200ms tick), so only an actual change counts —
   // re-rendering on every tick replaced the buttons mid-tap and swallowed clicks.
+  // v15: on a language change, each text that changed slides in sideways while fading (8px, 220ms) —
+  // from the right going to English (EN sits right on the switch), from the left going to Korean — instead of
+  // switching at once. Only leaf text elements are matched (by order, same structure), so the
+  // language switch's own slide keeps its motion and nothing else moves.
+  function swapTexts(root, render) {
+    if (!animatesFields() || matchMedia('(prefers-reduced-motion: reduce)').matches) { render(); return; }
+    const leaves = () => [...root.querySelectorAll('*')].filter((el) => !el.children.length && el.textContent.trim() && !el.closest('svg'));
+    // the old texts as they look now, so they can fade out where they are (a crossfade, not a cut)
+    const before = leaves().map((el) => {
+      const cs = getComputedStyle(el);
+      const range = document.createRange();
+      range.selectNodeContents(el);   // the text itself, not the box: titles carry padding (section titles 68)
+      return { text: el.textContent, rect: range.getBoundingClientRect(),
+        style: `color:${cs.color};font:${cs.font};letter-spacing:${cs.letterSpacing};text-transform:${cs.textTransform}` };
+    });
+    render();
+    const after = leaves();
+    if (after.length !== before.length) return;
+    const scale = document.getElementById('device').getBoundingClientRect().width / 600 || 1;
+    const host = root.firstElementChild || root;
+    if (getComputedStyle(host).position === 'static') host.style.position = 'relative';
+    const hr = host.getBoundingClientRect();
+    const sx = document.documentElement.lang === 'en' ? 6 : -6;
+    const EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
+    after.forEach((el, i) => {
+      const b = before[i];
+      if (el.textContent === b.text) return;
+      const g = document.createElement('span');
+      g.textContent = b.text;
+      g.style.cssText = `${b.style};position:absolute;margin:0;white-space:nowrap;pointer-events:none;z-index:6;left:${(b.rect.left - hr.left) / scale}px;top:${(b.rect.top - hr.top) / scale}px`;
+      host.appendChild(g);
+      // a soft crossfade: the old text drifts 4 back and blurs away, the new one slides 6 in and sharpens
+      g.animate([{ opacity: 1, transform: 'none', filter: 'blur(0)' }, { opacity: 0, transform: `translateX(${-sx * 0.66}px)`, filter: 'blur(2px)' }],
+        { duration: 220, easing: 'cubic-bezier(0.4, 0, 0.6, 1)', fill: 'forwards' }).finished.then(() => g.remove());
+      el.animate([{ opacity: 0, transform: `translateX(${sx}px)`, filter: 'blur(2px)' }, { opacity: 1, transform: 'none', filter: 'blur(0)' }],
+        { duration: 380, delay: 40, easing: EASE, fill: 'backwards' });   // transform, not translate (centred titles use translate)
+    });
+  }
   let shownLang = document.documentElement.lang;
   new MutationObserver(() => {
     const now = document.documentElement.lang;
     if (now === shownLang) return;
     shownLang = now;
-    if (!menu.hidden) renderMenu();
-    if (!setting.hidden) renderSetting();
-    if (!recipePage.hidden) renderRecipe();
+    if (!menu.hidden) swapTexts(menu, renderMenu);
+    if (!setting.hidden) swapTexts(setting, renderSetting);
+    if (!recipePage.hidden) swapTexts(rpBody, renderRecipe);
   }).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
 
   // -- open / close ---------------------------------------------------------
@@ -1274,38 +1663,52 @@
     closeTimer = setTimeout(() => { menu.hidden = true; }, ms);
   }
   // The app navigates first and lets the menu fade out over the new page.
-  // portfolio: the page enters instead (see #app-setting above), so the menu stays as it is under
-  // it and shuts once the page is in; shutting at once would show the cook screen coming back
-  // through the fade. ‹ before then drops it at once. ‹ slides the page back out over the cook
-  // screen and hides it once it's gone.
-  const SETTING_IN_MS = 360, SETTING_OUT_MS = 260;
-  let settingTimer = null;
+  // A variant can animate a page's close: it sets --page-close-ms on the page and styles
+  // .is-closing; the page stays shown that long, then hides. Unset → instant, as before.
+  const pageCloseTimers = new WeakMap();
+  // Likewise --page-open-ms: the page carries .is-opening that long after it is shown, so a variant
+  // can animate the page's content on open without replaying it when the page re-renders.
+  const pageOpenTimers = new WeakMap();
+  function showPage(page) {
+    clearTimeout(pageCloseTimers.get(page));
+    clearTimeout(pageOpenTimers.get(page));
+    page.classList.remove('is-closing');
+    page.hidden = false;
+    const ms = parseFloat(getComputedStyle(page).getPropertyValue('--page-open-ms')) || 0;
+    if (!ms) return;
+    page.classList.add('is-opening');
+    pageOpenTimers.set(page, setTimeout(() => page.classList.remove('is-opening'), ms));
+  }
+  function hidePage(page) {
+    if (page.hidden || page.classList.contains('is-closing')) return;
+    const ms = parseFloat(getComputedStyle(page).getPropertyValue('--page-close-ms')) || 0;
+    if (!ms) { page.hidden = true; return; }
+    page.classList.add('is-closing');
+    pageCloseTimers.set(page, setTimeout(() => { page.classList.remove('is-closing'); page.hidden = true; }, ms));
+  }
+  // A variant can keep the menu under a page while it opens (--page-over-menu: 1): the page fades
+  // in over the menu, not over the cook screen sliding back. Once the page covers the screen
+  // (--page-open-ms) the menu goes at once, so closing the page shows the cook screen.
+  const keepsMenu = (page) => getComputedStyle(page).getPropertyValue('--page-over-menu').trim() === '1';
+  function closeMenuUnder(page) {
+    if (!keepsMenu(page)) { closeMenu(); return; }
+    const ms = parseFloat(getComputedStyle(page).getPropertyValue('--page-open-ms')) || 0;
+    setTimeout(() => { if (!page.hidden) closeMenuInstantly(); }, ms);
+  }
   function openSetting() {
-    clearTimeout(settingTimer);
     renderSetting();
-    setting.classList.remove('is-leaving');
-    setting.classList.add('is-entering');
-    setting.hidden = false;
-    requestAnimationFrame(() => requestAnimationFrame(() => setting.classList.remove('is-entering')));
-    clearTimeout(closeTimer);
-    closeTimer = setTimeout(closeMenu, SETTING_IN_MS);
+    showPage(setting);
+    closeMenuUnder(setting);
   }
-  function closeSetting() {
-    if (!menu.hidden) closeMenuInstantly();
-    if (setting.hidden || setting.classList.contains('is-leaving')) return;
-    setting.classList.add('is-leaving');
-    settingTimer = setTimeout(() => {
-      setting.hidden = true;
-      setting.classList.remove('is-leaving');
-    }, SETTING_OUT_MS);
-  }
+  function closeSetting() { hidePage(setting); }
   function openRecipe() {
     Object.assign(recipeView, { id: null, optionId: null, popover: false, mode: null });
+    lastScrollKey = null;   // a fresh open starts at the top
     renderRecipe();
-    recipePage.hidden = false;
-    closeMenu();
+    showPage(recipePage);
+    closeMenuUnder(recipePage);
   }
-  function closeRecipe() { recipePage.hidden = true; }
+  function closeRecipe() { hidePage(recipePage); }
 
   // -- engineer PIN (components/ui/engineer-pin-modal.tsx, menu.tsx handleEngineerEntry) ------
   // 장비 관리 closes the menu and asks for the 4-digit engineer PIN over a black/70 blurred
@@ -1322,9 +1725,16 @@
   device.appendChild(pinLayer);
   let pin = '', pinError = false, unlocked = false;
   function renderPin() {
+    // v15: a wrong PIN shows its message in place of "비밀번호를 입력하세요" (same size, nothing below
+    // the dots), and the error red is the softer #ff5c5c on the message and the dots alike
+    const v15 = animatesFields();
+    const red = v15 ? 'bg-[#ff5c5c]' : 'bg-[#e44242]';
+    const title = v15 && pinError
+      ? `<p class="type-body2 w-[400px] text-center text-[#ff5c5c]">${t('pinError')}</p>`
+      : `<p class="type-body2 w-[400px] text-center text-white">${t('enterPasscode')}</p>`;
     const dots = Array.from({ length: 4 }, (_, i) => `
-              <div class="flex h-[120px] w-[80px] shrink-0 flex-col items-center justify-center rounded-[20px]">
-                <div class="size-4 shrink-0 rounded-full ${pinError ? 'bg-[#e44242]' : pin.length > i ? 'bg-white' : 'bg-white/30'}"></div>
+              <div data-slot="${pinError ? 'error' : pin.length > i ? 'filled' : pin.length === i ? 'focus' : 'empty'}" class="flex h-[120px] w-[80px] shrink-0 flex-col items-center justify-center rounded-[20px]">
+                <div class="size-4 shrink-0 rounded-full ${pinError ? red : pin.length > i ? 'bg-white' : 'bg-white/30'}"></div>
               </div>`).join('');
     const keys = ['1 2 3', '4 5 6', '7 8 9', '0 {bksp}'].map((row) => `
             <div class="hg-row">${row.split(' ').map((k) => `<div class="hg-button ${k === '{bksp}' ? 'hg-functionBtn hg-button-bksp' : 'hg-standardBtn'}" data-pin-key="${k}"><span>${k === '{bksp}' ? '' : k}</span></div>`).join('')}</div>`).join('');
@@ -1340,9 +1750,9 @@
         </header>
         <div class="flex min-h-0 w-full flex-1 flex-col items-center pt-[120px]">
           <div class="flex shrink-0 flex-col items-center">
-            <p class="type-body2 w-[400px] text-center text-white">${t('enterPasscode')}</p>
-            <div class="mt-12 flex shrink-0 items-start rounded-[20px]">${dots}</div>
-            ${pinError ? `<p class="type-body3 text-center leading-[130%] text-[#e44242]">${t('pinError')}</p>` : ''}
+            ${title}
+            <div class="mt-12 flex shrink-0 items-start rounded-[20px]" ${pinError ? "data-shake" : ""}>${dots}</div>
+            ${pinError && !v15 ? `<p class="type-body3 text-center leading-[130%] text-[#e44242]">${t('pinError')}</p>` : ''}
           </div>
         </div>
         <div class="shrink-0">
@@ -1416,6 +1826,18 @@
 
   setting.addEventListener('click', (e) => {
     if (e.target.closest('[data-setting-back]')) { closeSetting(); return; }
+    // v15: 빠른 레시피 선택's radio cards — picking the other one swaps the screen as the toggle did
+    const qsPick = e.target.closest('[data-quick-select]');
+    if (qsPick) {
+      const next = qsPick.dataset.quickSelect === 'on';
+      if (next === settings.quickSelect) return;
+      settings.quickSelect = next;
+      store.set('quickSelect', next);
+      renderSetting();
+      if (window.App && window.App.applyQuickSelect) setTimeout(() => window.App.applyQuickSelect({ reopenSetting: true }), 260);
+      return;
+    }
+    if (e.target.closest('[data-quick-select-row]')) return;   // the card around them isn't a control
     const toggle = e.target.closest('[data-setting-toggle]');
     if (toggle) {
       const key = toggle.dataset.settingToggle;
@@ -1428,7 +1850,9 @@
       }
       return;
     }
-    const sw = e.target.closest('[data-setting]');
+    // v15: the whole row is the segmented switch's tap target (as 조리물 감지's row is for its toggle)
+    const sw = e.target.closest('[data-setting]') ||
+      (animatesFields() ? e.target.closest('main > section > div')?.querySelector('[data-setting]') : null);
     if (!sw) return;
     const key = sw.dataset.setting;
     const current = key === 'locale' ? lang() : settings[key];
@@ -1439,7 +1863,14 @@
       settings[key] = next;
       store.set(key, next);
     }
-    renderSetting();
+    // 언어: this render is the one that swaps the texts (the lang observer then finds nothing new)
+    if (key === 'locale') {
+      swapTexts(setting, renderSetting);
+      // the lang observer would re-render the page once more and cut the swap short; this page is done
+      if (!menu.hidden) swapTexts(menu, renderMenu);
+      if (!recipePage.hidden) swapTexts(rpBody, renderRecipe);
+      shownLang = document.documentElement.lang;
+    } else renderSetting();
   });
 
   recipePage.addEventListener('click', (e) => {
@@ -1448,22 +1879,22 @@
     if (recipeView.mode === 'create' && handleFormClick(e)) return;
     if (recipeView.mode === 'reorder') { if (e.target.closest('[data-reorder-done]')) submitReorder(); return; }
     const open = e.target.closest('[data-recipe-open]');
-    if (open) { Object.assign(recipeView, { id: Number(open.dataset.recipeOpen), optionId: null, popover: false }); renderRecipe(); recipePage.scrollTop = 0; return; }
+    if (open) { navRecipe('in', () => Object.assign(recipeView, { id: Number(open.dataset.recipeOpen), optionId: null, popover: false })); recipePage.scrollTop = 0; return; }
     const tab = e.target.closest('[data-recipe-option]');
     if (tab) { recipeView.optionId = Number(tab.dataset.recipeOption); renderRecipe(); return; }
     if (e.target.closest('[data-recipe-kebab]')) { recipeView.popover = true; renderRecipe(); return; }
-    if (e.target.closest('[data-recipe-popover-close]')) { recipeView.popover = false; renderRecipe(); return; }
+    if (e.target.closest('[data-recipe-popover-close]')) { closePopover(); return; }
     const action = e.target.closest('[data-recipe-action]');
     if (action && action.dataset.recipeAction === 'create') { openCreate(); return; }
     if (action && action.dataset.recipeAction === 'reorder') { openReorder(); return; }
     if (action) {
       console.info('[Recipe] ' + action.dataset.recipeAction + ' (out of scope)');
-      if (recipeView.popover) { recipeView.popover = false; renderRecipe(); }
+      if (recipeView.popover) closePopover();
       return;
     }
     if (e.target.closest('[data-recipe-back]')) {
       // detail → list (navigate(-1)); list → the cook screen (navigate('/cook'))
-      if (recipeView.id != null) { Object.assign(recipeView, { id: null, optionId: null, popover: false }); renderRecipe(); }
+      if (recipeView.id != null) navRecipe('back', () => Object.assign(recipeView, { id: null, optionId: null, popover: false }));
       else closeRecipe();
     }
   });
@@ -1473,7 +1904,9 @@
     if (!pinLayer.hidden) closePin();
     else if (!menu.hidden) closeMenu();
     else if (!recipePage.hidden && kb) closeKeyboard();
-    else if (!recipePage.hidden) recipePage.querySelector('[data-confirm-cancel], [data-sheet-cancel], [data-recipe-popover-close], [data-recipe-back]').click();
+    // innermost first: a selector list would match in page order, so ‹ (earlier in the page) won over the open ⋯ popover
+    else if (!recipePage.hidden) ['[data-confirm-cancel]', '[data-sheet-cancel]', '[data-recipe-popover-close]', '[data-recipe-back]']
+      .map((s) => recipePage.querySelector(s)).find(Boolean)?.click();
     else if (!setting.hidden) closeSetting();
   });
 
