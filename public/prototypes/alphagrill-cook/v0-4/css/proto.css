@@ -407,16 +407,53 @@ svg:has(> use[href="#i-recipe-change"]), svg:has(> use[href="#i-unload"]), svg:h
    The screen's wrapper paints the ground and the container is see-through, so the card's inside
    shows the ground that stays put, and nothing changes paint as the card comes and goes. The card
    heads back as the sheet starts down, rather than once it's gone. */
+/* portfolio: the preheat ground in the ready green's shape (below), so its colour reaches further
+   down the middle than at the sides instead of ending on one line across: the green's linear and
+   radial layers (97.98% × 127.69% from the top centre), with their stops, in v0-4's red family —
+   a muted coral at the top (hue 8) deepening to wine (hue 342) by 60 %. Kept quiet: a little under
+   the saturation v0-4's red had (chroma ratio .41 → .45; full-strength crimson read loud) and 20 %
+   below the green's alphas. */
 .screen > div:has(> #cook-container.bg-cook-preparing) {
   background:
-    radial-gradient(90% 45% at 50% 0%, hsl(8 70% 60% / 22%) 0%, hsl(8 70% 60% / 0) 100%),
-    linear-gradient(180deg,
-      hsl(8 52% 34%) 0%,
-      hsl(356 58% 27%) 26%,
-      hsl(344 55% 16%) 56%,
-      hsl(336 45% 7%) 68%,
-      hsl(336 40% 3%) 73%,
-      #000 100%);
+    linear-gradient(
+      180deg,
+      rgba(234, 116, 98, 0.224) 0.22%,
+      rgba(229, 102, 94, 0.224) 10.17%,
+      rgba(225, 92, 93, 0.216) 18.27%,
+      rgba(222, 89, 97, 0.208) 24.8%,
+      rgba(219, 87, 101, 0.2) 30.04%,
+      rgba(217, 86, 103, 0.184) 34.29%,
+      rgba(215, 85, 105, 0.168) 37.83%,
+      rgba(214, 84, 106, 0.152) 40.94%,
+      rgba(212, 83, 108, 0.136) 43.9%,
+      rgba(211, 82, 109, 0.112) 47.01%,
+      rgba(209, 80, 111, 0.096) 50.55%,
+      rgba(207, 79, 113, 0.072) 54.79%,
+      rgba(204, 77, 115, 0.056) 60.04%,
+      rgba(204, 77, 115, 0.032) 66.57%,
+      rgba(204, 77, 115, 0.016) 74.67%,
+      rgba(204, 77, 115, 0) 84.62%
+    ),
+    radial-gradient(
+      97.98% 127.69% at 50% 0%,
+      rgba(234, 116, 98, 0.336) 0.22%,
+      rgba(229, 102, 94, 0.336) 10.17%,
+      rgba(225, 92, 93, 0.328) 18.27%,
+      rgba(222, 89, 97, 0.312) 24.8%,
+      rgba(219, 87, 101, 0.296) 30.04%,
+      rgba(217, 86, 103, 0.272) 34.29%,
+      rgba(215, 85, 105, 0.248) 37.83%,
+      rgba(214, 84, 106, 0.224) 40.94%,
+      rgba(212, 83, 108, 0.2) 43.9%,
+      rgba(211, 82, 109, 0.168) 47.01%,
+      rgba(209, 80, 111, 0.136) 50.55%,
+      rgba(207, 79, 113, 0.112) 54.79%,
+      rgba(204, 77, 115, 0.08) 60.04%,
+      rgba(204, 77, 115, 0.048) 66.57%,
+      rgba(204, 77, 115, 0.024) 74.67%,
+      rgba(204, 77, 115, 0) 84.62%
+    ),
+    #000;
 }
 /* portfolio: the ready ground is the app's own green (alphagrill.css .bg-cook-ready-to-cook), the
    one the quick button card's screens sit on, rather than v0-4's mint → teal. */
@@ -486,3 +523,48 @@ svg:has(> use[href="#i-recipe-change"]), svg:has(> use[href="#i-unload"]), svg:h
 @media (prefers-reduced-motion: reduce) {
   #cook-container, #cook-container > *, #tick-ring-slot { transition: none; }
 }
+
+/* ── portfolio, from v15 (recipe-proto 2a80e6a) ───────────────────────────────────────────
+   Cook screen header 8 lower (☰, Grill / Clean, the temperature button), as v15 moves it to line up
+   with its recipe / settings headers, so this card and the quick button card's v15 agree. Moved,
+   not re-laid-out: the 100 header band and everything under it stay put; tap areas move with the
+   buttons. The menu's ←| sits where ☰ is, so it moves too. */
+#cook-container header > * { transform: translateY(8px); }
+#app-menu .menu-popup > header > [data-menu="close"] { transform: translateY(8px); }
+
+/* The recipe sheet's ✕ as v15's: a quiet 48 circle (white/8) with a 24 ✕ in a solid grey (#a3a3a3,
+   ≈ white/55 over the circle) at the original ✕'s weight (#i-x-small); pressing brightens the
+   circle (white/16) instead of filling the 120 × 100 tap area, which stays. Its right edge sits 28
+   from the sheet's, level with the title (both 8 lower, above). */
+.sheet-icon-box { display: flex; width: 48px; height: 48px; align-items: center; justify-content: center; border-radius: 999px; background-color: rgb(255 255 255 / 8%); transition: background-color 150ms; }
+.sheet-icon-box svg { width: 24px; height: 24px; color: #a3a3a3; }
+#recipe-sheet [data-action="sheet-header-close"] { right: -8px; }
+#recipe-sheet [data-action="sheet-header-close"]:is(:active, .is-pressed) { background-color: transparent; }
+#recipe-sheet [data-action="sheet-header-close"]:is(:active, .is-pressed) .sheet-icon-box { background-color: rgb(255 255 255 / 16%); }
+
+/* …and its scrim as v15's dims: black 80 % (was 60 %), no blur. */
+#recipe-sheet > [data-action="sheet-close"] { backdrop-filter: none; -webkit-backdrop-filter: none; background-color: rgb(0 0 0 / 80%); }
+
+/* ☰ and the chevrons (the sheet's pager and "N ›") a touch lighter, as v15 has them: stroke 2 →
+   1.75. CSS wins over the symbols' stroke-width attribute. */
+:is(#i-menu, #i-chevron-left, #i-chevron-right) { stroke-width: 1.75; }
+
+/* The quick actions (Recipe · Unload · Scrape) press in the screen's own hue, as v15's do, instead
+   of plain white/15: a red tint on the red (preheating) screen, a green tint on the green (ready)
+   one. */
+#cook-container.bg-cook-preparing :is(#qa-recipe, #qa-unload, #qa-scrape):active { background-color: rgb(255 120 120 / 16%); }
+#cook-container.bg-cook-ready-to-cook :is(#qa-recipe, #qa-unload, #qa-scrape):active { background-color: rgb(110 230 160 / 14%); }
+
+/* The recipe sheet's selected row as v15's: a rounded box inside the row (inset 4 top / bottom,
+   16 at the sides, radius 20, black/25) instead of the dark band fading out at both ends; a pressed
+   row shows the same box at black/35. The rows lose the 8 between them and grow 8 taller instead
+   (100 → 108), so they sit where they did while the tap area and the box grow into the gap. */
+#sheet-list { gap: 0; }
+#sheet-list > button { position: relative; isolation: isolate; height: 108px; }
+:is(.sheet-row-on, #sheet-list > button:active, #sheet-list > button.is-pressed) { background: none; }
+#sheet-list > button::before {
+  content: ""; position: absolute; inset: 4px 16px; z-index: -1; border-radius: 20px;
+  background-color: transparent; pointer-events: none;
+}
+#sheet-list > button.sheet-row-on::before { background-color: rgb(0 0 0 / 25%); }
+#sheet-list > button:is(:active, .is-pressed)::before { background-color: rgb(0 0 0 / 35%); }
