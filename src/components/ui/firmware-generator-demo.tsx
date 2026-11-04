@@ -13,16 +13,17 @@ const SCENES = {
   // bottom edge leaves 88% of the card's height showing, 9/16 of the 1314px screen's width; `clip`
   // tells the page how much of its 820px screen is below that, so its scrolling list ends where the
   // card does. The 4:3 card keeps the corner and cuts the screen inside the editor instead.
-  // The square one would cut it short of the values being edited, so there the screen runs off the
-  // card's left edge too, past its sidebar, to bring them in. Between takes it zooms out to the
-  // wider cards' corner, 12% in from the card's top and left, at 145% of the card's width, the
+  // On the square one the page lays the screen out 1088px across in place of 1314 (its .narrow),
+  // the names' column brought in, so at the same height the screen sits 5% in from the card's left
+  // edge with its names and the values being edited both in. Between takes it zooms out to the
+  // wider cards' corner, 12% in from the card's top and left, at 118% of the card's width, the
   // least that still runs past its bottom edge, and back in for the next (the page says when). The
   // page drops `clip` there, as zoomed out the card cuts the screen lower down.
   edit: {
     frame: { top: "12%", left: "12%", height: `${(100 * 16 * 820) / (9 * 1314)}cqh`, width: `${(100 * 16) / 9}cqh` },
-    squareFrame: { left: "-15%" },
+    squareFrame: { left: "5%", width: `${(100 * 16 * 1088) / (9 * 1314)}cqh` },
     squareZoomedOutFrame: {
-      transform: `translateX(${12 + 15}cqw) scale(${145 / ((100 * 16) / 9)})`,
+      transform: `translateX(${12 - 5}cqw) scale(${118 / ((100 * 16 * 1088) / (9 * 1314))})`,
     },
     clip: 820 - 0.88 * ((9 / 16) * 1314),
   },

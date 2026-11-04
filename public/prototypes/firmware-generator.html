@@ -114,6 +114,13 @@
   .tag span { display: inline-block; min-width: 18px; text-align: center; padding: 1px 4px; border-radius: 4px; background: var(--muted); transition: background-color 90ms ease, color 90ms ease; }
   .row.active .tag span { color: var(--tc); background: var(--tb); }
   .name { color: var(--fg-light); width: 552px; white-space: nowrap; transition: color 90ms ease; }
+  /* The edit screen on the square phone card (fitClip in the script), 226px narrower: the names'
+     column comes in to 400px, the longest cut short with an ellipsis 16px before its value, the list
+     40px nearer the sidebar, and the editor with them. */
+  .scene-edit.narrow #stage { width: 1088px; margin-left: -544px; }
+  .scene-edit.narrow .editor { width: 720px; }
+  .scene-edit.narrow .list { padding-left: 37px; width: 684px; }
+  .scene-edit.narrow .name { width: 400px; padding-right: 16px; overflow: hidden; text-overflow: ellipsis; }
   .row.active .name { color: var(--fg); }
   .val { color: var(--vc); position: relative; white-space: pre; }
   .row.active .val { color: var(--fg); }
@@ -1182,13 +1189,15 @@ const params = new URLSearchParams(location.search);
 if (params.has('embed')) root.classList.add('embed');
 // ?clip=<stage px>: how much of the screen's bottom the embedding card cuts off. The square phone
 // card cuts it lower down whenever it zooms out, which would show the list ending short, so there
-// the list runs to the bottom; it measures the card the page is framed into (live-prototype.tsx),
-// whose shape changes with the viewport.
+// the list runs to the bottom, and the edit screen is laid out narrower (.narrow above); it measures
+// the card the page is framed into (live-prototype.tsx), whose shape changes with the viewport.
 const clip = parseFloat(params.get('clip') ?? '0');
 const card = frameElement?.closest('[data-live-prototype]');
 function fitClip() {
   const square = card && card.clientWidth < (card.clientHeight * 7) / 6;
   root.style.setProperty('--clip', `${square ? 0 : clip}px`);
+  root.classList.toggle('narrow', !!square);
+  fit();
 }
 addEventListener('resize', fitClip); fitClip();
 // Inert on the carousel card. The site gives the frame no pointer there (pointer-events: none on the
