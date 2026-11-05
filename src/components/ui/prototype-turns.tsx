@@ -1,6 +1,6 @@
 "use client";
 
-import { Children, useEffect, useRef, useState, type ReactNode } from "react";
+import { Children, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 
 /* Live prototypes sharing one card (recipe-select-demo.tsx, cleaning-mode-demo.tsx). Each page is
    framed into the whole card, one over the other, so all measure against the card; no layer takes
@@ -9,8 +9,13 @@ import { Children, useEffect, useRef, useState, type ReactNode } from "react";
    Their pages (?turns) take turns rather than playing at once: each posts its take's length, and
    once all are in, each is told its turn in a cycle as long as them all, in the order they're given
    here. Turns run on the wall clock, so the lightbox's copy of the card plays the same one as the
-   card. A page waiting for its turn is marked data-turn-waiting, which draws a black scrim over its
-   screen (live-prototype.tsx); the scrim fades off as its turn comes. */
+   card. A page waiting for its turn is marked data-turn-waiting, which has its screen recede
+   (live-prototype.tsx: translucent, grey, flatter, smaller); it comes back as its turn comes.
+
+   How far a waiting screen shrinks is --turn-waiting-scale, set here for the screens on the card:
+   live-prototype.tsx scales by it, and a card that sets its screens side by side takes back the room
+   the shrink opens between them, (1 − scale) / 2 of a screen's width (recipe-select-demo.tsx). */
+const WAITING_SCALE = 0.9;
 
 export default function PrototypeTurns({ children }: { children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -53,7 +58,7 @@ export default function PrototypeTurns({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <div ref={ref} className="relative w-full h-full">
+    <div ref={ref} className="relative w-full h-full" style={{ "--turn-waiting-scale": WAITING_SCALE } as CSSProperties}>
       {Children.map(children, (child, j) => (
         <div
           className="absolute inset-0 pointer-events-none"

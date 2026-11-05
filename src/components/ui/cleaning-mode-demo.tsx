@@ -13,14 +13,16 @@ import PrototypeTurns from "./prototype-turns";
    sixteenth on the 4:3 card, as on the recipe card (recipe-select-demo.tsx): −1.5cqh + 5.4375cqw
    through both. The square phone card, where the stagger left its corners empty, sets the two
    whole screens side by side instead, as the recipe card does: centred, 73% of its height with a
-   sixteenth between. */
+   sixteenth between. As there, those gaps are what shows beside the waiting screen, which shrinks
+   about its centre, so the frames sit closer by the room the shrink opens. */
 const HEIGHT = "(74cqh + 13.5cqw)";
 const WIDTH = `${HEIGHT} * 600 / 1024`;
-const GAP = "(-1.5cqh + 5.4375cqw)";
+const SHRINK_ROOM = (width: string) => `(1 - var(--turn-waiting-scale)) / 2 * ${width}`;
+const GAP = `(-1.5cqh + 5.4375cqw - ${SHRINK_ROOM(WIDTH)})`;
 const SCREEN: CSSProperties = { height: `calc${HEIGHT}`, width: `calc(${WIDTH})` };
 const SQUARE_HEIGHT = "73cqh";
 const SQUARE_WIDTH = `${SQUARE_HEIGHT} * 600 / 1024`;
-const SQUARE_GAP = `(${SQUARE_HEIGHT} / 16)`;
+const SQUARE_GAP = `(${SQUARE_HEIGHT} / 16 - ${SHRINK_ROOM(SQUARE_WIDTH)})`;
 const SQUARE_SCREEN: CSSProperties = { top: "50%", transform: "translateY(-50%)", height: SQUARE_HEIGHT, width: `calc(${SQUARE_WIDTH})` };
 
 export default function CleaningModeDemo() {

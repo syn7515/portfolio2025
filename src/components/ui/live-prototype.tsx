@@ -133,31 +133,37 @@ export default function LivePrototype({ src, scene, title, frame, frameClassName
       />
       <div
         data-frame={frameId}
-        className={`absolute overflow-hidden transition-opacity duration-300 ease-[ease-out] [[data-lightbox-live]_&]:transition-none ${frameClassName} ${bare ? "" : "shadow-[0px_1px_1px_-0.5px_rgba(0,0,0,0.10),0px_3px_3px_-1.5px_rgba(0,0,0,0.10)] dark:shadow-[0px_2px_4px_rgba(0,0,0,0.25)]"}`}
+        className={`absolute transition-opacity duration-300 ease-[ease-out] [[data-lightbox-live]_&]:transition-none ${frameClassName}`}
         style={{ ...frame, opacity: ready ? 1 : 0 }}
       >
-        <iframe
-          ref={iframeRef}
-          src={src}
-          title={title}
-          loading="lazy"
-          tabIndex={-1}
-          // Inert on the carousel card (a click there opens the lightbox); in the lightbox it takes
-          // real hover and press, which the page shows but doesn't act on.
-          className="block w-full h-full border-0 pointer-events-none [[data-lightbox-live]_&]:pointer-events-auto"
-          // The site's <meta name="color-scheme" content="light dark"> makes a "normal" iframe count
-          // as dark in dark mode, while the page inside declares nothing and counts as light. When
-          // the two differ the browser paints the iframe opaque white, so pin it to light to match.
-          style={{ colorScheme: "light" }}
-        />
-        {/* A scrim over the screen while another page on its card has the turn (prototype-turns.tsx),
-            fading once the card has settled which page that is: black in either scheme, so the
-            waiting screen dims the way a screen does rather than sinking into the card. */}
-        <div className="absolute inset-0 pointer-events-none bg-black opacity-0 [[data-turn-waiting]_&]:opacity-50 [[data-turn-fade]_&]:transition-opacity [[data-turn-fade]_&]:duration-500 [[data-turn-fade]_&]:ease-out" />
-        {/* Outline drawn above the iframe: an inset shadow on the wrapper would sit under it. */}
-        {!bare && (
-          <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_0_1px_rgba(0,0,0,0.10)] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)]" />
-        )}
+        {/* The screen itself, inside the box the frame places. While another page on its card has
+            the turn (prototype-turns.tsx) it recedes: translucent, grey, flatter and smaller (by the
+            card's --turn-waiting-scale),
+            screen, outline and shadow together, its paused frame still legible; all of it eases back
+            once the card has settled which page that is. Scaled here rather than on the box, whose
+            own transform places it, so it shrinks about its own centre. */}
+        <div
+          className={`absolute inset-0 overflow-hidden [[data-turn-waiting]_&]:opacity-55 [[data-turn-waiting]_&]:grayscale [[data-turn-waiting]_&]:contrast-75 [[data-turn-waiting]_&]:scale-(--turn-waiting-scale) [[data-turn-fade]_&]:transition-[opacity,filter,scale] [[data-turn-fade]_&]:duration-500 [[data-turn-fade]_&]:ease-out ${bare ? "" : "shadow-[0px_1px_1px_-0.5px_rgba(0,0,0,0.10),0px_3px_3px_-1.5px_rgba(0,0,0,0.10)] dark:shadow-[0px_2px_4px_rgba(0,0,0,0.25)]"}`}
+        >
+          <iframe
+            ref={iframeRef}
+            src={src}
+            title={title}
+            loading="lazy"
+            tabIndex={-1}
+            // Inert on the carousel card (a click there opens the lightbox); in the lightbox it takes
+            // real hover and press, which the page shows but doesn't act on.
+            className="block w-full h-full border-0 pointer-events-none [[data-lightbox-live]_&]:pointer-events-auto"
+            // The site's <meta name="color-scheme" content="light dark"> makes a "normal" iframe count
+            // as dark in dark mode, while the page inside declares nothing and counts as light. When
+            // the two differ the browser paints the iframe opaque white, so pin it to light to match.
+            style={{ colorScheme: "light" }}
+          />
+          {/* Outline drawn above the iframe: an inset shadow on the wrapper would sit under it. */}
+          {!bare && (
+            <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_0_1px_rgba(0,0,0,0.10)] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)]" />
+          )}
+        </div>
       </div>
     </div>
   );

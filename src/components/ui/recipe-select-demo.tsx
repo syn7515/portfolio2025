@@ -10,12 +10,16 @@ import QuickButtonDemo from "./quick-button-demo";
    twelfth of that between them, or a sixteenth on the 4:3 card, where a twelfth left the pair
    loose: 0.75cqh + 3.5625cqw is the line through both. On the square phone card, where the line
    runs the pair off the card's sides, it's held to the width instead: 73% of the card's height
-   with a sixteenth of that between, a twentieth of the card either side. */
+   with a sixteenth of that between, a twentieth of the card either side.
+   Those gaps are what shows between the screen playing and the one waiting, which shrinks about its
+   centre (prototype-turns.tsx): the frames sit closer by the room the shrink opens, (1 − scale) / 2
+   of a screen's width. */
 const HEIGHT = "(97cqh - 6.75cqw)";
-const GAP = "(0.75cqh + 3.5625cqw)";
+const SHRINK_ROOM = (width: string) => `(1 - var(--turn-waiting-scale)) / 2 * ${width}`;
+const GAP = `(0.75cqh + 3.5625cqw - ${SHRINK_ROOM(`${HEIGHT} * 600 / 1024`)})`;
 const SCREEN: CSSProperties = { top: "50%", transform: "translateY(-50%)", height: `calc${HEIGHT}`, width: `calc(${HEIGHT} * 600 / 1024)` };
 const SQUARE_HEIGHT = "73cqh";
-const SQUARE_GAP = `(${SQUARE_HEIGHT} / 16)`;
+const SQUARE_GAP = `(${SQUARE_HEIGHT} / 16 - ${SHRINK_ROOM(`${SQUARE_HEIGHT} * 600 / 1024`)})`;
 const SQUARE_SCREEN: CSSProperties = { height: SQUARE_HEIGHT, width: `calc(${SQUARE_HEIGHT} * 600 / 1024)` };
 
 export default function RecipeSelectDemo() {
