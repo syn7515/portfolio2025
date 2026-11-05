@@ -895,3 +895,22 @@ html[data-from="v14"] #qa-unload > svg { width: 52px; height: 52px; margin-block
 /* portfolio: Start cooking without the play icon, the label alone, as on the GRILL and CLEAN cards
    (v0-4). */
 #primary-btn svg { display: none; }
+
+/* ── portfolio: the settings page on the recipe sheet's grey (#222), as the card had it before v15,
+   rather than v15's black. Every colour v15 set against black moves with it, keeping the same steps
+   apart: the header and the fade under it take the grey; the boxes lift a little off it (white/7,
+   ≈ #313131); the segmented tracks and the toggle's off track sink below the box (black/35, as the
+   grey page had them darker than itself), their selected slide lighter to read on that (#4a4a4a);
+   a pressed row shows white/12 in place of the box; the Standby screen's chosen-card scrim steps
+   up from the box the way #3a3a3a did from v15's (#474747, pressed #525252). */
+html[data-from-variant="v15"] #app-setting > .h-full { background-color: #222; }
+html[data-from-variant="v15"] #app-setting header { background-color: #222; }
+html[data-from-variant="v15"] #app-setting header::after { background: linear-gradient(to bottom, #222 0%, rgb(34 34 34 / 0) 100%); }
+html[data-from-variant="v15"] #app-setting main > section > :not(h2) { background-color: rgb(255 255 255 / 7%); }
+html[data-from-variant="v15"] #app-setting main > section > :is(button, div):active { background-color: rgb(255 255 255 / 12%); }
+html[data-from-variant="v15"] #app-setting main > section > [data-quick-select-row]:active { background-color: rgb(255 255 255 / 7%); }
+html[data-from-variant="v15"] #app-setting [data-setting] > button[role="switch"] { background-color: rgb(0 0 0 / 35%); }
+html[data-from-variant="v15"] #app-setting [data-setting] > button[role="switch"] > span:first-child { background-color: #4a4a4a; }
+html[data-from-variant="v15"] #app-setting [data-setting-toggle] > .bg-white\/20 { background-color: rgb(0 0 0 / 35%); }
+html[data-from-variant="v15"] #app-setting .qs-bg { background-color: #474747; }
+html[data-from-variant="v15"] #app-setting .qs-option.is-on:active .qs-bg { background-color: #525252; }
