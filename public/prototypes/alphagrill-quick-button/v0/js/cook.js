@@ -545,6 +545,10 @@
   function tempUnitF() {
     const h = document.documentElement;
     if (!(h.dataset.variant === 'v15' || h.dataset.fromVariant === 'v15')) return false;
+    // the settings page (menu.js) mirrors its unit here once it loads; until then, the saved one —
+    // except in an embedded frame (?embed: handoff screens), which starts from the default °C
+    if (h.dataset.tempUnit) return h.dataset.tempUnit === '°F';
+    if (new URLSearchParams(location.search).has('embed')) return false;
     try { return JSON.parse(localStorage.getItem('proto:temperatureUnit')) === '°F'; } catch (e) { return false; }
   }
   // a temperature *difference* ("163°C 남음"): °F is × 9/5, no + 32

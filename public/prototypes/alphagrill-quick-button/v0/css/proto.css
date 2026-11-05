@@ -358,8 +358,17 @@ html[data-from-variant="v15"] #app-setting [data-setting-back] { margin-left: 12
    while it opens (--page-over-menu), so the menu — not the cook screen sliding back — shows
    through; once the page is in, the menu is gone, so ‹ lands on the cook screen.
    menu.js showPage / hidePage hold .is-opening / .is-closing for --page-open-ms / --page-close-ms.
-   TODO(미정): timings, distance. */
+   Settled (handoff v15): 280 / 160ms, 8 / 4. */
 html[data-from-variant="v15"] :is(#app-setting, #app-recipe) { --page-open-ms: 280; --page-close-ms: 160; --page-over-menu: 1; }
+
+/* v15: picking the other 대기 화면 card keeps settings open — only the cook screen behind it changes.
+   In the prototype that swap (v15 ↔ v0) is a page load, so the old page is held on screen for
+   200ms (a cross-document view transition, stepped: no crossfade) while the new page shows
+   settings again at the same scroll, then it cuts between two identical frames. Both pages opt
+   in (v15/css/proto.css has the same block); v14 doesn't, so its own swap stays a plain load.
+   proto-only mechanics — the app keeps its settings page mounted and just swaps the screen under it. */
+@view-transition { navigation: auto; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 200ms; animation-timing-function: steps(1, end); }
 @keyframes v15-page-in  { from { opacity: 0; transform: translateX(8px); } to { opacity: 1; transform: none; } }
 @keyframes v15-page-out { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateX(4px); } }
 html[data-from-variant="v15"] :is(#app-setting, #app-recipe).is-opening { animation: v15-page-in 280ms cubic-bezier(0.32, 0.72, 0, 1) both; }
@@ -388,7 +397,7 @@ html[data-from-variant="v15"] #app-setting [data-setting-back]:active { backgrou
 html[data-from-variant="v15"] #app-setting main > section { display: flex; flex-direction: column; gap: 4px; }
 html[data-from-variant="v15"] #app-setting main > section > h2 { margin-bottom: 12px; padding-left: 80px; }   /* level with the row labels (40 box + 40 inside) */
 html[data-from-variant="v15"] #app-setting main > section > :not(h2) {
-  margin: 0 40px; width: auto; padding: 18px 28px 18px 40px;   /* 40 from the sides (as the recipe detail); padding top / bottom 18, right 28, left 40 */   /* left 20 → 32: labels at 52, level with the title */
+  margin: 0 40px; width: auto; padding: 16px 28px 16px 40px;   /* 40 from the sides (as the recipe detail); padding top / bottom 16, right 28, left 40 */   /* left 20 → 32: labels at 52, level with the title */
   background-color: rgb(255 255 255 / 8%); border-radius: 6px;
 }
 html[data-from-variant="v15"] #app-setting main > section > h2 + * { border-top-left-radius: 24px; border-top-right-radius: 24px; }
@@ -423,7 +432,7 @@ html[data-from-variant="v15"] #app-recipe [data-recipe-popover-close] + div > bu
    the panel gets 12 padding all round and a larger radius (16 → 28), each row is a rounded
    item (radius 18) whose pressed fill (black/30) stays inside it. Text stays 32 from the panel
    edge (12 + 20). */
-html[data-from-variant="v15"] #app-recipe [data-recipe-popover-close] + div { padding: 6px; gap: 0; border-radius: 28px; }   /* tight around the items; no gap between them */
+html[data-from-variant="v15"] #app-recipe [data-recipe-popover-close] + div { padding: 6px; gap: 0; border-radius: 28px; border: 0; box-shadow: var(--v15-lit-edge); }   /* tight around the items; no gap between them; lit edge, no 1px border */
 html[data-from-variant="v15"] #app-recipe [data-recipe-popover-close] + div > button { padding: 20px 26px; border-radius: 22px; }   /* text still 32 from the panel edge (6 + 26); radius 28 − 6 */
 html[data-from-variant="v15"] #app-recipe [data-recipe-popover-close] + div > button:active { background-color: rgb(0 0 0 / 30%); }   /* black scrim (was white/10) */
 
@@ -434,7 +443,7 @@ html[data-from-variant="v15"] #app-recipe [data-recipe-popover-close] + div { to
 /* v15: ⋯ popover opens with motion — it grows from its top-right corner (over ⋯) 0.9 → 1 while
    fading in, 240ms on the menu's ease; the dim behind it fades in over 200ms. The popover is
    created on open, so this plays each time it opens. Closing stays instant.
-   TODO(미정): close motion; scale / timing. */
+   Settled (handoff v15): 0.9 → 1 in 240ms, close 120ms fade. */
 @keyframes v15-pop-in { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: none; } }
 @keyframes v15-dim-in { from { opacity: 0; } to { opacity: 1; } }
 html[data-from-variant="v15"] #app-recipe [data-recipe-popover-close] + div { transform-origin: top right; animation: v15-pop-in 240ms cubic-bezier(0.32, 0.72, 0, 1) both; }
@@ -461,7 +470,7 @@ html[data-from-variant="v15"] #app-pin [data-pin-close] > span { translate: 0 4p
    of rows split by bands; ✕ presses with a black scrim like the ⋯ items.
    Motion: opens growing 0.95 → 1 with a fade (240ms, the menu's ease) over a fading dim;
    closes with a 120ms fade (cook.js renderTempModal holds .is-closing). */
-html[data-from-variant="v15"] #temp-modal > div { border-radius: 28px; box-shadow: inset 0 0 0 1px rgb(255 255 255 / 10%); padding-bottom: 16px; }
+html[data-from-variant="v15"] #temp-modal > div { border-radius: 28px; box-shadow: var(--v15-lit-edge); padding-bottom: 16px; }   /* lit edge, no 1px ring */
 html[data-from-variant="v15"] #temp-modal > div > div:nth-child(2) { background: transparent; }
 html[data-from-variant="v15"] #temp-modal > div > div:nth-child(2) > div { color: rgb(255 255 255 / 70%); padding-top: 4px; padding-bottom: 12px; }
 html[data-from-variant="v15"] #temp-modal > div > div:nth-child(3),
@@ -542,8 +551,8 @@ html[data-from-variant="v15"] #app-recipe header:has([data-recipe-kebab]) [data-
 
 /* v15: the first / last card of a group gets 4 more on its rounded side (18 → 22), so the
    24 corners don't crowd the content. */
-html[data-from-variant="v15"] #app-setting main > section > h2 + * { padding-top: 22px; }
-html[data-from-variant="v15"] #app-setting main > section > :last-child { padding-bottom: 22px; }
+html[data-from-variant="v15"] #app-setting main > section > h2 + * { padding-top: 20px; }
+html[data-from-variant="v15"] #app-setting main > section > :last-child { padding-bottom: 20px; }
 
 /* v15: the | between a recipe row's details is lighter than the text (white/70 → white/25). */
 html[data-from-variant="v15"] #app-recipe :is([data-recipe-open], [data-drag-row]) .border-l { border-color: rgb(255 255 255 / 25%); }   /* list and 순서 편집 rows alike */
@@ -605,7 +614,7 @@ html[data-from-variant="v15"] #app-setting main > section > :not(h2):not(h2 + *)
 
 /* v15: settings rhythm — header → first title 40 (was 48), title → its box 16 (was ≈ 13),
    box → next section's title 56 (was 48): a title sits clearly with its own box, sections read apart. */
-html[data-from-variant="v15"] #app-setting main { padding-top: 40px; row-gap: 56px; }
+html[data-from-variant="v15"] #app-setting main { padding-top: 40px; row-gap: 48px; }   /* sections 48 apart (was 56) */
 html[data-from-variant="v15"] #app-setting main > section > h2 { margin-bottom: 15px; }
 
 /* v15: settings segmented switches — the selected slide is a solid grey (#3a3a3a, was white/20)
@@ -647,6 +656,12 @@ html[data-from-variant="v15"] #app-recipe [data-drag-list="recipes"] [data-drag-
    from the press and simply stays once the drag starts. */
 html[data-from-variant="v15"] #app-recipe [data-drag-list="recipes"] [data-drag-row]:active { background-color: transparent; }
 html[data-from-variant="v15"] #app-recipe [data-drag-list="recipes"] [data-drag-row]:active::before { background-color: #1a1a1a; }
+
+/* v15: the lit edge — 1px white/10 along the top and a 1px white/30 soft rim all round (the
+   designer's 0.5px values, doubled). On the dragged 순서 편집 row (only while dragging, not on
+   press), the temperature panel and the ⋯ popover, which drop their 1px white/10 boundary for it. */
+html[data-from-variant="v15"] { --v15-lit-edge: inset 0 1px 0 rgb(255 255 255 / 10%), inset 0 0 1px rgb(255 255 255 / 30%); }
+html[data-from-variant="v15"] #app-recipe [data-drag-list="recipes"] [data-drag-row].is-dragging::before { box-shadow: var(--v15-lit-edge); }
 
 /* v15: a pressed settings row hides the hairlines above and below it, so its band reads clean. */
 html[data-from-variant="v15"] #app-setting main > section > :active::before,
@@ -744,7 +759,7 @@ html[data-from-variant="v15"] #app-setting .qs-label { opacity: 0.6; }
 html[data-from-variant="v15"] #app-setting .qs-option:not(.is-on) .qs-thumb { filter: grayscale(1); }   /* the other card's miniature in black and white; colour arrives with the scrim (menu.js) */
 html[data-from-variant="v15"] #app-setting .qs-option.is-on .qs-label,
 html[data-from-variant="v15"] #app-setting .qs-option:active .qs-label { opacity: 1; }
-/* the miniature: 600 × 1024 at ~0.17 on the red standby glow */
+/* the miniature: 600 × 1024 at ~0.17 on the standby glow (red here; green / none by tone, below) */
 html[data-from-variant="v15"] #app-setting .qs-thumb {
   position: relative; display: block; width: 104px; height: 178px; overflow: hidden; border-radius: 14px;
   background: radial-gradient(140% 75% at 50% 0%, rgb(222 65 65 / 42%), rgb(222 65 65 / 0) 72%), #0c0c0c;
@@ -760,6 +775,20 @@ html[data-from-variant="v15"] #app-setting .qs-thumb > .qs-icon { background: rg
 html[data-from-variant="v15"] #app-setting .qs-thumb > :is(.qs-bright, .qs-dim, .qs-icon) { background: rgb(255 255 255 / 12%); }   /* every text / icon skeleton at the CTA's 12 %: the ring and the six keys read first */
 html[data-from-variant="v15"] #app-setting .qs-thumb > .qs-key { background: rgb(255 255 255 / 18%); }
 html[data-from-variant="v15"] #app-setting .qs-thumb > .qs-key.is-sel { background: rgb(245 96 96 / 65%); }
+
+/* the miniature takes the cook screen's tone, as the real screen behind it does (the header
+   switch's data-color, cook.js renderHeader) — and changes with it while settings is open:
+   red (preheat, cooking): the red glow, red preheat ticks, the picked key red
+   green (ready, wait-melt): the green glow, the whole ring lit white, the picked key #46CB89
+   black (no recipe): no glow, the ring dim, no key picked */
+html[data-from-variant="v15"] #app-setting .qs-svg > rect { fill: #fff; opacity: 0.4; }
+html[data-from-variant="v15"] #app-setting .qs-svg > .qs-t-on { fill: #e74646; opacity: 1; }
+html[data-from-variant="v15"]:has(#clean-switch[data-color="green"]) #app-setting .qs-thumb { background: radial-gradient(140% 75% at 50% 0%, rgb(65 222 143 / 36%), rgb(65 222 143 / 0) 72%), #0c0c0c; }
+html[data-from-variant="v15"]:has(#clean-switch[data-color="green"]) #app-setting .qs-svg > rect { fill: #fff; opacity: 0.55; }
+html[data-from-variant="v15"]:has(#clean-switch[data-color="green"]) #app-setting .qs-thumb > .qs-key.is-sel { background: rgb(70 203 137 / 55%); }
+html[data-from-variant="v15"]:has(#clean-switch[data-color="black"]) #app-setting .qs-thumb { background: #0c0c0c; }
+html[data-from-variant="v15"]:has(#clean-switch[data-color="black"]) #app-setting .qs-svg > rect { fill: #fff; opacity: 0.4; }
+html[data-from-variant="v15"]:has(#clean-switch[data-color="black"]) #app-setting .qs-thumb > .qs-key.is-sel { background: rgb(255 255 255 / 18%); }
 /* the cards make the page a little taller than the screen: room after the last box when scrolled */
 html[data-from-variant="v15"] #app-setting main { padding-bottom: 24px; }
 
@@ -873,6 +902,10 @@ html[data-from-variant="v15"] #app-recipe .rd-line { grid-column: 1 / -1; displa
 html[data-from-variant="v15"] #app-recipe .rd-line .rd-stage { color: rgb(255 255 255 / 45%); white-space: nowrap; }
 html[data-from-variant="v15"] #app-recipe .rd-line .rd-v { white-space: nowrap; font-variant-numeric: tabular-nums; }
 html[data-from-variant="v15"] #app-recipe .rd-line .rd-k { margin-right: 8px; color: rgb(255 255 255 / 45%); }
+
+/* v15: one text size in the settings body — the row labels, segmented-switch labels and 대기 화면 card
+   names (type-body2, 28) come down to the section titles' and descriptions' 24 (type-body3). */
+html[data-from-variant="v15"] #app-setting main .type-body2 { font-size: 24px; line-height: 130%; }
 
 /* portfolio (?from=v15, aliased to v14): PREPARING / READY TO COOK as v0-4 (from v0-2) — 400
    (500 in the app), 24px (28), tracked caps at 0.2em centred against the trailing space

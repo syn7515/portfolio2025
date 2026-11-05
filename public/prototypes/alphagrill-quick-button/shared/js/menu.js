@@ -124,12 +124,18 @@
   // mocked footer (getPcStats / getProductName / getVersionInfo)
   const FOOTER = { ipv4: '192.168.0.42', product: 'AlphaGrill', hmi: '1.8.0', fwName: 'alphagrill-stm', fwVersion: '2.4.1' };
 
+  // Embedded frames (?embed — the handoff's screens, compare.html) start from the defaults and never
+  // write: a handoff screen that taps 게이지 or °F must not change the settings of the prototype itself
+  // (same origin, same localStorage).
+  const EMBEDDED = new URLSearchParams(location.search).has('embed');
   const store = {
     get(key, fallback) {
+      if (EMBEDDED) return fallback;
       try { const v = localStorage.getItem('proto:' + key); return v === null ? fallback : JSON.parse(v); }
       catch (e) { return fallback; }
     },
     set(key, value) {
+      if (EMBEDDED) return;
       try { localStorage.setItem('proto:' + key, JSON.stringify(value)); } catch (e) { /* ignore */ }
     },
   };
@@ -140,6 +146,9 @@
     // prototype-only: off = the app as it ships (v0); the redirect itself lives in app.js
     quickSelect: store.get('quickSelect', true),
   };
+  // the cook screen (cook.js tempUnitF) reads °C / °F from here, so an embedded frame's in-memory
+  // switch reaches the temperature panel too (it never reaches localStorage)
+  document.documentElement.dataset.tempUnit = settings.temperatureUnit;
 
   const lang = () => (window.Cook && window.Cook.state && STR[window.Cook.state.lang]) ? window.Cook.state.lang : (STR[document.documentElement.lang] ? document.documentElement.lang : 'ko');
   const t = (key) => STR[lang()][key];
@@ -356,8 +365,9 @@
   // The standby tick ring in the 빠른 레시피 선택 miniature, in the screen's own units (viewBox
   // 600 × 1024): 625 across, centred at (300, 492.5), 40-long ticks (cook-tick-ring.tsx) — every
   // other one of the 150, drawn thicker so they read at 0.17. It fades by angle as the real one
-  // (v0 ?from=v14 #tick-ring-box): gone within 60° of 6 o'clock, whole from 150°. Red from 6
-  // o'clock round to the left and up (a preheat under way), the rest the empty ticks' white.
+  // (v0 ?from=v14 #tick-ring-box): gone within 60° of 6 o'clock, whole from 150°. The ticks from 6
+  // o'clock round to the left and up are .qs-t-on (a preheat under way), the rest .qs-t-off; their
+  // colour comes from proto.css and follows the cook screen's tone (red · green · black).
   let qsRingSvg = null;
   function quickSelectRing() {
     if (qsRingSvg) return qsRingSvg;
@@ -368,8 +378,7 @@
       const d = Math.min(deg, 360 - deg);
       const a = Math.max(0, Math.min(1, (d - 60) / 90));
       if (!a) continue;
-      const red = deg < 120;
-      ticks += `<rect x="${cx - W / 2}" y="${cy - R}" width="${W}" height="${LEN}" rx="${W / 2}" fill="${red ? '#e74646' : '#fff'}" fill-opacity="${+(a * (red ? 1 : 0.4)).toFixed(3)}" transform="rotate(${180 + deg} ${cx} ${cy})"/>`;
+      ticks += `<rect class="${deg < 120 ? 'qs-t-on' : 'qs-t-off'}" x="${cx - W / 2}" y="${cy - R}" width="${W}" height="${LEN}" rx="${W / 2}" fill-opacity="${+a.toFixed(3)}" transform="rotate(${180 + deg} ${cx} ${cy})"/>`;
     }
     qsRingSvg = `<svg class="qs-svg" viewBox="0 0 600 1024" preserveAspectRatio="none" aria-hidden="true">${ticks}</svg>`;
     return qsRingSvg;
@@ -571,11 +580,9 @@
             <button type="button" data-recipe-action="edit" class="proto-icon-8 flex w-full items-center gap-3 px-10 py-6 active:bg-white/5"><span class="text-white">${animatesFields() ? ICON.pencilFill : ICON.pencil}</span><span class="type-body2 whitespace-nowrap text-white">${t('editRecipeAction')}</span></button>
             <button type="button" data-recipe-action="delete" class="proto-icon-8 flex w-full items-center gap-3 px-10 py-6 active:bg-white/5"><span class="text-[#ff2222]">${animatesFields() ? ICON.trashFill : ICON.trash2}</span><span class="type-body2 whitespace-nowrap text-[#ff2222]">${t('deleteRecipeAction')}</span></button>
           </div>` : '';
-    // v15: the settings page's grammar — a title over a white/8 box per section, label | value rows
-    // split by inset hairlines — in three sections (치즈 and 배출 share 마무리), with short labels the
-    // section title already explains (상판 · 하판, 두께 · 조리 시간). Several cook options: chips that
-    // scroll sideways (the next one shows half) instead of underline tabs.
-    if (animatesFields()) {
+    // v15 experiments for the body (dev bar 옵션: 카드 / 드롭다운 / 칩) — the default is the v14 body
+    // below, under v15's header. Kept for a later rethink; see README.
+    if (animatesFields() && optionPicker() !== 'v14') {
       const vrow = (label, value) => `<div class="rd-row"><span class="type-body2 text-white/70">${label}</span><span class="type-body2 text-white">${value}</span></div>`;
       const vsection = (title, rows) => `<section><h2 class="type-body3 text-white/70">${title}</h2><div class="rd-box">${rows}</div></section>`;
       const multi = r.cookOptions.length > 1;
@@ -849,11 +856,11 @@
     parts.forEach((el) => el.classList.add('is-closing'));
     setTimeout(done, 120);
   }
-  // proto-only: how the detail shows its cook setups — 'cards' (default: every setup as a card),
-  // 'dropdown' or 'chips' (pick one) — switched from the dev bar
-  const OPTION_PICKERS = ['cards', 'dropdown', 'chips'];
+  // proto-only: how the detail shows its cook setups — 'v14' (default: the v14 body), or the v15
+  // experiments 'cards' (every setup as a block), 'dropdown' or 'chips' (pick one) — from the dev bar
+  const OPTION_PICKERS = ['v14', 'cards', 'dropdown', 'chips'];
   function optionPicker() {
-    try { const v = localStorage.getItem('proto:optionPicker'); return OPTION_PICKERS.includes(v) ? v : 'cards'; } catch (e) { return 'cards'; }
+    try { const v = localStorage.getItem('proto:optionPicker'); return OPTION_PICKERS.includes(v) ? v : 'v14'; } catch (e) { return 'v14'; }
   }
   function renderRecipe() {
     withMorph(rpBody, renderRecipeNow);
@@ -2023,7 +2030,8 @@
         });
       }
       if (window.App && window.App.applyQuickSelect) setTimeout(() => {
-        // the swap loads the other page and reopens settings there: at the same scroll, not the top
+        // the swap loads the other page, which shows settings again at the same scroll while the old
+        // frame is still held (proto.css @view-transition) — so settings never seems to close
         try { sessionStorage.setItem('proto:settingScroll', String(settingScroller()?.scrollTop || 0)); } catch (err) { /* ignore */ }
         window.App.applyQuickSelect({ reopenSetting: true });
       }, 260);
@@ -2054,6 +2062,7 @@
     } else {
       settings[key] = next;
       store.set(key, next);
+      if (key === 'temperatureUnit') document.documentElement.dataset.tempUnit = next;
       // v15: the cook screen's temperatures follow °C / °F — redraw it under the page now
       if (key === 'temperatureUnit' && animatesFields() && window.Cook && window.Cook.render) window.Cook.render();
     }
@@ -2123,11 +2132,11 @@
     if (devbar && animatesFields()) {
       const b = document.createElement('button');
       b.dataset.dev = 'option-picker';
-      b.title = '레시피 상세: 조리 설정 보여주는 방식 — 카드 / 드롭다운 / 칩 (proto-only)';
-      const NAMES = { cards: '옵션: 카드', dropdown: '옵션: 드롭다운', chips: '옵션: 칩' };
+      b.title = '레시피 상세 본문 — v14 (기본) / 카드 / 드롭다운 / 칩 실험 (proto-only)';
+      const NAMES = { v14: '상세: v14', cards: '상세: 카드', dropdown: '상세: 드롭다운', chips: '상세: 칩' };
       const label = () => { b.textContent = NAMES[optionPicker()]; };
       label();
-      b.addEventListener('click', () => {   // 카드 → 드롭다운 → 칩 → 카드
+      b.addEventListener('click', () => {   // v14 → 카드 → 드롭다운 → 칩 → v14
         const next = OPTION_PICKERS[(OPTION_PICKERS.indexOf(optionPicker()) + 1) % OPTION_PICKERS.length];
         try { localStorage.setItem('proto:optionPicker', next); } catch (e) { /* ignore */ }
         label();
