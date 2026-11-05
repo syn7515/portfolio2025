@@ -776,9 +776,9 @@ html[data-variant="v15"] #app-setting [data-setting-back]:active { background-co
    rounded large, inner ones small, 4 apart). Cards sit 20 in from the sides with 20 padding, so
    labels still start at 40 under the section title; controls end 40 from the edge (was 28). */
 html[data-variant="v15"] #app-setting main > section { display: flex; flex-direction: column; gap: 4px; }
-html[data-variant="v15"] #app-setting main > section > h2 { margin-bottom: 12px; padding-left: 68px; }   /* 40 → 68, level with the card labels */
+html[data-variant="v15"] #app-setting main > section > h2 { margin-bottom: 12px; padding-left: 80px; }   /* level with the row labels (40 box + 40 inside) */
 html[data-variant="v15"] #app-setting main > section > :not(h2) {
-  margin: 0 28px; width: auto; padding: 18px 28px 18px 40px;   /* sides 20 → 28; padding top / bottom 18, right 28, left 40 */   /* left 20 → 32: labels at 52, level with the title */
+  margin: 0 40px; width: auto; padding: 18px 28px 18px 40px;   /* 40 from the sides (as the recipe detail); padding top / bottom 18, right 28, left 40 */   /* left 20 → 32: labels at 52, level with the title */
   background-color: rgb(255 255 255 / 8%); border-radius: 6px;
 }
 html[data-variant="v15"] #app-setting main > section > h2 + * { border-top-left-radius: 24px; border-top-right-radius: 24px; }
@@ -1121,14 +1121,19 @@ html[data-variant="v15"] #app-setting main > section > [data-quick-select-row] {
 html[data-variant="v15"] #app-setting main > section > [data-quick-select-row]:active { background-color: rgb(255 255 255 / 8%); }
 html[data-variant="v15"] #app-setting main > section > [data-quick-select-row]:active::before,
 html[data-variant="v15"] #app-setting main > section > [data-quick-select-row]:active + *::before { opacity: 1; }
-html[data-variant="v15"] #app-setting main > section > .qs-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 16px 28px 14px; }   /* the box holds the cards alone: even sides, centred pair */
-html[data-variant="v15"] #app-setting .qs-option { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 12px 0 14px; border-radius: 20px; cursor: pointer; }
-html[data-variant="v15"] #app-setting .qs-option > .qs-thumb { margin-bottom: 4px; }   /* thumbnail · 16 · name · 12 · radio */
-html[data-variant="v15"] #app-setting .qs-option:active { background-color: rgb(255 255 255 / 6%); }
-html[data-variant="v15"] #app-setting .qs-radio { display: flex; width: 32px; height: 32px; align-items: center; justify-content: center; border-radius: 50%; color: #fff; box-shadow: inset 0 0 0 2px rgb(255 255 255 / 30%); }
-html[data-variant="v15"] #app-setting .qs-radio svg { width: 20px; height: 20px; opacity: 0; }
-html[data-variant="v15"] #app-setting .qs-radio.is-on { background-color: #38b6ff; box-shadow: none; }
-html[data-variant="v15"] #app-setting .qs-radio.is-on svg { opacity: 1; }
+html[data-variant="v15"] #app-setting main > section > .qs-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 16px 16px 14px; }   /* the box holds the cards alone: 16 above and beside the scrims */
+html[data-variant="v15"] #app-setting .qs-option { position: relative; isolation: isolate; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 16px 0 18px; border-radius: 8px; color: #fff; cursor: pointer; }
+html[data-variant="v15"] #app-setting .qs-option > .qs-thumb { margin-bottom: 4px; }   /* thumbnail · 16 · name */
+/* the picked card: a #3a3a3a scrim (.qs-bg, the settings switch's selected slide) behind thumbnail and
+   name, which slides across when the other card is picked (menu.js, 260ms); the other card's name at
+   60 %. No radio. Pressed: the other card's name lights up to white (no scrim); the picked card's scrim
+   lifts to #464646. */
+html[data-variant="v15"] #app-setting .qs-bg { position: absolute; inset: 0; z-index: -1; border-radius: 8px; background-color: #3a3a3a; }   /* concentric with the box: 24 − the 16 inset */
+html[data-variant="v15"] #app-setting .qs-option.is-on:active .qs-bg { background-color: #464646; }
+html[data-variant="v15"] #app-setting .qs-label { opacity: 0.6; }
+html[data-variant="v15"] #app-setting .qs-option:not(.is-on) .qs-thumb { filter: grayscale(1); }   /* the other card's miniature in black and white; colour arrives with the scrim (menu.js) */
+html[data-variant="v15"] #app-setting .qs-option.is-on .qs-label,
+html[data-variant="v15"] #app-setting .qs-option:active .qs-label { opacity: 1; }
 /* the miniature: 600 × 1024 at ~0.17 on the red standby glow */
 html[data-variant="v15"] #app-setting .qs-thumb {
   position: relative; display: block; width: 104px; height: 178px; overflow: hidden; border-radius: 14px;
@@ -1140,12 +1145,124 @@ html[data-variant="v15"] #app-setting .qs-thumb > * { position: absolute; displa
 html[data-variant="v15"] #app-setting .qs-thumb > .qs-svg { inset: 0; width: 100%; height: 100%; }
 html[data-variant="v15"] #app-setting .qs-thumb > .qs-faint { background: rgb(255 255 255 / 12%); }
 html[data-variant="v15"] #app-setting .qs-thumb > .qs-dim { background: rgb(255 255 255 / 35%); }
-html[data-variant="v15"] #app-setting .qs-thumb > .qs-bright { background: rgb(255 255 255 / 85%); }
-html[data-variant="v15"] #app-setting .qs-thumb > .qs-icon { background: rgb(255 255 255 / 60%); }
+html[data-variant="v15"] #app-setting .qs-thumb > .qs-bright { background: rgb(255 255 255 / 35%); }   /* the recipe name's bar: the same as every other text skeleton */
+html[data-variant="v15"] #app-setting .qs-thumb > .qs-icon { background: rgb(255 255 255 / 35%); }   /* the three action icons under the gauge, as the text skeletons */
+html[data-variant="v15"] #app-setting .qs-thumb > :is(.qs-bright, .qs-dim, .qs-icon) { background: rgb(255 255 255 / 12%); }   /* every text / icon skeleton at the CTA's 12 %: the ring and the six keys read first */
 html[data-variant="v15"] #app-setting .qs-thumb > .qs-key { background: rgb(255 255 255 / 18%); }
 html[data-variant="v15"] #app-setting .qs-thumb > .qs-key.is-sel { background: rgb(245 96 96 / 65%); }
 /* the cards make the page a little taller than the screen: room after the last box when scrolled */
 html[data-variant="v15"] #app-setting main { padding-bottom: 24px; }
+
+/* v15: temperature panel rows — 상판 / 하판, the target and the first zone's reading sit on one text
+   baseline (they were each placed by their own box, a few px apart). The zone icons stay centred on
+   their reading; only the reading takes part in the baseline. */
+html[data-variant="v15"] #temp-modal > div > div:is(:nth-child(3), :nth-child(5)) { align-items: baseline; }
+html[data-variant="v15"] #temp-modal > div > div:is(:nth-child(3), :nth-child(5)) > div:last-child > div > span { align-self: baseline; }
+
+/* v15: temperature panel spacing, one rhythm (measured from the glyphs, not the boxes):
+   panel edge → text 28 top and bottom, 40 at the sides · header text → its line 16 · line / divider → row text 24 ·
+   row text → divider 24 · last reading → panel edge 28 · the two zone readings 36 apart (baselines).
+   Columns size to their content and line up across the header and both rows (subgrid), so 목표 sits
+   40 from 현재 and 64 clear of 상판 / 하판 in either language — the panel is as wide as that needs
+   (was a fixed 500 with 126 / 1fr / 156, which left 목표 floating and clipped "Current °C"). */
+html[data-variant="v15"] #temp-modal > div { display: grid; grid-template-columns: auto auto auto; width: max-content; padding: 23px 40px 4px; }   /* sides 40 (28 read too tight), top / bottom 28 to the text */
+html[data-variant="v15"] #temp-modal > div > div:is(:nth-child(2), :nth-child(3), :nth-child(5)) { grid-column: 1 / -1; grid-template-columns: subgrid; }
+html[data-variant="v15"] #temp-modal > div > div:nth-child(4) { grid-column: 1 / -1; margin: 0; }
+html[data-variant="v15"] #temp-modal > div > div:nth-child(2) { background-size: 100% 1px; background-position: 0 100%; }
+html[data-variant="v15"] #temp-modal > div > div:is(:nth-child(2), :nth-child(3), :nth-child(5)) > div:nth-child(n) { padding-left: 0; padding-right: 0; }   /* :nth-child(n) outranks the old :first-child / :last-child 40s */
+html[data-variant="v15"] #temp-modal > div > div:is(:nth-child(2), :nth-child(3), :nth-child(5)) > div:nth-child(2) { padding-left: 64px; }
+html[data-variant="v15"] #temp-modal > div > div:is(:nth-child(2), :nth-child(3), :nth-child(5)) > div:nth-child(3) { padding-left: 40px; }
+html[data-variant="v15"] #temp-modal > div > div:nth-child(2) > div { padding-top: 0; padding-bottom: 11px; }
+html[data-variant="v15"] #temp-modal > div > div:is(:nth-child(3), :nth-child(5)) > div { padding-top: 16px; padding-bottom: 16px; }
+html[data-variant="v15"] #temp-modal > div > div:is(:nth-child(3), :nth-child(5)) > div:nth-child(3) { gap: 4px; }
+
+/* v15: recipe detail in the settings page's grammar — section title at 68, a white/8 box 28 in from
+   the sides (outer radius 24), label | value rows 18 / 28 / 18 / 40 (22 on the box's first / last row),
+   inset white/8 hairlines from 40. Rhythm as settings: header → first title 40, title → box 15,
+   box → next title 56. Option chips (several cook options) sit sticky above, 28 in, 12 apart. */
+html[data-variant="v15"] #app-recipe .rd-main { padding-bottom: 40px; }
+html[data-variant="v15"] #app-recipe .rd-sections { display: flex; flex-direction: column; row-gap: 56px; padding-top: 40px; }
+html[data-variant="v15"] #app-recipe .rd-chips-wrap + .rd-sections { padding-top: 16px; }   /* chips' own 24 below + 16 = 40 to the first title */
+html[data-variant="v15"] #app-recipe .rd-sections h2 { padding-left: 80px; margin-bottom: 15px; }
+html[data-variant="v15"] #app-recipe .rd-box { margin: 0 40px; overflow: hidden; border-radius: 24px; background-color: rgb(255 255 255 / 8%); }
+html[data-variant="v15"] #app-recipe .rd-row { position: relative; display: flex; align-items: baseline; justify-content: space-between; gap: 24px; padding: 18px 40px; }
+html[data-variant="v15"] #app-recipe .rd-row:first-child { padding-top: 22px; }
+html[data-variant="v15"] #app-recipe .rd-row:last-child { padding-bottom: 22px; }
+html[data-variant="v15"] #app-recipe .rd-row + .rd-row::before { content: ""; position: absolute; top: 0; right: 0; left: 40px; height: 1px; background-color: rgb(255 255 255 / 8%); }
+html[data-variant="v15"] #app-recipe .rd-chips {
+  position: relative; display: flex; gap: 0; overflow-x: auto; scrollbar-width: none;   /* relative: the chips' offsetLeft counts from the row */
+  padding: 40px 43px 24px;   /* top 40: the chips start below the header's 40 gradient, not under it; sides 40 + the background's 3 */
+}
+html[data-variant="v15"] #app-recipe .rd-chips::-webkit-scrollbar { display: none; }
+/* chips, the usual build: each chip 21 to the sides with no gap (labels 42 apart), and the picked one's
+   background a layer of its own (.rd-chip-bg) reaching 3 past the chip each side (6 over its neighbours
+   in all, was 8) — 24 inside, without the chips overlapping. Picking another slides that layer across (menu.js, 260ms).
+   Picked: secondary (#3a3a3a, the settings switch's slide), white text. Others: ghost, text at 60%,
+   full white while pressed (no fill). 72 tall, radius 18. */
+html[data-variant="v15"] #app-recipe .rd-chip { position: relative; isolation: isolate; flex: none; height: 72px; padding: 0 21px; color: #fff; white-space: nowrap; }
+html[data-variant="v15"] #app-recipe .rd-chip-label { position: relative; opacity: 0.6; }
+html[data-variant="v15"] #app-recipe .rd-chip.is-on .rd-chip-label { opacity: 1; }
+html[data-variant="v15"] #app-recipe .rd-chip-bg { position: absolute; top: 0; bottom: 0; left: -3px; right: -3px; z-index: -1; border-radius: 18px; }
+html[data-variant="v15"] #app-recipe .rd-chip-bg { background-color: #3a3a3a; }
+html[data-variant="v15"] #app-recipe .rd-chip.is-on:active .rd-chip-bg { background-color: #464646; }
+/* a ghost chip pressed: only its text lights up (60 → 100 %), no fill — a fill would show where it
+   meets the picked chip's wider background */
+html[data-variant="v15"] #app-recipe .rd-chip:not(.is-on):active .rd-chip-label { opacity: 1; }
+
+/* v15: the chip row scrolls sideways — a black gradient lies over each end while chips are hidden past
+   it (right: more follow; left: some scrolled past), so the row reads as draggable. The wrapper is the
+   sticky black band; the gradients sit on it, over the scrolling row, and fade (160ms) as the row moves. */
+html[data-variant="v15"] #app-recipe .rd-chips-wrap { position: sticky; top: 0; z-index: 1; background-color: #000; }
+html[data-variant="v15"] #app-recipe .rd-fade { position: absolute; top: 0; bottom: 0; width: 96px; pointer-events: none; opacity: 0; transition: opacity 160ms ease; }
+html[data-variant="v15"] #app-recipe .rd-fade.is-left { left: 0; background: linear-gradient(to left, rgb(0 0 0 / 0%), #000); }
+html[data-variant="v15"] #app-recipe .rd-fade.is-right { right: 0; background: linear-gradient(to right, rgb(0 0 0 / 0%), #000); }
+html[data-variant="v15"] #app-recipe .rd-chips-wrap.fade-left .rd-fade.is-left,
+html[data-variant="v15"] #app-recipe .rd-chips-wrap.fade-right .rd-fade.is-right { opacity: 1; }
+html[data-variant="v15"] #app-recipe .rd-chips-wrap.no-fade-anim .rd-fade { transition: none; }
+html[data-variant="v15"] #app-recipe .rd-chips { cursor: grab; user-select: none; }   /* prototype: the row drags with a mouse (menu.js) */
+
+/* v15: recipe detail — more room at the sides than the settings page: boxes 40 in (was 28), rows 40 / 40
+   inside (was 40 / 28), titles at 80; the chips / dropdown line up with the boxes. */
+
+/* v15: recipe detail cook-option dropdown (dev bar "옵션: 드롭다운") — a field box like the info boxes,
+   40 below the header (clear of its gradient) and 40 in: 조리 설정 | 레어 ⌄. Its list opens over it as
+   the ⋯ popover does — #222 panel, padding 6, radius 28, items 20 / 34 (text level with the field's
+   80), radius 22, black/30 pressed, ✓ on the current one — popping 0.9 → 1 from the top (240ms) over the
+   page's black/80 dim; it fades out (120ms) when closed or picked. */
+html[data-variant="v15"] #app-recipe .rd-pick { position: relative; padding: 40px 40px 0; }
+html[data-variant="v15"] #app-recipe .rd-select { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 24px; padding: 22px 40px; border-radius: 24px; background-color: rgb(255 255 255 / 8%); }
+html[data-variant="v15"] #app-recipe .rd-select:active { background-color: rgb(255 255 255 / 14%); }
+html[data-variant="v15"] #app-recipe .rd-select-value { display: inline-flex; min-width: 0; align-items: center; gap: 12px; }
+html[data-variant="v15"] #app-recipe .rd-select-value svg { width: 32px; height: 32px; flex: none; color: rgb(255 255 255 / 70%); stroke-width: 1.75; }
+html[data-variant="v15"] #app-recipe .rd-opt-dim { position: absolute; inset: 0; z-index: 40; background-color: rgb(0 0 0 / 80%); animation: v15-dim-in 200ms ease-out both; }
+html[data-variant="v15"] #app-recipe .rd-opt-menu {
+  position: absolute; top: 40px; right: 40px; left: 40px; z-index: 50; display: flex; flex-direction: column;
+  padding: 6px; border-radius: 28px; background-color: #222; box-shadow: inset 0 0 0 1px rgb(255 255 255 / 10%);
+  transform-origin: top center; animation: v15-pop-in 240ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+html[data-variant="v15"] #app-recipe .rd-opt-item { display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 76px; padding: 20px 34px; border-radius: 22px; color: #fff; text-align: left; }
+html[data-variant="v15"] #app-recipe .rd-opt-item:active { background-color: rgb(0 0 0 / 30%); }
+html[data-variant="v15"] #app-recipe .rd-opt-item svg { width: 32px; height: 32px; flex: none; stroke-width: 2; }
+html[data-variant="v15"] #app-recipe :is(.rd-opt-dim, .rd-opt-menu).is-closing { animation: v15-fade-out 120ms ease-out both; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) {
+  html[data-variant="v15"] #app-recipe .rd-opt-menu { animation-name: v15-dim-in; }
+}
+
+/* v15: recipe detail as setup blocks (dev bar "옵션: 카드", the default) — text only: no box, no lines.
+   Each setup: its name (28), then one line per stage in cooking order (예열 → 압착 조리 → 마무리), all
+   24: stage white/45 on the left, values white, each after a white/45 word. Lines 16 apart, setups 48
+   apart, 40 below the header. Each setup is anchored by its number (1, 2, 3 …, 24 white/70) centred in
+   the list's 80 gutter (from 12), on the name's baseline; the text starts at 92 as the list's names do. Stage · first value · second value are columns shared
+   by every line of every setup (subgrid), 20 apart, so the stack reads as one table. */
+html[data-variant="v15"] #app-recipe .rd-cards { display: grid; grid-template-columns: 60px auto auto 1fr; column-gap: 20px; row-gap: 48px; padding: 40px 40px 0 12px; }   /* 12 + 60 + the 20 gap = 92: text where the list's names start */
+html[data-variant="v15"] #app-recipe .rd-card { grid-column: 1 / -1; display: grid; grid-template-columns: subgrid; align-items: baseline; color: #fff; }
+html[data-variant="v15"] #app-recipe .rd-num { grid-column: 1; width: 80px; text-align: center; color: rgb(255 255 255 / 70%); }   /* as the list's row number: centred in 12 … 92 (spans past its 60 track into the gap) */
+html[data-variant="v15"] #app-recipe .rd-card-name { grid-column: 2 / -1; margin-bottom: 14px; }
+html[data-variant="v15"] #app-recipe .rd-lines { grid-column: 2 / -1; display: grid; grid-template-columns: subgrid; row-gap: 16px; }
+html[data-variant="v15"] #app-recipe .rd-line { grid-column: 1 / -1; display: grid; grid-template-columns: subgrid; align-items: baseline; }
+html[data-variant="v15"] #app-recipe .rd-line .rd-stage { color: rgb(255 255 255 / 45%); white-space: nowrap; }
+html[data-variant="v15"] #app-recipe .rd-line .rd-v { white-space: nowrap; font-variant-numeric: tabular-nums; }
+html[data-variant="v15"] #app-recipe .rd-line .rd-k { margin-right: 8px; color: rgb(255 255 255 / 45%); }
 
 /* portfolio: Start cooking without the play icon, the label alone, as on the GRILL and CLEAN cards
    (v0-4). */

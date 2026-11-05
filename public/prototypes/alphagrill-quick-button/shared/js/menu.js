@@ -36,7 +36,7 @@
       unitAndLanguage: '단위 및 언어', temperature: '온도', length: '길이', language: '언어',
       otherFeatures: '기타 기능', foodDetection: '조리물 감지',
       foodDetectionDesc: '그리들 위 조리물 위치에 맞춰 배출합니다',
-      foodDetectionDescV15: '조리물 위치에 맞춰 배출합니다',   // v15: without 그리들 위
+      foodDetectionDescV15: '카메라로 조리물을 찾아 배출합니다',   // the camera: one line (≈ 329 of 360)   // v15: without 그리들 위
       quickSelect: '빠른 레시피 선택', quickSelectDesc: '조리 화면에서 레시피를 바로 고릅니다',
       quickSelectDescV15: '대기 화면에서 레시피를 바로 고릅니다',   // v15: 조리 → 대기 화면
       standbyScreen: '대기 화면', quickSelectOn: '레시피 버튼', quickSelectOff: '게이지',   // v15: 빠른 레시피 선택 as its own section, a name per mode
@@ -49,6 +49,8 @@
       pressCookingSetup: '압착 조리 설정', pressThickness: '압착 두께', cookingTime: '조리 시간',
       cheeseMeltOption: '치즈 가열 옵션', heatingTime: '가열 시간', disabled: '사용하지 않음',
       autoUnloadSetting: '배출 기본 설정', autoUnloadStateOn: '배출 켬', autoUnloadStateOff: '배출 끔',
+      // v15 recipe detail: short row labels under their section's title
+      rdSetup: '조리 설정', rdCookTime: '조리 시간', rdStagePreheat: '예열', rdStagePress: '압착 조리', rdStageFinish: '마무리', rdTime: '시간', rdCheeseShort: '치즈', rdUpper: '상판', rdLower: '하판', rdThickness: '두께', rdFinish: '마무리', rdCheese: '치즈 가열', rdUnload: '배출', rdOn: '켬', rdOff: '끔', rdNone: '없음',
       recipeOptions: '레시피 옵션', editRecipeAction: '레시피 수정', deleteRecipeAction: '레시피 삭제',
       // create / reorder (locales/ko.json recipe.*, common.*)
       done: '변경 완료', reOrder2: '순서 변경하기', reorderEdit: '순서 편집', orderUpdated: '순서를 변경했습니다',
@@ -80,7 +82,7 @@
       unitAndLanguage: 'Unit & Languages', temperature: 'Temperature', length: 'Length', language: 'Language',
       otherFeatures: 'Other features', foodDetection: 'Food detection',
       foodDetectionDesc: 'Unload based on food placement',
-      foodDetectionDescV15: 'Unload by food position',   // one line in the card
+      foodDetectionDescV15: 'Camera finds food to unload',   // one line in the card (309 of 360)
       quickSelect: 'Quick recipe select', quickSelectDesc: 'Pick recipes on the cook screen',
       quickSelectDescV15: 'Pick recipes on standby',   // one line in the card
       standbyScreen: 'Standby screen', quickSelectOn: 'Recipe buttons', quickSelectOff: 'Gauge',
@@ -92,6 +94,7 @@
       pressCookingSetup: 'Press cooking', pressThickness: 'Thickness', cookingTime: 'Cooking time',
       cheeseMeltOption: 'Cheese melting', heatingTime: 'Heating time', disabled: 'Disabled',
       autoUnloadSetting: 'Unload setting', autoUnloadStateOn: 'On', autoUnloadStateOff: 'Off',
+      rdSetup: 'Cooking setup', rdCookTime: 'Cook time', rdStagePreheat: 'Preheat', rdStagePress: 'Press', rdStageFinish: 'Finish', rdTime: 'Time', rdCheeseShort: 'Cheese', rdUpper: 'Upper', rdLower: 'Lower', rdThickness: 'Thickness', rdFinish: 'Finishing', rdCheese: 'Cheese melt', rdUnload: 'Unload', rdOn: 'On', rdOff: 'Off', rdNone: 'None',
       recipeOptions: 'Recipe options', editRecipeAction: 'Edit recipe', deleteRecipeAction: 'Delete recipe',
       done: 'Done', reOrder2: 'Reorder', reorderEdit: 'Edit order', orderUpdated: 'Order updated',
       unsavedChangesWarning: 'You have unsaved changes.\nLeaving this page will discard them.',
@@ -147,6 +150,8 @@
     // v14: close as "←|" (arrow into a vertical line), pointing back where the menu folds away
     arrowLeftToLine: '<svg data-icon="arrowLeftToLine" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19V5"/><path d="m13 6-6 6 6 6"/><path d="M7 12h14"/></svg>',
     chevronLeft: '<svg data-icon="chevronLeft" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>',
+    chevronDown: '<svg data-icon="chevronDown" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
+    check: '<svg data-icon="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
     chevronRight: '<svg data-icon="chevronRight" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>',
     // lucide ArrowUpDown / Plus / Ellipsis / Pencil / Trash2 (recipe page)
     arrowUpDown: '<svg data-icon="arrowUpDown" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>',
@@ -371,7 +376,15 @@
   }
 
   function renderSetting() { withMorph(setting, renderSettingNow); }
+  // v15: the page is rebuilt on every change (innerHTML), which put its scroll box back at the top —
+  // a toggle or card near the bottom jumped the page up. The scroll position carries over.
+  const settingScroller = () => setting.querySelector('.overflow-y-auto');
   function renderSettingNow() {
+    const keep = animatesFields() ? (settingScroller()?.scrollTop || 0) : 0;
+    renderSettingBody();
+    if (keep) { const sc = settingScroller(); if (sc) sc.scrollTop = keep; }
+  }
+  function renderSettingBody() {
     const row = (label, control) => `
       <div class="flex items-center justify-between py-5 pr-7 pl-10">
         <p class="type-body2 text-white">${label}</p>
@@ -393,7 +406,9 @@
               </button>`;
     };
     // v15: 빠른 레시피 선택 as its own section, 대기 화면, with two radio cards — 게이지 · 레시피 버튼 (as
-    // iOS's 화면 모드 → 라이트 / 다크): thumbnail, name, radio. Each draws the standby screen it
+    // iOS's 화면 모드 → 라이트 / 다크): thumbnail and name; the picked card is highlighted by a scrim
+    // (.qs-bg, the settings switch's #3a3a3a) that slides across when the other is picked; no radio.
+    // Each draws the standby screen it
     // gives in miniature, from the real screens' coordinates (600 × 1024 → 104 wide) — 끔: the recipe
     // name inside the tick ring with the three actions under it; 켬: the name up top and the recipe
     // grid. Only what differs is drawn bright; ☰ · 그릴 | 마감 청소 · 온도 · 조리 시작 stay faint.
@@ -414,10 +429,10 @@
       const opt = (value, labelKey, thumb) => {
         const sel = settings.quickSelect === value;
         return `
-                <button type="button" role="radio" aria-checked="${sel}" data-quick-select="${value ? 'on' : 'off'}" class="qs-option">
+                <button type="button" role="radio" aria-checked="${sel}" data-quick-select="${value ? 'on' : 'off'}" class="qs-option${sel ? ' is-on' : ''}">
+                  ${sel ? '<span class="qs-bg" aria-hidden="true"></span>' : ''}
                   <span class="qs-thumb" aria-hidden="true">${thumb}</span>
-                  <span class="type-body2 text-white">${t(labelKey)}</span>
-                  <span class="qs-radio transition-colors${sel ? ' is-on' : ''}" aria-hidden="true"><svg class="transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+                  <span class="qs-label type-body2 transition-opacity">${t(labelKey)}</span>
                 </button>`;
       };
       return `
@@ -556,6 +571,85 @@
             <button type="button" data-recipe-action="edit" class="proto-icon-8 flex w-full items-center gap-3 px-10 py-6 active:bg-white/5"><span class="text-white">${animatesFields() ? ICON.pencilFill : ICON.pencil}</span><span class="type-body2 whitespace-nowrap text-white">${t('editRecipeAction')}</span></button>
             <button type="button" data-recipe-action="delete" class="proto-icon-8 flex w-full items-center gap-3 px-10 py-6 active:bg-white/5"><span class="text-[#ff2222]">${animatesFields() ? ICON.trashFill : ICON.trash2}</span><span class="type-body2 whitespace-nowrap text-[#ff2222]">${t('deleteRecipeAction')}</span></button>
           </div>` : '';
+    // v15: the settings page's grammar — a title over a white/8 box per section, label | value rows
+    // split by inset hairlines — in three sections (치즈 and 배출 share 마무리), with short labels the
+    // section title already explains (상판 · 하판, 두께 · 조리 시간). Several cook options: chips that
+    // scroll sideways (the next one shows half) instead of underline tabs.
+    if (animatesFields()) {
+      const vrow = (label, value) => `<div class="rd-row"><span class="type-body2 text-white/70">${label}</span><span class="type-body2 text-white">${value}</span></div>`;
+      const vsection = (title, rows) => `<section><h2 class="type-body3 text-white/70">${title}</h2><div class="rd-box">${rows}</div></section>`;
+      const multi = r.cookOptions.length > 1;
+      // (dev bar "옵션: 카드", the default) one block of text per cook setup, every setup shown — no
+      // picking, no box, no lines: whitespace alone. One setup: the lines without a name; several: named
+      // and stacked. One line per
+      // stage in the order the grill runs it — 예열 → 압착 조리 → 마무리 — so it reads top to bottom:
+      // the stage on the left (white/45), its values to the right (white, each after a white/45 word),
+      // all 24 — one size; the order, colour and the lines carry the weight. Only the name is 28. The stage, first and second
+      // value each keep a column (subgrid), the same on every card, so the stack also compares down.
+      if (optionPicker() === 'cards') {
+        const v = (label, value) => `<span class="rd-v type-body3">${label ? `<span class="rd-k">${label}</span>` : ''}${value}</span>`;
+        const line = (stage, a, b) => `<div class="rd-line"><span class="rd-stage type-body3">${stage}</span>${a}${b}</div>`;
+        // each setup is anchored by its number in the list's 80 gutter: the recipe's list number, then
+        // the setup's — 5-1, 5-2 … (a lone setup too: 2-1)
+        const recipeNo = recipes().indexOf(r) + 1;
+        const card = (o, i) => `
+              <section class="rd-card">
+                <span class="rd-num type-body3" aria-hidden="true">${recipeNo}-${i + 1}</span>
+                ${multi ? `<h2 class="rd-card-name type-body2">${esc(o.name)}</h2>` : ''}
+                <div class="rd-lines">
+                  ${line(t('rdStagePreheat'), v(t('rdUpper'), fmtUnit(o.top, settings.temperatureUnit)), v(t('rdLower'), fmtUnit(o.bot, settings.temperatureUnit)))}
+                  ${line(t('rdStagePress'), v('', fmtTime(o.cookingSec)), v(t('rdThickness'), fmtUnit(o.thickness, settings.lengthUnit)))}   <!-- 2분 30초 reads as time on its own: no word -->
+                  ${line(t('rdStageFinish'), v(t('rdCheeseShort'), o.meltingSec > 0 ? fmtTime(o.meltingSec) : t('rdNone')), v(t('rdUnload'), o.withoutArm ? t('rdOff') : t('rdOn')))}
+                </div>
+              </section>`;
+        return `
+      <div class="relative h-full bg-black">
+        <div class="flex h-full flex-col overflow-hidden">
+          ${pageHeader('data-recipe-back', r.name, kebab)}
+          <main class="rd-main min-h-0 flex-1 overflow-auto">
+            <div class="rd-cards">${r.cookOptions.map(card).join('')}</div>
+          </main>
+        </div>
+        ${popover}
+      </div>`;
+      }
+      // the row scrolls under two black gradients that show where chips are hidden (updateChipFades)
+      // or (dev bar "옵션: 드롭다운") a dropdown field — 조리 설정 | 레어 ⌄ — whose list opens over it
+      const dropdown = multi && optionPicker() === 'dropdown' ? `
+            <div class="rd-pick">
+              <button type="button" data-recipe-option-open class="rd-select" aria-haspopup="listbox" aria-expanded="${!!recipeView.optionMenu}">
+                <span class="type-body2 text-white/70">${t('rdSetup')}</span>
+                <span class="rd-select-value"><span class="type-body2 text-white">${esc(opt.name)}</span>${ICON.chevronDown}</span>
+              </button>
+              ${recipeView.optionMenu ? `
+              <div class="rd-opt-menu" role="listbox" aria-label="${t('rdSetup')}">
+                ${r.cookOptions.map((o) => `<button type="button" role="option" aria-selected="${o.id === opt.id}" data-recipe-option="${o.id}" class="rd-opt-item${o.id === opt.id ? ' is-on' : ''}"><span class="type-body2">${esc(o.name)}</span>${o.id === opt.id ? ICON.check : ''}</button>`).join('')}
+              </div>` : ''}
+            </div>` : '';
+      const chips = multi && optionPicker() === 'chips' ? `
+            <div class="rd-chips-wrap">
+              <div class="rd-chips" data-keep-scroll-x="chips" role="tablist">
+                ${r.cookOptions.map((o) => `<button type="button" role="tab" aria-selected="${o.id === opt.id}" data-recipe-option="${o.id}" class="rd-chip type-body2${o.id === opt.id ? ' is-on' : ''}">${o.id === opt.id ? '<span class="rd-chip-bg" aria-hidden="true"></span>' : ''}<span class="rd-chip-label transition-opacity">${esc(o.name)}</span></button>`).join('')}
+              </div>
+              <i class="rd-fade is-left" aria-hidden="true"></i><i class="rd-fade is-right" aria-hidden="true"></i>
+            </div>` : '';
+      return `
+      <div class="relative h-full bg-black">
+        <div class="flex h-full flex-col overflow-hidden">
+          ${pageHeader('data-recipe-back', r.name, kebab)}
+          <main class="rd-main min-h-0 flex-1 overflow-auto">
+            ${chips}${dropdown}
+            <div class="rd-sections">
+              ${vsection(t('griddlePreheatTemp'), vrow(t('rdUpper'), fmtUnit(opt.top, settings.temperatureUnit)) + vrow(t('rdLower'), fmtUnit(opt.bot, settings.temperatureUnit)))}
+              ${vsection(t('pressCooking'), vrow(t('rdThickness'), fmtUnit(opt.thickness, settings.lengthUnit)) + vrow(t('cookingTime'), fmtTime(opt.cookingSec)))}
+              ${vsection(t('rdFinish'), vrow(t('rdCheese'), opt.meltingSec > 0 ? fmtTime(opt.meltingSec) : t('disabled')) + vrow(t('rdUnload'), opt.withoutArm ? t('rdOff') : t('rdOn')))}
+            </div>
+          </main>
+        </div>
+        ${recipeView.optionMenu && dropdown ? '<div class="rd-opt-dim" data-recipe-option-close></div>' : ''}
+        ${popover}
+      </div>`;
+    }
     return `
       <div class="relative h-full bg-black">
         <div class="flex h-full flex-col overflow-hidden">
@@ -744,6 +838,23 @@
     dim.nextElementSibling && dim.nextElementSibling.classList.add('is-closing');
     setTimeout(done, 120);
   }
+  // v15 recipe detail dropdown: the list fades out (120ms), then the picked option (if any) shows
+  let optionMenuClosing = false;
+  function closeOptionMenu(pick) {
+    if (!recipeView.optionMenu || optionMenuClosing) return;
+    const done = () => { optionMenuClosing = false; recipeView.optionMenu = false; if (pick != null) recipeView.optionId = pick; renderRecipe(); };
+    const parts = rpBody.querySelectorAll('.rd-opt-dim, .rd-opt-menu');
+    if (!parts.length || matchMedia('(prefers-reduced-motion: reduce)').matches) { done(); return; }
+    optionMenuClosing = true;
+    parts.forEach((el) => el.classList.add('is-closing'));
+    setTimeout(done, 120);
+  }
+  // proto-only: how the detail shows its cook setups — 'cards' (default: every setup as a card),
+  // 'dropdown' or 'chips' (pick one) — switched from the dev bar
+  const OPTION_PICKERS = ['cards', 'dropdown', 'chips'];
+  function optionPicker() {
+    try { const v = localStorage.getItem('proto:optionPicker'); return OPTION_PICKERS.includes(v) ? v : 'cards'; } catch (e) { return 'cards'; }
+  }
   function renderRecipe() {
     withMorph(rpBody, renderRecipeNow);
     if (animatesFields()) animateFields();
@@ -752,16 +863,81 @@
   // drop in 순서 편집 jumped the list up. The same list (list ↔ 순서 편집) or the same recipe keeps
   // its scroll; another page (list → detail, back, a fresh open) starts at the top as before.
   let lastScrollKey = null;
+  const CHIP_FADE = 96;   // the chip row's edge gradients (proto.css .rd-fade)
+  const CHIP_BG_OUT = 3;   // v15 recipe detail: the picked chip's background reaches 3 past the chip each side (proto.css .rd-chip-bg)
   function renderRecipeNow() {
     if (!animatesFields() || recipeView.mode === 'create') { lastScrollKey = null; renderRecipeBody(); return; }
     const key = recipeView.id != null && recipeView.mode !== 'reorder' ? 'detail:' + recipeView.id : 'list';
     const main = rpBody.querySelector('main');
-    const keep = key === lastScrollKey && main ? main.scrollTop : 0;
+    const same = key === lastScrollKey;
+    const keep = same && main ? main.scrollTop : 0;
+    const keepX = same ? [...rpBody.querySelectorAll('[data-keep-scroll-x]')].map((el) => [el.dataset.keepScrollX, el.scrollLeft]) : [];
+    const wasOn = same && rpBody.querySelector('.rd-chip.is-on');
+    const oldBg = wasOn ? [wasOn.offsetLeft - CHIP_BG_OUT, wasOn.offsetWidth + 2 * CHIP_BG_OUT] : null;   // in the row's own px
     renderRecipeBody();
     lastScrollKey = key;
     const next = keep && rpBody.querySelector('main');
     if (next) next.scrollTop = keep;
+    keepX.forEach(([name, x]) => { const el = rpBody.querySelector(`[data-keep-scroll-x="${name}"]`); if (el) el.scrollLeft = x; });
+    // the picked cook-option chip slides into view if it was cut off or under a gradient
+    const row = rpBody.querySelector('.rd-chips'), on = row && row.querySelector('.is-on');
+    if (row) updateChipFades(row, true);
+    // the picked chip's background slides (and resizes) from the chip it was on
+    if (on && oldBg && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const nx = on.offsetLeft, nw = on.offsetWidth;
+      const l0 = oldBg[0] - nx, r0 = nw - (oldBg[0] + oldBg[1] - nx);
+      if (Math.abs(l0 + CHIP_BG_OUT) > 0.5 || Math.abs(r0 + CHIP_BG_OUT) > 0.5) {
+        on.querySelector('.rd-chip-bg').animate(
+          [{ left: l0 + 'px', right: r0 + 'px' }, { left: -CHIP_BG_OUT + 'px', right: -CHIP_BG_OUT + 'px' }],
+          { duration: 260, easing: 'cubic-bezier(0.32, 0.72, 0, 1)' });
+      }
+    }
+    // ... and the row slides on until that background is clear of the edge gradient (96) — at either
+    // end of the row the gradient is gone, so the first / last chip just goes to the end
+    if (on) {
+      const edge = CHIP_FADE + CHIP_BG_OUT, max = row.scrollWidth - row.clientWidth;
+      const left = Math.max(0, on.offsetLeft - edge), right = Math.min(max, on.offsetLeft + on.offsetWidth + edge - row.clientWidth);
+      if (row.scrollLeft > left) row.scrollTo({ left, behavior: 'smooth' });
+      else if (row.scrollLeft < right) row.scrollTo({ left: right, behavior: 'smooth' });
+    }
   }
+  // v15 recipe detail: a black gradient over each end of the chip row while chips are hidden past it
+  // (right: more to come; left: scrolled past some). Set at once on a render, faded (160ms) on scroll.
+  function updateChipFades(row, instant) {
+    const wrap = row.parentElement, max = row.scrollWidth - row.clientWidth;
+    if (instant) wrap.classList.add('no-fade-anim');
+    wrap.classList.toggle('fade-left', row.scrollLeft > 1);
+    wrap.classList.toggle('fade-right', row.scrollLeft < max - 1);
+    if (instant) { void wrap.offsetWidth; wrap.classList.remove('no-fade-anim'); }
+  }
+  rpBody.addEventListener('scroll', (e) => {
+    if (e.target.classList && e.target.classList.contains('rd-chips')) updateChipFades(e.target);
+  }, true);   // scroll doesn't bubble: listen in the capture phase
+  // Prototype: a mouse drags the chip row sideways as a finger does on the device (touch, a trackpad
+  // and Shift + wheel already scroll it). Past 5px it's a drag, and the click that ends it doesn't pick a chip.
+  let chipDrag = null, chipDragged = false;
+  rpBody.addEventListener('pointerdown', (e) => {
+    const row = e.target.closest('.rd-chips');
+    if (!row || e.pointerType !== 'mouse' || e.button !== 0) return;
+    chipDrag = { row, x0: e.clientX, left0: row.scrollLeft, k: row.getBoundingClientRect().width / row.offsetWidth || 1, moved: false };
+  });
+  window.addEventListener('pointermove', (e) => {
+    if (!chipDrag) return;
+    const dx = e.clientX - chipDrag.x0;
+    if (!chipDrag.moved && Math.abs(dx) < 5) return;
+    chipDrag.moved = true;
+    e.preventDefault();
+    chipDrag.row.scrollLeft = chipDrag.left0 - dx / chipDrag.k;   // the device is drawn scaled: screen px → row px
+  });
+  window.addEventListener('pointerup', () => {
+    if (!chipDrag) return;
+    chipDragged = chipDrag.moved;
+    chipDrag = null;
+    setTimeout(() => { chipDragged = false; }, 0);
+  });
+  rpBody.addEventListener('click', (e) => {
+    if (chipDragged && e.target.closest('.rd-chips')) { e.stopPropagation(); e.preventDefault(); chipDragged = false; }
+  }, true);
   function renderRecipeBody() {
     if (recipeView.mode === 'create') {
       const scrolls = [...rpBody.querySelectorAll('.overflow-auto')].map((el) => el.scrollTop);
@@ -1831,10 +2007,26 @@
     if (qsPick) {
       const next = qsPick.dataset.quickSelect === 'on';
       if (next === settings.quickSelect) return;
+      const was = setting.querySelector('.qs-option.is-on');
+      const from = was ? was.offsetLeft : null;
       settings.quickSelect = next;
       store.set('quickSelect', next);
       renderSetting();
-      if (window.App && window.App.applyQuickSelect) setTimeout(() => window.App.applyQuickSelect({ reopenSetting: true }), 260);
+      // the scrim slides over from the card it was on (260ms, as the recipe detail's chips)
+      const now = setting.querySelector('.qs-option.is-on'), bg = now && now.querySelector('.qs-bg');
+      if (bg && from != null && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        bg.animate([{ transform: `translateX(${from - now.offsetLeft}px)` }, { transform: 'none' }], { duration: 260, easing: 'cubic-bezier(0.32, 0.72, 0, 1)' });
+        // the picked card's miniature takes on its colour as the scrim arrives; the other's drains to grey
+        setting.querySelectorAll('.qs-option').forEach((o) => {
+          const on = o === now;
+          o.querySelector('.qs-thumb').animate([{ filter: `grayscale(${on ? 1 : 0})` }, { filter: `grayscale(${on ? 0 : 1})` }], { duration: 260, easing: 'ease-out' });
+        });
+      }
+      if (window.App && window.App.applyQuickSelect) setTimeout(() => {
+        // the swap loads the other page and reopens settings there: at the same scroll, not the top
+        try { sessionStorage.setItem('proto:settingScroll', String(settingScroller()?.scrollTop || 0)); } catch (err) { /* ignore */ }
+        window.App.applyQuickSelect({ reopenSetting: true });
+      }, 260);
       return;
     }
     if (e.target.closest('[data-quick-select-row]')) return;   // the card around them isn't a control
@@ -1862,6 +2054,8 @@
     } else {
       settings[key] = next;
       store.set(key, next);
+      // v15: the cook screen's temperatures follow °C / °F — redraw it under the page now
+      if (key === 'temperatureUnit' && animatesFields() && window.Cook && window.Cook.render) window.Cook.render();
     }
     // 언어: this render is the one that swaps the texts (the lang observer then finds nothing new)
     if (key === 'locale') {
@@ -1879,8 +2073,11 @@
     if (recipeView.mode === 'create' && handleFormClick(e)) return;
     if (recipeView.mode === 'reorder') { if (e.target.closest('[data-reorder-done]')) submitReorder(); return; }
     const open = e.target.closest('[data-recipe-open]');
-    if (open) { navRecipe('in', () => Object.assign(recipeView, { id: Number(open.dataset.recipeOpen), optionId: null, popover: false })); recipePage.scrollTop = 0; return; }
+    if (open) { navRecipe('in', () => Object.assign(recipeView, { id: Number(open.dataset.recipeOpen), optionId: null, popover: false, optionMenu: false })); recipePage.scrollTop = 0; return; }
+    if (e.target.closest('[data-recipe-option-open]')) { recipeView.optionMenu = true; renderRecipe(); return; }
+    if (e.target.closest('[data-recipe-option-close]')) { closeOptionMenu(); return; }
     const tab = e.target.closest('[data-recipe-option]');
+    if (tab && recipeView.optionMenu) { closeOptionMenu(Number(tab.dataset.recipeOption)); return; }
     if (tab) { recipeView.optionId = Number(tab.dataset.recipeOption); renderRecipe(); return; }
     if (e.target.closest('[data-recipe-kebab]')) { recipeView.popover = true; renderRecipe(); return; }
     if (e.target.closest('[data-recipe-popover-close]')) { closePopover(); return; }
@@ -1905,7 +2102,7 @@
     else if (!menu.hidden) closeMenu();
     else if (!recipePage.hidden && kb) closeKeyboard();
     // innermost first: a selector list would match in page order, so ‹ (earlier in the page) won over the open ⋯ popover
-    else if (!recipePage.hidden) ['[data-confirm-cancel]', '[data-sheet-cancel]', '[data-recipe-popover-close]', '[data-recipe-back]']
+    else if (!recipePage.hidden) ['[data-confirm-cancel]', '[data-sheet-cancel]', '[data-recipe-popover-close]', '[data-recipe-option-close]', '[data-recipe-back]']
       .map((s) => recipePage.querySelector(s)).find(Boolean)?.click();
     else if (!setting.hidden) closeSetting();
   });
@@ -1915,8 +2112,30 @@
       sessionStorage.removeItem('proto:reopenSetting');
       renderSetting();
       setting.hidden = false;
+      const y = Number(sessionStorage.getItem('proto:settingScroll')) || 0;
+      sessionStorage.removeItem('proto:settingScroll');
+      if (y) { const sc = settingScroller(); if (sc) sc.scrollTop = y; }
     }
   } catch (e) { /* ignore */ }
+
+  // proto-only dev bar switch (v15): the recipe detail picks a cook option from a dropdown or chips
+  { const devbar = document.getElementById('devbar');
+    if (devbar && animatesFields()) {
+      const b = document.createElement('button');
+      b.dataset.dev = 'option-picker';
+      b.title = '레시피 상세: 조리 설정 보여주는 방식 — 카드 / 드롭다운 / 칩 (proto-only)';
+      const NAMES = { cards: '옵션: 카드', dropdown: '옵션: 드롭다운', chips: '옵션: 칩' };
+      const label = () => { b.textContent = NAMES[optionPicker()]; };
+      label();
+      b.addEventListener('click', () => {   // 카드 → 드롭다운 → 칩 → 카드
+        const next = OPTION_PICKERS[(OPTION_PICKERS.indexOf(optionPicker()) + 1) % OPTION_PICKERS.length];
+        try { localStorage.setItem('proto:optionPicker', next); } catch (e) { /* ignore */ }
+        label();
+        recipeView.optionMenu = false;
+        if (!recipePage.hidden) renderRecipe();
+      });
+      (devbar.querySelector('[data-dev="grid"]') || devbar.lastElementChild).after(b);
+    } }
 
   window.AppMenu = { open: openMenu, close: closeMenu, openSetting, closeSetting, openRecipe, closeRecipe, openPin, settings };
 })();

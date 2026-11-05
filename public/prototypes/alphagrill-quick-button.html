@@ -2,7 +2,7 @@
 <!-- AlphaGrill's quick recipe select, played as a storyboard for the portfolio carousel.
 
      The prototype itself is in alphagrill-quick-button/, copied as it is from the Prototypes repo's
-     "quick button" recipe-proto (2a80e6a): v15 (the cook screen with quick recipe buttons), v0 (the
+     "quick button" recipe-proto (12fbfad): v15 (the cook screen with quick recipe buttons), v0 (the
      app's cook screen as it ships) and the shared/ files both load. This page frames the two in
      English and plays one take over them: from the app's own cook screen, open the menu, pick Recipe
      buttons for the Standby screen in Settings and back out to the quick buttons, then change the
@@ -131,8 +131,8 @@ function settle(f, on) {
 }
 // Settings shut at once, with no fade out: the last take left v0's open beneath the quick buttons.
 // Its contents go too. v15 plays every re-render of the page from the one before (menu.js
-// withMorph), so the next open would draw Recipe buttons' radio, where the last take left it,
-// fading back to Gauge; emptied, the page opens on Gauge already checked.
+// withMorph) and keeps its scroll, so the next open would start from where the last take left it,
+// on Recipe buttons; emptied, the page opens at the top on Gauge, already chosen.
 function hideSetting(f) {
   const setting = F[f].doc.getElementById('app-setting');
   setting.hidden = true;
@@ -163,9 +163,10 @@ function heated(f) {
   sim.phase = 'ready';
   render();
 }
-// Standby screen's Recipe buttons card. Picking it re-renders the settings page with its radio on
-// (the prototype plays the radio's fill across the re-render) and, 260ms on, swaps pages; embedded,
-// the prototype leaves the swap alone, so the take does it itself.
+// Standby screen's Recipe buttons card. Picking it re-renders the settings page with the chosen
+// card's scrim on it (the prototype slides the scrim over from Gauge and brings the miniature's
+// colour in, 260ms) and then swaps pages; embedded, the prototype leaves the swap alone, so the
+// take does it itself once the scrim lands.
 const QS_ON = '#app-setting [data-quick-select="on"]', QS_ON_THUMB = QS_ON + ' .qs-thumb';
 
 /* ---------- timeline ---------- */

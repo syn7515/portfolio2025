@@ -68,7 +68,10 @@
     else if (on && pageVariant === 'v0' && from) target = variantUrl(from);
     if (!target) return false;
     if (opts && opts.reopenSetting) { try { sessionStorage.setItem('proto:reopenSetting', '1'); } catch (e) { /* ignore */ } }
-    location.replace(target);
+    // v0 standing in for a variant already shows that variant's address (rewritten below), so going
+    // back to it is a navigation to the very URL the page is at — a hash jump, not a load. Reload then.
+    if (target.split('#')[0] === location.pathname + location.search) location.reload();
+    else location.replace(target);
     return true;
   }
   if (applyQuickSelect()) return;

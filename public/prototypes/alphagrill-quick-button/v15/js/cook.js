@@ -45,6 +45,7 @@
       temperatureTitle: '온도',
       griddleLabel: '그리들',
       currentLabel: '현재',
+      targetLabel: '목표',   // v15: the temperature panel's middle column (was the recipe's name)
       topPlate: '상판',
       bottomPlate: '하판',
     },
@@ -70,6 +71,7 @@
       temperatureTitle: 'Temperature',
       griddleLabel: 'Griddle',
       currentLabel: 'Current',
+      targetLabel: 'Target',
       topPlate: 'Upper',
       bottomPlate: 'Lower',
     },
@@ -455,11 +457,19 @@
     $('grid-option').textContent = d.recipe && d.multi && d.option ? d.option.name : '';
     // the temperature alone; the phase word ("가열 중 ·") is dropped
     setReadout($('grid-hint'), d.isPreheat
-      ? Math.round(Math.max(d.temps.remainingDeltaTemp, d.temps.overshootDeltaTemp)) + '°C ' + d.str.remaining
-      : '', (d.isPreheat ? 'preheat' : 'none') + ':' + (d.option ? d.option.id : '') + ':' + state.lang);
+      ? fmtTempDelta(Math.max(d.temps.remainingDeltaTemp, d.temps.overshootDeltaTemp)) + ' ' + d.str.remaining
+      : '', (d.isPreheat ? 'preheat' : 'none') + ':' + (d.option ? d.option.id : '') + ':' + state.lang + ':' + tempUnitF());
   }
   // v15 (and v0 reached from it): a temperature readout changes at most once a second, so it can be
   // read; a change of kind (shown ↔ hidden, other recipe) goes through at once.
+  // v15 (and v0 reached from it): temperatures follow 설정 → 온도 (°C / °F). The sim is in °C.
+  function tempUnitF() {
+    const h = document.documentElement;
+    if (!(h.dataset.variant === 'v15' || h.dataset.fromVariant === 'v15')) return false;
+    try { return JSON.parse(localStorage.getItem('proto:temperatureUnit')) === '°F'; } catch (e) { return false; }
+  }
+  // a temperature *difference* ("163°C 남음"): °F is × 9/5, no + 32
+  function fmtTempDelta(c) { return tempUnitF() ? Math.round((c * 9) / 5) + '°F' : Math.round(c) + '°C'; }
   function setReadout(el, text, kind) {
     const h = document.documentElement;
     if (!(h.dataset.variant === 'v15' || h.dataset.fromVariant === 'v15')) { el.textContent = text; return; }
@@ -661,16 +671,21 @@
       renderTempModal.lastRead = now;
     }
     $('tm-title').textContent = d.str.temperatureTitle;
-    $('tm-griddle').textContent = d.str.griddleLabel;
-    $('tm-current').textContent = d.str.currentLabel;
+    $('tm-griddle').textContent = fades ? '' : d.str.griddleLabel;   // v15: no 그리들 over 상판 / 하판
+    // v15: the columns say what they are — 목표 / 현재 + the unit — instead of the recipe's name over the
+    // targets, and the panel follows 설정 → 온도 (°C / °F): its numbers convert, the headers name the unit
+    const unitF = tempUnitF();
+    const unit = unitF ? '°F' : '°C';
+    const conv = (c) => (unitF ? (c * 9) / 5 + 32 : c);
+    $('tm-current').textContent = fades ? d.str.currentLabel + ' ' + unit : d.str.currentLabel;
     $('tm-top-label').textContent = d.str.topPlate;
     $('tm-bot-label').textContent = d.str.bottomPlate;
-    $('tm-recipe').textContent = d.recipe ? d.recipe.name : '-';
-    $('tm-top-target').textContent = Math.round(d.temps.top.target);
-    $('tm-bot-target').textContent = Math.round(d.temps.bottom.target);
+    $('tm-recipe').textContent = fades ? d.str.targetLabel + ' ' + unit : (d.recipe ? d.recipe.name : '-');
+    $('tm-top-target').textContent = Math.round(conv(d.temps.top.target));
+    $('tm-bot-target').textContent = Math.round(conv(d.temps.bottom.target));
     const line = (id, value, heating) => {
       const el = $(id);
-      const text = value.toFixed(1);
+      const text = conv(value).toFixed(1);
       el.textContent = text;
       el.classList.toggle('text-[#FF5454]', heating);
       el.classList.toggle('text-white', !heating);
