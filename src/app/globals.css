@@ -78,6 +78,11 @@
   --paper-grid-major: rgb(120 113 108 / 0.12);
   --paper-grid-hover-minor: rgb(120 113 108 / 0.12);
   --paper-grid-hover-major: rgb(120 113 108 / 0.13);
+  /* The strip of desk held across the foot of the screen below 1024px, where the full-bleed paper
+     would otherwise cover the desk entirely until its very end (ui/reveal-footer). The paper's edge
+     rests on its top. A whole number of grid cells, so that edge falls on a grid line; 0 from
+     1024px, where the desk shows around the sheet instead. See the blocks below this one. */
+  --reveal-band-h: 0px;
   /* Loading skeleton for carousel media (.media-skeleton below). The block sits a step darker
      than the card even with the hover scrim up, so it still reads as a shape under the pointer. */
   --media-skeleton: rgb(231 229 228 / 0.75); /* stone-200 */
@@ -119,6 +124,25 @@
     --paper-grid-hover-major: rgb(161 161 170 / 0.07);
     --media-skeleton: rgb(63 63 70 / 0.55); /* zinc-700 */
     --media-skeleton-sheen: rgb(255 255 255 / 0.05);
+  }
+}
+
+/* --reveal-band-h: two cells on a phone, three from 640px, where the screen is taller and the
+   footers have more room under their text. Focus moves and in-page jumps keep what they bring into
+   view clear of it. */
+@media (max-width: 1023.98px) {
+  :root {
+    --reveal-band-h: 40px;
+  }
+
+  html {
+    scroll-padding-bottom: var(--reveal-band-h);
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1023.98px) {
+  :root {
+    --reveal-band-h: 60px;
   }
 }
 
@@ -394,6 +418,112 @@ body {
     }
 
     .paper-grid-background[data-pointer-active='true']::after {
+      opacity: 1;
+    }
+  }
+}
+
+/* Below 1024px, where the paper is full-bleed, the desk is the screen behind it: the grid is fixed
+   to the screen, never to the page, and shows wherever the paper isn't, which is the footer it
+   lifts off at the end of the page (ui/reveal-footer) and whatever a rubber-band overscroll pulls
+   into view beyond either end of it. Nothing on it moves with a drag, and nothing clips it, so
+   iOS has nothing to carry along with the scroll. .paper-grid-strip is the same grid again on the
+   strip of desk held over the paper at the foot of the screen (--reveal-band-h); the two are
+   measured off the same edge, so they meet without a seam.
+   Laid off the screen's foot, with a major line along the strip's top, where the paper's edge
+   rests: a percentage position puts each tile's bottom on the box's, and each layer goes up by the
+   strip's height, less half a pixel to centre the 1px stroke on the line. Centred across, so the
+   middle line falls between a footer's two ends.
+   The strip's grid fades into the foot of the screen over the strip's height, on the curve the
+   desk uses into the top of the page on the sheet, compressed, so the grid runs off the screen
+   instead of stopping at it but the line under the paper's edge is still at full strength. The
+   desk's own layer needs no fade there: the strip always covers it.
+   The desk is only ever seen *below* the paper, so the layer covers only the lower part of the
+   screen, from 40% of the way down, fading in over its first 80px. The paper's edge never comes up further
+   than that: at the end of the page it rests a footer's height up, and an overscroll there pulls it
+   up by a few hundred pixels at most. What it keeps out of view is the overscroll the other way: a
+   pull down at the top of the page draws the paper down off the top of the screen, and the bare
+   page background shows above it, not a grid that reads as lying over the paper. */
+@media (max-width: 1023.98px) {
+  .paper-grid-background,
+  .paper-grid-strip {
+    display: block;
+    pointer-events: none;
+    background-image:
+      linear-gradient(to right, var(--paper-grid-major) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--paper-grid-major) 1px, transparent 1px),
+      linear-gradient(to right, var(--paper-grid-minor) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--paper-grid-minor) 1px, transparent 1px);
+    background-position:
+      calc(50% + 49.5px) calc(100% - var(--reveal-band-h) - 0.5px),
+      calc(50% + 49.5px) calc(100% - var(--reveal-band-h) - 0.5px),
+      calc(50% + 9.5px) calc(100% - var(--reveal-band-h) - 0.5px),
+      calc(50% + 9.5px) calc(100% - var(--reveal-band-h) - 0.5px);
+    background-size:
+      100px 100px,
+      100px 100px,
+      20px 20px,
+      20px 20px;
+  }
+
+  .paper-grid-background {
+    position: fixed;
+    inset: 40% 0 0;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, rgb(0 0 0 / 0.25) 28px, black 80px);
+    mask-image: linear-gradient(to bottom, transparent 0, rgb(0 0 0 / 0.25) 28px, black 80px);
+  }
+
+  /* The strip's box is the strip, so the bottom fade alone, from its foot. */
+  .paper-grid-strip {
+    position: absolute;
+    inset: 0;
+    -webkit-mask-image: linear-gradient(
+      to top,
+      transparent 0,
+      rgb(0 0 0 / 0.25) calc(var(--reveal-band-h) * 0.35),
+      black var(--reveal-band-h)
+    );
+    mask-image: linear-gradient(
+      to top,
+      transparent 0,
+      rgb(0 0 0 / 0.25) calc(var(--reveal-band-h) * 0.35),
+      black var(--reveal-band-h)
+    );
+  }
+
+  /* The pointer spotlight, as on the sheet's desk: a darker copy masked to a circle at the pointer,
+     which PaperGridBackground positions (it finds the strip's copy by data-paper-grid-pointer). */
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .paper-grid-background::after,
+    .paper-grid-strip::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      background-image:
+        linear-gradient(to right, var(--paper-grid-hover-major) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--paper-grid-hover-major) 1px, transparent 1px),
+        linear-gradient(to right, var(--paper-grid-hover-minor) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--paper-grid-hover-minor) 1px, transparent 1px);
+      background-position: inherit;
+      background-size: inherit;
+      -webkit-mask-image: radial-gradient(
+        circle 150px at var(--paper-grid-pointer-x, 0px) var(--paper-grid-pointer-y, 0px),
+        black 0,
+        rgb(0 0 0 / 0.75) 35%,
+        transparent 100%
+      );
+      mask-image: radial-gradient(
+        circle 150px at var(--paper-grid-pointer-x, 0px) var(--paper-grid-pointer-y, 0px),
+        black 0,
+        rgb(0 0 0 / 0.75) 35%,
+        transparent 100%
+      );
+      transition: opacity 180ms ease-out;
+    }
+
+    .paper-grid-background[data-pointer-active='true']::after,
+    .paper-grid-strip[data-pointer-active='true']::after {
       opacity: 1;
     }
   }

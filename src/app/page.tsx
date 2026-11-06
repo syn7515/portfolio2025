@@ -7,7 +7,7 @@ import InlineLinkPreview from '@/components/ui/inline-link-preview';
 import { DescriptionBackdrop } from '@/components/ui/description-backdrop';
 import PaperGridBackground from '@/components/ui/paper-grid-background';
 import PaperExitSheet from '@/components/ui/paper-exit-sheet';
-import RevealFooter, { revealPaperClassName } from '@/components/ui/reveal-footer';
+import RevealFooter, { RevealFooterText, revealPaperClassName } from '@/components/ui/reveal-footer';
 import styles from './page.module.css';
 import { trackOutboundClick } from '@/lib/analytics';
 import {
@@ -73,12 +73,16 @@ const ENTRANCE_TOTAL_MS = CONTENT_BASE_DELAY_MS + DELAY.footer + CONTENT_RISE_DU
 // the two links would start overlapping each other, with whichever paints on top quietly swallowing
 // taps meant for the other.
 //
+// `tabIndex` is for the reveal footer's on-screen copy (RevealFooterText), which comes before the
+// article in the document and so keeps its links out of the tab order; the copy after it is the one
+// the keyboard reaches.
+//
 // `onGrid` is the reveal footer's copy, which sits on the drafting grid rather than the paper: each
 // side carries DescriptionBackdrop there, as the case studies' Previous/Next pair does, to wash the
 // lines out from under the text. The wrappers stay on the sheet's copy too, so the two lay out alike.
 // The socials get an outer one rather than the backdrop going inside, where `.socialLinks > *` would
 // reach it and its children would need lifting over it one by one.
-function HomeFooterLinks({ onGrid = false }: { onGrid?: boolean }) {
+function HomeFooterLinks({ onGrid = false, tabIndex }: { onGrid?: boolean; tabIndex?: number }) {
   return (
     <div className="flex items-baseline justify-between gap-4">
       <div className="relative isolate">
@@ -89,6 +93,7 @@ function HomeFooterLinks({ onGrid = false }: { onGrid?: boolean }) {
             target="_blank"
             rel="noopener noreferrer"
             data-social-link-trigger
+            tabIndex={tabIndex}
             onClick={() => trackOutboundClick("https://x.com/sue_park__", "X")}
             className="sm:text-[calc(14*var(--text-px))] px-2 py-3 -mx-2 -my-3 !text-stone-500 dark:!text-zinc-400 hover:!text-rose-700 active:!text-rose-700 dark:hover:!text-rose-400 dark:active:!text-rose-400 motion-safe:active:scale-[0.97]"
             style={{
@@ -103,6 +108,7 @@ function HomeFooterLinks({ onGrid = false }: { onGrid?: boolean }) {
             target="_blank"
             rel="noopener noreferrer"
             data-social-link-trigger
+            tabIndex={tabIndex}
             onClick={() => trackOutboundClick("https://www.linkedin.com/in/sooyeonp/", "LinkedIn")}
             className="sm:text-[calc(14*var(--text-px))] px-2 py-3 -mx-2 -my-3 !text-stone-500 dark:!text-zinc-400 hover:!text-rose-700 active:!text-rose-700 dark:hover:!text-rose-400 dark:active:!text-rose-400 motion-safe:active:scale-[0.97]"
             style={{
@@ -198,6 +204,15 @@ export default function Home() {
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-4 focus:left-4 focus:px-4 focus:py-2 focus:bg-white focus:text-stone-800 focus:rounded focus:shadow">Skip to content</a>
       <main id="main" className="w-full flex-1 flex flex-col relative">
         <PaperGridBackground />
+        {/* The reveal footer as it is seen, below 1024px: fixed to the foot of the screen, here
+            before the paper so the paper slides off it rather than taking it along. Its place in
+            the reading order is RevealFooter, after the paper. See ui/reveal-footer. */}
+        <RevealFooterText
+          className={riseClass.trim() || undefined}
+          style={riseDelay(DELAY.footer)}
+        >
+          <HomeFooterLinks onGrid tabIndex={-1} />
+        </RevealFooterText>
         {/* paper-grid-bottom: below 1024px the paper is full-bleed, so PaperGridBackground has
             nothing left to peek out of. The grid that would be composited into this element's own
             background there (globals.css) is on the reveal footer after it instead, which
@@ -328,7 +343,7 @@ export default function Home() {
               The two widths need different numbers because the rows around the rule change size.
               On desktop each row is one 40px line and rows sit 2px apart, so 16px a side (a 33px
               block) is the smallest gap that still separates. On a phone the rows are tighter, 36px
-              with the year trailing the title, and 12px a side (25px) keeps the break in
+              with the year leading the title, and 12px a side (25px) keeps the break in
               proportion to them.
 
               The space before the interpolation is load-bearing: Tailwind's scanner reads the
@@ -347,10 +362,10 @@ export default function Home() {
               named product rather than a descriptive project title. Worth revisiting as labelled
               "Work"/"Personal" groups once there are two or three personal projects to name.
 
-              The two orderings are deliberate. On desktop that column is right-aligned at the end of
+              The two wordings are deliberate. On desktop that column is right-aligned at the end of
               a dotted rule, where "Personal, 2026" puts the word that marks the break nearest the
-              title; on phones it stacks above the title in the same place every case study shows a
-              year, so it leads with the year instead.
+              title; on phones it comes before the title, in the same place every case study shows
+              its year, and there it is the year alone, so the title starts where the others do.
 
               Carries the same `gap-0.5` as the case-study list above even though it holds a single
               row today, so a second personal project would get the same spacing as every other pair:
@@ -405,14 +420,11 @@ export default function Home() {
         {/* Reveal footer, below 1024px: the desk under the paper, holding the drafting grid and the
             footer row, uncovered as the paper scrolls up off it — the same footer a case study
             ends on. See ui/reveal-footer.
-            Home's one line of links sits a grid cell (20px) lower on the desk than the footer's
-            own padding puts it, 60/68px under the paper's edge rather than 40/48px, with as much
-            taken off the bottom so the desk is no taller: set that close under the edge, a single
-            short row read as stuck to the paper rather than resting on the grid. A whole cell, so
-            it keeps its place against the grid's lines. Posts keep the footer's own padding; their
-            Previous/Next pair is tall enough to hang from the edge. */}
+            It keeps the footer's own spacing, the case studies' too, so the paper comes to rest
+            the same height above the screen's foot on every page and the row under it sits in the
+            same place, the same distance under the edge. */}
         <RevealFooter
-          className={`pt-15 pb-15 min-[640px]:pt-17 min-[640px]:pb-19 ${riseClass.trim()}`}
+          className={riseClass.trim() || undefined}
           style={riseDelay(DELAY.footer)}
         >
           <HomeFooterLinks onGrid />

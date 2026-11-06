@@ -71,40 +71,130 @@ export function RevealDesk() {
   )
 }
 
+/** The drafting grid's cell (reveal-footer.module.css), which the footer's height is rounded to. */
+const GRID_CELL = 20
+
+/**
+ * The footer's text and its padding, shared by its two copies (RevealFooterText, RevealFooter), so
+ * the two come out the same size and the text in the same place.
+ */
+function FooterContent({ children, className, style }: Omit<RevealFooterProps, 'fromSheet'>) {
+  const contentRef = useRef<HTMLDivElement>(null)
+
+  // The grid is laid off the screen's foot, so the line under the strip's top is a whole number of
+  // cells up from it. For the paper's edge to come to rest on a line too at the end of the page,
+  // the footer it rests on has to be a whole number of cells tall, which its text alone won't be
+  // (a 21px line, or a description that wraps to two or three). So the footer is rounded to the
+  // nearest cell, by up to half a cell either way at the bottom, below the text, where the strip
+  // hides the difference. Nearest rather than up, so the room under the text stays within a few
+  // pixels of what the page set. Measured, and only ever on resize: before hydration the footer
+  // is just off by those few pixels, at the end of the page. Each copy measures its own content,
+  // which is the same content, so the two round alike.
+  useEffect(() => {
+    const content = contentRef.current
+    if (!content) return
+
+    const observer = new ResizeObserver(([entry]) => {
+      const height = entry.borderBoxSize?.[0]?.blockSize ?? content.getBoundingClientRect().height
+      const round = Math.round(height / GRID_CELL) * GRID_CELL - height
+      content.parentElement?.style.setProperty('--reveal-footer-round', `${round}px`)
+    })
+    observer.observe(content)
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <>
+      {/* Below 1024px, the same for every page: the text two grid cells (40px) under the paper's
+          edge, so it reads as hanging off the edge it was uncovered from, and its top lies on a
+          line; under it, the strip and one cell more, which keeps the text and its tap targets
+          clear of the strip and sets the footer no higher on the screen than it needs to be. 120px
+          of desk on a phone for a one-line footer, 140px from 640px.
+          From 1024px, where only the case studies have one, it hangs from the sheet as it always
+          has. */}
+      <div
+        ref={contentRef}
+        className={cn(
+          'relative px-6 sheet:px-0 pt-10 pb-[calc(var(--reveal-band-h)_+_20px)] sheet:pt-12 sheet:pb-24',
+          className
+        )}
+        style={style}
+      >
+        {/* From 1024px (only ever shown there with fromSheet) the column lines up with the sheet's
+            text column rather than centring on the screen: the case-study column's own formula in
+            blog-post-layout.tsx, measured from the viewport's left edge here instead of the
+            sheet's, which is why it leaves out --paper-left. */}
+        <div className="max-w-[var(--content-w)] mx-auto sheet:max-w-none sheet:w-[var(--content-w)] sheet:ml-[calc(50vw_-_var(--content-w)_/_2_+_var(--paper-center-offset))]">
+          {children}
+        </div>
+      </div>
+      <div aria-hidden className={styles.cellRound} />
+    </>
+  )
+}
+
+/**
+ * The footer as it is seen: fixed to the foot of the screen, behind the paper, so the paper slides
+ * off it and it never moves — not as the page scrolls, and not as an overscroll pulls the paper
+ * past the end of the page and back. It is what the reader sees, taps and hovers. Being behind the
+ * paper is a matter of document order (a z-index on the paper would trap a case study's carousel
+ * under the top fade), so it goes before the paper — after PaperGridBackground, and after RevealDesk
+ * where there is one — and RevealFooter after the paper keeps the same footer's place in the
+ * reading order (see that component).
+ *
+ * Out of the reading order itself: hidden from assistive technology, and the page has to keep its
+ * links out of the tab order (tabIndex={-1}), since this copy comes before the article.
+ */
+export function RevealFooterText({ children, className, style, fromSheet = false }: RevealFooterProps) {
+  return (
+    <div aria-hidden className={cn(styles.text, fromSheet && styles.fromSheet)}>
+      <FooterContent className={className} style={style}>
+        {children}
+      </FooterContent>
+    </div>
+  )
+}
+
 /**
  * The footer under the full-bleed paper, below 1024px: the desk the paper is lifted off, with the
- * drafting grid and whatever the page ends on. It holds still while the paper scrolls up off it.
+ * drafting grid and whatever the page ends on, uncovered as the paper scrolls up off it. With it
+ * comes the strip of desk held across the foot of the screen the whole way down, which the paper's
+ * edge rests on until the paper runs out (see reveal-footer.module.css).
+ *
+ * What the reader sees is RevealFooterText, the same content fixed to the screen behind the paper.
+ * This is the footer's place in the page: it gives the page the room to scroll the paper off the
+ * footer, and it keeps the footer after the article for screen readers and the keyboard. It is
+ * never seen or touched, except that it shows while a keyboard has focus in it, sitting exactly
+ * where the copy behind the paper does.
+ *
  * Place it directly after the paper and give the paper `revealPaperClassName`. From 1024px it
  * renders nothing, and the page keeps its footer on the sheet, unless `fromSheet` asks for it there
  * too.
  *
- * Must sit under the same parent as PaperGridBackground, which finds its grid there to light the
+ * Must sit under the same parent as PaperGridBackground, which finds its grids there to light the
  * pointer spotlight.
  */
 export default function RevealFooter({ children, className, style, fromSheet = false }: RevealFooterProps) {
   return (
-    <div className={cn(styles.footer, fromSheet && styles.fromSheet)}>
-      <div className={styles.track}>
-        <div className={styles.pinned}>
-          <div aria-hidden data-paper-grid-pointer className={styles.grid} />
-          {/* Weighted toward the paper, half the room above that it has below, so the content
-              reads as hanging off the edge it was uncovered from rather than floating mid-desk,
-              and clears the grid's fade into the bottom of the viewport. */}
-          <div
-            className={cn('relative px-6 sheet:px-0 pt-10 pb-20 min-[640px]:pt-12 min-[640px]:pb-24', className)}
-            style={style}
-          >
-            {/* From 1024px (only ever shown there with fromSheet) the column lines up with the
-                sheet's text column rather than centring on the screen: the case-study column's
-                own formula in blog-post-layout.tsx, measured from the viewport's left edge here
-                instead of the sheet's, which is why it leaves out --paper-left. */}
-            <div className="max-w-[var(--content-w)] mx-auto sheet:max-w-none sheet:w-[var(--content-w)] sheet:ml-[calc(50vw_-_var(--content-w)_/_2_+_var(--paper-center-offset))]">
+    <>
+      <div aria-hidden className={styles.edge} />
+      <div className={cn(styles.footer, fromSheet && styles.fromSheet)}>
+        <div className={styles.track}>
+          <div className={styles.pinned}>
+            <FooterContent className={className} style={style}>
               {children}
-            </div>
+            </FooterContent>
           </div>
         </div>
       </div>
-      <div aria-hidden className={styles.edge} />
-    </div>
+      {/* The grid is a global class, shared with PaperGridBackground's own below 1024px
+          (globals.css), so the two can't drift apart. */}
+      <div aria-hidden className={styles.band}>
+        <div data-paper-grid-pointer className="paper-grid-strip" />
+        <div className={styles.bandEdge} />
+      </div>
+      <div aria-hidden className={styles.bottomFade} />
+
+    </>
   )
 }

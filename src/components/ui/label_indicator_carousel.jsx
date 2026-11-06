@@ -439,7 +439,9 @@ export default function LabelIndicatorCarousel({
       data-carousel-layer
       aria-label={ariaLabel}
     >
-      <div className="relative z-[50] flex flex-col items-center justify-center w-full">
+      {/* No z-index here: only each card is raised above the screen's edge fades (CarouselCard),
+          and the captions stay on the text's level, fading with it. */}
+      <div className="relative flex flex-col items-center justify-center w-full">
         {/* Always a vertical stack, at every viewport size. Cards centre on this column, and the
             column itself is what's held clear of the paper's left edge (--paper-center-offset in
             globals.css), so there is no per-carousel shift to apply here. */}

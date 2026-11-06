@@ -181,8 +181,13 @@ export function CarouselCard({
     >
       {/* Only the card hides while the lightbox shows its copy; the caption below stays put. The
           hide sits on this transition-free wrapper so it flips in the same frame the copy unmounts:
-          on the card itself, its transition-all would fade it back in, which flickers. */}
-      <div className={`w-full${isHiddenByLightbox ? " opacity-0 pointer-events-none" : ""}`}>
+          on the card itself, its transition-all would fade it back in, which flickers.
+          z-[50] lifts the card, and only the card, over the page's fixed edge fades (z-40, the
+          layouts' top fade and the reveal footer's at the foot): a screenshot or a running
+          prototype reads whole right up to the screen's edge, while its caption is text and fades
+          with the text around it. It works at the root stacking level because the case-study
+          paper deliberately isn't a stacking context (blog-post-layout.tsx). */}
+      <div className={`relative z-[50] w-full${isHiddenByLightbox ? " opacity-0 pointer-events-none" : ""}`}>
         <motion.div
           ref={cardRef}
           initial={false}

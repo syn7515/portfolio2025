@@ -9,12 +9,12 @@ import { trackCaseStudyOpen, trackOutboundClick } from '@/lib/analytics';
 interface ProjectListItemProps {
   title: string;
   // The right-hand column carries whatever context the row needs, not strictly a date: case studies
-  // use their year, personal work names its category ("Personal, 2026"). On phones it trails the
-  // title inline instead of sitting in its own column.
+  // use their year, personal work names its category ("Personal, 2026"). On phones, where the
+  // dotted rule that leads out to it is gone, it comes before the title instead.
   dates: string;
-  // Phone-only wording for that same column. There it trails the title inline, where a category
-  // would push the row onto a second line, so a personal row drops it and keeps just the year.
-  // Falls back to `dates`.
+  // Phone-only wording for that same column. There it leads the title, where a category would
+  // push the title over and set its column off from the other rows', so a personal row drops it
+  // and keeps just the year. Falls back to `dates`.
   datesMobile?: string;
   href: string;
   // The home page's entrance is CSS-driven so it can run before hydration; these carry that
@@ -89,14 +89,18 @@ export default function ProjectListItem({
 
   const content = (
     <>
-      {/* Mobile: dates trail the title inline with no divider. The title's last word, the arrow and
-          the dates sit in one nowrap run, so a wrap carries that word down with them instead of
-          stranding the dates (or the arrow) on a line of their own. */}
-      <div className="sm:hidden not-italic">
-        <span className={titleClassName} style={titleStyle}>{titleHead}</span>
-        <span className="whitespace-nowrap">
+      {/* Mobile: no divider to lead the eye from the title out to the dates, so the dates come first
+          instead, on the title's first line. They hold a column of their own, so a title that wraps
+          runs on under its own start rather than back under the year, and with every row's year
+          four tabular digits the titles line up down the list (proportional figures left 2023's
+          title a pixel off the others'). Aligned on the baseline, the
+          smaller sans year sits on the serif title's line. The title's last word and the arrow
+          stay one nowrap run, so a wrap never strands the arrow on a line of its own. */}
+      <div className="sm:hidden not-italic flex items-baseline gap-2">
+        <span className={`${datesClassName} shrink-0 tabular-nums`}>{datesMobile ?? dates}</span>
+        <span className="min-w-0">
+          <span className={titleClassName} style={titleStyle}>{titleHead}</span>
           <span className={`${titleClassName} !text-nowrap`} style={titleStyle}>{titleTail}{icon}</span>
-          <span className={`${datesClassName} ml-2`}>{datesMobile ?? dates}</span>
         </span>
       </div>
 

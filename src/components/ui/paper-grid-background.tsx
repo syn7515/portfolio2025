@@ -2,10 +2,11 @@
 
 import { useEffect, useRef } from 'react';
 
-// No width clause: two grids want this pointer position and they live on opposite sides of 1024px
-// — this component's own layer above it, and the paper's bottom-edge grid (.paper-grid-bottom)
-// below it. Each is display-gated by its own media query in globals.css, so at any given width only
-// one of them can actually light up and the other reads its variables harmlessly.
+// No width clause: this component's layer lights up at every width (below 1024px it is the desk
+// fixed to the screen behind the full-bleed paper, with the reveal footer's strip carrying a copy),
+// and the paper's bottom-edge grid (.paper-grid-bottom) wants the position below 1024px too. Each
+// is display-gated by its own media query in globals.css, so one that isn't showing reads its
+// variables harmlessly.
 const INTERACTIVE_GRID_QUERY = '(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)';
 
 export default function PaperGridBackground() {

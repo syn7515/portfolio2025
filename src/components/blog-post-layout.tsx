@@ -14,7 +14,7 @@ import PaperGridBackground from '@/components/ui/paper-grid-background'
 import PaperExitSheet from '@/components/ui/paper-exit-sheet'
 import Dinkus from '@/components/ui/dinkus'
 import { DescriptionBackdrop } from '@/components/ui/description-backdrop'
-import RevealFooter, { RevealDesk, revealPaperClassName } from '@/components/ui/reveal-footer'
+import RevealFooter, { RevealDesk, RevealFooterText, revealPaperClassName } from '@/components/ui/reveal-footer'
 import { PROJECTS } from '@/lib/projects'
 import {
   isBlogPostMaskNavigation,
@@ -106,21 +106,29 @@ type ProjectNavigationHandler = (
 ) => void
 
 // The Previous/Next pair, which the post ends on: the layout puts it in the reveal footer under the
-// paper, at every width.
+// paper, at every width. Rendered twice, as the reveal footer is (ui/reveal-footer): `tabIndex` is
+// for the on-screen copy, which comes before the article in the document and so keeps its links out
+// of the tab order.
 function ProjectNavigationLinks({
   previousProject,
   nextProject,
   onNavigate,
-}: ProjectNavigation & { onNavigate: ProjectNavigationHandler }) {
+  tabIndex,
+}: ProjectNavigation & { onNavigate: ProjectNavigationHandler; tabIndex?: number }) {
+  const previousTextRef = useRef<HTMLDivElement>(null)
+  const nextTextRef = useRef<HTMLDivElement>(null)
+
   return (
     // Below 640px each link is just its one-line label, a 21px-tall target. Each carries py-3
     // there, cancelled by an equal negative margin, which takes the target to 45px without moving
     // the label or the rows around it — the same trade the home footer's social links make. From
     // 640px the description joins the link and makes the target tall enough on its own.
     // The footer sits on the drafting grid at every width, so each link's text carries
-    // DescriptionBackdrop to wash the lines out from under it. Its box is fit to the text rather
-    // than the half-row, so below 640px the wash hugs the one-word label, and inside the hit
-    // padding so the padding doesn't widen it.
+    // DescriptionBackdrop to wash the lines out from under it. The wash is fit to the text's own
+    // lines (fitTo) rather than to the half-row the link fills: below 640px it hugs the one-word
+    // label, and from 640px the rectangle the kicker and the description's lines make, where the
+    // block they sit in runs the full half-row as soon as the description wraps. Inside the hit
+    // padding as well, so the tap target never widens it.
     // Below 640px, where the label stands alone, it takes the post body's colour (.mdxContent p in
     // blog-post.module.css: stone-600, or zinc-300 at 80% in dark); from 640px it's the quieter
     // kicker over the description.
@@ -136,10 +144,11 @@ function ProjectNavigationLinks({
           className="flex-1 group cursor-pointer py-3 -my-3 sm:py-0 sm:my-0"
           style={{ textDecoration: 'none' }}
           onClick={(event) => onNavigate(event, `/${previousProject.slug}`, 'previous')}
+          tabIndex={tabIndex}
         >
           <div className="relative isolate w-fit -ml-3 sm:ml-0">
-            <DescriptionBackdrop />
-            <div className="relative z-10">
+            <DescriptionBackdrop fitTo={previousTextRef} />
+            <div ref={previousTextRef} className="relative z-10">
               <div className="text-[calc(14*var(--text-px))] max-sm:text-[rgb(87_83_78)] max-sm:dark:text-[rgb(212_212_216/0.8)] sm:text-stone-500 sm:dark:text-zinc-400 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 transition-colors duration-150 font-[400] sm:font-normal not-italic mb-0 sm:mb-1.5 sm:opacity-80 font-sans">
                 <span className="relative inline-flex items-center">
                   <ChevronLeft
@@ -171,10 +180,11 @@ function ProjectNavigationLinks({
           className="flex-1 text-right group cursor-pointer py-3 -my-3 sm:py-0 sm:my-0"
           style={{ textDecoration: 'none' }}
           onClick={(event) => onNavigate(event, `/${nextProject.slug}`, 'next')}
+          tabIndex={tabIndex}
         >
           <div className="relative isolate w-fit ml-auto -mr-3 sm:mr-0">
-            <DescriptionBackdrop />
-            <div className="relative z-10">
+            <DescriptionBackdrop fitTo={nextTextRef} />
+            <div ref={nextTextRef} className="relative z-10">
               <div className="text-[calc(14*var(--text-px))] max-sm:text-[rgb(87_83_78)] max-sm:dark:text-[rgb(212_212_216/0.8)] sm:text-stone-500 sm:dark:text-zinc-400 group-hover:!text-rose-700 group-active:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 transition-colors duration-150 font-[400] sm:font-normal not-italic mb-0 sm:mb-1.5 sm:opacity-80 font-sans">
                 <span className="relative inline-flex items-center justify-end">
                   <span className="relative z-10">
@@ -441,6 +451,21 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
             between the desk's own grid and the paper, so it paints under the sheet. */}
         {hasProjectNavigation && <RevealDesk />}
 
+        {/* The reveal footer as it is seen, at every width: fixed to the foot of the screen, here
+            between the desk and the paper so the paper slides off it rather than taking it along,
+            through the reveal and through an overscroll past the end. Its place in the reading
+            order is RevealFooter, after the paper. See ui/reveal-footer. */}
+        {hasProjectNavigation && (
+          <RevealFooterText fromSheet className={styles.contentBlurRevealItem}>
+            <ProjectNavigationLinks
+              previousProject={previousProject}
+              nextProject={nextProject}
+              onNavigate={handleProjectNavigation}
+              tabIndex={-1}
+            />
+          </RevealFooterText>
+        )}
+
         {/* Real paper: holds the actual header and content, floats after sidebar at ≥1500px. This
             element and its content wrapper are never transformed or faded — transform, filter, and
             opacity below 1 create stacking contexts that would trap descendants (e.g. the carousel's
@@ -465,19 +490,21 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           {/* Compact rail: Home + tick-mark TOC, for 820–1200px and 1362.5–1520px, where there is
               no gutter for the text sidebar below — see blog-post-rail-nav.tsx. Below 1024px it is
               the TOC alone, the navbar's logo standing in for its Home.
-              It sits on the paper, in a viewport-tall sticky box spanning it, because below 1024px
-              it belongs to the paper rather than to the screen: when the paper's bottom edge
-              scrolls up off the reveal footer, the box runs out of paper and is pushed up with it,
-              so the rail leaves at the paper's pace instead of hanging over the footer. Sticky
-              rather than measured, so it moves on the compositor in step with the scroll. dvh so
-              the box ends where the visible viewport does, which is where the reveal starts.
+              It sits on the paper, in a sticky box spanning it, because below 1024px it belongs to
+              the paper rather than to the screen: when the paper's bottom edge scrolls up off the
+              reveal footer, the box runs out of paper and is pushed up with it, so the rail leaves
+              at the paper's pace instead of hanging over the footer. Sticky rather than measured,
+              so it moves on the compositor in step with the scroll. The box is the paper that can
+              be seen: the screen (dvh, the visible viewport) less the strip of desk held across
+              its foot (--reveal-band-h, ui/reveal-footer), so the rail centres on that, and the
+              box starts to go up just as the paper's edge comes up off the strip.
               From 1024px the rail is fixed instead, which also takes it out of this element's
               overflow clip — it lives in the sheet's margin there, outside the paper.
               The box carries the rail's z-60 itself: a sticky element is always a stacking
               context, so the rail's own z-index only counts inside it, and without one here the
               carousel and everything else later on the paper would paint over the rail. */}
           <div className="absolute inset-0 pointer-events-none">
-            <div className="sticky top-0 h-dvh z-60">
+            <div className="sticky top-0 h-[calc(100dvh_-_var(--reveal-band-h))] z-60">
               <BlogPostRailNav />
             </div>
           </div>

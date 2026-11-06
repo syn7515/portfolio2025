@@ -3,12 +3,26 @@
    rather than on it, and is uncovered by the paper scrolling up off it: the footer holds still
    while the paper's straight bottom edge slides up over it. Used by Home and the case studies.
 
+   The desk never goes out of sight. A strip of it, --reveal-band-h tall (globals.css), is held
+   across the bottom of the screen the whole way down — .band, below — and the paper's edge rests
+   on its top, so the page reads as a sheet lying on the desk with its text scrolling up out from
+   under the strip, rather than as a screen of text. Only once the paper's real end has come up out
+   of the strip does the edge leave it and travel up with the paper, uncovering the footer; .edge
+   draws the edge in both places.
+   The desk's grid is never the footer's. Down here PaperGridBackground is a layer fixed to the
+   screen behind the paper (globals.css), so the footer is just its text over that, and the grid
+   holds still whatever the page does: through the reveal, and through an overscroll past the end
+   of the page, which shows more desk rather than the bare page background. The strip carries the
+   same grid, measured off the same edge, so where the two meet there is nothing to see.
+
    The usual build — a fixed footer with the page raised above it — is the one these pages can't
    use. Raising the case-study paper takes a z-index, which makes it a stacking context, which traps
    the carousel's z-[50] layers under the page-level fixed overlays (see blog-post-layout.tsx);
    sinking the footer with a negative z-index instead would put it under <body>'s own background.
-   So nothing overlaps at all. The footer is an ordinary block after the paper, sized by its
-   content, and that content is pinned to the bottom of the viewport *inside* it.
+   So the footer the reader sees (.text, under "Two copies") is fixed and goes *before* the paper in
+   the document, which paints the paper over it with no z-index at all, and the footer's place in
+   the page — the block below, after the paper — carries the same content for the reading order,
+   pinned to the bottom of the viewport *inside* it.
 
    The pinning is a sticky element given room to travel. Its track reaches a full viewport up behind
    the paper (a 100vh spacer, cancelled by an equal negative margin so the footer's own height is
@@ -24,8 +38,9 @@
 }
 
 @media (max-width: 1023.98px) {
-    /* The paper's bottom-edge grid (globals.css) moves onto the desk below — see .grid. Two classes
-       to outrank the global rule whatever order the stylesheets load in.
+    /* The paper's bottom-edge grid (globals.css) gives way to the desk's, which shows below the
+       paper's edge instead. Two classes to outrank the global rule whatever order the stylesheets
+       load in.
        Deliberately no minimum height on the paper. Forcing it to a full viewport made a page short
        enough to fit (Home on a tablet) scroll a footer's height just to lift a mostly empty sheet;
        left to the page's own layout, a page that fits shows the footer at the bottom of the screen
@@ -42,6 +57,60 @@
     }
 }
 
+/* ── Two copies ─────────────────────────────────────────────────────────────────────────────────
+   The footer the reader sees is .text (RevealFooterText): fixed to the foot of the screen, before
+   the paper in the document so the paper paints over it, and so uncovered wherever the paper
+   isn't. Fixed rather than pinned with sticky as .pinned is, because iOS carries sticky content
+   along with a rubber-band overscroll, and the text should hold its place while the paper is
+   pulled past the end of the page as surely as it does while the paper scrolls off it. Nothing
+   clips it either: iOS carries a fixed element inside a clipped one along with the scroll too.
+   .footer, below, is the same content in the footer's place in the page, after the article: it
+   sizes the room the page scrolls the paper off the footer by, and it is what screen readers and
+   the keyboard reach. Otherwise it is never seen and never in the way: invisible, and pointer
+   events pass through it to .text, which takes the taps, hovers and presses. Pinned, it sits
+   exactly where .text does whenever the page isn't overscrolled, so a keyboard focus on it shows
+   it there in .text's place (.text stepping aside so the text isn't drawn twice). */
+.text {
+    display: none;
+}
+
+@media (max-width: 1023.98px) {
+    .text {
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        inset: auto 0 0;
+        overflow-y: clip;
+    }
+}
+
+@media (min-width: 1024px) {
+    .text.fromSheet {
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        inset: auto 0 0;
+        overflow-y: clip;
+    }
+}
+
+.footer {
+    pointer-events: none;
+}
+
+.pinned {
+    opacity: 0;
+}
+
+.footer:has(:focus-visible) .pinned {
+    opacity: 1;
+}
+
+/* Opacity rather than visibility, so it still takes a click that lands on it meanwhile. */
+:global(body):has(.footer :focus-visible) .text {
+    opacity: 0;
+}
+
 /* Flex column on the footer so this negative margin can't collapse through it: the footer's height
    has to come out as the track's minus the spacer, i.e. the content's. */
 .track {
@@ -56,97 +125,197 @@
     height: 100vh;
 }
 
+/* A flex column so the spacer RevealFooter rounds the footer's height with can take a negative
+   margin without it collapsing out through the bottom of this box. When it does, the content runs
+   that far past the box's foot, all of it padding; the clip keeps that from adding to the page's
+   scroll height, which would hold the paper's edge short of the line it is rounded onto. Only
+   vertically, and the footer clips to this same box anyway (its clip-path). Clipping isn't
+   scrolling, so the stickiness still answers to the viewport. */
 .pinned {
     position: sticky;
     bottom: 0;
+    display: flex;
+    flex-direction: column;
+    overflow-y: clip;
 }
 
-/* The same drafting grid as the desk around the sheet (.paper-grid-background in globals.css),
-   centred on the column so its middle line falls between the footer's two ends, and laid so a
-   major line runs along the top edge — where the paper comes to rest, just as the desk's lines run
-   along the sheet's edges. A percentage position on a repeating tile lines the tile's own middle up
-   with the box's, so each layer adds back half its tile, less half a pixel to centre the 1px stroke.
-   It fades out into the viewport's bottom edge on the same curve the desk grid uses into its top
-   edge on the sheet, so the grid runs off the screen rather than stopping at it. The box is pinned
-   to that edge, so its own bottom is the viewport's. */
-.grid {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    -webkit-mask-image: linear-gradient(to top, transparent 0, rgb(0 0 0 / 0.25) 35px, black 100px);
-    mask-image: linear-gradient(to top, transparent 0, rgb(0 0 0 / 0.25) 35px, black 100px);
-    background-image:
-        linear-gradient(to right, var(--paper-grid-major) 1px, transparent 1px),
-        linear-gradient(to bottom, var(--paper-grid-major) 1px, transparent 1px),
-        linear-gradient(to right, var(--paper-grid-minor) 1px, transparent 1px),
-        linear-gradient(to bottom, var(--paper-grid-minor) 1px, transparent 1px);
-    background-position:
-        calc(50% + 49.5px) -0.5px,
-        calc(50% + 49.5px) -0.5px,
-        calc(50% + 9.5px) -0.5px,
-        calc(50% + 9.5px) -0.5px;
-    background-size:
-        100px 100px,
-        100px 100px,
-        20px 20px,
-        20px 20px;
+/* Rounds the footer's height to a whole number of grid cells (RevealFooter measures the content),
+   so that at the end of the page, where the paper comes to rest on the footer, its edge lies on a
+   grid line as it does on the strip. Nothing from 1024px, where the desk's grid is laid off the
+   top of the page instead. */
+.cellRound {
+    flex-shrink: 0;
+    margin-top: var(--reveal-footer-round, 0px);
 }
 
-/* The pointer spotlight the paper's bottom-edge grid had, carried over. This grid is a layer of its
-   own, so it can use the desk's simpler version: a darker copy masked to a circle at the pointer.
-   PaperGridBackground feeds it the position (it looks for data-paper-grid-pointer). */
-@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-    .grid::after {
+@media (min-width: 1024px) {
+    .cellRound {
+        margin-top: 0;
+    }
+}
+
+/* ── The strip and the edge ─────────────────────────────────────────────────────────────────────
+   The strip is the desk at the foot of the screen: opaque, so the paper's text goes under it, and
+   carrying the desk's grid (.paper-grid-strip, globals.css). It is fixed, as the desk's own layer
+   is, so the two hold still together in both halves of the scroll — over the paper while there is
+   paper under it, and over the desk once there isn't, where it shows what the desk would. Opaque,
+   it covers the desk's copy of the grid under it rather than doubling it (two translucent lines in
+   one place read as one darker line). The footer's bottom padding (RevealFooter) is a cell deeper
+   than the strip, so its text is never under it.
+   It takes taps rather than passing them through: what is under it is paper text the reader can't
+   see, and a tap on the desk shouldn't follow a link hidden beneath it.
+   Its z-index puts it over everything on the paper, a case study's carousel layers (z-[50], at the
+   root stacking level) among them, and over the two sheets that cross the whole screen, the
+   departing sheet and the post-to-post wipe (z-[55]): the desk holds still through a page turn
+   too, and a sheet comes and goes from under the strip the way the text does. The compact rail
+   (z-60), the menu (z-[65]) and the bar (z-[70]) stay on top of it. */
+.band,
+.edge,
+.bottomFade {
+    display: none;
+}
+
+@media (max-width: 1023.98px) {
+    .band {
+        display: block;
+        position: fixed;
+        inset: auto 0 0;
+        height: var(--reveal-band-h);
+        z-index: 56;
+        background-color: var(--background);
+    }
+
+    /* The paper's bottom edge, where it is seen to be: on the strip while there is still paper
+       running on underneath it, and on the paper's real end once that has come up into view.
+       It is a zero-height marker laid out right where the paper ends (a grid item in the case
+       studies' first row, aligned to its foot; the next flex item after the paper on Home), and
+       `bottom` holds it the strip's height above the screen's foot for as long as that end is
+       further down — the same sticky trick as the footer's pinned content, with the strip's
+       height as its margin. So it moves on the compositor in step with the scroll and is never
+       measured. It is its own layer rather than part of the strip or the footer so that it can
+       sit over both, and over the footer's text as that comes out from under it. */
+    .edge {
+        display: block;
+        grid-row: 1;
+        grid-column: 1;
+        align-self: end;
+        flex-shrink: 0;
+        width: 100%;
+        height: 0;
+        position: sticky;
+        bottom: var(--reveal-band-h);
+        z-index: 57;
+        pointer-events: none;
+    }
+
+    /* The hairline is the sheet's own 0.5px edge (--paper-box-shadow in globals.css). The shadow is
+       the sheet's drop-shadow colour on a short eased falloff rather than its 60px blur, which at
+       this height would read as a haze over the whole strip instead of an edge. The strip's own
+       copy of the edge (.bandEdge, below) is drawn the same. */
+    .edge::before,
+    .bandEdge {
         content: '';
         position: absolute;
-        inset: 0;
-        opacity: 0;
-        background-image:
-            linear-gradient(to right, var(--paper-grid-hover-major) 1px, transparent 1px),
-            linear-gradient(to bottom, var(--paper-grid-hover-major) 1px, transparent 1px),
-            linear-gradient(to right, var(--paper-grid-hover-minor) 1px, transparent 1px),
-            linear-gradient(to bottom, var(--paper-grid-hover-minor) 1px, transparent 1px);
-        background-position: inherit;
-        background-size: inherit;
-        -webkit-mask-image: radial-gradient(
-            circle 150px at var(--paper-grid-pointer-x, 0px) var(--paper-grid-pointer-y, 0px),
-            black 0,
-            rgb(0 0 0 / 0.75) 35%,
+        inset: 0 0 auto;
+        height: 40px;
+        pointer-events: none;
+        box-shadow: inset 0 0.5px 0 0 var(--paper-inset-shadow);
+        background-image: linear-gradient(
+            to bottom,
+            color-mix(in srgb, var(--paper-drop-shadow) 50%, transparent) 0,
+            color-mix(in srgb, var(--paper-drop-shadow) 22%, transparent) 30%,
+            color-mix(in srgb, var(--paper-drop-shadow) 7%, transparent) 65%,
             transparent 100%
         );
-        mask-image: radial-gradient(
-            circle 150px at var(--paper-grid-pointer-x, 0px) var(--paper-grid-pointer-y, 0px),
-            black 0,
-            rgb(0 0 0 / 0.75) 35%,
-            transparent 100%
-        );
-        transition: opacity 180ms ease-out;
     }
 
-    .grid[data-pointer-active='true']::after {
-        opacity: 1;
+    .bandEdge {
+        display: none;
     }
 }
 
-/* The paper's bottom edge and the shadow it casts on the desk. Painted by the footer rather than
-   the paper because the two always meet — the footer is laid out directly after it — and because
-   from here it sits above the pinned content as that slides underneath. The hairline is the
-   sheet's own 0.5px edge (--paper-box-shadow in globals.css). The shadow is the sheet's drop-shadow
-   colour on a short eased falloff rather than its 60px blur, which at this height would read as a
-   haze over the whole footer instead of an edge. */
-.edge {
-    position: absolute;
-    inset: 0 0 auto;
-    height: 40px;
-    pointer-events: none;
-    box-shadow: inset 0 0.5px 0 0 var(--paper-inset-shadow);
-    background-image: linear-gradient(
-        to bottom,
-        color-mix(in srgb, var(--paper-drop-shadow) 50%, transparent) 0,
-        color-mix(in srgb, var(--paper-drop-shadow) 22%, transparent) 30%,
-        color-mix(in srgb, var(--paper-drop-shadow) 7%, transparent) 65%,
-        transparent 100%
-    );
+/* ── The edge through an overscroll ─────────────────────────────────────────────────────────────
+   A rubber-band overscroll in a desktop browser moves the page and leaves fixed layers where they
+   are. Sticky positions are worked out from the scroll position, which an overscroll doesn't
+   change, so a sticky element is carried along with the page like anything else in it. Pulled
+   down past the top, the paper went down, the strip stayed put, and the sticky edge went down with
+   the paper, off the strip's top and under it: the faded grid was left lying straight on the
+   paper's text, with no edge between them.
+   So where the browser can say how far the page has scrolled to an animation, the edge is drawn in
+   two places, each attached to what it belongs to. While the paper runs on under the strip, the
+   edge is the strip's own (.bandEdge), and moves only if the strip does. Once the paper's real end
+   has come up off the strip, it is .edge, laid out at that end and moving with the paper, and
+   never sticky. The handover is a scroll-driven animation on .bandEdge, timed off .edge's way into
+   view: it goes the moment .edge has come up the strip's height from the foot of the screen, which
+   is where the two lie one on the other, so nothing seems to change. A scroll-driven animation
+   reads the scroll position too, so no overscroll moves the handover either.
+   .edge sits under the strip now (z-index 54 against its 56), so on the stretch where the paper's
+   end is still behind the strip, the strip covers it; over the desk it is still above the
+   footer's text, and under the full-screen sheets (z-[55]) that cross on a page turn.
+   Without scroll-driven animations the sticky edge above stands, and only an overscroll past the
+   top shows the old fault. */
+@supports (timeline-scope: --reveal-paper-end) {
+    :global(html) {
+        timeline-scope: --reveal-paper-end;
+    }
+
+    @media (max-width: 1023.98px) {
+        /* Inset 0: by default a view timeline measures from inside the page's scroll padding, which
+           already keeps the strip's height clear at the foot (globals.css), and the handover would
+           come a strip's height late. */
+        .edge {
+            position: relative;
+            bottom: auto;
+            z-index: 54;
+            view-timeline-name: --reveal-paper-end;
+            view-timeline-inset: 0;
+        }
+
+        .bandEdge,
+        .bottomFade {
+            display: block;
+            animation: band-edge-handover linear both;
+            animation-timeline: --reveal-paper-end;
+            animation-range: cover var(--reveal-band-h) cover calc(var(--reveal-band-h) + 1px);
+        }
+
+        /* The top of the screen's fade (the layouts' top-edge overlay), mirrored onto the strip:
+           the paper's text fades out as it goes under the edge, as it does going under the top of
+           the screen. The same z-index as that overlay, 40, so it is under the case studies'
+           carousels (z-[50]) just as that one is, and they go under the edge whole; and the same
+           eased curve the post's overlay uses on a phone, 80px tall.
+           Fixed on the strip's top, for the same reason the strip's edge is, and gone at the same
+           handover: once the paper's real end is up off the strip, what lies over the edge is the
+           desk and the footer, which mustn't fade. At the handover what is under it is the blank
+           foot of the paper (its bottom padding is taller than this), so it goes without a trace.
+           Only where the handover can be timed; without it there is no fade at the foot. */
+        .bottomFade {
+            position: fixed;
+            inset: auto 0 var(--reveal-band-h);
+            height: 80px;
+            z-index: 40;
+            pointer-events: none;
+            background: linear-gradient(
+                to top,
+                color-mix(in srgb, var(--background) 95%, transparent) 0%,
+                color-mix(in srgb, var(--background) 85%, transparent) 20%,
+                color-mix(in srgb, var(--background) 62%, transparent) 40%,
+                color-mix(in srgb, var(--background) 33%, transparent) 60%,
+                color-mix(in srgb, var(--background) 10%, transparent) 80%,
+                transparent 100%
+            );
+        }
+    }
+}
+
+@keyframes band-edge-handover {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
 }
 
 /* ── From the sheet ─────────────────────────────────────────────────────────────────────────────
@@ -155,7 +324,8 @@
    on it. Used by the case studies; Home keeps its footer on the sheet.
 
    This is a different reveal from the full-bleed one above. There the paper is the whole screen,
-   so the footer is a surface of its own under it, with its own grid and the edge's shadow. Here the
+   so the footer is desk that only shows once the paper moves, with the strip and the edge's
+   shadow. Here the
    desk is already on screen around the sheet, so nothing new comes out but the footer's text: the
    sheet alone slides up, and the desk around and under it holds still for the length of the
    reveal, as do the side navigation (fixed) and the drafting grid. The only shadow is the sheet's
@@ -180,12 +350,6 @@
         display: flex;
         flex-direction: column;
         clip-path: inset(0);
-    }
-
-    /* Just the text: the desk under it is RevealDesk's, and the sheet's own shadow is the edge. */
-    .fromSheet .grid,
-    .fromSheet .edge {
-        display: none;
     }
 }
 
