@@ -93,10 +93,10 @@
   // v0-2: the recipe list from the reference video (grill-2.mov): five single-setup recipes
   // on one page. Plate targets are mock values (°C internally).
   const RECIPES = [
-    { id: 1, name: '6oz Pork',  cookOptions: [{ id: 1, name: 'default', top: 250, bot: 230, cookingSec: 240, meltingSec: 0, thickness: 25 }] },
-    { id: 2, name: '8oz Pork',  cookOptions: [{ id: 2, name: 'default', top: 250, bot: 230, cookingSec: 300, meltingSec: 0, thickness: 32 }] },
-    { id: 3, name: '6oz Beef',  cookOptions: [{ id: 3, name: 'default', top: 260, bot: 240, cookingSec: 180, meltingSec: 0, thickness: 22 }] },
-    { id: 4, name: '8oz Beef',  cookOptions: [{ id: 4, name: 'default', top: 260, bot: 240, cookingSec: 220, meltingSec: 0, thickness: 28 }] },
+    { id: 1, name: '6oz pork',  cookOptions: [{ id: 1, name: 'default', top: 250, bot: 230, cookingSec: 240, meltingSec: 0, thickness: 25 }] },
+    { id: 2, name: '8oz pork',  cookOptions: [{ id: 2, name: 'default', top: 250, bot: 230, cookingSec: 300, meltingSec: 0, thickness: 32 }] },
+    { id: 3, name: '6oz beef',  cookOptions: [{ id: 3, name: 'default', top: 260, bot: 240, cookingSec: 180, meltingSec: 0, thickness: 22 }] },
+    { id: 4, name: '8oz beef',  cookOptions: [{ id: 4, name: 'default', top: 260, bot: 240, cookingSec: 220, meltingSec: 0, thickness: 28 }] },
     { id: 5, name: 'Chicken',   cookOptions: [{ id: 5, name: 'default', top: 230, bot: 210, cookingSec: 360, meltingSec: 0, thickness: 20 }] },
   ];
 
@@ -220,7 +220,7 @@
   }
 
   // ── Video demo (v0-2) ──────────────────────────────────────────────────
-  // Replays the reference video (grill-1.mov, 14.6s): 6oz Pork preheating with 4 → 3 → 2 → 1 °F
+  // Replays the reference video (grill-1.mov, 14.6s): 6oz pork preheating with 4 → 3 → 2 → 1 °F
   // remaining, then READY at 10.8s. Start from the dev bar ("▶ 영상") or ?demo=video (starts
   // after 1s). The remaining °F are fed back as °C so the display rounds to exactly those.
   // The temperature rises continuously (5.3 → 0.5 °F remaining over 10.8s), so the rounded
@@ -264,8 +264,8 @@
   }
 
   // ── Video demo 2 (grill-2.mov, 15.9s) ─────────────────────────────────
-  // 6oz Pork preheating with 9°F (5°C) left, held steady → open the recipe sheet (3.8s) →
-  // tap 8oz Beef (4.9s) → sheet slides away → open again (11.6s) → tap 6oz Pork (12.9s).
+  // 6oz pork preheating with 9°F (5°C) left, held steady → open the recipe sheet (3.8s) →
+  // tap 8oz beef (4.9s) → sheet slides away → open again (11.6s) → tap 6oz pork (12.9s).
   // Unlike the video the plate keeps heating throughout: 9.4 → 2 °F remaining over the 15.9s,
   // and the ring fills with it (about 60 % → 92 %), across both recipe changes.
   function startDemo2() {
@@ -910,7 +910,7 @@
   // on a wall-clock loop that a second copy (the lightbox) can join mid-take. The demos run on
   // timers from their own start, so the page drives the screen through these instead.
   // Grill (startDemo / startDemo2):
-  //   take.reset()           6oz Pork preheating with the sheet shut, as both demos begin
+  //   take.reset()           6oz pork preheating with the sheet shut, as both demos begin
   //   take.hold(f, base)     the plate f °F short of ready, the ring's t0 `base` °C under the ready
   //                          threshold (demo 1: 5.5, demo 2: 13), for whichever recipe is on
   //   take.ready()           demo 1's switch to READY

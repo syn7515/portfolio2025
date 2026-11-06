@@ -88,22 +88,22 @@
   //       grid has more than one page to demonstrate paging.
   const RECIPE_POOL = [
     { id: 1,  name: '불고기 패티',     cookOptions: [{ id: 1, name: 'default', top: 250, bot: 230, cookingSec: 240, meltingSec: 0,  thickness: 30 }] },
-    { id: 2,  name: 'Beef Burger',     cookOptions: [{ id: 2, name: 'default', top: 250, bot: 230, cookingSec: 150, meltingSec: 10, thickness: 22 }] },
-    { id: 3,  name: 'Salmon Fillet',   cookOptions: [{ id: 3, name: 'default', top: 200, bot: 200, cookingSec: 120, meltingSec: 5,  thickness: 18, withoutArm: true }] },
-    { id: 10, name: 'Ribeye Steak',    cookOptions: [
+    { id: 2,  name: 'Beef burger',     cookOptions: [{ id: 2, name: 'default', top: 250, bot: 230, cookingSec: 150, meltingSec: 10, thickness: 22 }] },
+    { id: 3,  name: 'Salmon fillet',   cookOptions: [{ id: 3, name: 'default', top: 200, bot: 200, cookingSec: 120, meltingSec: 5,  thickness: 18, withoutArm: true }] },
+    { id: 10, name: 'Ribeye steak',    cookOptions: [
       { id: 101, name: '레어', top: 270, bot: 240, cookingSec: 120, meltingSec: 0, thickness: 30 },
       { id: 102, name: '웰던', top: 250, bot: 230, cookingSec: 300, meltingSec: 0, thickness: 30 },
     ] },
-    { id: 11, name: 'Tenderloin Steak', cookOptions: [
+    { id: 11, name: 'Tenderloin steak', cookOptions: [
       { id: 111, name: '레어',       top: 270, bot: 230, cookingSec: 150, meltingSec: 8,  thickness: 13, withoutArm: true },
       { id: 112, name: '미디엄 레어', top: 260, bot: 220, cookingSec: 180, meltingSec: 0,  thickness: 14 },
       { id: 113, name: '미디엄',     top: 250, bot: 210, cookingSec: 210, meltingSec: 10, thickness: 15 },
       { id: 114, name: '미디엄웰던', top: 240, bot: 200, cookingSec: 240, meltingSec: 0,  thickness: 16 },
       { id: 115, name: '웰던',       top: 230, bot: 190, cookingSec: 300, meltingSec: 12, thickness: 18 },
     ] },
-    { id: 4,  name: '10oz Ribeye',     cookOptions: [{ id: 4, name: 'default', top: 260, bot: 240, cookingSec: 300, meltingSec: 15, thickness: 35 }] },
-    { id: 5,  name: 'Chicken Breast',  cookOptions: [{ id: 5, name: 'default', top: 200, bot: 200, cookingSec: 180, meltingSec: 0,  thickness: 20 }] },
-    { id: 6,  name: 'Lamb Chop',       cookOptions: [{ id: 6, name: 'default', top: 240, bot: 220, cookingSec: 200, meltingSec: 12, thickness: 25 }] },
+    { id: 4,  name: '10oz ribeye',     cookOptions: [{ id: 4, name: 'default', top: 260, bot: 240, cookingSec: 300, meltingSec: 15, thickness: 35 }] },
+    { id: 5,  name: 'Chicken breast',  cookOptions: [{ id: 5, name: 'default', top: 200, bot: 200, cookingSec: 180, meltingSec: 0,  thickness: 20 }] },
+    { id: 6,  name: 'Lamb chop',       cookOptions: [{ id: 6, name: 'default', top: 240, bot: 220, cookingSec: 200, meltingSec: 12, thickness: 25 }] },
   ];
 
   // Dev bar "레시피 N개": the list the screen sees. Counts past the pool are filled with
@@ -133,7 +133,7 @@
     preheatAlmost:      { label: 'Preheat · almost',       state: 'preheat', temp: { 0: 215, 1: 218, 4: 212, 5: 216 }, t0: COLD,                     heat: { 0: 215, 1: 218 } },
     preheatCoolingdown: { label: 'Preheat · cooling down', state: 'preheat', temp: { 0: 260, 1: 265, 4: 258, 5: 262 }, t0: { 0: 260, 1: 265, 4: 258, 5: 262 }, heat: { 0: 260, 1: 265 } },
     ready:              { label: 'Ready',                  state: 'ready',   temp: { 0: 220, 1: 220, 4: 220, 5: 220 }, t0: { 0: 220, 1: 220, 4: 220, 5: 220 }, heat: { 0: 220, 1: 220 } },
-    // 조리 시작 이후 (cooking). Jumping here starts the cook at that step; Beef Burger has cheese (meltingSec 10).
+    // 조리 시작 이후 (cooking). Jumping here starts the cook at that step; Beef burger has cheese (meltingSec 10).
     cook:               { label: 'Cooking · 조리 중',      state: 'ready',   temp: { 0: 220, 1: 220, 4: 220, 5: 220 }, t0: { 0: 220, 1: 220, 4: 220, 5: 220 }, heat: { 0: 220, 1: 220 }, cook: 'cook' },
     cookWaitMelt:       { label: 'Cooking · 치즈 대기',    state: 'ready',   temp: { 0: 220, 1: 220, 4: 220, 5: 220 }, t0: { 0: 220, 1: 220, 4: 220, 5: 220 }, heat: { 0: 220, 1: 220 }, cook: 'waitMelt', recipeId: 2 },
     cookMelt:           { label: 'Cooking · 치즈 조리 중', state: 'ready',   temp: { 0: 220, 1: 220, 4: 220, 5: 220 }, t0: { 0: 220, 1: 220, 4: 220, 5: 220 }, heat: { 0: 220, 1: 220 }, cook: 'melt', recipeId: 2 },

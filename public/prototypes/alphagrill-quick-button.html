@@ -72,7 +72,7 @@ const F = {};   // 'v15' | 'v0' → { el, win, doc, device }
 
 // The mock recipes that only have Korean names get English ones: this is the English app. The
 // first is named after the recipe the cook screen beside it on the card starts on.
-const EN = { '불고기 패티': '6oz Pork', '레어': 'Rare', '미디엄 레어': 'Medium rare', '미디엄': 'Medium', '미디엄웰던': 'Medium well', '웰던': 'Well done' };
+const EN = { '불고기 패티': '6oz pork', '레어': 'Rare', '미디엄 레어': 'Medium rare', '미디엄': 'Medium', '미디엄웰던': 'Medium well', '웰던': 'Well done' };
 
 // The handoff page's trick: copy every :active rule as .is-pressed right after the original, so a
 // scripted press shows the look a finger's would. A sheet added later (menu.js adds its own) gets
@@ -265,7 +265,7 @@ async function tap(f, sel, id, { at, text = false, act } = {}) {
 const MENU = '#menu-btn', MENU_ICON = '#menu-btn > div';
 const SETTINGS = '#app-menu [data-menu="setting"]', SETTINGS_LABEL = SETTINGS + ' p';
 const BACK = '#app-setting [data-setting-back]';
-const BEEF_BURGER = '#quick-list [data-quick-recipe="2"]';       // beside the selected 6oz Pork
+const BEEF_BURGER = '#quick-list [data-quick-recipe="2"]';       // beside the selected 6oz pork
 
 async function take(id) {
   if (!dry) reset();
@@ -281,7 +281,7 @@ async function take(id) {
   await tap('v15', BACK, id);
   await wait(1600, id);                                           // the quick buttons on the cook screen
   await tap('v15', BEEF_BURGER, id);                              // one tap changes the recipe
-  await wait(3400, id);                                           // Beef Burger heats toward its own targets
+  await wait(3400, id);                                           // Beef burger heats toward its own targets
   if (!dry) heated('v15');
   await wait(3000, id);                                           // and rests on Ready before the take ends
 }
