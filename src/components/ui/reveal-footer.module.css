@@ -282,8 +282,10 @@
         /* The top of the screen's fade (the layouts' top-edge overlay), mirrored onto the strip:
            the paper's text fades out as it goes under the edge, as it does going under the top of
            the screen. The same z-index as that overlay, 40, so it is under the case studies'
-           carousels (z-[50]) just as that one is, and they go under the edge whole; and the same
-           eased curve the post's overlay uses on a phone, 80px tall.
+           carousel cards (z-[50]) just as that one is, and they go under the edge whole.
+           Lighter than the top one, though: 64px rather than 80, and 70% at the edge rather than
+           95%. This is where the eye goes next, and the line about to go under should still read;
+           at the top the text is leaving, here it is arriving.
            Fixed on the strip's top, for the same reason the strip's edge is, and gone at the same
            handover: once the paper's real end is up off the strip, what lies over the edge is the
            desk and the footer, which mustn't fade. At the handover what is under it is the blank
@@ -292,16 +294,15 @@
         .bottomFade {
             position: fixed;
             inset: auto 0 var(--reveal-band-h);
-            height: 80px;
+            height: 64px;
             z-index: 40;
             pointer-events: none;
             background: linear-gradient(
                 to top,
-                color-mix(in srgb, var(--background) 95%, transparent) 0%,
-                color-mix(in srgb, var(--background) 85%, transparent) 20%,
-                color-mix(in srgb, var(--background) 62%, transparent) 40%,
-                color-mix(in srgb, var(--background) 33%, transparent) 60%,
-                color-mix(in srgb, var(--background) 10%, transparent) 80%,
+                color-mix(in srgb, var(--background) 70%, transparent) 0%,
+                color-mix(in srgb, var(--background) 52%, transparent) 20%,
+                color-mix(in srgb, var(--background) 32%, transparent) 45%,
+                color-mix(in srgb, var(--background) 14%, transparent) 70%,
                 transparent 100%
             );
         }

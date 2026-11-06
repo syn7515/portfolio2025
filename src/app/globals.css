@@ -439,11 +439,18 @@ body {
    instead of stopping at it but the line under the paper's edge is still at full strength. The
    desk's own layer needs no fade there: the strip always covers it.
    The desk is only ever seen *below* the paper, so the layer covers only the lower part of the
-   screen, from 40% of the way down, fading in over its first 80px. The paper's edge never comes up further
-   than that: at the end of the page it rests a footer's height up, and an overscroll there pulls it
-   up by a few hundred pixels at most. What it keeps out of view is the overscroll the other way: a
+   screen, 60% of it, fading in over its first 80px. The paper's edge never comes up further than
+   that: at the end of the page it rests a footer's height up, and an overscroll there pulls it up
+   by a few hundred pixels at most. What it keeps out of view is the overscroll the other way: a
    pull down at the top of the page draws the paper down off the top of the screen, and the bare
-   page background shows above it, not a grid that reads as lying over the paper. */
+   page background shows above it, not a grid that reads as lying over the paper.
+   It is held by its foot alone, a height rather than a top: every grid on the desk is measured off
+   the foot of the screen, and so must every box that carries one, the strip's and the footer's
+   included, all `bottom: 0` and nothing else. iOS Safari moves such a box with its toolbar as that
+   grows and shrinks; one pinned top and bottom it sizes and places some other way, and while it
+   was (inset: 40% 0 0), this layer's lines came loose from the strip's and from the paper's
+   resting edge by several pixels as soon as the toolbar moved, doubling them, and the two halves
+   of the grid moved at different times.  */
 @media (max-width: 1023.98px) {
   .paper-grid-background,
   .paper-grid-strip {
@@ -468,7 +475,9 @@ body {
 
   .paper-grid-background {
     position: fixed;
-    inset: 40% 0 0;
+    inset: auto 0 0;
+    height: 60vh;
+    height: 60lvh;
     -webkit-mask-image: linear-gradient(to bottom, transparent 0, rgb(0 0 0 / 0.25) 28px, black 80px);
     mask-image: linear-gradient(to bottom, transparent 0, rgb(0 0 0 / 0.25) 28px, black 80px);
   }
