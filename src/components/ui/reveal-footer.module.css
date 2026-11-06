@@ -212,17 +212,26 @@
        falloff, rather than its 60px blur, which at this height would read as a haze over the whole
        strip instead of an edge. The strip's own copy of the edge (.bandEdge, below) is drawn the
        same.
+       The edge always comes to rest on one of the grid's lines: on the strip's top, and a whole
+       number of cells up from it at the end of the page (the footer's height is rounded to a cell).
+       But only to within a fraction of a pixel, and the fraction is the page's own: how far the
+       paper's end falls off a whole pixel decides how much of the line's 1px shows below the edge,
+       none of it or all of it. Added to the hairline, that drew the same edge two device pixels
+       thick on one page and three on the next, and a major line under it (the strip's top is one)
+       darker again. So the first 1.5px under the edge are painted the page's own colour before the
+       shade and the hairline go on, which takes the line beneath out from under it whatever the
+       fraction, and the edge weighs the same on every page and in both places.
        Its own weights rather than the sheet's (--paper-inset-shadow, --paper-box-shadow in
-       globals.css), because here the edge always lies on one of the grid's lines, which adds its
-       own weight to the hairline's. In light mode the sheet's 15% hairline and 50% shade made the
-       pair read heavy, so they come down to 7% and 35%. In dark mode the sheet's zinc-600 hairline
-       all but went into the grid, so it lightens to zinc-500 at 55%: about half as bright again over the
-       page, a step up rather than a new line. */
+       globals.css). In light mode an 18% hairline over a 40% shade: with no grid line under it to
+       add to it, the hairline carries the edge alone, so it is a little stronger than the sheet's 15%; the shade
+       comes down from the sheet's 50% so the pair stays an edge rather than a band. In dark mode the
+       sheet's zinc-600 hairline all but went into the grid, so it lightens to zinc-500 at 55%:
+       about half as bright again over the page, a step up rather than a new line. */
     .edge,
     .band {
-        --reveal-edge-line: rgb(120 113 108 / 0.07);
-        --reveal-edge-shade-0: 35%;
-        --reveal-edge-shade-1: 15%;
+        --reveal-edge-line: rgb(120 113 108 / 0.18);
+        --reveal-edge-shade-0: 40%;
+        --reveal-edge-shade-1: 17%;
         --reveal-edge-shade-2: 5%;
     }
 
@@ -234,13 +243,19 @@
         height: 40px;
         pointer-events: none;
         box-shadow: inset 0 0.5px 0 0 var(--reveal-edge-line);
-        background-image: linear-gradient(
-            to bottom,
-            color-mix(in srgb, var(--paper-drop-shadow) var(--reveal-edge-shade-0), transparent) 0,
-            color-mix(in srgb, var(--paper-drop-shadow) var(--reveal-edge-shade-1), transparent) 30%,
-            color-mix(in srgb, var(--paper-drop-shadow) var(--reveal-edge-shade-2), transparent) 65%,
-            transparent 100%
-        );
+        background-image:
+            linear-gradient(
+                to bottom,
+                color-mix(in srgb, var(--paper-drop-shadow) var(--reveal-edge-shade-0), transparent) 0,
+                color-mix(in srgb, var(--paper-drop-shadow) var(--reveal-edge-shade-1), transparent) 30%,
+                color-mix(in srgb, var(--paper-drop-shadow) var(--reveal-edge-shade-2), transparent) 65%,
+                transparent 100%
+            ),
+            linear-gradient(var(--background), var(--background));
+        background-size:
+            100% 100%,
+            100% 1.5px;
+        background-repeat: no-repeat;
     }
 
     .bandEdge {
