@@ -157,9 +157,10 @@ export function RevealFooterText({ children, className, style, fromSheet = false
 
 /**
  * The footer under the full-bleed paper, below 1024px: the desk the paper is lifted off, with the
- * drafting grid and whatever the page ends on, uncovered as the paper scrolls up off it. With it
- * comes the strip of desk held across the foot of the screen the whole way down, which the paper's
- * edge rests on until the paper runs out (see reveal-footer.module.css).
+ * drafting grid and whatever the page ends on, uncovered as the paper scrolls up off it. It goes
+ * with RevealBand, the strip of desk held across the foot of the screen the whole way down, which
+ * the paper's edge rests on until the paper runs out (see reveal-footer.module.css); that one is
+ * placed early in the page, not here.
  *
  * What the reader sees is RevealFooterText, the same content fixed to the screen behind the paper.
  * This is the footer's place in the page: it gives the page the room to scroll the paper off the
@@ -170,9 +171,6 @@ export function RevealFooterText({ children, className, style, fromSheet = false
  * Place it directly after the paper and give the paper `revealPaperClassName`. From 1024px it
  * renders nothing, and the page keeps its footer on the sheet, unless `fromSheet` asks for it there
  * too.
- *
- * Must sit under the same parent as PaperGridBackground, which finds its grids there to light the
- * pointer spotlight.
  */
 export default function RevealFooter({ children, className, style, fromSheet = false }: RevealFooterProps) {
   return (
@@ -187,6 +185,29 @@ export default function RevealFooter({ children, className, style, fromSheet = f
           </div>
         </div>
       </div>
+    </>
+  )
+}
+
+/**
+ * The strip of desk held across the foot of the screen below 1024px, with its copy of the paper's
+ * edge, and the fade over the text just above it (see reveal-footer.module.css). Renders nothing
+ * from 1024px.
+ *
+ * Its own component, for where it goes in the document: early, directly after PaperGridBackground,
+ * not after the paper with RevealFooter. Being fixed and z-indexed, it looks the same wherever it
+ * sits in the DOM, but Safari paints a page as its HTML comes in, and after the paper it was among
+ * the last 15% of a long case study's markup. When the HTML came in slowly, as on a first visit or
+ * just after a deploy, the article was up on the screen for as long as that took with no strip
+ * under it, and the paper ran on under the toolbar instead, as if the page had none. Up front it
+ * arrives with the desk's own grid, in the first few kilobytes.
+ *
+ * Must sit under the same parent as PaperGridBackground, which finds the strip's grid there to
+ * light the pointer spotlight.
+ */
+export function RevealBand() {
+  return (
+    <>
       {/* The grid is a global class, shared with PaperGridBackground's own below 1024px
           (globals.css), so the two can't drift apart. */}
       <div aria-hidden className={styles.band}>
@@ -194,7 +215,6 @@ export default function RevealFooter({ children, className, style, fromSheet = f
         <div className={styles.bandEdge} />
       </div>
       <div aria-hidden className={styles.bottomFade} />
-
     </>
   )
 }

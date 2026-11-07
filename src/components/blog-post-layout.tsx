@@ -14,7 +14,7 @@ import PaperGridBackground from '@/components/ui/paper-grid-background'
 import PaperExitSheet from '@/components/ui/paper-exit-sheet'
 import Dinkus from '@/components/ui/dinkus'
 import { DescriptionBackdrop } from '@/components/ui/description-backdrop'
-import RevealFooter, { RevealDesk, RevealFooterText, revealPaperClassName } from '@/components/ui/reveal-footer'
+import RevealFooter, { RevealBand, RevealDesk, RevealFooterText, revealPaperClassName } from '@/components/ui/reveal-footer'
 import { PROJECTS } from '@/lib/projects'
 import {
   isBlogPostMaskNavigation,
@@ -428,6 +428,11 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
         )}
       >
         <PaperGridBackground />
+
+        {/* The strip of desk across the foot of the screen below 1024px, which goes with the
+            reveal footer. Up here rather than with RevealFooter after the paper, so it is in the
+            first of the HTML to arrive. See ui/reveal-footer. */}
+        {hasProjectNavigation && <RevealBand />}
 
         {/* Dummy paper: static sheet already in place at the paper's rest position, sitting beneath
             everything else so the entrance reads as a new paper landing on an existing stack rather

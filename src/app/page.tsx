@@ -7,7 +7,7 @@ import InlineLinkPreview from '@/components/ui/inline-link-preview';
 import { DescriptionBackdrop } from '@/components/ui/description-backdrop';
 import PaperGridBackground from '@/components/ui/paper-grid-background';
 import PaperExitSheet from '@/components/ui/paper-exit-sheet';
-import RevealFooter, { RevealFooterText, revealPaperClassName } from '@/components/ui/reveal-footer';
+import RevealFooter, { RevealBand, RevealFooterText, revealPaperClassName } from '@/components/ui/reveal-footer';
 import styles from './page.module.css';
 import { trackOutboundClick } from '@/lib/analytics';
 import {
@@ -204,6 +204,9 @@ export default function Home() {
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-4 focus:left-4 focus:px-4 focus:py-2 focus:bg-white focus:text-stone-800 focus:rounded focus:shadow">Skip to content</a>
       <main id="main" className="w-full flex-1 flex flex-col relative">
         <PaperGridBackground />
+        {/* The strip of desk across the foot of the screen below 1024px. Up here rather than with
+            RevealFooter so it is in the first of the HTML to arrive. See ui/reveal-footer. */}
+        <RevealBand />
         {/* The reveal footer as it is seen, below 1024px: fixed to the foot of the screen, here
             before the paper so the paper slides off it rather than taking it along. Its place in
             the reading order is RevealFooter, after the paper. See ui/reveal-footer. */}
