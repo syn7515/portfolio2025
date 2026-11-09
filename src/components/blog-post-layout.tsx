@@ -452,8 +452,9 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
           }}
         />
 
-        {/* From 1024px, holds the desk still while the sheet slides up off the reveal footer. Here,
-            between the desk's own grid and the paper, so it paints under the sheet. */}
+        {/* From 1024px, holds the desk still while the sheet slides up off the reveal footer, where
+            the desk's own grid can't hold itself (no scroll-driven animations; see ui/reveal-footer).
+            Here, between the desk's own grid and the paper, so it paints under the sheet. */}
         {hasProjectNavigation && <RevealDesk />}
 
         {/* The reveal footer as it is seen, at every width: fixed to the foot of the screen, here

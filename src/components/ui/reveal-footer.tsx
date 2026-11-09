@@ -31,6 +31,10 @@ interface RevealFooterProps {
  * the footer, by laying a copy of PaperGridBackground's grid over the last stretch of the page and
  * pinning it to the screen for the length of the reveal.
  *
+ * Only where the scroll can't drive an animation. Where it can, PaperGridBackground's grid holds
+ * still for the reveal itself, through an overscroll past the end too, which a sticky copy can't
+ * (iOS and macOS carry sticky content along with a rubber-band); this copy is then hidden.
+ *
  * The page wrapper must be a one-column grid (`minmax(0, 1fr)`), the page in its first row and the
  * footer in its second, with this placed after PaperGridBackground and before the paper — so that it
  * paints between the two — and the footer after the paper. It takes the footer's cell itself.
@@ -176,7 +180,10 @@ export default function RevealFooter({ children, className, style, fromSheet = f
   return (
     <>
       <div aria-hidden className={styles.edge} />
-      <div className={cn(styles.footer, fromSheet && styles.fromSheet)}>
+      {/* data-paper-grid-hold: from 1024px, where the footer comes out from under the sheet, the
+          desk's grid stops following the scroll when the sheet's end reaches the foot of the
+          screen (PaperGridBackground). */}
+      <div className={cn(styles.footer, fromSheet && styles.fromSheet)} data-paper-grid-hold={fromSheet || undefined}>
         <div className={styles.track}>
           <div className={styles.pinned}>
             <FooterContent className={className} style={style}>

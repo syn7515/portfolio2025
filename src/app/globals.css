@@ -423,6 +423,37 @@ body {
   }
 }
 
+/* From 1024px the grid moves with the page, and should, since it is laid off the sheet's corner;
+   but a rubber-band overscroll past either end mustn't take it along. There only the sheet should
+   move, over a desk that holds still, as below 1024px. Scrolling with the page, as above, the
+   layer goes wherever the page does, overscroll included. So, where the scroll can drive an
+   animation, it is fixed to the screen instead and moved up by the scroll, exactly the distance the
+   page has moved: the same place on the screen at every scroll position, but a scroll-driven
+   animation only reads the scroll position, and an overscroll doesn't change it. It stops at
+   --paper-grid-desk-hold, the end of the page, or where the footer comes out from under the
+   sheet (ui/reveal-footer), so the desk holds still while the sheet slides up off the footer, a
+   job RevealDesk's pinned copy of this grid does where this can't run. PaperGridBackground
+   measures the three numbers and sets data-desk-follow once it has; until then the layer is the
+   absolute one above, which looks the same. */
+@supports (animation-timeline: scroll()) {
+  @media (min-width: 1024px) {
+    .paper-grid-background[data-desk-follow] {
+      position: fixed;
+      inset: var(--paper-grid-desk-top) 0 auto;
+      height: var(--paper-grid-desk-h);
+      animation: paper-grid-desk-follow linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0px var(--paper-grid-desk-hold);
+    }
+  }
+}
+
+@keyframes paper-grid-desk-follow {
+  to {
+    transform: translateY(calc(-1 * var(--paper-grid-desk-hold)));
+  }
+}
+
 /* Below 1024px, where the paper is full-bleed, the desk is the screen behind it: the grid is fixed
    to the screen, never to the page, and shows wherever the paper isn't, which is the footer it
    lifts off at the end of the page (ui/reveal-footer) and whatever a rubber-band overscroll pulls

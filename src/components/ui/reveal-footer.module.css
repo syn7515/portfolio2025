@@ -373,7 +373,9 @@
 
    Holding the desk still is RevealDesk's job, below. The desk's grid (PaperGridBackground) scrolls
    with the page; for the last stretch of it RevealDesk lays an exact, opaque copy of that grid over
-   it and pins the copy to the screen, so the grid stops while the sheet goes on.
+   it and pins the copy to the screen, so the grid stops while the sheet goes on. Where the scroll
+   can drive an animation the desk's grid stops by itself instead (globals.css, data-desk-follow),
+   holding through an overscroll past the end as well, and the copy steps aside.
 
    Both expect the page wrapper to be a one-column grid with the page in its first row and the
    footer in its second: RevealDesk takes the footer's row as its own so that it sizes to the footer
@@ -400,6 +402,16 @@
    is pinned for its length, ending wherever the footer's text does, since the two share a cell. */
 .deskTrack {
     display: none;
+}
+
+/* Where the desk's own grid can hold still for the reveal (globals.css, data-desk-follow), it does
+   this copy's job, and does it through an overscroll too, which a sticky copy can't: iOS and
+   macOS carry sticky content along with a rubber-band. So the copy steps aside. Hidden rather
+   than removed, so the page's layout doesn't change under it. */
+@media (min-width: 1024px) {
+    :global(.paper-grid-background[data-desk-follow]) ~ .deskTrack {
+        visibility: hidden;
+    }
 }
 
 @media (min-width: 1024px) {
