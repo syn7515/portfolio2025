@@ -198,3 +198,58 @@
 .noEntrance :is(.paperEntrance, .contentRise) {
     animation: none;
 }
+
+/* From 1024px the sheet runs off the foot of the screen, but only as far as the page goes. A
+   rubber-band overscroll past the end lifts it, and a browser draws nothing past the end of the
+   page there, not even the sheet's own shadow: the sheet just stopped, square across, its bottom
+   edge line showing, over the desk's grid, which holds still. So a length of paper is fixed to
+   the foot of the screen behind it, and what an overscroll uncovers is this, as if the sheet ran
+   on: fixed boxes are drawn there, and hold still as the desk does, which a plain run of paper
+   can't be seen to do.
+   It is inside the sheet, at z-index -1: over the sheet's own background, edge lines included,
+   and under everything on it. The paper is the same colour, so it can't be seen over the sheet,
+   only past its end; and the sheet's bottom edge line, which comes up with it, is under it too.
+   Its own edge lines continue the sheet's (left, and from 1362.5px right as well, as in
+   globals.css), and stand in for them where it covers them. Half the screen, so that an
+   overscroll past the top, which pulls the sheet down, can't bring the sheet's top edge down to
+   it. Its left is where it would sit in the sheet (left: auto, the sheet's left edge), and it is
+   as wide as the screen leaves the sheet, up to the sheet's own width, so it ends where the sheet
+   does or at the screen's right edge, never past it. No soft shadow of its own: behind the sheet
+   it would double the sheet's along both sides. */
+.paperRunout {
+    display: none;
+}
+
+@media (min-width: 1024px) {
+    .paperRunout {
+        display: block;
+        position: fixed;
+        z-index: -1;
+        bottom: 0;
+        width: calc(100% - var(--paper-left));
+        max-width: var(--paper-max-w);
+        height: 50vh;
+        pointer-events: none;
+        background-color: var(--paper-bg);
+        box-shadow: inset 0.5px 0 0 0 var(--paper-inset-shadow);
+    }
+}
+
+@media (min-width: 1362.5px) {
+    .paperRunout {
+        box-shadow:
+            inset 0.5px 0 0 0 var(--paper-inset-shadow),
+            inset -0.5px 0 0 0 var(--paper-inset-shadow);
+    }
+}
+
+/* Out of sight until the entrance has been retired (.noEntrance). While it plays, and until then
+   (the materialize holds its last filter), the sheet is its containing block, which puts it at the
+   sheet's foot and makes its width come out short of the sheet's by --paper-left. */
+.paperEntrance > .paperRunout {
+    visibility: hidden;
+}
+
+.noEntrance .paperEntrance > .paperRunout {
+    visibility: visible;
+}

@@ -225,6 +225,9 @@ export default function Home() {
           className={`paper-grid-bottom ${revealPaperClassName} relative z-10 w-full flex-1 flex flex-col sheet:mt-[100px] overflow-x-clip${paperClass}`}
           style={{ backgroundColor: 'var(--paper-bg)', boxShadow: 'var(--paper-box-shadow)', marginLeft: 'var(--paper-left)', maxWidth: 'var(--paper-max-w)' }}
         >
+        {/* From 1024px, the length of paper an overscroll past the end uncovers, so the sheet
+            seems to run on rather than stop. See page.module.css. */}
+        <div aria-hidden className={styles.paperRunout} />
         {/* Top padding on the paper: a ramp from 100px at 1200 to 140px by 1500px where --sidebar-w
             settles (40px over 300px = 13.333vw; intercept 100px - 160px = -3.75rem). It runs from the
             paper breakpoint up; across the sheet band it holds its 1200px value, 100px. Kept
