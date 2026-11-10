@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 import styles from './reveal-footer.module.css'
@@ -159,6 +159,93 @@ export function RevealFooterText({ children, className, style, fromSheet = false
   )
 }
 
+/*
+ * The sheet's length across a page change, below 1024px. On a tall screen Home fits, and its sheet
+ * ends a footer's height up from the foot of the screen, with the footer under it; a case study's
+ * runs on, its edge resting on the strip until its end comes up. Changing page jumped the edge from
+ * wherever it was to wherever the next page has it. So the page being left notes where its edge was
+ * seen, as a rise from the screen's foot, as it goes (in its layout cleanup, which runs ahead of
+ * the next page's layout effects, whatever took the reader there: a link, the router, the browser's
+ * back button), and the page arriving starts its own edge there, before its first paint, and runs
+ * it to where it belongs. Wherever the last page was scrolled to: at its top the edge is on the
+ * strip, at its end (where Previous and Next are) it is up off the footer, and in between anywhere
+ * between the two. Every page lands at its top (a link scrolls there just after this, the back
+ * button just before), so that is where this one's edge is measured, whatever the scroll is yet.
+ *   - Where this page's edge is the strip's (a case study), the strip
+ *     starts as tall as the last page's desk was and comes down to its own height, its copy of the
+ *     edge with it. The strip is the desk, grid and all, laid off the screen's foot, so a taller
+ *     strip is the same desk, and the sheet seems to run on down over it.
+ *   - Where it is the sheet's real end, on a page that fits (Home on a tall screen), the sheet
+ *     fills the screen above the footer, so a margin over the footer sets its length: the footer
+ *     starts with a margin of the difference, taking length off the sheet or, negative, giving it
+ *     more, and lets go, and the sheet runs on or draws back to its own end, its edge (.edge) with
+ *     it.
+ */
+
+/** The case-study sheet's settle (blog-post.module.css): its 500ms and its curve, so the sheet
+    comes to its length as it comes to rest. */
+const EDGE_HANDOFF_TIMING: KeyframeAnimationOptions = { duration: 500, easing: 'cubic-bezier(0.33, 1, 0.68, 1)' }
+/** From a navigation's start, when the back button's edge is noted, to the next page's mount, which
+    may wait on the network; anything later isn't that navigation. */
+const EDGE_HANDOFF_WINDOW_MS = 5000
+
+let departingEdge: { from: string; rise: number; at: number } | null = null
+
+function edgeHandoffApplies() {
+  return (
+    window.matchMedia('(max-width: 1023.98px)').matches &&
+    !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  )
+}
+
+function stripHeight() {
+  return parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--reveal-band-h')) || 0
+}
+
+/** How far up from the screen's foot the sheet's edge is seen: its real end, or the strip's top
+    while the end is further down. As things stand, or with the page at its top. */
+function edgeRise(edge: HTMLElement, strip: number, atTop = false) {
+  const top = edge.getBoundingClientRect().top + (atTop ? window.scrollY : 0)
+  return Math.max(strip, window.innerHeight - top)
+}
+
+function recordEdgeHandoff(edge: HTMLElement, from: string, risen: { rise: number; at: number } | null) {
+  const now = performance.now()
+  const rise =
+    risen && now - risen.at < EDGE_HANDOFF_WINDOW_MS ? risen.rise : edge.isConnected ? edgeRise(edge, stripHeight()) : null
+  departingEdge = rise !== null && edgeHandoffApplies() ? { from, rise, at: now } : null
+}
+
+function playEdgeHandoff(edge: HTMLElement, footer: HTMLElement, page: string) {
+  const handoff = departingEdge
+  departingEdge = null
+  // The same page is only React running a layout effect twice in development.
+  if (
+    !handoff ||
+    handoff.from === page ||
+    performance.now() - handoff.at > EDGE_HANDOFF_WINDOW_MS ||
+    !edgeHandoffApplies()
+  ) {
+    return
+  }
+
+  const strip = stripHeight()
+  const rise = edgeRise(edge, strip, true)
+  if (Math.abs(handoff.rise - rise) < 1) return
+
+  if (rise <= strip + 0.5) {
+    // This page's edge is the strip's: it can only start higher, the strip taller.
+    const band = document.querySelector<HTMLElement>('[data-reveal-band]')
+    if (band && handoff.rise > rise) {
+      band.animate([{ height: `${handoff.rise}px` }, { height: `${strip}px` }], EDGE_HANDOFF_TIMING)
+    }
+  } else if (document.documentElement.scrollHeight - window.innerHeight < 1) {
+    // Its real end, on a page that fits, so the sheet fills the screen above the footer: a margin
+    // over the footer takes length off the sheet, a negative one gives it more.
+    footer.animate([{ marginTop: `${handoff.rise - rise}px` }, { marginTop: '0px' }], EDGE_HANDOFF_TIMING)
+  }
+}
+
 /**
  * The footer under the full-bleed paper, below 1024px: the desk the paper is lifted off, with the
  * drafting grid and whatever the page ends on, uncovered as the paper scrolls up off it. It goes
@@ -177,13 +264,46 @@ export function RevealFooterText({ children, className, style, fromSheet = false
  * too.
  */
 export default function RevealFooter({ children, className, style, fromSheet = false }: RevealFooterProps) {
+  const edgeRef = useRef<HTMLDivElement>(null)
+  const footerRef = useRef<HTMLDivElement>(null)
+
+  // Below 1024px, between Home and a case study: the sheet's length runs on from where the last
+  // page's was (see the note above EDGE_HANDOFF_TIMING). Before the first paint, so the page is
+  // never seen at its own length first.
+  useLayoutEffect(() => {
+    const edge = edgeRef.current
+    const footer = footerRef.current
+    if (!edge || !footer) return
+    const page = window.location.pathname
+    playEdgeHandoff(edge, footer, page)
+
+    // The back and forward buttons have the page scrolled to its top before it is swapped out
+    // (app/layout.tsx), so by the cleanup the edge has been put back on the strip. The Navigation
+    // API's navigate event comes first, before anything has moved, so where it was seen is noted
+    // then. Without that API, popstate is the earliest there is, and already too late: the back
+    // button starts from the strip there, as if the page had been at its top.
+    // Traversals only: the router's own replaceState calls fire navigate too, after the scroll
+    // has gone to the top, and a link's push is still in place by the cleanup anyway.
+    let risen: { rise: number; at: number } | null = null
+    const noteEdge = (event: Event) => {
+      if ((event as Event & { navigationType?: string }).navigationType !== 'traverse') return
+      risen = { rise: edgeRise(edge, stripHeight()), at: performance.now() }
+    }
+    const navigation = (window as Window & { navigation?: EventTarget }).navigation
+    navigation?.addEventListener('navigate', noteEdge)
+    return () => {
+      navigation?.removeEventListener('navigate', noteEdge)
+      recordEdgeHandoff(edge, page, risen)
+    }
+  }, [])
+
   return (
     <>
-      <div aria-hidden className={styles.edge} />
+      <div ref={edgeRef} aria-hidden className={styles.edge} />
       {/* data-paper-grid-hold: from 1024px, where the footer comes out from under the sheet, the
           desk's grid stops following the scroll when the sheet's end reaches the foot of the
           screen (PaperGridBackground). */}
-      <div className={cn(styles.footer, fromSheet && styles.fromSheet)} data-paper-grid-hold={fromSheet || undefined}>
+      <div ref={footerRef} className={cn(styles.footer, fromSheet && styles.fromSheet)} data-paper-grid-hold={fromSheet || undefined}>
         <div className={styles.track}>
           <div className={styles.pinned}>
             <FooterContent className={className} style={style}>
@@ -217,7 +337,7 @@ export function RevealBand() {
     <>
       {/* The grid is a global class, shared with PaperGridBackground's own below 1024px
           (globals.css), so the two can't drift apart. */}
-      <div aria-hidden className={styles.band}>
+      <div aria-hidden data-reveal-band className={styles.band}>
         <div data-paper-grid-pointer className="paper-grid-strip" />
         <div className={styles.bandEdge} />
       </div>
