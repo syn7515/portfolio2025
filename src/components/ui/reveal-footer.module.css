@@ -111,6 +111,16 @@
     opacity: 0;
 }
 
+/* The post-to-post wipe (blog-post-transition-mask.tsx) clears the sheet and stops at its edge, so
+   the footer under the edge stays in view through it. Its text goes as the sheet's does, faded out
+   by the time the next page goes up, rather than there one frame and gone the next, when that
+   page's strip comes up over the footer. The next page's own copy is under its strip and then its
+   sheet until the wipe is cleared away. */
+:global(html[data-blog-mask-nav]) .text {
+    opacity: 0;
+    transition: opacity 240ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
 /* Flex column on the footer so this negative margin can't collapse through it: the footer's height
    has to come out as the track's minus the spacer, i.e. the content's. */
 .track {

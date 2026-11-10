@@ -164,13 +164,17 @@ export function RevealFooterText({ children, className, style, fromSheet = false
  * ends a footer's height up from the foot of the screen, with the footer under it; a case study's
  * runs on, its edge resting on the strip until its end comes up. Changing page jumped the edge from
  * wherever it was to wherever the next page has it. So the page being left notes where its edge was
- * seen, as a rise from the screen's foot, as it goes (in its layout cleanup, which runs ahead of
- * the next page's layout effects, whatever took the reader there: a link, the router, the browser's
- * back button), and the page arriving starts its own edge there, before its first paint, and runs
- * it to where it belongs. Wherever the last page was scrolled to: at its top the edge is on the
- * strip, at its end (where Previous and Next are) it is up off the footer, and in between anywhere
- * between the two. Every page lands at its top (a link scrolls there just after this, the back
- * button just before), so that is where this one's edge is measured, whatever the scroll is yet.
+ * seen, as it goes (in its layout cleanup, which runs ahead of the next page's layout effects,
+ * whatever took the reader there: a link, the router, the browser's back button), and the page
+ * arriving starts its own edge there, before its first paint, and runs it to where it belongs.
+ * Wherever the last page was scrolled to: at its top the edge is on the strip, at its end (where
+ * Previous and Next are) it is up off the footer, and in between anywhere between the two. Every
+ * page lands at its top (a link scrolls there just after this, the back button just before), so
+ * that is where this one's edge is measured, whatever the scroll is yet.
+ * Noted as a height down from the top of the screen, where both sheets start, not up from its foot:
+ * iOS Safari brings its toolbar back on a page change, and the foot of the screen comes up with it,
+ * so a rise from the foot put the edge that much higher on the next page than it was on the last.
+ * The post-to-post wipe stops at the same place (seenEdgeTop).
  *   - Where this page's edge is the strip's (a case study), the strip
  *     starts as tall as the last page's desk was and comes down to its own height, its copy of the
  *     edge with it. The strip is the desk, grid and all, laid off the screen's foot, so a taller
@@ -183,13 +187,22 @@ export function RevealFooterText({ children, className, style, fromSheet = false
  */
 
 /** The case-study sheet's settle (blog-post.module.css): its 500ms and its curve, so the sheet
-    comes to its length as it comes to rest. */
-const EDGE_HANDOFF_TIMING: KeyframeAnimationOptions = { duration: 500, easing: 'cubic-bezier(0.33, 1, 0.68, 1)' }
+    comes to its length as it comes to rest. Held for the first 90ms (fill: backwards), for two
+    reasons: the page has only just mounted, and a height runs on the main thread, which is busy
+    with it for that long and more on a phone, so a run started straight away lost its first
+    frames and jumped; and the post-to-post wipe stays over the sheet for about as long
+    (blog-post-transition-mask.tsx), so the edge moves as the next post's content comes up. */
+const EDGE_HANDOFF_TIMING: KeyframeAnimationOptions = {
+  duration: 500,
+  delay: 90,
+  fill: 'backwards',
+  easing: 'cubic-bezier(0.33, 1, 0.68, 1)',
+}
 /** From a navigation's start, when the back button's edge is noted, to the next page's mount, which
     may wait on the network; anything later isn't that navigation. */
 const EDGE_HANDOFF_WINDOW_MS = 5000
 
-let departingEdge: { from: string; rise: number; at: number } | null = null
+let departingEdge: { from: string; top: number; at: number } | null = null
 
 function edgeHandoffApplies() {
   return (
@@ -209,11 +222,26 @@ function edgeRise(edge: HTMLElement, strip: number, atTop = false) {
   return Math.max(strip, window.innerHeight - top)
 }
 
-function recordEdgeHandoff(edge: HTMLElement, from: string, risen: { rise: number; at: number } | null) {
+/** How far down from the top of the screen the sheet's edge is seen, as things stand. */
+function edgeTop(edge: HTMLElement) {
+  return window.innerHeight - edgeRise(edge, stripHeight())
+}
+
+/**
+ * Below 1024px, how far down from the top of the screen this page's sheet is seen to end, for
+ * something that has to stop at its edge (the post-to-post wipe, blog-post-transition-mask.tsx);
+ * null from 1024px, or on a page without the reveal footer.
+ */
+export function seenEdgeTop() {
+  const edge = document.querySelector<HTMLElement>('[data-reveal-edge]')
+  return edge && window.matchMedia('(max-width: 1023.98px)').matches ? edgeTop(edge) : null
+}
+
+function recordEdgeHandoff(edge: HTMLElement, from: string, noted: { top: number; at: number } | null) {
   const now = performance.now()
-  const rise =
-    risen && now - risen.at < EDGE_HANDOFF_WINDOW_MS ? risen.rise : edge.isConnected ? edgeRise(edge, stripHeight()) : null
-  departingEdge = rise !== null && edgeHandoffApplies() ? { from, rise, at: now } : null
+  const top =
+    noted && now - noted.at < EDGE_HANDOFF_WINDOW_MS ? noted.top : edge.isConnected ? edgeTop(edge) : null
+  departingEdge = top !== null && edgeHandoffApplies() ? { from, top, at: now } : null
 }
 
 function playEdgeHandoff(edge: HTMLElement, footer: HTMLElement, page: string) {
@@ -231,18 +259,20 @@ function playEdgeHandoff(edge: HTMLElement, footer: HTMLElement, page: string) {
 
   const strip = stripHeight()
   const rise = edgeRise(edge, strip, true)
-  if (Math.abs(handoff.rise - rise) < 1) return
+  // Where the last page's edge was, as a rise from this screen's foot, wherever that is now.
+  const from = window.innerHeight - handoff.top
+  if (Math.abs(from - rise) < 1) return
 
   if (rise <= strip + 0.5) {
     // This page's edge is the strip's: it can only start higher, the strip taller.
     const band = document.querySelector<HTMLElement>('[data-reveal-band]')
-    if (band && handoff.rise > rise) {
-      band.animate([{ height: `${handoff.rise}px` }, { height: `${strip}px` }], EDGE_HANDOFF_TIMING)
+    if (band && from > rise) {
+      band.animate([{ height: `${from}px` }, { height: `${strip}px` }], EDGE_HANDOFF_TIMING)
     }
   } else if (document.documentElement.scrollHeight - window.innerHeight < 1) {
     // Its real end, on a page that fits, so the sheet fills the screen above the footer: a margin
     // over the footer takes length off the sheet, a negative one gives it more.
-    footer.animate([{ marginTop: `${handoff.rise - rise}px` }, { marginTop: '0px' }], EDGE_HANDOFF_TIMING)
+    footer.animate([{ marginTop: `${from - rise}px` }, { marginTop: '0px' }], EDGE_HANDOFF_TIMING)
   }
 }
 
@@ -284,22 +314,22 @@ export default function RevealFooter({ children, className, style, fromSheet = f
     // button starts from the strip there, as if the page had been at its top.
     // Traversals only: the router's own replaceState calls fire navigate too, after the scroll
     // has gone to the top, and a link's push is still in place by the cleanup anyway.
-    let risen: { rise: number; at: number } | null = null
+    let noted: { top: number; at: number } | null = null
     const noteEdge = (event: Event) => {
       if ((event as Event & { navigationType?: string }).navigationType !== 'traverse') return
-      risen = { rise: edgeRise(edge, stripHeight()), at: performance.now() }
+      noted = { top: edgeTop(edge), at: performance.now() }
     }
     const navigation = (window as Window & { navigation?: EventTarget }).navigation
     navigation?.addEventListener('navigate', noteEdge)
     return () => {
       navigation?.removeEventListener('navigate', noteEdge)
-      recordEdgeHandoff(edge, page, risen)
+      recordEdgeHandoff(edge, page, noted)
     }
   }, [])
 
   return (
     <>
-      <div ref={edgeRef} aria-hidden className={styles.edge} />
+      <div ref={edgeRef} aria-hidden data-reveal-edge className={styles.edge} />
       {/* data-paper-grid-hold: from 1024px, where the footer comes out from under the sheet, the
           desk's grid stops following the scroll when the sheet's end reaches the foot of the
           screen (PaperGridBackground). */}

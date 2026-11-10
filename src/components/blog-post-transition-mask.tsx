@@ -12,6 +12,7 @@ import {
   type BlogPostMaskDirection,
   type BlogPostMaskNavigationDetail,
 } from '@/lib/blog-post-mask-transition'
+import { seenEdgeTop } from '@/components/ui/reveal-footer'
 import styles from './blog-post-transition-mask.module.css'
 
 type MaskPhase = 'idle' | 'preparing' | 'covering'
@@ -25,6 +26,15 @@ export default function BlogPostTransitionMask() {
   const pathname = usePathname()
   const [phase, setPhase] = useState<MaskPhase>('idle')
   const [direction, setDirection] = useState<BlogPostMaskDirection>('next')
+  // The wipe crosses the sheet, not the screen: it stops at the sheet's edge as it is seen when
+  // the wipe starts, above the desk and the footer (on the strip at the top of a post, up off the
+  // footer at its end, where Previous and Next are). Painted down over them, it read as the sheet
+  // suddenly filling the screen, and then the next post drew its edge back down from the old one.
+  // The desk stays put through the wipe and the footer's text fades (ui/reveal-footer.module.css);
+  // the next post then takes its edge up from exactly here and runs it to its own (ui/reveal-footer).
+  // Measured, and so held, from the top of the screen, as that is: iOS Safari brings its toolbar
+  // back on the page change, and the foot of the screen comes up with it.
+  const [edgeTop, setEdgeTop] = useState<number | null>(null)
   const activeRef = useRef(false)
   const hrefRef = useRef<string | null>(null)
   const departurePathRef = useRef<string | null>(null)
@@ -50,6 +60,7 @@ export default function BlogPostTransitionMask() {
       departurePathRef.current = pathname
       markBlogPostMaskNavigation()
       setDirection(nextDirection)
+      setEdgeTop(seenEdgeTop())
       setPhase('preparing')
     }
 
@@ -117,6 +128,7 @@ export default function BlogPostTransitionMask() {
       className={styles.mask}
       data-direction={direction}
       data-phase={phase}
+      style={edgeTop === null ? undefined : { bottom: 'auto', height: edgeTop }}
     />
   )
 }
