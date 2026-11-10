@@ -186,8 +186,15 @@ export function CarouselCard({
           layouts' top fade and the reveal footer's at the foot): a screenshot or a running
           prototype reads whole right up to the screen's edge, while its caption is text and fades
           with the text around it. It works at the root stacking level because the case-study
-          paper deliberately isn't a stacking context (blog-post-layout.tsx). */}
-      <div className={`relative z-[50] w-full${isHiddenByLightbox ? " opacity-0 pointer-events-none" : ""}`}>
+          paper deliberately isn't a stacking context (blog-post-layout.tsx), and nor is anything
+          between: the post's entrance fades and unblurs this and the caption after it
+          (data-carousel-reveal, blog-post.module.css) rather than the carousel around them, since
+          an opacity or a filter on any ancestor would hold the card under the fades until it had
+          played out. */}
+      <div
+        data-carousel-reveal
+        className={`relative z-[50] w-full${isHiddenByLightbox ? " opacity-0 pointer-events-none" : ""}`}
+      >
         <motion.div
           ref={cardRef}
           initial={false}

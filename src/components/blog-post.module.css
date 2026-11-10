@@ -173,11 +173,15 @@
 
     /* Opacity overlaps the sheet's final 190ms for responsiveness. Blur starts closer to the
        landing frame so it remains visible after the sheet clears. Both keyed to the sheet's 400ms
-       landing frame (paper-entrance-dismiss). */
+       landing frame (paper-entrance-dismiss).
+       A carousel comes in card by card and caption by caption (data-carousel-reveal), not as a
+       whole: an opacity or a filter on the carousel would make it a stacking context and hold its
+       cards (z-[50]) under the screen's edge fades (z-40) until the reveal had played out, then
+       let them jump over. On a card itself the z-index still counts at the page's level. */
     .contentBlurRevealItem,
     .contentBlurReveal > :not(:has([data-carousel])),
     .contentBlurReveal > * > :not(:has([data-carousel])),
-    .contentBlurReveal [data-carousel-layer] {
+    .contentBlurReveal :is([data-carousel-reveal], [data-carousel-reveal] ~ *) {
         animation:
             content-opacity-reveal 350ms cubic-bezier(0.23, 1, 0.32, 1) 210ms backwards,
             content-blur-reveal 300ms cubic-bezier(0.23, 1, 0.32, 1) 350ms backwards;
@@ -226,7 +230,7 @@
     .contentBlurRevealItem,
     .contentBlurReveal > :not(:has([data-carousel])),
     .contentBlurReveal > * > :not(:has([data-carousel])),
-    .contentBlurReveal [data-carousel-layer] {
+    .contentBlurReveal :is([data-carousel-reveal], [data-carousel-reveal] ~ *) {
         animation: none;
     }
 }
@@ -265,25 +269,25 @@
 .contentBlurRevealItem,
 .contentBlurReveal > :not(:has([data-carousel])),
 .contentBlurReveal > * > :not(:has([data-carousel])),
-.contentBlurReveal [data-carousel-layer]),
+.contentBlurReveal :is([data-carousel-reveal], [data-carousel-reveal] ~ *)),
 :global(html[data-blog-mask-nav]) :is(.paperEntranceOverlay,
 .paperUnderlay,
 .contentBlurRevealItem,
 .contentBlurReveal > :not(:has([data-carousel])),
 .contentBlurReveal > * > :not(:has([data-carousel])),
-.contentBlurReveal [data-carousel-layer]),
+.contentBlurReveal :is([data-carousel-reveal], [data-carousel-reveal] ~ *)),
 :global(html[data-page-reload]) :is(.paperEntranceOverlay,
 .paperUnderlay,
 .contentBlurRevealItem,
 .contentBlurReveal > :not(:has([data-carousel])),
 .contentBlurReveal > * > :not(:has([data-carousel])),
-.contentBlurReveal [data-carousel-layer]),
+.contentBlurReveal :is([data-carousel-reveal], [data-carousel-reveal] ~ *)),
 .paperNoEntrance :is(.paperEntranceOverlay,
 .paperUnderlay,
 .contentBlurRevealItem,
 .contentBlurReveal > :not(:has([data-carousel])),
 .contentBlurReveal > * > :not(:has([data-carousel])),
-.contentBlurReveal [data-carousel-layer]) {
+.contentBlurReveal :is([data-carousel-reveal], [data-carousel-reveal] ~ *)) {
     animation: none;
 }
 
@@ -310,7 +314,7 @@
         .contentBlurRevealItem,
         .contentBlurReveal > :not(:has([data-carousel])),
         .contentBlurReveal > * > :not(:has([data-carousel])),
-        .contentBlurReveal [data-carousel-layer]
+        .contentBlurReveal :is([data-carousel-reveal], [data-carousel-reveal] ~ *)
     ) {
         animation:
             content-opacity-reveal 350ms cubic-bezier(0.23, 1, 0.32, 1) both,
