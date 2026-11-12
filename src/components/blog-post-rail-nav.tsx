@@ -189,7 +189,9 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
         onClick={handleHomeClick}
         aria-label="Back to home"
         className={cn(
-          'hidden sheet:flex h-8 w-14 items-center rounded-full pl-2',
+          // 64x48 of hit area, laid out as the old 56x32: the negative margins give the extra back to
+          // the cluster, so the glyph and the gap to the ticks stay where they were.
+          'hidden sheet:flex h-12 w-16 -my-2 -ml-2 items-center rounded-full pl-4',
           // The ≥1200px sidebar Home link's colour, a step darker in light mode: there a lone 16px
           // glyph on the drafting grid read fainter than that link's word in the same stone-400.
           // In dark mode they match. The glyph carries the hover by itself; no hover background
@@ -204,8 +206,8 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
           transition: 'color 300ms ease-out, scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
         }}
       >
-        {/* The 56x32 box is hit area, not a drawn shape — the same width the tick rows use, so the
-            whole cluster answers to one reach. */}
+        {/* The box is hit area, not a drawn shape; its right edge lines up with the tick rows', so
+            the whole cluster answers to one reach. */}
         <Undo2 className="size-4 flex-shrink-0 -translate-y-px" aria-hidden />
       </Link>
 
