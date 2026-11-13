@@ -450,8 +450,8 @@
     // headerCleanSwitchColor(): no recipe / standby → black, READY → green, else red.
     const color = !d.recipe || d.phase === 'standby' ? 'black' : d.isReady ? 'green' : 'red';
     sw.dataset.color = color;
-    sw.classList.remove('bg-black/50', 'shadow-switch-red', 'bg-black/20', 'bg-white/18!');
-    slide.classList.remove('bg-[rgb(245,96,96)]/50', 'bg-[#46CB89]/40', 'shadow-[0px_0px_12px_0px_rgba(0,0,0,0.25)]', 'bg-white/20!');
+    sw.classList.remove('bg-black/50', 'shadow-switch-red', 'bg-black/20', 'bg-white/18!', 'bg-white/10!');
+    slide.classList.remove('bg-[rgb(245,96,96)]/50', 'bg-[#46CB89]/40', 'shadow-[0px_0px_12px_0px_rgba(0,0,0,0.25)]', 'bg-white/20!', 'bg-white/15!');
     if (color === 'red') {
       sw.classList.add('bg-black/50', 'shadow-switch-red');
       slide.classList.add('bg-[rgb(245,96,96)]/50');
@@ -459,8 +459,10 @@
       sw.classList.add('bg-black/20');
       slide.classList.add('bg-[#46CB89]/40', 'shadow-[0px_0px_12px_0px_rgba(0,0,0,0.25)]');
     } else {
-      sw.classList.add('bg-white/18!');
-      slide.classList.add('bg-white/20!');
+      // portfolio: v19's switch on black, lighter — track white 10 % (18), knob white 15 % (20), to the red and green
+      // screens' weight (recipe-proto v19 00ac52a)
+      sw.classList.add('bg-white/10!');
+      slide.classList.add('bg-white/15!');
     }
     // v0-3: the switch shows CLEAN while clean mode is on
     const on = state.mode === 'clean';
@@ -485,15 +487,21 @@
     const knob = $('cc-knob');
     if (!ccDragging) knob.style.transform = `translateX(${CC_CENTER(CC_POS.findIndex((p) => p.id === cc.selected)) - 40}px)`;
     knob.classList.toggle('is-disabled', cc.positioning);
+    // portfolio: v20's button (clean-mode.js) — there only while there's somewhere to go. Gone (idle), it keeps the
+    // words it left with while it fades.
     const cta = $('cc-cta');
-    const st = cc.positioning ? 'positioning' : cc.selected === cc.current ? 'ready' : 'getReady';
+    const st = cc.positioning ? 'positioning' : cc.selected === cc.current ? 'idle' : 'getReady';
     const area = CC_POS.find((p) => p.id === cc.selected).label;
-    cta.classList.toggle('is-go', st === 'getReady');
-    cta.classList.toggle('is-positioning', st === 'positioning');
+    cta.dataset.state = st;
+    cta.classList.toggle('is-moving', st === 'positioning');
     cta.classList.toggle('is-pressed', cc.pressed);
     cta.disabled = st !== 'getReady';
-    $('cc-spinner').toggleAttribute('hidden', st !== 'positioning');
-    $('cc-cta-label').textContent = st === 'positioning' ? 'Repositioning' : st === 'ready' ? `Ready to clean the ${area}` : `Get ready to clean the ${area}`;
+    const go = $('cc-cta-go'), moving = $('cc-cta-moving');
+    if (st === 'getReady') { const t = `Get ready to clean the ${area}`; if (go.textContent !== t) go.textContent = t; }
+    else if (st === 'positioning') {
+      if (window.ProtoSheen) ProtoSheen.set(moving, 'Positioning', { base: 'rgb(255 255 255 / 70%)', hl: '#fff' });
+      else moving.textContent = 'Positioning';
+    }
   }
   let ccTimer = null;
   function ccSelect(id) { if (state.cc.positioning) return; state.cc.selected = id; render(); }

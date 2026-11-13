@@ -382,6 +382,28 @@ svg:has(> use[href="#i-recipe-change"]), svg:has(> use[href="#i-unload"]), svg:h
 /* portfolio: the clean ring is drawn at the grill ring's size (cook.js), 12.5 in on each side, so the
    pill narrows by as much (490 → 465) to keep its top corners as far off the ticks. */
 .cc-explain { width: 465px; }
+/* ── portfolio: the button as v20's (recipe-proto v20, shared/js/clean-mode.js): 조리 시작's pill, there only while there's
+   somewhere to go. Another area chosen, "Get ready to clean the …" fades in rising 8 (300ms, ease-out); pressed #aaa; tapped,
+   it turns quiet — white 12 %, "Positioning" in white 70 % with the shared sheen (shared/js/sheen.js; no spinner) — and fades
+   out (180ms) when the grill is there. Its colour and words change back only once it's gone (the 180ms delays), so
+   "Positioning" doesn't flash white on its way out. No "Ready to clean": the knob on the area says where the grill is.
+   Its place in the layout stays (opacity, not display), so the slider doesn't move. Its touch area: 40 above it, to the
+   screen's sides and bottom, as v20's. */
+.cc-cta { position: relative; display: grid; place-items: center; gap: 0; background: #fff; color: #000; font-weight: 500; white-space: nowrap;
+  opacity: 0; transform: translateY(8px); pointer-events: none;
+  transition: opacity 180ms ease-out, transform 180ms ease-out, background-color 0s 180ms; }
+.cc-cta::before { content: ''; position: absolute; inset: -40px -27px -47px; }
+.cc-cta > span { grid-area: 1 / 1; transition: opacity 0s 180ms; }
+.cc-cta:is([data-state="getReady"], [data-state="positioning"]) { opacity: 1; transform: none;
+  transition: opacity 300ms cubic-bezier(0.23, 1, 0.32, 1), transform 300ms cubic-bezier(0.23, 1, 0.32, 1), background-color 200ms ease; }
+.cc-cta:is([data-state="getReady"], [data-state="positioning"]) > span { transition: opacity 150ms ease; }
+.cc-cta[data-state="getReady"] { pointer-events: auto; cursor: pointer; }
+.cc-cta[data-state="getReady"]:is(:active, .is-pressed) { background: #aaa; transition-duration: 300ms, 300ms, 0s; }
+.cc-cta.is-moving { background: rgb(255 255 255 / 12%); }
+.cc-cta.is-moving .cc-cta-go, .cc-cta:not(.is-moving) .cc-cta-moving { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .cc-cta { transform: none; } }
+.no-anim .cc-cta, .no-anim .cc-cta > span { transition: none !important; }
+
 /* Repositioning: the labels dim with the header. */
 #cook-container.is-positioning ~ * .cc-label, .cc-marker:disabled .cc-label { color: rgb(255 255 255 / 40%); }
 .cc-marker:disabled .cc-tick { background: rgb(255 255 255 / 25%); }
@@ -568,3 +590,33 @@ svg:has(> use[href="#i-recipe-change"]), svg:has(> use[href="#i-unload"]), svg:h
 }
 #sheet-list > button.sheet-row-on::before { background-color: rgb(0 0 0 / 25%); }
 #sheet-list > button:is(:active, .is-pressed)::before { background-color: rgb(0 0 0 / 35%); }
+
+/* ── portfolio: the cook screen's header as recipe-proto v20 has it (from v18 · v19; Prototypes repo, quick button,
+   recipe-proto/v20/css/proto.css). The headers 100 → 108 tall, so what's in them sits 4 lower; nothing under the cook
+   screen's header moves (margin-bottom −8). The 그릴 / 마감 청소 switch 296 × 64 (276 × 60), its track radius 20 and knob 14
+   (12 / 8), lighter on black (track white 10 %, knob white 15 %: cook.js) and on red (track black 30 %, its inner shadow
+   25 %); the knob eases across (250ms, strong ease-out) with the labels. ☰ and 온도 give up 12 each on their inner side so
+   the switch stays centred; their pressed scrim 72 square, radius 20 (64, 10), white 10 % on black and black 12 % on green;
+   one touch band 0 → 112 across the header (☰ 0–152, the switch 152–448, 온도 448–600). Icon line ends cut square. */
+html #cook-container header { height: 108px; margin-bottom: -8px; }
+html #cook-container header > * { z-index: 1; }
+html #clean-switch { width: 296px; height: 64px; border-radius: 20px; overflow: visible; transition: background-color 600ms ease, box-shadow 600ms ease, opacity 200ms ease; }
+html #switch-slide { border-radius: 14px; transition: translate 250ms cubic-bezier(0.23, 1, 0.32, 1), transform 250ms cubic-bezier(0.23, 1, 0.32, 1), background-color 600ms ease, box-shadow 600ms ease; }
+html :is(#switch-left, #switch-right) { transition: opacity 250ms cubic-bezier(0.23, 1, 0.32, 1); }
+@media (prefers-reduced-motion: reduce) {
+  html #switch-slide { transition: translate 250ms cubic-bezier(0.23, 1, 0.32, 1); }
+  html #clean-switch { transition: none; }
+}
+html #clean-switch[data-color="red"] { background-color: rgb(0 0 0 / 30%); box-shadow: inset 0 0 12px 0 rgb(0 0 0 / 25%); }
+html #clean-switch::after { top: -30px; bottom: -18px; left: 0; right: 0; }
+html #menu-btn { padding-right: 52px; }
+html #temp-btn { padding-left: 52px; }
+html :is(#menu-btn, #temp-btn) { position: relative; }
+html :is(#menu-btn, #temp-btn)::before { content: ""; position: absolute; inset: -12px 0 0; }
+html :is(#menu-btn, #temp-btn) > div { padding: 16px; margin: -4px; border-radius: 20px; }
+html #menu-btn > div { margin-left: 0; }
+html #temp-btn > div { margin-right: 0; }
+html :is(#menu-btn, #temp-btn):active > div { background-color: rgb(255 255 255 / 10%); }
+html #cook-container.bg-cook-ready-to-cook :is(#menu-btn, #temp-btn):active > div { background-color: rgb(0 0 0 / 12%); }
+html #cook-container header [stroke-linecap="round"] { stroke-linecap: square; }
+html #cook-container header [stroke-linejoin="round"] { stroke-linejoin: miter; }

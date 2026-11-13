@@ -468,8 +468,8 @@
     // headerCleanSwitchColor(): no recipe / standby → black, READY → green, else red.
     const color = !d.recipe || d.phase === 'standby' ? 'black' : cook ? (cook.phase === 'waitMelt' ? 'green' : 'red') : d.isReady ? 'green' : 'red';
     sw.dataset.color = color;
-    sw.classList.remove('bg-black/50', 'shadow-switch-red', 'bg-black/20', 'bg-white/18!');
-    slide.classList.remove('bg-[rgb(245,96,96)]/50', 'bg-[#46CB89]/40', 'shadow-[0px_0px_12px_0px_rgba(0,0,0,0.25)]', 'bg-white/20!');
+    sw.classList.remove('bg-black/50', 'shadow-switch-red', 'bg-black/20', 'bg-white/18!', 'bg-white/10!');
+    slide.classList.remove('bg-[rgb(245,96,96)]/50', 'bg-[#46CB89]/40', 'shadow-[0px_0px_12px_0px_rgba(0,0,0,0.25)]', 'bg-white/20!', 'bg-white/15!');
     if (color === 'red') {
       sw.classList.add('bg-black/50', 'shadow-switch-red');
       slide.classList.add('bg-[rgb(245,96,96)]/50');
@@ -477,8 +477,10 @@
       sw.classList.add('bg-black/20');
       slide.classList.add('bg-[#46CB89]/40', 'shadow-[0px_0px_12px_0px_rgba(0,0,0,0.25)]');
     } else {
-      sw.classList.add('bg-white/18!');
-      slide.classList.add('bg-white/20!');
+      // portfolio: v19's switch on black, lighter — track white 10 % (18), knob white 15 % (20), to the red and green
+      // screens' weight (recipe-proto v19 00ac52a)
+      sw.classList.add('bg-white/10!');
+      slide.classList.add('bg-white/15!');
     }
     $('switch-left').textContent = d.str.grill;
     $('switch-right').textContent = d.str.clean;

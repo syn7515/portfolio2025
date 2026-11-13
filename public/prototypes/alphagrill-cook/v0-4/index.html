@@ -239,7 +239,8 @@
                   </div>
                 </div>
                 <div class="cc-bottom">
-                  <button type="button" id="cc-cta" class="cc-cta"><svg id="cc-spinner" class="cc-spinner" viewBox="0 0 24 24" hidden aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span id="cc-cta-label"></span></button>
+                  <!-- portfolio: v20's button (recipe-proto v20, shared/js/clean-mode.js) — there only while there's somewhere to go: "Get ready to clean the …" fades in rising 8 once another area is chosen; tapped, it turns quiet, "Positioning" with the shared sheen (no spinner), and fades out when the grill is there. No "Ready to clean". -->
+                  <button type="button" id="cc-cta" class="cc-cta" data-state="idle" disabled><span id="cc-cta-go" class="cc-cta-go"></span><span id="cc-cta-moving" class="cc-cta-moving"></span></button>
                 </div>
               </section>
             </div>
@@ -352,6 +353,7 @@
 </div>
 
 <script src="../shared/js/app.js"></script>
+<script src="../shared/js/sheen.js"></script>   <!-- portfolio: v20's shimmer for "Positioning" -->
 <script src="js/cook.js"></script>
 </body>
 </html>
