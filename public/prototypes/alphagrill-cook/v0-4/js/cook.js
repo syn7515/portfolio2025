@@ -892,25 +892,23 @@
   if (demoCcBtn) demoCcBtn.addEventListener('click', startDemoController);
   if (params.get('demo') === 'clean2') setTimeout(startDemoController, 1000);
 
-  // TEMP (v0-2) dev-bar select: quick-action icons as outline or filled glyphs.
+  // TEMP (v0-2) dev-bar select: quick-action icons as outline or filled glyphs — portfolio: or, the default, the app's own
+  // (as recipe-proto v20's gauge screen has them: #i-recipe-change, #i-scrape). The default no longer comes from storage, so
+  // a choice left from before doesn't bring the book and scraper back; the select still tries the others for the session.
   const qaIcons = document.querySelector('[data-dev="qa-icons"]');
   if (qaIcons) {
     const ICONS = {
+      app: { 'qa-recipe': '#i-recipe-change', 'qa-scrape': '#i-scrape' },
       line: { 'qa-recipe': '#i-recipe-book', 'qa-scrape': '#i-scraper' },
       fill: { 'qa-recipe': '#i-recipe-book-fill', 'qa-scrape': '#i-scraper-fill' },
     };
-    let v = 'line';
-    try { v = localStorage.getItem('proto:v0-4-qa-icons') || 'fill'; } catch (e) { /* ignore */ }
     const apply = (val) => {
       Object.entries(ICONS[val]).forEach(([id, href]) => $(id).querySelector('use').setAttribute('href', href));
       $('action-panel').dataset.qaIcons = val;   // lets proto.css tone the filled glyphs down
     };
-    qaIcons.value = v;
-    apply(v);
-    qaIcons.addEventListener('change', () => {
-      apply(qaIcons.value);
-      try { localStorage.setItem('proto:v0-4-qa-icons', qaIcons.value); } catch (e) { /* ignore */ }
-    });
+    qaIcons.value = 'app';
+    apply('app');
+    qaIcons.addEventListener('change', () => apply(qaIcons.value));
   }
 
   // ── portfolio: the video demos on someone else's clock ──────────────────

@@ -620,3 +620,47 @@ html :is(#menu-btn, #temp-btn):active > div { background-color: rgb(255 255 255 
 html #cook-container.bg-cook-ready-to-cook :is(#menu-btn, #temp-btn):active > div { background-color: rgb(0 0 0 / 12%); }
 html #cook-container header [stroke-linecap="round"] { stroke-linecap: square; }
 html #cook-container header [stroke-linejoin="round"] { stroke-linejoin: miter; }
+
+/* ── portfolio: the three quick actions' icons as recipe-proto v20's gauge screen (the app's): 레시피 변경's turning arrows
+   (#i-recipe-change) and 간이 청소's scraper glyph (#i-scrape) in place of v0-2's filled book and scraper, all three at the app's
+   64 — the two in white, the unload arrow in its state colour at full strength (the 44 / 52, grey and 80 % went with the
+   filled icons). The labels stay as they were. */
+html :is(#qa-recipe, #qa-scrape) > svg { width: 64px; height: 64px; margin-block: 0; color: #fff; opacity: 1; }
+html #cook-container:is(.bg-cook-preparing, .bg-cook-ready-to-cook) :is(#qa-recipe, #qa-scrape) > svg { color: #fff; }
+html #qa-unload > svg { width: 64px; height: 64px; margin-block: 0; opacity: 1; }
+
+/* ── portfolio: pressing as recipe-proto v20 has it — less scrim, a small shrink (in 100ms, back in 200ms, ease-out).
+   · 레시피 변경 · 배출 · 간이 청소: no box — the button shrinks to 0.96 and dims to 60 % at once, back in 150ms; their taps
+     reach 24 above, and 40 below while 조리 시작 can't be tapped.
+   · 조리 시작 (and the gauge's 레시피 선택) 0.98; header and sheet icons (☰, 온도, ‹, ✕) only the icon, 0.92.
+   · 그릴 ↔ 마감 청소: the label the tap will switch to lights up at once and shrinks to 0.94, the track under a black 10 % wash;
+     the knob takes the lit edge.
+   · The recipe sheet's rows 0.97 (the selected fill with them), its ‹ › icons 0.92. */
+html { --v20-lit-edge: inset 0 1px 0 rgb(255 255 255 / 10%), inset 0 0 1px rgb(255 255 255 / 30%); }
+html :is(#qa-recipe, #qa-unload, #qa-scrape) { position: relative; z-index: 11; border-radius: 24px; transition: scale 150ms ease-out, opacity 150ms ease-out; }
+html #cook-container :is(#qa-recipe, #qa-unload, #qa-scrape):is(:active, .is-pressed) { background-color: transparent !important; scale: 0.96; opacity: 0.6; transition-duration: 0s; }
+html :is(#qa-recipe, #qa-unload, #qa-scrape)::after { content: ""; position: absolute; left: 0; right: 0; top: -24px; bottom: 0; }
+html #action-panel:has(#primary-btn[aria-disabled="true"]) :is(#qa-recipe, #qa-unload, #qa-scrape)::after { bottom: -40px; }
+html #primary-btn > div > span { transition: scale 200ms ease-out, background-color 150ms, color 150ms; }
+html #primary-btn:is(:active, .is-pressed):not([aria-disabled="true"]) > div > span { scale: .98; transition-duration: 100ms, 0s, 0s; }
+html #primary-btn.grid-start { transition: scale 200ms ease-out, background-color 150ms; }
+html #primary-btn.grid-start:is(:active, .is-pressed):not(:disabled) { scale: .98; transition-duration: 100ms, 0s; }
+html #select-trigger { transition: scale 200ms ease-out, background-color 150ms; }
+html #select-trigger:is(:active, .is-pressed) { scale: .98; transition-duration: 100ms, 0s; }
+html :is(header button, [data-action="sheet-back"], [data-action="sheet-header-close"], [data-action="temp-close"]) svg { transition: scale 200ms ease-out; }
+html :is(header button, [data-action="sheet-back"], [data-action="sheet-header-close"], [data-action="temp-close"]):is(:active, .is-pressed) svg { scale: .92; transition-duration: 100ms; }
+html #switch-slide { box-shadow: var(--v20-lit-edge); }
+html #clean-switch:active:not([data-disabled]):not(:disabled) { background-image: linear-gradient(rgb(0 0 0 / 10%), rgb(0 0 0 / 10%)); transition-duration: 0s; }
+html #clean-switch:active:not([data-disabled]):not(:disabled)[data-unchecked] #switch-right,
+html #clean-switch:active:not([data-disabled]):not(:disabled)[data-checked] #switch-left { opacity: 1; scale: .94; transition: opacity 0s, scale 100ms ease-out; }
+html :is(button[data-select-recipe], button[data-select-option]) { transition: scale 200ms ease-out, background-color 150ms, opacity 150ms; }
+html :is(button[data-select-recipe], button[data-select-option]):is(:active, .is-pressed) { scale: .97; transition-duration: 100ms, 0s, 0s; }
+html :is(#sheet-prev, #sheet-next) svg { transition: scale 200ms ease-out; }
+html :is(#sheet-prev, #sheet-next):is(:active, .is-pressed):not(:disabled) svg { scale: .92; transition-duration: 100ms; }
+
+/* ── portfolio: v20's presses on the clean screens — Clean anyway and its pressed box 0.97; the controller's button 0.98. */
+html .clean-anyway { transition: scale 200ms ease-out, background-color 150ms; }
+html .clean-anyway:is(:active, .is-pressed) { scale: .97; transition-duration: 100ms, 0s; }
+html .cc-cta[data-state="getReady"]:is(:active, .is-pressed) { scale: .98; }
+html .cc-cta:is([data-state="getReady"], [data-state="positioning"]) { transition: opacity 300ms cubic-bezier(0.23, 1, 0.32, 1), transform 300ms cubic-bezier(0.23, 1, 0.32, 1), background-color 200ms ease, scale 200ms ease-out; }
+html .cc-cta[data-state="getReady"]:is(:active, .is-pressed) { transition-duration: 300ms, 300ms, 0s, 100ms; }

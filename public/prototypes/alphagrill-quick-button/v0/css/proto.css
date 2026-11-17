@@ -1012,3 +1012,81 @@ html[data-from-variant="v15"] #app-setting .qs-bg { border-radius: 16px; }
 html[data-from-variant="v15"] #app-setting main { padding-bottom: 80px; }
 html[data-from-variant="v15"] :is(#app-setting, #app-recipe) { --page-close-ms: 110; }
 html[data-from-variant="v15"] :is(#app-setting, #app-recipe).is-closing { animation-duration: 110ms; animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1); }
+
+/* ── portfolio: the three quick actions' icons as recipe-proto v20's gauge screen (the app's): 레시피 변경's turning arrows
+   (#i-recipe-change) and 간이 청소's scraper glyph (#i-scrape) in place of v0-2's filled book and scraper, all three at the app's
+   64 — the two in white, the unload arrow in its state colour at full strength (the 44 / 52, grey and 80 % went with the
+   filled icons). The labels stay as they were. */
+html[data-from-variant="v15"] :is(#qa-recipe, #qa-scrape) > svg { width: 64px; height: 64px; margin-block: 0; color: #fff; opacity: 1; }
+html[data-from-variant="v15"] #cook-container:is(.bg-cook-preparing, .bg-cook-ready-to-cook) :is(#qa-recipe, #qa-scrape) > svg { color: #fff; }
+html[data-from-variant="v15"] #qa-unload > svg { width: 64px; height: 64px; margin-block: 0; opacity: 1; }
+
+/* ── portfolio: pressing as recipe-proto v20 has it — less scrim, a small shrink (in 100ms, back in 200ms, ease-out).
+   · 레시피 변경 · 배출 · 간이 청소: no box — the button shrinks to 0.96 and dims to 60 % at once, back in 150ms; their taps
+     reach 24 above, and 40 below while 조리 시작 can't be tapped.
+   · 조리 시작 (and the gauge's 레시피 선택) 0.98; header and sheet icons (☰, 온도, ‹, ✕) only the icon, 0.92.
+   · 그릴 ↔ 마감 청소: the label the tap will switch to lights up at once and shrinks to 0.94, the track under a black 10 % wash;
+     the knob takes the lit edge.
+   · The recipe sheet's rows 0.97 (the selected fill with them), its ‹ › icons 0.92. */
+html[data-from-variant="v15"] { --v20-lit-edge: inset 0 1px 0 rgb(255 255 255 / 10%), inset 0 0 1px rgb(255 255 255 / 30%); }
+html[data-from-variant="v15"] :is(#qa-recipe, #qa-unload, #qa-scrape) { position: relative; z-index: 11; border-radius: 24px; transition: scale 150ms ease-out, opacity 150ms ease-out; }
+html[data-from-variant="v15"] #cook-container :is(#qa-recipe, #qa-unload, #qa-scrape):is(:active, .is-pressed) { background-color: transparent !important; scale: 0.96; opacity: 0.6; transition-duration: 0s; }
+html[data-from-variant="v15"] :is(#qa-recipe, #qa-unload, #qa-scrape)::after { content: ""; position: absolute; left: 0; right: 0; top: -24px; bottom: 0; }
+html[data-from-variant="v15"] #action-panel:has(#primary-btn[aria-disabled="true"]) :is(#qa-recipe, #qa-unload, #qa-scrape)::after { bottom: -40px; }
+html[data-from-variant="v15"] #primary-btn > div > span { transition: scale 200ms ease-out, background-color 150ms, color 150ms; }
+html[data-from-variant="v15"] #primary-btn:is(:active, .is-pressed):not([aria-disabled="true"]) > div > span { scale: .98; transition-duration: 100ms, 0s, 0s; }
+html[data-from-variant="v15"] #primary-btn.grid-start { transition: scale 200ms ease-out, background-color 150ms; }
+html[data-from-variant="v15"] #primary-btn.grid-start:is(:active, .is-pressed):not(:disabled) { scale: .98; transition-duration: 100ms, 0s; }
+html[data-from-variant="v15"] #select-trigger { transition: scale 200ms ease-out, background-color 150ms; }
+html[data-from-variant="v15"] #select-trigger:is(:active, .is-pressed) { scale: .98; transition-duration: 100ms, 0s; }
+html[data-from-variant="v15"] :is(header button, [data-action="sheet-back"], [data-action="sheet-header-close"], [data-action="temp-close"]) svg { transition: scale 200ms ease-out; }
+html[data-from-variant="v15"] :is(header button, [data-action="sheet-back"], [data-action="sheet-header-close"], [data-action="temp-close"]):is(:active, .is-pressed) svg { scale: .92; transition-duration: 100ms; }
+html[data-from-variant="v15"] #switch-slide { box-shadow: var(--v20-lit-edge); }
+html[data-from-variant="v15"] #clean-switch:active:not([data-disabled]):not(:disabled) { background-image: linear-gradient(rgb(0 0 0 / 10%), rgb(0 0 0 / 10%)); transition-duration: 0s; }
+html[data-from-variant="v15"] #clean-switch:active:not([data-disabled]):not(:disabled)[data-unchecked] #switch-right,
+html[data-from-variant="v15"] #clean-switch:active:not([data-disabled]):not(:disabled)[data-checked] #switch-left { opacity: 1; scale: .94; transition: opacity 0s, scale 100ms ease-out; }
+html[data-from-variant="v15"] :is(button[data-select-recipe], button[data-select-option]) { transition: scale 200ms ease-out, background-color 150ms, opacity 150ms; }
+html[data-from-variant="v15"] :is(button[data-select-recipe], button[data-select-option]):is(:active, .is-pressed) { scale: .97; transition-duration: 100ms, 0s, 0s; }
+html[data-from-variant="v15"] :is(#sheet-prev, #sheet-next) svg { transition: scale 200ms ease-out; }
+html[data-from-variant="v15"] :is(#sheet-prev, #sheet-next):is(:active, .is-pressed):not(:disabled) svg { scale: .92; transition-duration: 100ms; }
+
+/* ── portfolio: v20's presses on the recipe-button screen, the menu and settings —
+   · the recipe keys 0.97 (the picked one takes the lit edge in place of its drop shadow); the pager's ‹ › icons 0.92;
+   · 배출 · 간이 청소: the words (and the On / Off pill) 0.96, the half's tint about half as strong (red 8 %, green 7 %, white 3 %);
+   · the menu's rows: their content 0.97 toward the row's centre (the pressed fill stays full width); 장비 관리 0.97;
+   · settings: the label a unit / language row will switch to 0.94; the Standby screen's cards 0.97;
+   · the recipe pages' rows, 순서 변경 and + 0.97. */
+html[data-from-variant="v15"] #cook-container .recipe-key { transition: background 120ms, border-color 120ms, scale 200ms ease-out; }
+html[data-from-variant="v15"] #cook-container .recipe-key.is-selected { box-shadow: var(--v20-lit-edge); transition: background 600ms ease, box-shadow 600ms ease, border-color 600ms ease, scale 200ms ease-out; }
+html[data-from-variant="v15"] #cook-container .recipe-key:is(:active, .is-pressed) { scale: .97; }
+html[data-from-variant="v15"] #cook-container .recipe-key:not(.is-selected):is(:active, .is-pressed) { transition-duration: 120ms, 120ms, 100ms; }
+html[data-from-variant="v15"] #cook-container .recipe-key.is-selected:is(:active, .is-pressed) { transition-duration: 120ms, 120ms, 120ms, 100ms; }
+html[data-from-variant="v15"] .grid-pager button svg { transition: scale 200ms ease-out; }
+html[data-from-variant="v15"] .grid-pager button:is(:active, .is-pressed):not(:disabled) svg { scale: .92; transition-duration: 100ms; }
+html[data-from-variant="v15"] .grid-secondary button > * { transition: scale 200ms ease-out; }
+html[data-from-variant="v15"] .grid-secondary button:is(:active, .is-pressed):not(:disabled) > * { scale: .96; transition-duration: 100ms; }
+html[data-from-variant="v15"] #cook-container .grid-secondary:has(#quick-unload:is(:active, .is-pressed)) { background-image: linear-gradient(to right, rgb(255 255 255 / 3%) 50%, transparent 50%); }
+html[data-from-variant="v15"] #cook-container .grid-secondary:has(#quick-scrape:is(:active, .is-pressed)) { background-image: linear-gradient(to right, transparent 50%, rgb(255 255 255 / 3%) 50%); }
+html[data-from-variant="v15"] #cook-container.bg-cook-preparing .grid-secondary:has(#quick-unload:is(:active, .is-pressed)) { background-image: linear-gradient(to right, rgb(255 120 120 / 8%) 50%, transparent 50%); }
+html[data-from-variant="v15"] #cook-container.bg-cook-preparing .grid-secondary:has(#quick-scrape:is(:active, .is-pressed)) { background-image: linear-gradient(to right, transparent 50%, rgb(255 120 120 / 8%) 50%); }
+html[data-from-variant="v15"] #cook-container.bg-cook-ready-to-cook .grid-secondary:has(#quick-unload:is(:active, .is-pressed)) { background-image: linear-gradient(to right, rgb(110 230 160 / 7%) 50%, transparent 50%); }
+html[data-from-variant="v15"] #cook-container.bg-cook-ready-to-cook .grid-secondary:has(#quick-scrape:is(:active, .is-pressed)) { background-image: linear-gradient(to right, transparent 50%, rgb(110 230 160 / 7%) 50%); }
+html[data-from-variant="v15"] button[data-menu].h-30 { container-type: inline-size; }
+html[data-from-variant="v15"] button[data-menu].h-30 > * { transition: scale 200ms ease-out; }
+html[data-from-variant="v15"] button[data-menu].h-30:is(:active, .is-pressed) > * { scale: .97; transition-duration: 100ms; }
+html[data-from-variant="v15"] button[data-menu].h-30 > :nth-child(1) { transform-origin: calc(50cqw - 12px) center; }
+html[data-from-variant="v15"] button[data-menu].h-30 > :nth-child(2) { transform-origin: calc(50cqw - 92px) center; }
+html[data-from-variant="v15"] button[data-menu].h-30 > :nth-child(3) { transform-origin: calc(100% + 32px - 50cqw) center; }
+html[data-from-variant="v15"] button[data-menu="manage-device"] { transition: scale 200ms ease-out, background-color 150ms, color 150ms; }
+html[data-from-variant="v15"] button[data-menu="manage-device"]:is(:active, .is-pressed) { scale: .97; transition-duration: 100ms, 0s, 0s; }
+html[data-from-variant="v15"] #app-setting main > section > div > [data-setting] > button[role="switch"] > span.opacity-70 { transition: opacity 200ms ease-out, scale 200ms ease-out; }
+html[data-from-variant="v15"] #app-setting main > section > div:is(:active, .is-pressed) > [data-setting] > button[role="switch"] > span.opacity-70 { scale: .94; transition: opacity 0s, scale 100ms ease-out; }
+html[data-from-variant="v15"] #app-setting .qs-option { transition: scale 200ms ease-out; }
+html[data-from-variant="v15"] #app-setting .qs-option:is(:active, .is-pressed) { scale: .97; transition-duration: 100ms; }
+html[data-from-variant="v15"] button[data-recipe-open] { transition: scale 200ms ease-out, background-color 150ms; }
+html[data-from-variant="v15"] button[data-recipe-open]:active { scale: .97; transition-duration: 100ms, 0s; }
+html[data-from-variant="v15"] button[data-recipe-action="reorder"] { transition: scale 200ms ease-out; }
+html[data-from-variant="v15"] button[data-recipe-action="reorder"]:active { scale: .97; transition-duration: 100ms; }
+html[data-from-variant="v15"] button[data-recipe-action="reorder"]:active svg { scale: none; }
+html[data-from-variant="v15"] #app-recipe button[data-recipe-action="create"].absolute { transition: scale 200ms ease-out, background-color 150ms; }
+html[data-from-variant="v15"] #app-recipe button[data-recipe-action="create"].absolute:active { scale: .97; transition-duration: 100ms, 0s; }
