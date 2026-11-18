@@ -20,7 +20,12 @@ const defaultTransition = {
 const LIGHTBOX_TRANSITION_DURATION = 0.4;
 const LIGHTBOX_EXIT_DURATION_PER_INDEX = 0.08;
 const LIGHTBOX_EXIT_MAX_EXTRA_DURATION = 0.24;
-const LIGHTBOX_EXIT_FALLBACK_BUFFER_MS = 100;
+// How long past the exit's own duration the fallback waits before clearing the lightbox itself
+// (closeLightbox). The exit only starts on Motion's frame after the close commits, and a page busy
+// with live prototypes (same-origin iframes, on this page's main thread) can drop a few frames on
+// the way, so at 100ms the fallback often beat a close that was still playing and cut it off
+// mid-shrink. It only has to catch a completion that never comes; a normal close clears it first.
+const LIGHTBOX_EXIT_FALLBACK_BUFFER_MS = 1000;
 
 const getLightboxExitDuration = (openingIndex, currentIndex) => {
   const indexDistance = Math.abs(currentIndex - openingIndex);
