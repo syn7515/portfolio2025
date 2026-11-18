@@ -34,10 +34,12 @@ const NAV_DIVIDER_CLASS = "w-px self-stretch bg-black/10 dark:bg-white/18";
    just the edge around the half. Positioned, so the divider doesn't paint over it. The rounding
    would also cut the half's corners out of what a click can hit, and a press there fell through to
    the backdrop and closed the lightbox, so a bare ::before fills out the half's whole rectangle as
-   its target. A press scales the arrow rather than the half: the half would only shrink into a fill
+   its target, and reaches past the pill besides: 8px above and below and 12px off its outer end
+   (set where each half is used), taking the 44x42 half to a ~56x58 target with nothing drawn any
+   bigger. A press scales the arrow rather than the half: the half would only shrink into a fill
    of its own colour. */
 const NAV_BUTTON_CLASS =
-  "group relative py-3 before:absolute before:inset-0 transition-[background-color,color,box-shadow] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)]";
+  "group relative py-3 before:absolute before:-inset-y-2 transition-[background-color,color,box-shadow] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)]";
 const NAV_ICON_CLASS =
   "w-[18px] h-[18px] transition-[scale] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-safe:group-enabled:group-active:scale-90";
 
@@ -656,13 +658,15 @@ export function Lightbox({
                 />
               </div>
 
-              {/* Caption - fixed relative to viewport so it doesn't move during the open/close animation */}
+              {/* Caption - fixed relative to viewport so it doesn't move during the open/close animation.
+                  19px, a step over the card's caption (~17.6px from 640px), so it holds its own
+                  under the enlarged media rather than shrinking as the card opens. */}
               {(() => {
                 const caption = normalizedItems[captionIndex]?.caption?.trim();
                 if (!caption) return null;
                 return (
                   <motion.div
-                    className={`fixed left-0 right-0 text-center text-[16.5px] leading-[1.4] pointer-events-none ${isDarkMode ? '!text-white' : '!text-stone-600'}`}
+                    className={`fixed left-0 right-0 text-center text-[19px] leading-[1.4] pointer-events-none ${isDarkMode ? '!text-white' : '!text-stone-600'}`}
                     style={{ top: captionTop, fontFamily: "var(--font-crimson-pro), serif", fontWeight: 400, letterSpacing: "-0.015em", wordSpacing: "0.02em" }}
                     {...belowMediaMotion}
                   >
@@ -698,7 +702,7 @@ export function Lightbox({
                       onMouseEnter={() => setIsPrevHovered(true)}
                       onMouseLeave={() => setIsPrevHovered(false)}
                       disabled={isPrevDisabled}
-                      className={`${NAV_BUTTON_CLASS} pl-[15px] pr-[11px] rounded-l-full ${isPrevDisabled ? 'cursor-default' : 'cursor-pointer'}`}
+                      className={`${NAV_BUTTON_CLASS} pl-[15px] pr-[11px] before:-left-3 before:right-0 rounded-l-full ${isPrevDisabled ? 'cursor-default' : 'cursor-pointer'}`}
                       style={navButtonColors(isDarkMode, isPrevDisabled, isPrevHovered)}
                       aria-label="Previous"
                     >
@@ -711,7 +715,7 @@ export function Lightbox({
                       onMouseEnter={() => setIsNextHovered(true)}
                       onMouseLeave={() => setIsNextHovered(false)}
                       disabled={isNextDisabled}
-                      className={`${NAV_BUTTON_CLASS} pl-[11px] pr-[15px] rounded-r-full ${isNextDisabled ? 'cursor-default' : 'cursor-pointer'}`}
+                      className={`${NAV_BUTTON_CLASS} pl-[11px] pr-[15px] before:left-0 before:-right-3 rounded-r-full ${isNextDisabled ? 'cursor-default' : 'cursor-pointer'}`}
                       style={navButtonColors(isDarkMode, isNextDisabled, isNextHovered)}
                       aria-label="Next"
                     >

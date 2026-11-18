@@ -409,9 +409,10 @@ const LIGHTBOX_OUTER_PADDING = 16;
 // edges.
 const LIGHTBOX_SIDE_PADDING = 40;
 
-// Under the media: a 16px gap and one line of text-sm caption.
-export const LIGHTBOX_CAPTION_GAP = 16;
-const LIGHTBOX_CAPTION_BELOW = LIGHTBOX_CAPTION_GAP + 24;
+// Under the media: a 22px gap and one line of the 19px caption (26.6px at its 1.4 leading,
+// lightbox.tsx).
+export const LIGHTBOX_CAPTION_GAP = 22;
+const LIGHTBOX_CAPTION_BELOW = LIGHTBOX_CAPTION_GAP + 27;
 
 // The prev/next pair sits side by side, floated this far off the viewport's bottom edge — 40px
 // buttons (p-2.5 padding + w-5 h-5 icon, see lightbox.tsx). Pinned to the viewport rather than
