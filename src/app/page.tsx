@@ -268,9 +268,8 @@ export default function Home() {
           {/* Below the sheet breakpoint the name tracks the viewport: the 28px phone size up to
               640px, rising to 36px by 1024px. Slope is 8px over 384px = 2.0833vw; the intercept is
               28px - 640px * 0.020833 = 14.67px. With no sheet around it the name runs larger than
-              on the sheet, so where the sheet comes in at 1024px it steps down to 32px. From 1280px
-              that 32px rises with the column, to ~34px by 1680px where the column stops widening
-              (--text-px in globals.css). Crimson
+              on the sheet, so where the sheet comes in at 1024px it steps down to 32 on the sheet's
+              type scale, ~34px (--text-px in globals.css). Crimson
               Pro carries a far larger x-height than the Biro Script it replaced, so it runs ~0.8x
               the old 32-40px ramp to hold the same optical size. */}
           <div>

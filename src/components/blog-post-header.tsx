@@ -24,8 +24,9 @@ export default function BlogPostHeader({ title, subtitle }: BlogPostHeaderProps)
           sheet's (560px, 15px), so a title well under 40 there read as undersized against them; the
           step lands at 640px because the rest of this header changes there too (spacing, the
           subtitle), and it keeps the ramp continuous into the sheet. Slope is 8px over 384px =
-          2.0833vw; the intercept is 32px - 640px * 0.020833 = 18.667px. From 1280px the 40px cap
-          rises with the column, to ~42.7px by 1680px (--text-px in globals.css).
+          2.0833vw; the intercept is 32px - 640px * 0.020833 = 18.667px. On the sheet the cap is 40
+          on its type scale, ~42.7px (--text-px in globals.css), so the ramp carries on past 40px
+          from 1024px and reaches it at ~1152px.
 
           On a phone it matches the home name (26px, see the h1 in app/page.tsx), so a reader
           arriving from home meets the same voice at the same scale; above that the title runs
