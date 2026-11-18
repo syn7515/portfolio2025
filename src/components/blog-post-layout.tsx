@@ -392,24 +392,26 @@ export default function BlogPostLayout({ children, slug, title, subtitle }: Blog
             Home
           </Link>
           <BlogPostToc className="mt-2" />
+          {/* Back to top sits just under the outline, as far below it as Home is above it: the
+              gap-6 plus its own 8px of padding, which -mb-2 alone doesn't pull back. */}
+          <button
+            type="button"
+            onClick={handleBackToTop}
+            className={cn(
+              'flex items-center gap-2 w-fit whitespace-nowrap text-sm font-[460] text-stone-400 dark:text-zinc-400 hover:text-rose-700 dark:hover:text-rose-400 motion-safe:active:scale-[0.97] cursor-pointer pointer-events-auto px-3 py-2 -mx-3 -mb-2 rounded',
+              showBackToTop && viewportTall && !scrollingToTop
+                ? 'opacity-100 blur-none'
+                : 'opacity-0 blur-[4px] pointer-events-none'
+            )}
+            style={{
+              transition: 'color 300ms ease-out, opacity 300ms ease-out, filter 300ms ease-out, scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
+            }}
+            aria-label="Back to top"
+          >
+            <ArrowUp className="size-4 flex-shrink-0" strokeWidth={1.75} />
+            Back to top
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={handleBackToTop}
-          className={cn(
-            'absolute bottom-20 paper:bottom-[120px] mb-[120px] left-14 min-[1520px]:left-auto min-[1520px]:right-10 flex items-center gap-2 w-fit whitespace-nowrap text-sm font-[460] text-stone-400 dark:text-zinc-400 hover:text-rose-700 dark:hover:text-rose-400 motion-safe:active:scale-[0.97] cursor-pointer pointer-events-auto px-3 py-2 -mx-3 -my-2 rounded',
-            showBackToTop && viewportTall && !scrollingToTop
-              ? 'opacity-100 blur-none'
-              : 'opacity-0 blur-[4px] pointer-events-none'
-          )}
-          style={{
-            transition: 'color 300ms ease-out, opacity 300ms ease-out, filter 300ms ease-out, scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
-          }}
-          aria-label="Back to top"
-        >
-          <ArrowUp className="size-4 flex-shrink-0" strokeWidth={1.75} />
-          Back to top
-        </button>
       </aside>
 
       <div
