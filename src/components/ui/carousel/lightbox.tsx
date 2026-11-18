@@ -616,7 +616,7 @@ export function Lightbox({
               duration: exitTransform ? exitDuration : 0.4,
               ease: [0.77, 0, 0.175, 1],
             }}
-            className={`fixed inset-0 z-[70] cursor-zoom-out ${isDarkMode ? 'bg-black/80' : 'bg-stone-100/90'}`}
+            className={`fixed inset-0 z-[70] cursor-zoom-out ${isDarkMode ? 'bg-black/80' : 'bg-stone-200/90'}`}
             onClick={closeLightbox}
             // Without it the backdrop blinks out as it lands and back in as it leaves — see
             // keepOnMainThread.
@@ -673,7 +673,7 @@ export function Lightbox({
                     {/* The backdrop hugs the text, so it wraps an inline box rather than spanning
                         the full-width row; it fades and drifts with the caption it backs. */}
                     <span className="relative isolate inline-block">
-                      <DescriptionBackdrop />
+                      <DescriptionBackdrop tint={isDarkMode ? undefined : 'var(--color-stone-200)'} />
                       <span className="relative z-10">{renderCaptionWithBadges(caption)}</span>
                     </span>
                   </motion.div>

@@ -12,6 +12,11 @@ interface DescriptionBackdropProps {
    * own lines make, and nothing else. Measured, so until hydration it covers the box as before.
    */
   fitTo?: RefObject<HTMLElement | null>
+  /**
+   * What the wash is a wash of. The page background by default; text floating over something else,
+   * like the lightbox's stone-200 scrim, passes that instead so the wash matches what it fades into.
+   */
+  tint?: string
 }
 
 /**
@@ -37,7 +42,7 @@ interface DescriptionBackdropProps {
  * that sit on the drafting grid (a post's Previous/Next, Home's below 1024px) so they can't drift
  * apart.
  */
-export function DescriptionBackdrop({ fitTo }: DescriptionBackdropProps = {}) {
+export function DescriptionBackdrop({ fitTo, tint = 'var(--background)' }: DescriptionBackdropProps = {}) {
   const boxRef = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
@@ -100,11 +105,11 @@ export function DescriptionBackdrop({ fitTo }: DescriptionBackdropProps = {}) {
     <span ref={boxRef} aria-hidden className="pointer-events-none absolute inset-0 z-0">
       <span
         className="absolute -inset-x-10 -inset-y-7 rounded-[44px] blur-[20px]"
-        style={{ background: 'color-mix(in srgb, var(--background) 30%, transparent)' }}
+        style={{ background: `color-mix(in srgb, ${tint} 30%, transparent)` }}
       />
       <span
         className="absolute -inset-x-6 -inset-y-4 rounded-[30px] blur-[12px]"
-        style={{ background: 'color-mix(in srgb, var(--background) 48%, transparent)' }}
+        style={{ background: `color-mix(in srgb, ${tint} 48%, transparent)` }}
       />
     </span>
   )
