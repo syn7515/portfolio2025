@@ -18,24 +18,12 @@ const defaultTransition = {
 };
 
 const LIGHTBOX_TRANSITION_DURATION = 0.4;
-const LIGHTBOX_EXIT_DURATION_PER_INDEX = 0.08;
-const LIGHTBOX_EXIT_MAX_EXTRA_DURATION = 0.24;
 // How long past the exit's own duration the fallback waits before clearing the lightbox itself
 // (closeLightbox). The exit only starts on Motion's frame after the close commits, and a page busy
 // with live prototypes (same-origin iframes, on this page's main thread) can drop a few frames on
 // the way, so at 100ms the fallback often beat a close that was still playing and cut it off
 // mid-shrink. It only has to catch a completion that never comes; a normal close clears it first.
 const LIGHTBOX_EXIT_FALLBACK_BUFFER_MS = 1000;
-
-const getLightboxExitDuration = (openingIndex, currentIndex) => {
-  const indexDistance = Math.abs(currentIndex - openingIndex);
-  const extraDuration = Math.min(
-    indexDistance * LIGHTBOX_EXIT_DURATION_PER_INDEX,
-    LIGHTBOX_EXIT_MAX_EXTRA_DURATION
-  );
-
-  return LIGHTBOX_TRANSITION_DURATION + extraDuration;
-};
 
 export default function LabelIndicatorCarousel({
   items,
@@ -91,7 +79,6 @@ export default function LabelIndicatorCarousel({
   const [pendingLightboxIndex, setPendingLightboxIndex] = useState(null); // For delayed transform calculation
   const [hiddenCardIndex, setHiddenCardIndex] = useState(null); // Card hidden while lightbox is open
   const cardRefs = useRef({});
-  const openingLightboxIndexRef = useRef(index);
   const exitDurationRef = useRef(LIGHTBOX_TRANSITION_DURATION);
   const scrollbarGutterRef = useRef(0); // Store scrollbar gutter for exit animation
   const exitFallbackTimerRef = useRef(null);
@@ -273,7 +260,6 @@ export default function LabelIndicatorCarousel({
       exitFallbackTimerRef.current = null;
     }
     isLightboxClosingRef.current = false;
-    openingLightboxIndexRef.current = i;
     exitDurationRef.current = LIGHTBOX_TRANSITION_DURATION;
 
     // FIX 2: Set pending index to trigger scroll lock, then calculate transform after layout stabilizes
@@ -282,21 +268,43 @@ export default function LabelIndicatorCarousel({
     setPendingLightboxIndex(i); // This triggers scroll lock effect, then transform calculation
   }, [effectiveLightboxEnabled, setIndex]);
 
+  // Stepping through the lightbox moves the locked page behind it along with each step, centring
+  // the card now on show. Otherwise closing on a card several steps from the one that opened flew the
+  // media off to wherever that card sat, often thousands of px off-screen, and covered it in the
+  // same 0.4-0.64s, so it shot away. The page sits under a 90% scrim, so the jump barely shows,
+  // and the scroll position released on close (releaseScrollLock) is this one, so the reader comes
+  // back to the card they were looking at.
+  const followCardBehind = useCallback((cardIndex) => {
+    const lockedY = lockedScrollYRef.current;
+    const card = cardRefs.current[cardIndex];
+    if (lockedY === null || !card) return;
+    const body = document.body;
+    const rect = card.getBoundingClientRect();
+    const maxY = Math.max(0, body.offsetHeight - window.innerHeight);
+    const nextY = Math.round(
+      Math.min(maxY, Math.max(0, lockedY + rect.top + rect.height / 2 - window.innerHeight / 2))
+    );
+    lockedScrollYRef.current = nextY;
+    body.style.top = `-${nextY}px`;
+  }, []);
+
   const prevLightbox = useCallback(() => {
     const newIndex = Math.max(0, lightboxIndex - 1);
+    followCardBehind(newIndex);
     setLightboxIndex(newIndex);
     setHiddenCardIndex(newIndex);
     // Sync carousel index with lightbox index
     setIndex(newIndex);
-  }, [lightboxIndex, setIndex]);
+  }, [lightboxIndex, setIndex, followCardBehind]);
 
   const nextLightbox = useCallback(() => {
     const newIndex = Math.min(normalized.length - 1, lightboxIndex + 1);
+    followCardBehind(newIndex);
     setLightboxIndex(newIndex);
     setHiddenCardIndex(newIndex);
     // Sync carousel index with lightbox index
     setIndex(newIndex);
-  }, [lightboxIndex, normalized.length, setIndex]);
+  }, [lightboxIndex, normalized.length, setIndex, followCardBehind]);
 
   const handleLightboxExitComplete = useCallback(() => {
     if (exitFallbackTimerRef.current !== null) {
@@ -322,9 +330,9 @@ export default function LabelIndicatorCarousel({
     // Since carousel index is synced with lightbox index, no sliding needed
     // Just animate back to the current card position
     const transform = calculateCardTransform(lightboxIndex);
-    const exitAnimationDuration = transform
-      ? getLightboxExitDuration(openingLightboxIndexRef.current, lightboxIndex)
-      : LIGHTBOX_TRANSITION_DURATION;
+    // The page behind has followed each step (followCardBehind), so the card is near the middle of
+    // the screen and the close is the open played back, at the open's own pace.
+    const exitAnimationDuration = LIGHTBOX_TRANSITION_DURATION;
 
     if (transform) {
       // Apply same scrollbar gutter compensation as opening
