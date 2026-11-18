@@ -64,16 +64,13 @@
   /* Width of the reading column: text, header, lists and footer all cap at it. 560px everywhere
      but wide screens — see the paper breakpoint block below. */
   --content-w: 560px;
-  /* Type grows with the column, so the wider measure on a wide sheet doesn't leave the text looking
-     small in it. A size inside the column is written as `calc(15 * var(--text-px))`: 15px while the
-     column is 560px, which is every width up to 1280px, rising with it to 16px by the time it
-     reaches 640px. That is 1/15 more type for 1/7 more column, so the text grows about half as fast
-     as the measure and each line still gains a few characters. 80px of column over 1200 = 1/15px.
-     Sizes in rem use --text-rem instead, the same ramp scaled to 16px, so a reader's own default
-     font size still carries through them.
-     Phone sizes stay literal: the column is never wider than 560px there. */
-  --text-px: calc(1px + (var(--content-w) - 560px) / 1200);
-  --text-rem: calc(1rem + (var(--content-w) - 560px) / 75);
+  /* The type scale inside the column. A size there is written as `calc(15 * var(--text-px))`: 15px
+     below 1024px, and 16px from there, wherever the paper floats as a sheet (the sheet block below
+     sets both to 16/15). Sizes in rem use --text-rem instead, the same scale against the root font
+     size, so a reader's own default still carries through them.
+     Phone sizes stay literal and ignore this. */
+  --text-px: 1px;
+  --text-rem: 1rem;
   --paper-grid-minor: rgb(120 113 108 / 0.1);
   --paper-grid-major: rgb(120 113 108 / 0.12);
   --paper-grid-hover-minor: rgb(120 113 108 / 0.12);
@@ -165,6 +162,12 @@
       0 30px 60px 0 var(--paper-drop-shadow);
     --paper-left: 88px;
     --carousel-card-w: 784px;
+
+    /* Type on the sheet is a step up: 15px copy becomes 16px, and every other size in the column
+       comes up with it by the same 1/15. Fixed from here up; the column widening from 1280px no
+       longer changes it. */
+    --text-px: calc(16px / 15);
+    --text-rem: calc(16rem / 15);
 
     /* Cards centre on the viewport, but the paper's left edge is inset by --paper-left, so a card
        that centred naively would hang off the sheet. The carousel pushes itself right by whatever
