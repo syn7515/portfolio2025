@@ -472,10 +472,15 @@ export default function LabelIndicatorCarousel({
                   setIndex={setIndex}
                   forceActive={true}
                   mobileAspect={mobileAspect}
+                  // Kept unconditionally. The card is a motion.div, and Motion only ever calls the
+                  // ref callback it was handed on mount, so a condition here was frozen at its
+                  // mount-time value: a carousel that mounted with the lightbox off (a client-side
+                  // navigation into the page below 768px, or below the sheet for taller cards) never
+                  // recorded its cards, and once widened its lightbox opened and closed with no
+                  // card to fly from or back to, until a reload. calculateCardTransform only reads
+                  // these while the lightbox is on.
                   cardRef={(el) => {
-                    if (effectiveLightboxEnabled && (item.imageUrl || item.videoUrl || item.content)) {
-                      cardRefs.current[i] = el;
-                    }
+                    cardRefs.current[i] = el;
                   }}
                   renderCard={renderCard}
                   renderCaption={renderCaption}
