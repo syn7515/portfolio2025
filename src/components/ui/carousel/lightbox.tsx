@@ -21,7 +21,7 @@ import { keepOnMainThread } from "@/lib/motion";
    its edge comes from the shadow's own hairline ring (smooth-shadow-ring) rather than a border or a
    blurred 1px layer standing in for one — a separate edge reads as a second, greyer line just
    outside the first. The light ring is tinted up from the plugin's 5% default: the pill sits on a
-   near-white stone-100/90 backdrop, where 5% black leaves it barely detached from it. Dark mode
+   light stone backdrop (LIGHT_SCRIM_TONE), where 5% black leaves it barely detached from it. Dark mode
    keeps the plugin's white hairline. The divider takes the ring's tones, so it reads as the same
    line carried across the middle. */
 const NAV_PILL_CLASS =
@@ -44,11 +44,16 @@ const NAV_ICON_CLASS =
   "w-[18px] h-[18px] transition-[scale] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-safe:group-enabled:group-active:scale-90";
 
 const navFill = (isDarkMode: boolean) => (isDarkMode ? '#18181b' : '#ffffff');
+
+/* The light scrim's tone (the bg-stone-300/90 on the backdrop below must match it). The caption's
+   wash is a wash of it, so the two read as one. */
+const LIGHT_SCRIM_TONE = 'var(--color-stone-300)';
 const navRing = (color: string) => `0 0 0 var(--smooth-ring-width, 1px) ${color}`;
 
 /* Disabled is a solid fill and icon colour rather than a fade: a faded half let the page behind
    the backdrop show through it. The solids are the tones that 40% fade landed on over each
-   backdrop, so the disabled half reads the same, just opaque.
+   backdrop, so the disabled half reads the same, just opaque. The light pair is the one worked out
+   over the old stone-100 scrim, kept as it is rather than following the scrim as it darkened.
    Hover leaves the fill alone and takes the site's rose accent — rose-700 in light, rose-400 in
    dark, as on the project rows and links — on the icon, tinting the half's ring with it. */
 function navButtonColors(isDarkMode: boolean, isDisabled: boolean, isHovered: boolean): CSSProperties {
@@ -616,7 +621,7 @@ export function Lightbox({
               duration: exitTransform ? exitDuration : 0.4,
               ease: [0.77, 0, 0.175, 1],
             }}
-            className={`fixed inset-0 z-[70] cursor-zoom-out ${isDarkMode ? 'bg-black/80' : 'bg-stone-200/90'}`}
+            className={`fixed inset-0 z-[70] cursor-zoom-out ${isDarkMode ? 'bg-black/80' : 'bg-stone-300/90'}`}
             onClick={closeLightbox}
             // Without it the backdrop blinks out as it lands and back in as it leaves — see
             // keepOnMainThread.
@@ -666,14 +671,14 @@ export function Lightbox({
                 if (!caption) return null;
                 return (
                   <motion.div
-                    className={`fixed left-0 right-0 text-center text-[19px] leading-[1.4] pointer-events-none ${isDarkMode ? '!text-white' : '!text-stone-600'}`}
+                    className={`fixed left-0 right-0 text-center text-[19px] leading-[1.4] pointer-events-none ${isDarkMode ? '!text-white' : '!text-stone-700'}`}
                     style={{ top: captionTop, fontFamily: "var(--font-crimson-pro), serif", fontWeight: 400, letterSpacing: "-0.015em", wordSpacing: "0.02em" }}
                     {...belowMediaMotion}
                   >
                     {/* The backdrop hugs the text, so it wraps an inline box rather than spanning
                         the full-width row; it fades and drifts with the caption it backs. */}
                     <span className="relative isolate inline-block">
-                      <DescriptionBackdrop tint={isDarkMode ? undefined : 'var(--color-stone-200)'} />
+                      <DescriptionBackdrop tint={isDarkMode ? undefined : LIGHT_SCRIM_TONE} />
                       <span className="relative z-10">{renderCaptionWithBadges(caption)}</span>
                     </span>
                   </motion.div>
