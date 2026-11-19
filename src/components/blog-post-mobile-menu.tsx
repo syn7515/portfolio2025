@@ -7,7 +7,8 @@ import { cn, prefersReducedMotion } from '@/lib/utils'
 import { PROJECTS } from '@/lib/projects'
 import { markPaperBackNav } from '@/lib/paper-exit-transition'
 
-const BAR_CLASS = 'absolute left-[8px] right-[8px] h-[1.5px] rounded-none bg-stone-500 dark:bg-zinc-400 motion-safe:transition-[translate,rotate,opacity,filter] motion-safe:duration-250 motion-safe:ease-out'
+// The bars take the site's rose on hover and a step deeper while pressed, as the links do.
+const BAR_CLASS = 'absolute left-[8px] right-[8px] h-[1.5px] rounded-none bg-stone-500 dark:bg-zinc-400 group-hover:bg-rose-700 group-active:bg-rose-800 dark:group-hover:bg-rose-400 dark:group-active:bg-rose-500 transition-[background-color] duration-150 motion-safe:transition-[translate,rotate,opacity,filter,background-color] motion-safe:duration-250 motion-safe:ease-out'
 
 // How long the overlay takes to settle into a solid paper sheet before the route swap happens
 const LEAVE_FADE_MS = 300
