@@ -97,7 +97,7 @@ function HomeFooterLinks({ onGrid = false, tabIndex }: { onGrid?: boolean; tabIn
             data-social-link-trigger
             tabIndex={tabIndex}
             onClick={() => trackOutboundClick("https://x.com/sue_park__", "X")}
-            className="sm:text-[calc(14*var(--text-px))] pl-4 pr-3.5 -ml-4 -mr-3.5 py-3 -my-3 !text-stone-500 dark:!text-zinc-400 hover:!text-rose-700 active:!text-rose-700 dark:hover:!text-rose-400 dark:active:!text-rose-400 motion-safe:active:scale-[0.97]"
+            className="sm:text-[calc(14*var(--text-px))] pl-4 pr-3.5 -ml-4 -mr-3.5 py-3 -my-3 !text-stone-500 dark:!text-zinc-400 hover:!text-rose-700 active:!text-rose-800 dark:hover:!text-rose-400 dark:active:!text-rose-500 motion-safe:active:scale-[0.97]"
             style={{
               transition: 'scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
             }}
@@ -112,7 +112,7 @@ function HomeFooterLinks({ onGrid = false, tabIndex }: { onGrid?: boolean; tabIn
             data-social-link-trigger
             tabIndex={tabIndex}
             onClick={() => trackOutboundClick("https://www.linkedin.com/in/sooyeonp/", "LinkedIn")}
-            className="sm:text-[calc(14*var(--text-px))] pl-3.5 pr-4 -ml-3.5 -mr-4 py-3 -my-3 !text-stone-500 dark:!text-zinc-400 hover:!text-rose-700 active:!text-rose-700 dark:hover:!text-rose-400 dark:active:!text-rose-400 motion-safe:active:scale-[0.97]"
+            className="sm:text-[calc(14*var(--text-px))] pl-3.5 pr-4 -ml-3.5 -mr-4 py-3 -my-3 !text-stone-500 dark:!text-zinc-400 hover:!text-rose-700 active:!text-rose-800 dark:hover:!text-rose-400 dark:active:!text-rose-500 motion-safe:active:scale-[0.97]"
             style={{
               transition: 'scale 150ms cubic-bezier(0.23, 1, 0.32, 1)',
             }}

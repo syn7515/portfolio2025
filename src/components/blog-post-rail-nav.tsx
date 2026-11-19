@@ -198,7 +198,7 @@ export default function BlogPostRailNav({ contentSelector }: BlogPostRailNavProp
           // behind it, since a tint under a 16px mark and the mark's own colour change are two
           // signals for one state.
           '!not-italic !no-underline !text-stone-500 dark:!text-zinc-400',
-          'hover:!text-rose-700 dark:hover:!text-rose-400',
+          'hover:!text-rose-700 active:!text-rose-800 dark:hover:!text-rose-400 dark:active:!text-rose-500',
           'motion-safe:active:scale-[0.97]',
           'focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-600/60 dark:focus-visible:ring-rose-300/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background'
         )}

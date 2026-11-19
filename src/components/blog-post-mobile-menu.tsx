@@ -172,7 +172,7 @@ export default function BlogPostMobileMenu() {
                   'block w-full py-[14px] text-[20px] font-[460] tracking-[-0.01em] !not-italic motion-safe:active:scale-[0.97] motion-reduce:!transform-none motion-reduce:!filter-none [-webkit-tap-highlight-color:transparent]',
                   isCurrent
                     ? '!text-stone-700 dark:!text-zinc-200'
-                    : '!text-stone-500 dark:!text-zinc-400 !no-underline hover:!text-rose-700 active:!text-rose-700 dark:hover:!text-rose-400 dark:active:!text-rose-400'
+                    : '!text-stone-500 dark:!text-zinc-400 !no-underline hover:!text-rose-700 active:!text-rose-800 dark:hover:!text-rose-400 dark:active:!text-rose-500'
                 )}
                 tabIndex={menuOpen ? undefined : -1}
                 style={{
@@ -211,8 +211,8 @@ export default function BlogPostMobileMenu() {
         )}
       >
         {/* The link pads the mark 24px on both sides, so the target runs from the viewport edge to
-            as far past the mark on its right. The press scale sits on the image, not the link, so
-            the mark shrinks about its own centre. */}
+            as far past the mark on its right. The press scale sits on the mark's own box, not the
+            link, so the mark shrinks about its own centre. */}
         <Link
           href="/"
           aria-label="Sue Park — Home"
@@ -229,16 +229,33 @@ export default function BlogPostMobileMenu() {
               name, so the image itself is decorative. The old `translate-y-[3px]` went with it: it
               was nudging a script baseline that no longer exists, and the image centres on its
               own. */}
-          <img
-            src="/favicon.svg"
-            alt=""
-            aria-hidden
-            width={28}
-            height={28}
-            draggable={false}
-            className="size-7 select-none motion-safe:group-active:scale-[0.97]"
+          <span
+            className="relative block size-7 motion-safe:group-active:scale-[0.97]"
             style={{ transition: PRESS_SCALE_TRANSITION }}
-          />
+          >
+            <img
+              src="/favicon.svg"
+              alt=""
+              aria-hidden
+              width={28}
+              height={28}
+              draggable={false}
+              className="block size-7 select-none"
+            />
+            {/* Pressed, a dark scrim comes over the portrait, as a photo dims under a finger. It is
+                masked by the portrait itself, so it keeps to the squircle baked into the image
+                rather than darkening its transparent corners. */}
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-0 bg-black/25 opacity-0 transition-opacity duration-150 ease-out group-active:opacity-100"
+              style={{
+                WebkitMaskImage: 'url(/favicon.svg)',
+                maskImage: 'url(/favicon.svg)',
+                WebkitMaskSize: '100% 100%',
+                maskSize: '100% 100%',
+              }}
+            />
+          </span>
         </Link>
 
         {/* The bars keep their old 36px box, now nested so the button itself can fill the bar's

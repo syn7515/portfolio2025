@@ -16,6 +16,9 @@
   --dotted-divider-dot-radius: 0.75px;
   --dotted-divider-height: 1.5px;
   --intro-trigger-decoration-hover: var(--color-rose-700);
+  /* Pressed: whatever hovers to rose goes a step deeper while held — rose-800 here, rose-500 in
+     dark, where the hover is rose-400. The utility-class hovers do the same with active: variants. */
+  --rose-pressed: var(--color-rose-800);
   /* Shared inline-preview highlight. Points at Tailwind's own token rather than repeating a hex:
      this was rgb(190 18 60), the sRGB rose-700 of Tailwind v3, while every component reaching for
      rose through a utility class gets v4's wider-gamut one — rgb(199 0 54) once clipped. A link
@@ -100,6 +103,7 @@
     --intro-trigger-decoration: rgb(113 113 122);
     /* zinc-500 - underline color for intro/link preview triggers */
     --intro-trigger-decoration-hover: var(--color-rose-400);
+    --rose-pressed: var(--color-rose-500);
     /* Same token swap as the light value above. */
     --scrollbar-thumb: rgb(82 82 91 / 0.6);
     /* zinc-600 */
@@ -1418,4 +1422,17 @@ a.inline-flex.items-center {
     --ds-pad-stripe: rgb(225 29 72 / 0.55) !important;
     --ds-pad-stripe-light: rgb(225 29 72 / 0.32) !important;
   }
+}
+
+/* Pressed (--rose-pressed). Last in the file so it wins over the hover rules above, light and dark,
+   which match a held link too. */
+.prose a:active,
+.intro-link:active,
+a[data-inline-link-preview-trigger]:active {
+  color: var(--rose-pressed) !important;
+}
+
+.intro-link:active,
+a[data-social-link-trigger]:active {
+  text-decoration-color: var(--rose-pressed) !important;
 }

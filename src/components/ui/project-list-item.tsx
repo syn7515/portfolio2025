@@ -33,9 +33,9 @@ const titleStyle: CSSProperties = {
   wordSpacing: '0.02em',
 };
 
-const titleClassName = "text-[17.5px] sm:text-[calc(18.5*var(--text-px))] [text-wrap:wrap] sm:[text-wrap:balance] !text-stone-700 dark:!text-zinc-200 transition-colors duration-150 group-hover:!text-rose-700 group-active:!text-rose-700 group-focus-visible:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 dark:group-focus-visible:!text-rose-400";
-const dividerClassName = "dotted-divider w-full !text-stone-300 dark:!text-zinc-700 transition-[color,opacity] duration-150 group-hover:opacity-40 group-active:opacity-40 group-focus-visible:opacity-40 group-hover:!text-rose-700 group-active:!text-rose-700 group-focus-visible:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 dark:group-focus-visible:!text-rose-400";
-const datesClassName = "text-[14px] sm:text-[calc(15*var(--text-px))] !font-[400] sm:!font-[460] leading-[150%] sm:leading-[160%] font-sans !text-stone-400 dark:!text-zinc-500 whitespace-nowrap transition-[color,opacity] duration-150 group-hover:opacity-100 group-active:opacity-100 group-focus-visible:opacity-100 group-hover:!text-rose-700 group-active:!text-rose-700 group-focus-visible:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-400 dark:group-focus-visible:!text-rose-400";
+const titleClassName = "text-[17.5px] sm:text-[calc(18.5*var(--text-px))] [text-wrap:wrap] sm:[text-wrap:balance] !text-stone-700 dark:!text-zinc-200 transition-colors duration-150 group-hover:!text-rose-700 group-active:!text-rose-800 group-focus-visible:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-500 dark:group-focus-visible:!text-rose-400";
+const dividerClassName = "dotted-divider w-full !text-stone-300 dark:!text-zinc-700 transition-[color,opacity] duration-150 group-hover:opacity-40 group-active:opacity-40 group-focus-visible:opacity-40 group-hover:!text-rose-700 group-active:!text-rose-800 group-focus-visible:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-500 dark:group-focus-visible:!text-rose-400";
+const datesClassName = "text-[14px] sm:text-[calc(15*var(--text-px))] !font-[400] sm:!font-[460] leading-[150%] sm:leading-[160%] font-sans !text-stone-400 dark:!text-zinc-500 whitespace-nowrap transition-[color,opacity] duration-150 group-hover:opacity-100 group-active:opacity-100 group-focus-visible:opacity-100 group-hover:!text-rose-700 group-active:!text-rose-800 group-focus-visible:!text-rose-700 dark:group-hover:!text-rose-400 dark:group-active:!text-rose-500 dark:group-focus-visible:!text-rose-400";
 // Only the row-specific part: the hover nudge. Size, colour and the rose hover come from the mark
 // itself now. Tailwind v4 animates `translate` as its own property, not through `transform` —
 // matching the inline `transition: scale ...` the social links use.
@@ -45,6 +45,13 @@ const externalIconClassName = "transition-[color,translate] motion-safe:group-ho
 // the 8px it has from 640px left the list loose: titles 14px apart there with the list's 2px gap,
 // 18px from 640px.
 const linkClassName = "group block w-full cursor-pointer rounded py-1.5 sm:py-2";
+
+// Pressing a row presses its words, anchored at their left edge, as the rail's labels do: on
+// phones the whole line (year and title, no divider), from 640px the title alone, so the dotted
+// divider and the dates hold still rather than the full-width row pulling in about its middle.
+const PRESS_SCALE = 'cubic-bezier(0.23, 1, 0.32, 1)';
+const pressClassName = "origin-left motion-safe:group-active:scale-[0.98]";
+const pressTransition = `scale 150ms ${PRESS_SCALE}`;
 const linkStyle: CSSProperties = { textDecoration: 'none' };
 
 export default function ProjectListItem({
@@ -96,7 +103,7 @@ export default function ProjectListItem({
           title a pixel off the others'). Aligned on the baseline, the
           smaller sans year sits on the serif title's line. The title's last word and the arrow
           stay one nowrap run, so a wrap never strands the arrow on a line of its own. */}
-      <div className="sm:hidden not-italic flex items-baseline gap-2">
+      <div className={`sm:hidden not-italic flex items-baseline gap-2 ${pressClassName}`} style={{ transition: pressTransition }}>
         <span className={`${datesClassName} shrink-0 tabular-nums`}>{datesMobile ?? dates}</span>
         <span className="min-w-0">
           <span className={titleClassName} style={titleStyle}>{titleHead}</span>
@@ -106,7 +113,13 @@ export default function ProjectListItem({
 
       {/* Desktop: title, dotted divider, and dates on a single row */}
       <div className="hidden sm:flex items-center gap-3 not-italic">
-        <span className={titleClassName} style={{ ...titleStyle, whiteSpace: 'nowrap' }}>{title}{icon}</span>
+        <span
+          className={`${titleClassName} ${pressClassName}`}
+          // The class's color transition, restated here alongside the press scale.
+          style={{ ...titleStyle, whiteSpace: 'nowrap', transition: `color 150ms cubic-bezier(0.4, 0, 0.2, 1), ${pressTransition}` }}
+        >
+          {title}{icon}
+        </span>
         <div className="flex-1">
           <div className={dividerClassName} />
         </div>

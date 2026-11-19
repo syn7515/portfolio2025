@@ -195,3 +195,12 @@
         transition: background-color 120ms ease-out;
     }
 }
+
+/* Pressed: a step deeper than the hover (--rose-pressed in globals.css), after both hover rules. */
+.tickRow:active .tick {
+    background-color: var(--rose-pressed);
+}
+
+.tickRow:active .reveal {
+    color: var(--rose-pressed);
+}

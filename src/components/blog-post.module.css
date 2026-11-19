@@ -687,3 +687,9 @@
         /* rose-400 for dark mode */
     }
 }
+
+/* Pressed: a step deeper than the hover (--rose-pressed in globals.css). After both the light and
+   dark hover rules, which match a held link too. */
+.mdxContent a:active {
+    color: var(--rose-pressed) !important;
+}

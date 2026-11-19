@@ -41,7 +41,7 @@ const NAV_DIVIDER_CLASS = "w-px self-stretch bg-black/10 dark:bg-white/18";
 const NAV_BUTTON_CLASS =
   "group relative py-3 before:absolute before:-inset-y-2 transition-[background-color,color,box-shadow] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)]";
 const NAV_ICON_CLASS =
-  "w-[18px] h-[18px] transition-[scale] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-safe:group-enabled:group-active:scale-90";
+  "w-[18px] h-[18px] transition-[scale] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-safe:group-enabled:group-active:scale-90 group-enabled:group-active:!text-rose-800 dark:group-enabled:group-active:!text-rose-500";
 
 const navFill = (isDarkMode: boolean) => (isDarkMode ? '#18181b' : '#ffffff');
 
@@ -55,7 +55,8 @@ const navRing = (color: string) => `0 0 0 var(--smooth-ring-width, 1px) ${color}
    backdrop, so the disabled half reads the same, just opaque. The light pair is the one worked out
    over the old stone-100 scrim, kept as it is rather than following the scrim as it darkened.
    Hover leaves the fill alone and takes the site's rose accent — rose-700 in light, rose-400 in
-   dark, as on the project rows and links — on the icon, tinting the half's ring with it. */
+   dark, as on the project rows and links — on the icon, tinting the half's ring with it. A press
+   takes the icon a step deeper, to rose-800 / rose-500 (NAV_ICON_CLASS), as every rose hover does. */
 function navButtonColors(isDarkMode: boolean, isDisabled: boolean, isHovered: boolean): CSSProperties {
   if (isDisabled) {
     return isDarkMode
