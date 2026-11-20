@@ -17,7 +17,21 @@ interface DescriptionBackdropProps {
    * like the lightbox's stone-200 scrim, passes that instead so the wash matches what it fades into.
    */
   tint?: string
+  /**
+   * The side the text's anchor sits on, when it floats off one (an inline link's preview above or
+   * below the link, or out in the rail to its right). The wash keeps to the other three sides:
+   * on this one it is faded out by the text's own edge, so it never veils the word that opened it.
+   */
+  anchorSide?: 'top' | 'right' | 'bottom' | 'left'
 }
+
+// How far past the text the wash can reach on a free side: the halo's 40px spread plus its blur's
+// tail, with room to spare so the mask never clips it.
+const FREE_REACH = 112
+// On the anchor's side the mask runs out this far past the text's edge…
+const ANCHOR_REACH = 4
+// …having started fading this far inside it. The last line's descenders are all that sit there.
+const ANCHOR_FADE_IN = 10
 
 /**
  * The translucent plate that sits behind floating text so it stays readable over body copy without
@@ -42,7 +56,7 @@ interface DescriptionBackdropProps {
  * that sit on the drafting grid (a post's Previous/Next, Home's below 1024px) so they can't drift
  * apart.
  */
-export function DescriptionBackdrop({ fitTo, tint = 'var(--background)' }: DescriptionBackdropProps = {}) {
+export function DescriptionBackdrop({ fitTo, tint = 'var(--background)', anchorSide }: DescriptionBackdropProps = {}) {
   const boxRef = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
@@ -101,8 +115,8 @@ export function DescriptionBackdrop({ fitTo, tint = 'var(--background)' }: Descr
     }
   }, [fitTo])
 
-  return (
-    <span ref={boxRef} aria-hidden className="pointer-events-none absolute inset-0 z-0">
+  const halo = (
+    <>
       <span
         className="absolute -inset-x-10 -inset-y-7 rounded-[44px] blur-[20px]"
         style={{ background: `color-mix(in srgb, ${tint} 30%, transparent)` }}
@@ -111,6 +125,44 @@ export function DescriptionBackdrop({ fitTo, tint = 'var(--background)' }: Descr
         className="absolute -inset-x-6 -inset-y-4 rounded-[30px] blur-[12px]"
         style={{ background: `color-mix(in srgb, ${tint} 48%, transparent)` }}
       />
+    </>
+  )
+
+  if (!anchorSide) {
+    return (
+      <span ref={boxRef} aria-hidden className="pointer-events-none absolute inset-0 z-0">
+        {halo}
+      </span>
+    )
+  }
+
+  // A mask can't reach past its own element, so the masking layer is the wash's full extent —
+  // except on the anchor's side, where it stops just past the text and fades out over that edge.
+  // The layers inside are then set back to the text's box, which the masking layer overhangs by
+  // its reach on each side.
+  const reach = { top: FREE_REACH, right: FREE_REACH, bottom: FREE_REACH, left: FREE_REACH, [anchorSide]: ANCHOR_REACH }
+  const fade = `linear-gradient(to ${anchorSide}, #000 calc(100% - ${ANCHOR_REACH + ANCHOR_FADE_IN}px), transparent)`
+
+  return (
+    <span ref={boxRef} aria-hidden className="pointer-events-none absolute inset-0 z-0">
+      <span
+        className="absolute"
+        style={{
+          top: -reach.top,
+          right: -reach.right,
+          bottom: -reach.bottom,
+          left: -reach.left,
+          maskImage: fade,
+          WebkitMaskImage: fade,
+        }}
+      >
+        <span
+          className="absolute"
+          style={{ top: reach.top, right: reach.right, bottom: reach.bottom, left: reach.left }}
+        >
+          {halo}
+        </span>
+      </span>
     </span>
   )
 }

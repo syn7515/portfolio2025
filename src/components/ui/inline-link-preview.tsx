@@ -230,7 +230,7 @@ export function InlineLinkPreview({
               // Without it the fade blinks as it lands and as it leaves — see keepOnMainThread.
               onUpdate={keepOnMainThread}
             >
-              <DescriptionBackdrop />
+              <DescriptionBackdrop anchorSide={isAbove ? 'bottom' : 'top'} />
               <span className="relative z-10">{explanation}</span>
             </motion.span>
           )}
@@ -256,7 +256,7 @@ export function InlineLinkPreview({
               // Without it the fade blinks as it lands and as it leaves — see keepOnMainThread.
               onUpdate={keepOnMainThread}
             >
-              <DescriptionBackdrop />
+              <DescriptionBackdrop anchorSide="left" />
               <span className="relative z-10">{explanation}</span>
             </motion.span>
           )}
