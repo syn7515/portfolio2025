@@ -324,7 +324,10 @@
   // ── Tick ring (cook-tick-ring.tsx + tick-ring-geometry.ts) ───────────────
   // v0-2: tick width 3 → 2.5 (thinner ring); outer radius 312.5 → 300, tick length kept at 40
   const RING = { COUNT: 150, VIEW: 625, OUTER_R: 300, INNER_R: 260, WIDTH: 2.5, ALWAYS_FILLED_END: 44, PROGRESS_ZONE_END: 106 };
-  const TICK_COLOR = { filled: '#E74646', empty: 'hsl(0 100% 86% / 0.65)'   /* v0-2: light red instead of white, a little stronger (app: rgba(255,255,255,.4)) */, base: '#F2FFF880', boundary: '#FFB3B3' };
+  const TICK_COLOR = { filled: '#E74646', empty: 'hsl(0 100% 86% / 0.65)'   /* v0-2: light red instead of white, a little stronger (app: rgba(255,255,255,.4)) */, base: '#F2FFF880', boundary: '#FFB3B3',
+    // portfolio: on READY the ring takes the ready screen's light green (hue 150, as its phase label
+    // and guidance) instead of the app's white/50, as the preheat ring is light red
+    ready: 'hsl(150 80% 80% / 0.55)' };
   const ticks = [];
 
   function buildRing(svg) {
@@ -349,7 +352,8 @@
   }
 
   function tickStyle(index, filledCount, isPreheat, blink, hasRecipe) {
-    if (!hasRecipe || !isPreheat) return { fill: TICK_COLOR.base, opacity: 1 };
+    if (!hasRecipe) return { fill: TICK_COLOR.base, opacity: 1 };
+    if (!isPreheat) return { fill: TICK_COLOR.ready, opacity: 1 };
     // Zone 3: fill on complete (2:30 → 6, indices 106–149)
     if (index >= RING.PROGRESS_ZONE_END) {
       const done = filledCount >= RING.PROGRESS_ZONE_END;
