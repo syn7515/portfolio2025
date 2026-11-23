@@ -248,6 +248,14 @@
   .narrow .select .val { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .narrow .dispute { gap: 40px !important; }
   .narrow .dispute-for .label { width: auto; }
+
+  /* ---------- short ----------
+     On the square card (place(), below) the portal is 60px shorter, still centred on the backdrop
+     (762 → 702 tall, from 69 → 99 down), and the camera keeps the zoom it had, so the sky shows
+     46px above and below it rather than 16. Home's recent messages give up their last row to make
+     the room; Messages' panes take the height they're given. */
+  .short .app { top: 99px; height: 702px; }
+  .short .msgs > :last-child { display: none; }
 </style>
 </head>
 <body>
@@ -580,12 +588,15 @@ async function toRow(i, id, ms) {
 // views come in tighter and the portal reads a touch larger on a phone.
 const VIEW_MARGIN = 16;
 
-// The square card's camera on Home: the portal's whole height with a margin above and below, and
-// as much on its left, square, so it's cut a little past the status column.
+// The square card's camera on Home: square, as wide as the full-height portal's height with that margin
+// above and below (762 + 2 × 16), from the margin left of the portal, so it's cut a little past the
+// status column — and centred on the portal's height. The portal is shorter there (.short), so the same
+// zoom shows more backdrop above and below it.
+const HOME_VIEW = 762 + 2 * VIEW_MARGIN;
 function homeView() {
   const app = stageBox(document.querySelector('.app'));
-  const margin = VIEW_MARGIN, w = app.bottom - app.top + 2 * margin;
-  return { x: app.left - margin, y: app.top - margin, w, h: w };
+  const w = HOME_VIEW;
+  return { x: app.left - VIEW_MARGIN, y: (app.top + app.bottom) / 2 - w / 2, w, h: w };
 }
 async function playHome(id) {
   hoverRow(-1); aim(null);
@@ -666,7 +677,9 @@ async function pick(pop, i, id, ms = 300) {
 function paneView(y) {
   const app = stageBox(document.querySelector('.app')), pane = stageBox($('detail'));
   const margin = VIEW_MARGIN, x = pane.left - 24, w = app.right + margin - x;
-  return { x, y: Math.min(Math.max(y - w / 2, app.top - margin), app.bottom + margin - w), w, h: w };
+  // a view taller than the portal and its margins (the shorter portal, .short) sits centred on it
+  const lo = app.top - margin, hi = app.bottom + margin - w;
+  return { x, y: hi < lo ? (app.top + app.bottom) / 2 - w / 2 : Math.min(Math.max(y - w / 2, lo), hi), w, h: w };
 }
 async function playMessages(id) {
   resetForm(); aim(null);
@@ -815,6 +828,7 @@ const aim = v => { view = v; place(); };
 // A resize lands at once rather than gliding there.
 function fit() {
   root.classList.toggle('narrow', innerWidth < 600);
+  root.classList.toggle('short', innerWidth < (innerHeight * 7) / 6);
   const st = $('stage');
   st.style.transition = 'none'; place(); st.offsetHeight; st.style.transition = '';
 }
