@@ -9,7 +9,7 @@ import {
   calculateImagePosition,
   LIGHTBOX_CAPTION_GAP,
   LIGHTBOX_MEDIA_LIFT,
-  LIGHTBOX_NAV_BOTTOM,
+  LIGHTBOX_NAV_GAP,
   type CarouselItem,
 } from "./hooks";
 import { GrillLines } from "./grill-lines";
@@ -579,7 +579,7 @@ export function Lightbox({
   const isOverMedia = (e: React.MouseEvent) =>
     Math.abs(e.clientX - window.innerWidth / 2) <= dimensions.width / 2 &&
     Math.abs(e.clientY - (window.innerHeight / 2 - LIGHTBOX_MEDIA_LIFT)) <= dimensions.height / 2;
-  // The caption hangs off the media's bottom edge.
+  // The caption hangs off the media's bottom edge, and the buttons off the caption.
   const captionTop = `calc(50% - ${LIGHTBOX_MEDIA_LIFT}px + ${dimensions.height / 2}px + ${LIGHTBOX_CAPTION_GAP}px)`;
   // The caption and the buttons drift in under the media as it opens and fade out as it closes.
   // The box holds on its card until its item is ready (a live copy takes a few frames to load), so
@@ -664,72 +664,76 @@ export function Lightbox({
                 />
               </div>
 
-              {/* Caption - fixed relative to viewport so it doesn't move during the open/close animation.
-                  19px, a step over the card's caption (~17.6px from 640px), so it holds its own
-                  under the enlarged media rather than shrinking as the card opens. */}
-              {(() => {
-                const caption = normalizedItems[captionIndex]?.caption?.trim();
-                if (!caption) return null;
-                return (
+              {/* Caption and buttons - one column fixed relative to the viewport so it doesn't move
+                  during the open/close animation, hung off the media's bottom edge. The caption
+                  is 19px, a step over the card's caption (~17.6px from 640px), so it holds its own
+                  under the enlarged media rather than shrinking as the card opens. An item with
+                  no caption keeps its line, so the buttons hold still as the lightbox steps; only
+                  a caption that wraps (on a narrow window) pushes them down. */}
+              <div
+                className="fixed left-0 right-0 flex flex-col items-center pointer-events-none"
+                style={{ top: captionTop }}
+              >
+                {(() => {
+                  const caption = normalizedItems[captionIndex]?.caption?.trim();
+                  if (!caption) return <div aria-hidden className="h-[27px]" />;
+                  return (
+                    <motion.div
+                      className={`w-full min-h-[27px] text-center text-[19px] leading-[1.4] pointer-events-none ${isDarkMode ? '!text-white' : '!text-stone-700'}`}
+                      style={{ fontFamily: "var(--font-crimson-pro), serif", fontWeight: 400, letterSpacing: "-0.015em", wordSpacing: "0.02em" }}
+                      {...belowMediaMotion}
+                    >
+                      {/* The backdrop hugs the text, so it wraps an inline box rather than spanning
+                          the full-width row; it fades and drifts with the caption it backs. */}
+                      <span className="relative isolate inline-block">
+                        <DescriptionBackdrop tint={isDarkMode ? undefined : LIGHT_SCRIM_TONE} />
+                        <span className="relative z-10">{renderCaptionWithBadges(caption)}</span>
+                      </span>
+                    </motion.div>
+                  );
+                })()}
+
+                {normalizedItems.length > 1 && (
                   <motion.div
-                    className={`fixed left-0 right-0 text-center text-[19px] leading-[1.4] pointer-events-none ${isDarkMode ? '!text-white' : '!text-stone-700'}`}
-                    style={{ top: captionTop, fontFamily: "var(--font-crimson-pro), serif", fontWeight: 400, letterSpacing: "-0.015em", wordSpacing: "0.02em" }}
+                    className="relative z-20 flex justify-center pointer-events-none"
+                    style={{ marginTop: LIGHTBOX_NAV_GAP }}
+                    inert={!!exitTransform}
                     {...belowMediaMotion}
                   >
-                    {/* The backdrop hugs the text, so it wraps an inline box rather than spanning
-                        the full-width row; it fades and drifts with the caption it backs. */}
-                    <span className="relative isolate inline-block">
-                      <DescriptionBackdrop tint={isDarkMode ? undefined : LIGHT_SCRIM_TONE} />
-                      <span className="relative z-10">{renderCaptionWithBadges(caption)}</span>
-                    </span>
+                    <div
+                      className={NAV_PILL_CLASS}
+                      style={{ backgroundColor: navFill(isDarkMode) }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); prevLightbox(); }}
+                        onMouseEnter={() => setIsPrevHovered(true)}
+                        onMouseLeave={() => setIsPrevHovered(false)}
+                        disabled={isPrevDisabled}
+                        className={`${NAV_BUTTON_CLASS} pl-[15px] pr-[11px] before:-left-3 before:right-0 rounded-l-full ${isPrevDisabled ? 'cursor-default' : 'cursor-pointer'}`}
+                        style={navButtonColors(isDarkMode, isPrevDisabled, isPrevHovered)}
+                        aria-label="Previous"
+                      >
+                        <ArrowLeft className={NAV_ICON_CLASS} strokeWidth={1.75} />
+                      </button>
+                      <span aria-hidden className={NAV_DIVIDER_CLASS} />
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); nextLightbox(); }}
+                        onMouseEnter={() => setIsNextHovered(true)}
+                        onMouseLeave={() => setIsNextHovered(false)}
+                        disabled={isNextDisabled}
+                        className={`${NAV_BUTTON_CLASS} pl-[11px] pr-[15px] before:left-0 before:-right-3 rounded-r-full ${isNextDisabled ? 'cursor-default' : 'cursor-pointer'}`}
+                        style={navButtonColors(isDarkMode, isNextDisabled, isNextHovered)}
+                        aria-label="Next"
+                      >
+                        <ArrowRight className={NAV_ICON_CLASS} strokeWidth={1.75} />
+                      </button>
+                    </div>
                   </motion.div>
-                );
-              })()}
-
-              {/* Prev/Next pill - only when more than one item, floated just off the viewport's
-                  bottom edge (LIGHTBOX_NAV_BOTTOM). The pill swallows its own clicks, so a press
-                  that lands on the divider doesn't fall through to the backdrop and close the
-                  lightbox. */}
-              {normalizedItems.length > 1 && (
-                <motion.div
-                  className="fixed left-0 right-0 z-20 flex justify-center pointer-events-none"
-                  style={{ bottom: LIGHTBOX_NAV_BOTTOM }}
-                  inert={!!exitTransform}
-                  {...belowMediaMotion}
-                >
-                  <div
-                    className={NAV_PILL_CLASS}
-                    style={{ backgroundColor: navFill(isDarkMode) }}
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <button
-                      type="button"
-                      onClick={(e) => { e.stopPropagation(); prevLightbox(); }}
-                      onMouseEnter={() => setIsPrevHovered(true)}
-                      onMouseLeave={() => setIsPrevHovered(false)}
-                      disabled={isPrevDisabled}
-                      className={`${NAV_BUTTON_CLASS} pl-[15px] pr-[11px] before:-left-3 before:right-0 rounded-l-full ${isPrevDisabled ? 'cursor-default' : 'cursor-pointer'}`}
-                      style={navButtonColors(isDarkMode, isPrevDisabled, isPrevHovered)}
-                      aria-label="Previous"
-                    >
-                      <ArrowLeft className={NAV_ICON_CLASS} strokeWidth={1.75} />
-                    </button>
-                    <span aria-hidden className={NAV_DIVIDER_CLASS} />
-                    <button
-                      type="button"
-                      onClick={(e) => { e.stopPropagation(); nextLightbox(); }}
-                      onMouseEnter={() => setIsNextHovered(true)}
-                      onMouseLeave={() => setIsNextHovered(false)}
-                      disabled={isNextDisabled}
-                      className={`${NAV_BUTTON_CLASS} pl-[11px] pr-[15px] before:left-0 before:-right-3 rounded-r-full ${isNextDisabled ? 'cursor-default' : 'cursor-pointer'}`}
-                      style={navButtonColors(isDarkMode, isNextDisabled, isNextHovered)}
-                      aria-label="Next"
-                    >
-                      <ArrowRight className={NAV_ICON_CLASS} strokeWidth={1.75} />
-                    </button>
-                  </div>
-                </motion.div>
-              )}
+                )}
+              </div>
             </div>
           </motion.div>
         </div>

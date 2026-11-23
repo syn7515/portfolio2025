@@ -414,19 +414,19 @@ const LIGHTBOX_SIDE_PADDING = 40;
 export const LIGHTBOX_CAPTION_GAP = 22;
 const LIGHTBOX_CAPTION_BELOW = LIGHTBOX_CAPTION_GAP + 27;
 
-// The prev/next pair sits side by side, floated this far off the viewport's bottom edge — 46px
-// tall (14px padding above and below an 18px icon, see lightbox.tsx). Pinned to the viewport rather than
-// hung off the media, they hold still whatever the item and a repeated click keeps landing on the
-// same button.
-export const LIGHTBOX_NAV_BOTTOM = 24;
-const LIGHTBOX_NAV_ZONE = LIGHTBOX_NAV_BOTTOM + 46;
+// The prev/next pair hangs this far under the caption's line (lightbox.tsx), 46px tall (14px
+// padding above and below an 18px icon). It moves with the media rather than sitting at the
+// viewport's foot, but the media's frame is the same for every item, so a repeated click still
+// keeps landing on the same button.
+export const LIGHTBOX_NAV_GAP = 32;
+const LIGHTBOX_NAV_ZONE = LIGHTBOX_NAV_GAP + 46;
 
-// The media and its caption are centred as one stack in the room left above the buttons, so the
-// media's own centre sits this far above the viewport's. Everything that places the media — the
+// The media, its caption and the buttons are centred as one stack, so the media's own centre sits
+// this far above the viewport's. Everything that places the media — the
 // lightbox, its click hit test and the card-to-lightbox FLIP — measures from there.
 export const LIGHTBOX_MEDIA_LIFT = (LIGHTBOX_NAV_ZONE + LIGHTBOX_CAPTION_BELOW) / 2;
 
-// Room kept around that stack: the outer padding above it and between it and the buttons.
+// Room kept around that stack: the outer padding above and below it.
 const LIGHTBOX_VERTICAL_RESERVE =
   LIGHTBOX_OUTER_PADDING * 2 + LIGHTBOX_CAPTION_BELOW + LIGHTBOX_NAV_ZONE;
 
