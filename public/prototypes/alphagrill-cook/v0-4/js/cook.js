@@ -531,6 +531,8 @@
     // v0-3: no grill state class in clean mode, so none of its red / green tints apply
     if (state.mode !== 'clean') container.classList.add(!d.recipe ? 'bg-black' : d.isReady ? 'bg-cook-ready-to-cook' : 'bg-cook-preparing');
     container.classList.toggle('is-clean', state.mode === 'clean');
+    // portfolio: the grill's ground stays under the clean screen's while that fades in over it (proto.css)
+    if (state.mode !== 'clean') container.parentElement.dataset.ground = !d.recipe ? 'black' : d.isReady ? 'ready' : 'preparing';
     $('clean-view').classList.toggle('hidden', state.mode !== 'clean');
     $('clean-view').dataset.stage = state.cleanStage;
     container.classList.toggle('is-positioning', state.mode === 'clean' && state.cc.positioning);
@@ -692,8 +694,18 @@
     line('tm-bot-z1', d.temps.bottom.zone1, d.heating.botZ1);
   }
 
+  // portfolio: v20's 그릴 ↔ 마감 청소 (recipe-proto v20 clean-mode.js): the ring's ticks morph from one look to the other
+  // over 600ms, with the ground's fade (proto.css), rather than the 250ms they take for a tick changing.
+  let lastMode = null, morphTimer = null;
+  function morphRing() {
+    ticks.forEach((t) => { t.style.transition = 'fill 600ms ease, fill-opacity 600ms ease'; });
+    clearTimeout(morphTimer);
+    morphTimer = setTimeout(() => ticks.forEach((t) => { t.style.transition = 'fill 0.25s ease, fill-opacity 0.25s ease'; }), 650);
+  }
   function render() {
     const d = derive();
+    if (lastMode !== null && lastMode !== state.mode) morphRing();
+    lastMode = state.mode;
     renderHeader(d);
     renderStatus(d);
     renderActions(d);

@@ -10,7 +10,8 @@
        tap    grill-2: 6oz pork preheating; Recipe opens the sheet and 8oz beef is tapped, and the
               screen rests on it while the plate keeps heating (8.5s; the recording went on to tap
               6oz pork back)
-       cool   clean-1: the hot-grill guard, cooling from 318 toward the 300 °F limit (14.9s)
+       cool   clean-1: on the grill (6oz pork READY), the switch turned to Clean at 1.6s as v20 does it, then
+              the hot-grill guard cooling from 318 toward the 300 °F limit (14.9s; 16.5s in all)
        area   clean-2: the knob dragged from Grill to Side and confirmed, the grill moving there
               for 5.8s; then back to Grill the same way (21.4s)
      As in the quick button storyboard, a faint disc marks each touch (tap and area). The demos'
@@ -184,10 +185,22 @@ const SCENES = {
       await wait(3000, id);
     },
   },
+  // As v20 has it (recipe-proto v20 clean-mode.js): it opens on the grill, 6oz pork READY, and a finger turns the
+  // switch to Clean at 1.6s; the clean screen comes in over the grill (proto.css) on the cool-down, which then runs
+  // the recording's 14.9s from the switch.
   cool: {
-    start: () => take.cooling(318.4, 318.4),
-    plate: t => take.cooling(318.4 - (318.4 - 300.6) * Math.min(1, t / 14.9), 318.4),
+    start: () => { coolFrom = null; take.reset(); take.ready(); },
+    plate: t => {
+      if (coolFrom === null) return;
+      take.cooling(318.4 - (318.4 - 300.6) * Math.min(1, Math.max(0, t - coolFrom) / 14.9), 318.4);
+    },
     async steps(id) {
+      await wait(1250, id);
+      await tap(id, {                                      // set down 1.25s, pressed 1.47s, Clean at 1.6s
+        at: '#switch-right',
+        press: () => $('#clean-switch').classList.add('is-pressed'),
+        lift: () => { $('#clean-switch').classList.remove('is-pressed'); coolFrom = COOL_AT; take.cooling(318.4, 318.4); },
+      });
       await wait(14900, id);
     },
   },
@@ -214,6 +227,9 @@ const SCENES = {
   },
 };
 const scene = SCENES[SCENE];
+// cool: when the switch turned to Clean, in seconds into the take (null: still on the grill)
+const COOL_AT = 1.6;
+let coolFrom = null;
 
 /* ---------- timeline ---------- */
 // Waits are scheduled against the wall clock, as in the other prototypes: step n of the take lands
@@ -290,6 +306,7 @@ async function playTake(id) {
     touch.classList.remove('on', 'down');
     touch.style.transition = '';
     $('#qa-recipe').classList.remove('is-pressed');
+    $('#clean-switch').classList.remove('is-pressed');
     scene.start();
     plateNow();
   }
