@@ -414,12 +414,12 @@ const LIGHTBOX_SIDE_PADDING = 40;
 export const LIGHTBOX_CAPTION_GAP = 22;
 const LIGHTBOX_CAPTION_BELOW = LIGHTBOX_CAPTION_GAP + 27;
 
-// The prev/next pair sits side by side, floated this far off the viewport's bottom edge — 40px
-// buttons (p-2.5 padding + w-5 h-5 icon, see lightbox.tsx). Pinned to the viewport rather than
+// The prev/next pair sits side by side, floated this far off the viewport's bottom edge — 46px
+// tall (14px padding above and below an 18px icon, see lightbox.tsx). Pinned to the viewport rather than
 // hung off the media, they hold still whatever the item and a repeated click keeps landing on the
 // same button.
 export const LIGHTBOX_NAV_BOTTOM = 24;
-const LIGHTBOX_NAV_ZONE = LIGHTBOX_NAV_BOTTOM + 40;
+const LIGHTBOX_NAV_ZONE = LIGHTBOX_NAV_BOTTOM + 46;
 
 // The media and its caption are centred as one stack in the room left above the buttons, so the
 // media's own centre sits this far above the viewport's. Everything that places the media — the

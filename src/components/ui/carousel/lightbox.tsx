@@ -39,7 +39,7 @@ const NAV_DIVIDER_CLASS = "w-px self-stretch bg-black/10 dark:bg-white/18";
    bigger. A press scales the arrow rather than the half: the half would only shrink into a fill
    of its own colour. */
 const NAV_BUTTON_CLASS =
-  "group relative py-3 before:absolute before:-inset-y-2 transition-[background-color,color,box-shadow] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)]";
+  "group relative py-[14px] before:absolute before:-inset-y-2 transition-[background-color,color,box-shadow] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)]";
 const NAV_ICON_CLASS =
   "w-[18px] h-[18px] transition-[scale] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-safe:group-enabled:group-active:scale-90 group-enabled:group-active:!text-rose-800 dark:group-enabled:group-active:!text-rose-500";
 
