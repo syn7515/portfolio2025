@@ -576,11 +576,15 @@ async function toRow(i, id, ms) {
   hoverRow(i); cursor.classList.add('hand');
   await wait(ms * 0.4, id);
 }
+// How much backdrop the square card's camera keeps around the portal. 16 rather than 44, so the
+// views come in tighter and the portal reads a touch larger on a phone.
+const VIEW_MARGIN = 16;
+
 // The square card's camera on Home: the portal's whole height with a margin above and below, and
 // as much on its left, square, so it's cut a little past the status column.
 function homeView() {
   const app = stageBox(document.querySelector('.app'));
-  const margin = 44, w = app.bottom - app.top + 2 * margin;
+  const margin = VIEW_MARGIN, w = app.bottom - app.top + 2 * margin;
   return { x: app.left - margin, y: app.top - margin, w, h: w };
 }
 async function playHome(id) {
@@ -661,7 +665,7 @@ async function pick(pop, i, id, ms = 300) {
 // pointer's working at (y), kept to that margin above and below the portal.
 function paneView(y) {
   const app = stageBox(document.querySelector('.app')), pane = stageBox($('detail'));
-  const margin = 44, x = pane.left - 24, w = app.right + margin - x;
+  const margin = VIEW_MARGIN, x = pane.left - 24, w = app.right + margin - x;
   return { x, y: Math.min(Math.max(y - w / 2, app.top - margin), app.bottom + margin - w), w, h: w };
 }
 async function playMessages(id) {
