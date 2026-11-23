@@ -461,7 +461,9 @@ export default function LabelIndicatorCarousel({
         <div
           className="relative flex flex-col items-center w-full"
           style={{
-            rowGap: Math.max(effGap * 2, effWidth > 0 && effWidth <= 640 ? 56 : 24),
+            // 48px between phone-width cards (under 600, so below 640px viewports), 56px up to
+            // 640px cards, and the sizing's own gap doubled beyond.
+            rowGap: Math.max(effGap * 2, effWidth > 0 && effWidth < 600 ? 48 : effWidth > 0 && effWidth <= 640 ? 56 : 24),
           }}
         >
           {normalized.map((item, i) => (
