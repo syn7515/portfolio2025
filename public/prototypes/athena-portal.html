@@ -413,7 +413,7 @@ const params = new URLSearchParams(location.search);
 const INVOICE_NOS = ['122333', '023231', '778444', '667444', '663322'];
 const REASONS = ['EM - Incorrect Employee or Patient', 'DU - Duplicate charge', 'CO - Incorrect procedure code', 'AM - Incorrect amount'];
 const ITEMS = ['Procedure 94640', 'Procedure 95934'];
-const MESSAGE = 'The patient on this invoice isn’t one of our employees. Please review both procedures.';
+const MESSAGE = 'This patient isn’t in our employee database. Could you review both procedures?';
 const SCENE = params.get('scene') === 'messages' ? 'messages' : 'home';
 document.querySelectorAll('.scene').forEach(s => { if (s.dataset.scene !== SCENE) s.remove(); });
 document.querySelector(`.menu [data-page="${SCENE}"]`).classList.add('on');
